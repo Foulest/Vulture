@@ -5,7 +5,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import net.foulest.vulture.data.DataManager;
 import net.foulest.vulture.data.PlayerData;
-import net.foulest.vulture.util.ConcurrentStream;
+import net.foulest.vulture.util.data.ConcurrentStream;
 import net.foulest.vulture.util.raytrace.BoundingBox;
 import org.bukkit.Effect;
 import org.bukkit.Location;

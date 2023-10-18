@@ -1,4 +1,4 @@
-package net.foulest.vulture.util;
+package net.foulest.vulture.util.data;
 
 import lombok.Getter;
 import lombok.NonNull;

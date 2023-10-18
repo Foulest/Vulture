@@ -1,4 +1,4 @@
-package net.foulest.vulture.util;
+package net.foulest.vulture.util.data;
 
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import lombok.Getter;

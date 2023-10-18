@@ -1,4 +1,4 @@
-package net.foulest.vulture.util;
+package net.foulest.vulture.util.block;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packetwrappers.play.out.blockchange.WrappedPacketOutBlockChange;

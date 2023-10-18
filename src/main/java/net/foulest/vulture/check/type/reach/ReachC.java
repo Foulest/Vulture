@@ -11,8 +11,8 @@ import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.event.MovementEvent;
 import net.foulest.vulture.util.MathUtil;
-import net.foulest.vulture.util.MovingObjectPosition;
-import net.foulest.vulture.util.Pair;
+import net.foulest.vulture.util.data.MovingObjectPosition;
+import net.foulest.vulture.util.data.Pair;
 import net.foulest.vulture.util.raytrace.BoundingBox;
 import org.bukkit.GameMode;
 

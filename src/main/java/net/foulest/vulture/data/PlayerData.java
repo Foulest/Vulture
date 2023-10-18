@@ -13,10 +13,10 @@ import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.Violation;
 import net.foulest.vulture.check.type.clientbrand.type.PayloadType;
-import net.foulest.vulture.util.EvictingList;
+import net.foulest.vulture.util.data.EvictingList;
 import net.foulest.vulture.util.KickUtil;
-import net.foulest.vulture.util.Observable;
-import net.foulest.vulture.util.Pair;
+import net.foulest.vulture.util.data.Observable;
+import net.foulest.vulture.util.data.Pair;
 import net.foulest.vulture.util.raytrace.BoundingBox;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -98,7 +98,7 @@ public class PlayerData {
     private float attackerYaw2, attackerPitch2;
 
     // Target data
-    private net.foulest.vulture.util.Observable<Player> target = new Observable<>(null);
+    private Observable<Player> target = new Observable<>(null);
     private Player lastLastTarget;
     private Player lastTarget;
 

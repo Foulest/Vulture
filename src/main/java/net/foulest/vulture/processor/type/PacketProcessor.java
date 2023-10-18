@@ -48,7 +48,7 @@ import net.foulest.vulture.event.RotationEvent;
 import net.foulest.vulture.processor.Processor;
 import net.foulest.vulture.util.KickUtil;
 import net.foulest.vulture.util.MessageUtil;
-import net.foulest.vulture.util.Pair;
+import net.foulest.vulture.util.data.Pair;
 import net.foulest.vulture.util.TaskUtil;
 import net.foulest.vulture.util.block.BlockUtil;
 import net.foulest.vulture.util.raytrace.BoundingBox;

@@ -1,4 +1,4 @@
-package net.foulest.vulture.util;
+package net.foulest.vulture.util.data;
 
 public interface IStringSerializable {
 

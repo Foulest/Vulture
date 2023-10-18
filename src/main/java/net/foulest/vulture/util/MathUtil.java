@@ -1,6 +1,7 @@
 package net.foulest.vulture.util;
 
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
+import net.foulest.vulture.util.data.Pair;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;

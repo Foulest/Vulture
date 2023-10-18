@@ -11,9 +11,9 @@ import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
-import net.foulest.vulture.util.EvictingList;
+import net.foulest.vulture.util.data.EvictingList;
 import net.foulest.vulture.util.KickUtil;
-import net.foulest.vulture.util.Pair;
+import net.foulest.vulture.util.data.Pair;
 
 @CheckInfo(name = "PingSpoof (B)", type = CheckType.PINGSPOOF, acceptsServerPackets = true,
         description = "Detects clients modifying KeepAlive packets.")

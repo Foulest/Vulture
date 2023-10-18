@@ -13,7 +13,7 @@ import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.event.MovementEvent;
 import net.foulest.vulture.util.MathUtil;
 import net.foulest.vulture.util.MessageUtil;
-import net.foulest.vulture.util.Pair;
+import net.foulest.vulture.util.data.Pair;
 import net.foulest.vulture.util.raytrace.BoundingBox;
 import net.foulest.vulture.util.raytrace.RayTraceUtil;
 import org.bukkit.GameMode;

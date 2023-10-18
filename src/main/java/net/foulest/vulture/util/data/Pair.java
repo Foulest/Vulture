@@ -1,4 +1,4 @@
-package net.foulest.vulture.util;
+package net.foulest.vulture.util.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,7 +18,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @AllArgsConstructor
-public class Pair<X, Y> {
+public final class Pair<X, Y> {
 
     private final X x;
     private final Y y;

@@ -9,7 +9,7 @@ import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.event.MovementEvent;
-import net.foulest.vulture.util.GhostBlockUtil;
+import net.foulest.vulture.util.block.GhostBlockUtil;
 import net.foulest.vulture.util.MovementUtil;
 import org.bukkit.GameMode;
 import org.bukkit.potion.PotionEffectType;

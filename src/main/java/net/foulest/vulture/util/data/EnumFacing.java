@@ -1,4 +1,4 @@
-package net.foulest.vulture.util;
+package net.foulest.vulture.util.data;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import net.foulest.vulture.util.MathUtil;
 
 import java.util.Iterator;
 import java.util.Map;
