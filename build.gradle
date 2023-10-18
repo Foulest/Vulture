@@ -1,0 +1,48 @@
+plugins {
+    id 'java'
+}
+
+group = 'net.foulest'
+version = '1.0.0'
+description = 'Vulture'
+java.sourceCompatibility = JavaVersion.VERSION_1_8
+compileJava.options.encoding = 'UTF-8'
+
+repositories {
+    mavenCentral()
+
+    flatDir {
+        dirs 'libs'
+    }
+
+    // Needed for PacketEvents
+    maven {
+        url 'https://jitpack.io'
+    }
+}
+
+configurations {
+    provided
+    implementation.extendsFrom(provided)
+}
+
+dependencies {
+    compileOnly group: 'org.spigotmc', name: 'spigot', version: '1.8.8-R0.1-SNAPSHOT'
+
+    // https://github.com/retrooper/packetevents
+    provided group: 'com.github.retrooper', name: 'packetevents', version: 'v1.8.4'
+
+    // https://projectlombok.org
+    implementation group: 'org.projectlombok', name: 'lombok', version: '1.18.30'
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.30'
+}
+
+jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    from {
+        configurations.provided.collect { file ->
+            zipTree(file)
+        }
+    }
+}

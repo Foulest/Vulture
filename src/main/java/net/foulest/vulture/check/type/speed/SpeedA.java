@@ -1,0 +1,106 @@
+package net.foulest.vulture.check.type.speed;
+
+import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
+import io.github.retrooper.packetevents.utils.vector.Vector3d;
+import lombok.NonNull;
+import net.foulest.vulture.action.ActionType;
+import net.foulest.vulture.check.Check;
+import net.foulest.vulture.check.CheckInfo;
+import net.foulest.vulture.check.CheckType;
+import net.foulest.vulture.data.PlayerData;
+import net.foulest.vulture.event.MovementEvent;
+import net.foulest.vulture.util.MovementUtil;
+import org.bukkit.GameMode;
+import org.bukkit.potion.PotionEffectType;
+
+@CheckInfo(name = "Speed (A)", type = CheckType.SPEED, maxViolations = 25)
+public class SpeedA extends Check {
+
+    private double buffer;
+    private double otherBuffer;
+
+    public SpeedA(@NonNull PlayerData playerData) throws ClassNotFoundException {
+        super(playerData);
+    }
+
+    @Override
+    public void handle(@NonNull MovementEvent event, long timestamp) {
+        WrappedPacketInFlying to = event.getTo();
+        WrappedPacketInFlying from = event.getFrom();
+
+        Vector3d toPosition = to.getPosition();
+        Vector3d fromPosition = from.getPosition();
+
+        if (player.isFlying()
+                || player.getAllowFlight()
+                || player.getGameMode().equals(GameMode.CREATIVE)
+                || player.isInsideVehicle()
+                || playerData.isTeleporting(toPosition)) {
+            return;
+        }
+
+        boolean inWeb = playerData.isInWeb();
+        boolean onSoulSand = playerData.isOnSoulSand();
+        boolean onStairs = playerData.isOnStairs();
+        boolean onSlab = playerData.isOnSlab();
+        boolean underBlock = playerData.isUnderBlock();
+        boolean nearLiquid = playerData.isNearLiquid();
+        boolean nearSlimeBlock = playerData.isNearSlimeBlock();
+        boolean nearLilyPad = playerData.isNearLilyPad();
+
+        double deltaX = toPosition.getX() - fromPosition.getX();
+        double deltaZ = toPosition.getZ() - fromPosition.getZ();
+        double deltaXZ = Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
+        double maxSpeed = to.isOnGround() && !nearLilyPad ? 0.3125 : 0.35855;
+        double velocityHorizontal = playerData.getVelocityHorizontal();
+
+        int groundTicks = playerData.getGroundTicks();
+        int groundTicksStrict = playerData.getGroundTicksStrict();
+
+        long timeSinceOnIce = playerData.getTimeSince(ActionType.ON_ICE);
+        long timeSinceUnderBlock = playerData.getTimeSince(ActionType.UNDER_BLOCK);
+
+        float speedLevel = MovementUtil.getPotionEffectLevel(player, PotionEffectType.SPEED);
+        float slownessLevel = MovementUtil.getPotionEffectLevel(player, PotionEffectType.SLOW);
+        float depthStriderLevel = MovementUtil.getDepthStriderLevel(player);
+
+        float walkSpeed = player.getWalkSpeed();
+        float flySpeed = player.getFlySpeed();
+
+        maxSpeed += groundTicks < 5 ? speedLevel * 0.07 : speedLevel * 0.0573;
+        maxSpeed -= groundTicks < 5 ? slownessLevel * 0.07 : slownessLevel * 0.0573;
+        maxSpeed *= timeSinceOnIce < 100 ? 4.4 : 1.0; // TODO: This is a bit high
+        maxSpeed *= onSoulSand && groundTicksStrict > 2 ? 0.6 : 1.0;
+        maxSpeed *= nearSlimeBlock ? 1.25 : 1.0;
+        maxSpeed += underBlock ? 0.26 : 0.0;
+        maxSpeed += nearLiquid ? depthStriderLevel * 0.45 : 0.0;
+        maxSpeed += (walkSpeed - 0.2) * 2.5;
+        maxSpeed += (flySpeed - 0.1) * 2.5;
+        maxSpeed *= (onStairs || onSlab) ? 1.5 : 1.0;
+        maxSpeed += velocityHorizontal;
+        maxSpeed *= inWeb ? 0.11 : 1.0;
+
+        if (deltaXZ > maxSpeed) {
+            if (inWeb || onSoulSand) {
+                if (++otherBuffer > 2) {
+                    flag("(Terrain)"
+                            + " deltaXZ=" + deltaXZ
+                            + " maxSpeed=" + maxSpeed
+                            + " buffer=" + buffer);
+                }
+            } else {
+                if (++buffer > 5) {
+                    flag("deltaXZ=" + deltaXZ
+                            + " maxSpeed=" + maxSpeed
+                            + " buffer=" + buffer
+                            + " timeSinceOnIce=" + timeSinceOnIce
+                            + " timeSinceUnderBlock=" + timeSinceUnderBlock);
+                }
+            }
+
+        } else {
+            buffer = Math.max(buffer - 2, 0);
+            otherBuffer = Math.max(otherBuffer - 2, 0);
+        }
+    }
+}

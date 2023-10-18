@@ -1,0 +1,33 @@
+package net.foulest.vulture.action;
+
+public enum ActionType {
+    ARM_ANIMATION,
+    ATTACKING,
+    BLOCKING,
+    CHANGE_SLOT,
+    CHATTING,
+    CLOSE_WINDOW,
+    DELAYED_PACKET,
+    DIGGING,
+    ENTITY_INTERACT,
+    FAST,
+    FLYING_PACKET,
+    INVENTORY_OPEN,
+    IN_BED,
+    LAG,
+    LAG2,
+    LAST_ON_GROUND_LOCATION_SET,
+    LOGIN,
+    ON_ICE,
+    PLACING_BLOCK,
+    RELEASE_USE_ITEM,
+    RESPAWN,
+    SENT_PAYLOAD,
+    SETBACK,
+    SNEAKING,
+    SPRINTING,
+    STEER_VEHICLE,
+    TELEPORT,
+    UNDER_BLOCK,
+    WINDOW_CLICK
+}

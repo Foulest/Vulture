@@ -1,0 +1,5 @@
+name: Vulture
+version: '1.0.0'
+main: net.foulest.vulture.Vulture
+author: Foulest
+load: POSTWORLD
