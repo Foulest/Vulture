@@ -40,7 +40,7 @@ public class KillAuraB extends Check {
 
         } else if (packetId == PacketType.Play.Client.BLOCK_PLACE) {
             if (sentAttack && !sentInteract) {
-                flag();
+                flag(false);
             }
         }
     }

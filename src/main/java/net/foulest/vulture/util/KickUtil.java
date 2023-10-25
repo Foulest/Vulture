@@ -74,11 +74,9 @@ public final class KickUtil {
             playerData.setKicking(true);
             playerData.setNewViolationsPaused(true);
 
-            TaskUtil.run(() -> {
-                if (player.isOnline()) {
-                    player.kickPlayer(reason);
-                }
-            });
+            // This may cause "Player not found." to appear in the console.
+            // This, for now, is a necessary evil. Some players wouldn't get kicked otherwise.
+            TaskUtil.run(() -> player.kickPlayer(reason));
         }
     }
 }

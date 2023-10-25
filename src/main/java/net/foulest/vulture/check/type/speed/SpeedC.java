@@ -1,7 +1,6 @@
 package net.foulest.vulture.check.type.speed;
 
 import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
-import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import lombok.NonNull;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
@@ -27,30 +26,24 @@ public class SpeedC extends Check {
 
     @Override
     public void handle(@NonNull MovementEvent event, long timestamp) {
-        WrappedPacketInFlying to = event.getTo();
         WrappedPacketInFlying from = event.getFrom();
 
-        Vector3d toPosition = to.getPosition();
-        Vector3d fromPosition = from.getPosition();
-
-        double deltaX = toPosition.getX() - fromPosition.getX();
-        double deltaY = toPosition.getY() - fromPosition.getY();
-        double deltaZ = toPosition.getZ() - fromPosition.getZ();
-        double deltaXZ = Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
+        double deltaY = event.getDeltaY();
+        double deltaXZ = event.getDeltaXZ();
 
         // Sets friction to 0.91 if the player is not on the ground.
         if (!from.isOnGround()) {
             friction = 0.91;
         }
 
-        // Returns if the player is flying, climbing, in a vehicle, in creative, or in spectator mode.
+        // Checks the player for exemptions.
         if (player.getAllowFlight()
                 || playerData.isOnClimbable()
                 || player.isInsideVehicle()
                 || playerData.getTimeSince(ActionType.STEER_VEHICLE) < 100L
                 || player.getGameMode().equals(GameMode.CREATIVE)
                 || player.getGameMode().equals(GameMode.SPECTATOR)
-                || playerData.isTeleporting(toPosition)) {
+                || event.isTeleport(playerData)) {
             lastDeltaXZ = deltaXZ * friction;
             return;
         }
@@ -117,14 +110,14 @@ public class SpeedC extends Check {
 
         if (speedup > 0.1 && deltaXZ > 0.25) {
             if (++buffer >= 3) {
-                flag("speedup=" + speedup
+                flag(true, "speedup=" + speedup
                         + " buffer=" + buffer
                         + " deltaXZ=" + deltaXZ
                         + " diff=" + diff
                         + " movementSpeed=" + movementSpeed);
             }
         } else {
-            buffer = Math.max(0, buffer - 0.25);
+            buffer = Math.max(buffer - 0.25, 0);
         }
 
         lastDeltaXZ = deltaXZ * friction;

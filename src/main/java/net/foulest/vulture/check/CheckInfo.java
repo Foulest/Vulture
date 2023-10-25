@@ -25,13 +25,11 @@ public @interface CheckInfo {
 
     boolean punishable() default true;
 
-    String banCommand() default "ban %player% Unfair Advantage";
+    String banCommand() default "vulture kick %player% %check%";
 
     int maxViolations() default 10;
 
     boolean experimental() default false;
-
-    boolean setback() default true;
 
     boolean acceptsServerPackets() default false;
 }

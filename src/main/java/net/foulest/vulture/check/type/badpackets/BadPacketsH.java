@@ -31,6 +31,7 @@ public class BadPacketsH extends Check {
             ticksInBed++;
         }
 
+        // Checks the player for exemptions.
         if (ticksInBed < 10) {
             return;
         }
@@ -40,16 +41,16 @@ public class BadPacketsH extends Check {
             Vector3d flyingPosition = flying.getPosition();
 
             if (flying.isRotating()) {
-                flag("Sent invalid Rotation packet while in bed" + " (ticks=" + ticksInBed + ")");
+                flag(false, "Sent invalid Rotation packet while in bed" + " (ticks=" + ticksInBed + ")");
             }
 
             if (flying.isMoving() && playerData.isMoving() && !playerData.isTeleporting(flyingPosition)) {
-                flag("Sent invalid Position packet while in bed" + " (ticks=" + ticksInBed + ")");
+                flag(false, "Sent invalid Position packet while in bed" + " (ticks=" + ticksInBed + ")");
             }
 
         } else if (packetId != PacketType.Play.Client.CHAT
                 && packetId != PacketType.Play.Client.KEEP_ALIVE) {
-            flag("Sent invalid packet while in bed: " + PacketProcessor.getPacketFromId(packetId).getSimpleName());
+            flag(false, "Sent invalid packet while in bed: " + PacketProcessor.getPacketFromId(packetId).getSimpleName());
         }
     }
 }

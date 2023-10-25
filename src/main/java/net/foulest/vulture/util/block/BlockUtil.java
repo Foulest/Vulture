@@ -79,18 +79,6 @@ public class BlockUtil {
         return null;
     }
 
-    public static boolean isOnGround(@NonNull Player player) {
-        if (isPlayerInUnloadedChunk(player)) {
-            return true;
-        }
-
-        BoundingBox boundingBox = new BoundingBox(player).expand(0.0, 0.0, 0.0)
-                .expandMin(0.0, player.getFallDistance() > 0 ? 1.5 : 0.001, 0.0)
-                .expandMax(0.0, -1.0, 0.0);
-
-        return collidesWithSolid(player, boundingBox);
-    }
-
     private static boolean collidesWithSolid(@NonNull Player player, BoundingBox boundingBox) {
         ConcurrentStream<Block> collidingBlocks = getCollidingBlocks(player, boundingBox);
 
@@ -218,6 +206,20 @@ public class BlockUtil {
         BoundingBox boundingBox = getPlayerCustomBoundingBox(player, 0.0, 0.0, 0.0);
         ConcurrentStream<Block> collidingBlocks = getCollidingBlocks(player, boundingBox);
         return collidingBlocks.any(block -> block.getType() == Material.WEB);
+    }
+
+    public static boolean isInLiquid(@NonNull Player player) {
+        if (isPlayerInUnloadedChunk(player)) {
+            return false;
+        }
+
+        BoundingBox boundingBox = getPlayerCustomBoundingBox(player, 0.0, 0.001, 0.0);
+        ConcurrentStream<Block> collidingBlocks = getCollidingBlocks(player, boundingBox);
+
+        return collidingBlocks.any(block -> block.getType() == Material.LAVA
+                || block.getType() == Material.STATIONARY_LAVA
+                || block.getType() == Material.WATER
+                || block.getType() == Material.STATIONARY_WATER);
     }
 
     public static boolean isNearLiquid(@NonNull Player player) {

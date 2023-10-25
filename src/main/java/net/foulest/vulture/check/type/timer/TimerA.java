@@ -9,8 +9,9 @@ import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
-import net.foulest.vulture.util.data.EvictingList;
+import net.foulest.vulture.util.KickUtil;
 import net.foulest.vulture.util.MathUtil;
+import net.foulest.vulture.util.data.EvictingList;
 
 @CheckInfo(name = "Timer (A)", type = CheckType.TIMER, maxViolations = 25,
         acceptsServerPackets = true, description = "Detects modifying your game speed.")
@@ -56,8 +57,7 @@ public class TimerA extends Check {
                 if (flyingDiffs.isFull()) {
                     if (speed >= (1.01 + modifier)) {
                         if (++buffer > 50) {
-                            flag("speed=" + speed + "%");
-                            buffer -= 25;
+                            KickUtil.kickPlayer(player, event, "Timer (A)");
                         }
                     } else {
                         buffer = Math.max(buffer - 0.9, 0.0);

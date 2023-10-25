@@ -34,14 +34,14 @@ public class BadPacketsF extends Check {
 
         } else if (packetId == PacketType.Play.Client.UPDATE_SIGN) {
             if (!sentSignEditor) {
-                flag("Sent UpdateSign packet without SignEditor");
+                flag(false, "Sent UpdateSign packet without SignEditor");
             }
 
             sentUpdateSign = true;
 
         } else if (PacketType.Play.Client.Util.isInstanceOfFlying(packetId)) {
             if (sentUpdateSign && !sentBlockChange) {
-                flag("Sent UpdateSign packet without BlockChange");
+                flag(false, "Sent UpdateSign packet without BlockChange");
             }
 
             sentUpdateSign = false;

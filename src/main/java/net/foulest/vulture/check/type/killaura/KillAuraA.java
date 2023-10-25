@@ -36,7 +36,7 @@ public class KillAuraA extends Check {
                 if (delay < 100 && delay > 40 && !hasFast
                         && !droppedPackets && timeSinceLag > 250) {
                     if (++buffer > 3) {
-                        flag("delay=" + delay);
+                        flag(false, "delay=" + delay);
                         lastUseEntity = null;
                     }
 

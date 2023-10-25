@@ -24,13 +24,14 @@ public class InventoryG extends Check {
     @Override
     public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
                        @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+        // Checks the player for exemptions.
         if (playerData.getVersion().isNewerThanOrEquals(ClientVersion.v_1_9)) {
             return;
         }
 
         if (packetId == PacketType.Play.Client.CLOSE_WINDOW) {
             if (wasWindowOpenPreviously) {
-                flag("CLOSE_WINDOW");
+                flag(false, "CLOSE_WINDOW");
             }
 
         } else if (packetId == PacketType.Play.Client.CLIENT_COMMAND) {
@@ -45,7 +46,7 @@ public class InventoryG extends Check {
             wasWindowOpenPreviously = isWindowCurrentlyOpen;
 
             if (isWindowCurrentlyOpen) {
-                flag("WINDOW_CLICK");
+                flag(false, "WINDOW_CLICK");
                 isWindowCurrentlyOpen = false;
             }
 

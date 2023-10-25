@@ -1,7 +1,5 @@
 package net.foulest.vulture.check.type.velocity;
 
-import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
-import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import lombok.NonNull;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
@@ -21,6 +19,7 @@ public class VelocityA extends Check {
 
     @Override
     public void handle(@NonNull MovementEvent event, long timestamp) {
+        // Checks the player for exemptions.
         if (playerData.isNearLiquid()
                 || playerData.isUnderBlock()
                 || playerData.isInWeb()
@@ -29,12 +28,6 @@ public class VelocityA extends Check {
             return;
         }
 
-        WrappedPacketInFlying to = event.getTo();
-        WrappedPacketInFlying from = event.getFrom();
-
-        Vector3d toPosition = to.getPosition();
-        Vector3d fromPosition = from.getPosition();
-
         long transPing = playerData.getTransPing();
 
         int totalTicks = playerData.getTotalTicks();
@@ -42,7 +35,7 @@ public class VelocityA extends Check {
         int lastServerPositionTick = playerData.getLastServerPositionTick();
 
         double velocityY = playerData.getVelocityY();
-        double deltaY = toPosition.getY() - fromPosition.getY();
+        double deltaY = event.getDeltaY();
         double lastLastY = playerData.getLastLastLocation().getY();
 
         if (velocityY > 0.2 && lastLastY % 0.015625 == 0.0) {
@@ -54,7 +47,7 @@ public class VelocityA extends Check {
             if (velTicks <= MathUtil.getPingInTicks(transPing) + 2 && lastServerPositionTick > 55) {
                 if (scaledVelocity < 75.0 || scaledVelocity > 105.0) {
                     if (++buffer >= limit) {
-                        flag("velocity=" + scaledVelocity + "%");
+                        flag(false, "velocity=" + scaledVelocity + "%");
                     }
                 } else {
                     buffer = 0;

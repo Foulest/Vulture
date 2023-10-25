@@ -7,6 +7,7 @@ import net.foulest.vulture.Vulture;
 import net.foulest.vulture.check.type.clientbrand.type.PayloadType;
 import net.foulest.vulture.data.DataManager;
 import net.foulest.vulture.data.PlayerData;
+import net.foulest.vulture.util.KickUtil;
 import net.foulest.vulture.util.MessageUtil;
 import net.foulest.vulture.util.Settings;
 import net.foulest.vulture.util.command.Command;
@@ -77,20 +78,19 @@ public class VultureCmd {
                     return;
                 }
 
-                Player target = Bukkit.getPlayer(args.getArgs(1));
+                Player infoTarget = Bukkit.getPlayer(args.getArgs(1));
 
-                if (target == null || !target.isOnline()) {
+                if (infoTarget == null || !infoTarget.isOnline()) {
                     MessageUtil.messagePlayer(sender, "&cPlayer not found.");
                     return;
                 }
 
-                PlayerData targetData = DataManager.getPlayerData(target);
+                PlayerData targetData = DataManager.getPlayerData(infoTarget);
 
                 MessageUtil.messagePlayer(sender, "");
-                MessageUtil.messagePlayer(sender, "&e" + target.getName() + "'s Info");
-                MessageUtil.messagePlayer(sender, "");
+                MessageUtil.messagePlayer(sender, "&e" + infoTarget.getName() + "'s Info");
                 MessageUtil.messagePlayer(sender, "&7* &fVersion: &e" + targetData.getVersion().name());
-                MessageUtil.messagePlayer(sender, "&7* &fPing: &e" + Vulture.instance.getPacketEvents().getPlayerUtils().getPing(target) + "ms");
+                MessageUtil.messagePlayer(sender, "&7* &fPing: &e" + Vulture.instance.getPacketEvents().getPlayerUtils().getPing(infoTarget) + "ms");
                 MessageUtil.messagePlayer(sender, "&7* &fViolations: &e" + targetData.getViolations().size());
 
                 if (!targetData.getPayloads().isEmpty()) {
@@ -103,6 +103,34 @@ public class VultureCmd {
                     }
                 }
                 MessageUtil.messagePlayer(sender, "");
+                break;
+
+            case "kick":
+                if (!sender.hasPermission("vulture.kick")) {
+                    MessageUtil.messagePlayer(sender, "&cNo permission.");
+                    return;
+                }
+
+                if (args.length() < 3) {
+                    MessageUtil.messagePlayer(sender, "&cUsage: /vulture kick <player> <reason>");
+                    return;
+                }
+
+                Player kickTarget = Bukkit.getPlayer(args.getArgs(1));
+
+                if (kickTarget == null || !kickTarget.isOnline()) {
+                    MessageUtil.messagePlayer(sender, "&cPlayer not found.");
+                    return;
+                }
+
+                StringBuilder reasonBuilder = new StringBuilder();
+                for (int i = 2; i < args.length(); i++) {
+                    reasonBuilder.append(args.getArgs(i)).append(" ");
+                }
+
+                String reason = reasonBuilder.toString().trim();
+
+                KickUtil.kickPlayer(kickTarget, reason);
                 break;
 
             case "reload":
@@ -136,10 +164,11 @@ public class VultureCmd {
         List<String> commands = Arrays.asList(
                 "&7* &f/vulture alerts &7- Toggles alerts.",
                 "&7* &f/vulture reload &7- Reloads Vulture.",
-                "&7* &f/vulture info <player> &7- View player info."
+                "&7* &f/vulture info <player> &7- View player info.",
+                "&7* &f/vulture kick <player> <reason> &7- Kicks a player."
         );
 
-        int itemsPerPage = 5;
+        int itemsPerPage = 4;
         int maxPages = (int) Math.ceil((double) commands.size() / itemsPerPage);
         int page = 1;
 

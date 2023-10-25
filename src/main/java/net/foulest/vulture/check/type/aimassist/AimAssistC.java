@@ -28,7 +28,7 @@ public class AimAssistC extends Check {
 
         if (yawChange > 0 && yawChangeDiff < 1.0E-10) {
             if (++buffer > 2) {
-                flag("yawChange=" + yawChange
+                flag(false, "yawChange=" + yawChange
                         + " yawChangeDiff=" + yawChangeDiff
                         + " fromYaw=" + from.getYaw());
             } else {

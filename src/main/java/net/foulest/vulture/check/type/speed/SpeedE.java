@@ -1,7 +1,6 @@
 package net.foulest.vulture.check.type.speed;
 
 import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
-import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import lombok.NonNull;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
@@ -26,10 +25,6 @@ public class SpeedE extends Check {
     @Override
     public void handle(@NonNull MovementEvent event, long timestamp) {
         WrappedPacketInFlying to = event.getTo();
-        WrappedPacketInFlying from = event.getFrom();
-
-        Vector3d toPosition = to.getPosition();
-        Vector3d fromPosition = from.getPosition();
 
         long timeSinceBlocking = playerData.getTimeSince(ActionType.BLOCKING);
         long timeSinceRelease = playerData.getTimeSince(ActionType.RELEASE_USE_ITEM);
@@ -45,9 +40,7 @@ public class SpeedE extends Check {
 
         int groundTicks = playerData.getGroundTicks();
 
-        double deltaX = toPosition.getX() - fromPosition.getX();
-        double deltaZ = toPosition.getZ() - fromPosition.getZ();
-        double deltaXZ = Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
+        double deltaXZ = event.getDeltaXZ();
         double velocityHorizontal = playerData.getVelocityHorizontal();
         double maxSpeed = to.isOnGround() ? 0.21 : 0.32400000005960464;
 
@@ -60,35 +53,35 @@ public class SpeedE extends Check {
         // Detects standard no-slowdown.
         if (blocking) {
             if (deltaXZ > maxSpeed) {
-                if (++bufferRapid >= 3) {
-                    flag("Standard"
+                if (++bufferStandard >= 3) {
+                    flag(true, "Standard"
                             + " (deltaXZ=" + deltaXZ
                             + " maxSpeed=" + maxSpeed
                             + " timeBlocking=" + timeBlocking
                             + " buffer=" + bufferStandard + ")");
                 }
             } else {
-                bufferStandard = Math.max(0, bufferStandard - 0.5);
+                bufferStandard = Math.max(bufferStandard - 0.25, 0);
             }
         } else {
-            bufferStandard = Math.max(0, bufferStandard - 0.9);
+            bufferStandard = Math.max(bufferStandard - 0.25, 0);
         }
 
         // Detects rapidly blocking no-slowdown.
         if (rapidlyBlocking) {
             if (deltaXZ > maxSpeed) {
                 if (++bufferRapid >= 5) {
-                    flag("Rapidly blocking"
+                    flag(true, "Rapidly blocking"
                             + " (deltaXZ=" + deltaXZ
                             + " maxSpeed=" + maxSpeed
                             + " timeBlocking=" + timeBlocking
                             + " buffer=" + bufferRapid + ")");
                 }
             } else {
-                bufferRapid = Math.max(0, bufferRapid - 0.5);
+                bufferRapid = Math.max(bufferRapid - 0.25, 0);
             }
         } else {
-            bufferRapid = Math.max(0, bufferRapid - 0.9);
+            bufferRapid = Math.max(bufferRapid - 0.25, 0);
         }
     }
 }

@@ -28,6 +28,7 @@ public class KillAuraI extends Check {
     @Override
     public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
                        @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+        // Checks the player for exemptions.
         if (playerData.getLastAttackTick() > 2) {
             return;
         }
@@ -55,7 +56,7 @@ public class KillAuraI extends Check {
 
                     if (duplicates < 2 && average > 0.45 && average < 0.61 && stdDev > 3.0 && stdDev < 4.0) {
                         if (++buffer > 3.5) {
-                            flag("average=" + average
+                            flag(false, "average=" + average
                                     + " duplicates=" + duplicates
                                     + " stdDev=" + stdDev);
                         }

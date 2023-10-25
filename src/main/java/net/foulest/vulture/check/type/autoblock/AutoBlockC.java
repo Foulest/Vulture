@@ -39,7 +39,7 @@ public class AutoBlockC extends Check {
 
             if (digType == WrappedPacketInBlockDig.PlayerDigType.RELEASE_USE_ITEM) {
                 if (++buffer > 1) {
-                    flag();
+                    flag(false);
                 }
             }
         }

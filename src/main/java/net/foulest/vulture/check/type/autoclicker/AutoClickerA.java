@@ -47,7 +47,7 @@ public class AutoClickerA extends Check {
 
                         if (stdDev <= 0.28) {
                             if (++buffer > 5) {
-                                flag("stdDev=" + stdDev
+                                flag(false, "stdDev=" + stdDev
                                         + "buffer=" + buffer);
                             }
                         } else {

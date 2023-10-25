@@ -24,6 +24,7 @@ public class AutoClickerC extends Check {
     @Override
     public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
                        @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+        // Checks the player for exemptions.
         if (playerData.isDigging()) {
             return;
         }
@@ -56,7 +57,7 @@ public class AutoClickerC extends Check {
                 if (++clicks == 80) {
                     if (outliers == 0) {
                         if ((buffer += 1.4) >= 6.8) {
-                            flag("outliers=" + outliers
+                            flag(false, "outliers=" + outliers
                                     + " buffer=" + buffer);
                         }
                     } else {

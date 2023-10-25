@@ -75,7 +75,7 @@ public class InventoryB extends Check {
 
         if (stage == 4 && timeDiff < 350) {
             stage = 0;
-            flag("timeDiff=" + timeDiff);
+            flag(false, "timeDiff=" + timeDiff);
         }
     }
 }

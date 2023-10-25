@@ -18,8 +18,6 @@ import net.foulest.vulture.check.type.groundspoof.GroundSpoofA;
 import net.foulest.vulture.check.type.groundspoof.GroundSpoofB;
 import net.foulest.vulture.check.type.invalid.InvalidA;
 import net.foulest.vulture.check.type.invalid.InvalidB;
-import net.foulest.vulture.check.type.invalid.InvalidC;
-import net.foulest.vulture.check.type.invalid.InvalidD;
 import net.foulest.vulture.check.type.inventory.*;
 import net.foulest.vulture.check.type.killaura.*;
 import net.foulest.vulture.check.type.pingspoof.PingSpoofA;
@@ -56,8 +54,8 @@ public class CheckManager {
             ClientBrand.class,
 
             // AimAssist
-            AimAssistA.class, AimAssistB.class, AimAssistC.class, AimAssistD.class, AimAssistE.class, AimAssistF.class,
-            AimAssistG.class, AimAssistH.class, AimAssistI.class,
+            AimAssistA.class, AimAssistB.class, AimAssistC.class, AimAssistD.class, AimAssistE.class,
+            AimAssistF.class, AimAssistG.class, AimAssistH.class, AimAssistI.class,
 
             // AutoBlock
             AutoBlockA.class, AutoBlockB.class, AutoBlockC.class, AutoBlockD.class,
@@ -76,15 +74,16 @@ public class CheckManager {
             GroundSpoofA.class, GroundSpoofB.class,
 
             // Invalid
-            InvalidA.class, InvalidB.class, InvalidC.class, InvalidD.class,
+            InvalidA.class, InvalidB.class,
 
             // Inventory
-            InventoryA.class, InventoryB.class, InventoryC.class, InventoryD.class, InventoryE.class, InventoryF.class,
-            InventoryG.class, InventoryH.class, InventoryI.class, InventoryJ.class, InventoryK.class, InventoryL.class,
+            InventoryA.class, InventoryB.class, InventoryC.class, InventoryD.class, InventoryE.class,
+            InventoryF.class, InventoryG.class, InventoryH.class, InventoryI.class, InventoryJ.class,
+            InventoryK.class,
 
             // KillAura
-            KillAuraA.class, KillAuraB.class, KillAuraC.class, KillAuraD.class, KillAuraE.class, KillAuraF.class,
-            KillAuraG.class, KillAuraH.class, KillAuraI.class, KillAuraJ.class, KillAuraJ.class,
+            KillAuraA.class, KillAuraB.class, KillAuraC.class, KillAuraD.class, KillAuraE.class,
+            KillAuraF.class, KillAuraG.class, KillAuraH.class, KillAuraI.class, KillAuraJ.class,
 
             // PingSpoof
             PingSpoofA.class, PingSpoofB.class,
@@ -94,6 +93,7 @@ public class CheckManager {
 
             // Speed
             SpeedA.class, SpeedB.class, SpeedC.class, SpeedD.class, SpeedE.class,
+            SpeedF.class,
 
             // Timer
             TimerA.class,

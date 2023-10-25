@@ -25,7 +25,7 @@ public class KillAuraF extends Check {
                        @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
         if (PacketType.Play.Client.Util.isInstanceOfFlying(packetId)) {
             if (sentAttack == 10 && sentAnimation < 5) {
-                flag();
+                flag(false);
             }
 
             sentAnimation = 0;

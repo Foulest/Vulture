@@ -49,6 +49,11 @@ public class BadPacketsD extends Check {
     }
 
     public void checkDifference() {
+        // Checks the player for exemptions.
+        if (player.isDead()) {
+            return;
+        }
+
         long timeSincePosition = System.currentTimeMillis() - lastPosition;
         long timeSinceTransaction = System.currentTimeMillis() - lastTransaction;
 

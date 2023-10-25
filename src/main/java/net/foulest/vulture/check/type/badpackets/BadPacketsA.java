@@ -32,6 +32,7 @@ public class BadPacketsA extends Check {
                 && packetId != PacketType.Play.Client.ARM_ANIMATION
                 && packetId != PacketType.Play.Client.STEER_VEHICLE
                 && packetId != PacketType.Play.Client.SETTINGS
+                && packetId != PacketType.Play.Client.CUSTOM_PAYLOAD
                 && packetId != PacketType.Play.Client.ENTITY_ACTION
                 && packetId != PacketType.Play.Client.BLOCK_DIG
                 && packetId != PacketType.Play.Client.BLOCK_PLACE) {
@@ -46,7 +47,7 @@ public class BadPacketsA extends Check {
             if (flyingDiff < 9.0 && timeSinceLag > 200L
                     && lastServerPositionTick > 20
                     && totalTicks - lastPacketDrop > 20) {
-                flag("Post Packet"
+                flag(false, "Post Packet"
                         + " packet=" + PacketProcessor.getPacketFromId(packetId).getSimpleName()
                         + " flyingDiff=" + flyingDiff);
             }

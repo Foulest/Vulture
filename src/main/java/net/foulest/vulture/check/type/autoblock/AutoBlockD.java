@@ -38,7 +38,7 @@ public class AutoBlockD extends Check {
             WrappedPacketInBlockDig.PlayerDigType digType = blockDig.getDigType();
 
             if (digType == WrappedPacketInBlockDig.PlayerDigType.RELEASE_USE_ITEM && !sent) {
-                flag();
+                flag(false);
             }
 
             sent = false;

@@ -29,7 +29,7 @@ public class AimAssistE extends Check {
 
         if (angleYaw > 0.1 && Double.isNaN(remainder)) {
             if (++buffer > 10) {
-                flag("angleYaw=" + angleYaw);
+                flag(false, "angleYaw=" + angleYaw);
             }
         } else {
             buffer = Math.max(buffer - 1, 0);

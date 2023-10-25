@@ -31,6 +31,7 @@ public class SpeedD extends Check {
         Vector3d toPosition = to.getPosition();
         Vector3d fromPosition = from.getPosition();
 
+        // Checks the player for exemptions.
         if (!playerData.isSprinting()
                 || playerData.isNearLiquid()
                 || player.isFlying()
@@ -38,8 +39,8 @@ public class SpeedD extends Check {
                 || playerData.getVelocityH() > 0
                 || player.getGameMode().equals(GameMode.CREATIVE)
                 || player.getGameMode().equals(GameMode.SPECTATOR)
-                || !playerData.isOnGround()
-                || playerData.isTeleporting(toPosition)) {
+                || !playerData.isNearGround()
+                || event.isTeleport(playerData)) {
             return;
         }
 
@@ -63,8 +64,10 @@ public class SpeedD extends Check {
         maxDelta += (walkSpeed - 0.2) * 5;
 
         if (speedDelta > maxDelta) {
-            if ((buffer += 0.75) > 8) {
-                flag("speedDelta=" + speedDelta, "maxDelta=" + maxDelta + " direction=" + direction);
+            if (++buffer > 8) {
+                flag(true, "speedDelta=" + speedDelta
+                        + " maxDelta=" + maxDelta
+                        + " direction=" + direction);
             }
         } else {
             buffer = Math.max(buffer - 0.5, 0);

@@ -22,6 +22,7 @@ public class AimAssistB extends Check {
         WrappedPacketInFlying to = event.getTo();
         WrappedPacketInFlying from = event.getFrom();
 
+        // Checks the player for exemptions.
         if (to.getYaw() == from.getYaw()) {
             return;
         }
@@ -41,7 +42,7 @@ public class AimAssistB extends Check {
 
         if (deltaYaw % 1 == 0 && deltaYaw != 0) {
             if ((buffer += 12) > 35) {
-                flag("deltaYaw=" + deltaYaw
+                flag(false, "deltaYaw=" + deltaYaw
                         + " fromYaw=" + fromYaw);
             }
         } else {

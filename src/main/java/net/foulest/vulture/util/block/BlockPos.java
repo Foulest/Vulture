@@ -5,8 +5,8 @@ import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import net.foulest.vulture.util.data.EnumFacing;
 import net.foulest.vulture.util.MathUtil;
+import net.foulest.vulture.util.data.EnumFacing;
 
 @Getter
 @Setter

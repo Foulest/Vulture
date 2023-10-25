@@ -28,6 +28,7 @@ public class ReachB extends Check {
 
     @Override
     public void handle(@NonNull MovementEvent event, long timestamp) {
+        // Checks the player for exemptions.
         if (player.getGameMode().equals(GameMode.CREATIVE)
                 || playerData.getLastTarget() == null
                 || playerData.getTimeSince(ActionType.LAG) <= 200L
@@ -117,7 +118,7 @@ public class ReachB extends Check {
 
         if (distance > 3.03 && colliding > 2) {
             if ((buffer += 1.5) > 3.5) {
-                flag("distance=" + distance);
+                flag(false, "distance=" + distance);
                 event.setCancelled(true);
             }
         } else {

@@ -25,6 +25,7 @@ public class InventoryI extends Check {
     @Override
     public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
                        @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+        // Checks the player for exemptions.
         if (playerData.getVersion().isNewerThanOrEquals(ClientVersion.v_1_9)) {
             return;
         }
@@ -41,7 +42,7 @@ public class InventoryI extends Check {
                     stage = 1;
                 } else {
                     if (stage == 1 && clickedItem == null && lastSlot == windowSlot) {
-                        flag();
+                        flag(false);
                     }
 
                     stage = 0;

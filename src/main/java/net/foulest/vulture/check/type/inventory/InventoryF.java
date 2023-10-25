@@ -31,7 +31,7 @@ public class InventoryF extends Check {
 
         } else if (PacketType.Play.Client.Util.isInstanceOfFlying(packetId)) {
             if (swing && click) {
-                flag();
+                flag(false);
             }
 
             swing = false;

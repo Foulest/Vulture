@@ -48,9 +48,9 @@ import net.foulest.vulture.event.RotationEvent;
 import net.foulest.vulture.processor.Processor;
 import net.foulest.vulture.util.KickUtil;
 import net.foulest.vulture.util.MessageUtil;
-import net.foulest.vulture.util.data.Pair;
 import net.foulest.vulture.util.TaskUtil;
 import net.foulest.vulture.util.block.BlockUtil;
+import net.foulest.vulture.util.data.Pair;
 import net.foulest.vulture.util.raytrace.BoundingBox;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -777,7 +777,7 @@ public class PacketProcessor extends Processor {
                 }
 
                 // Handles invalid Y data.
-                if (flyingYPos > 1.0E9) {
+                if (Math.abs(flyingYPos) > 1.0E9) {
                     KickUtil.kickPlayer(player, event, "Sent Flying packet with invalid Y data");
                     return;
                 }
@@ -843,12 +843,12 @@ public class PacketProcessor extends Processor {
                     playerData.setLastLastOnGroundPacket(playerData.isLastOnGroundPacket());
                     playerData.setLastOnGroundPacket(playerData.isOnGroundPacket());
                     playerData.setOnGroundPacket(flying.isOnGround());
-                    playerData.setLastOnGround(playerData.isOnGround());
-                    playerData.setOnGroundStrict(BlockUtil.isOnGroundOffset(player, 0.001));
-                    playerData.setOnGround(BlockUtil.isOnGround(player));
+                    playerData.setLastOnGround(playerData.isNearGround());
+                    playerData.setOnGround(BlockUtil.isOnGroundOffset(player, 0.001));
+                    playerData.setNearGround(BlockUtil.isOnGroundOffset(player, 0.5));
 
                     // Sets non-strict ground data.
-                    if (playerData.isOnGround()) {
+                    if (playerData.isNearGround()) {
                         playerData.setAirTicks(0);
                         playerData.setGroundTicks(playerData.getGroundTicks() + 1);
 
@@ -866,7 +866,7 @@ public class PacketProcessor extends Processor {
                     }
 
                     // Sets strict ground data.
-                    if (playerData.isOnGroundStrict()) {
+                    if (playerData.isOnGround()) {
                         playerData.setAirTicksStrict(0);
                         playerData.setGroundTicksStrict(playerData.getGroundTicksStrict() + 1);
 
@@ -889,6 +889,7 @@ public class PacketProcessor extends Processor {
                     playerData.setNearPiston(BlockUtil.isNearPiston(player));
                     playerData.setNearCactus(BlockUtil.isNearCactus(player));
                     playerData.setInWeb(BlockUtil.isInWeb(player));
+                    playerData.setInLiquid(BlockUtil.isInLiquid(player));
                     playerData.setNearLiquid(BlockUtil.isNearLiquid(player));
                     playerData.setOnChest(BlockUtil.isOnChest(player));
                     playerData.setOnClimbable(BlockUtil.isOnClimbable(player));
@@ -918,11 +919,11 @@ public class PacketProcessor extends Processor {
                     playerData.setCollidingBlock(BlockUtil.getCollidingBlock(player));
 
                     // Sets the last on ground location.
-                    if (playerData.isOnGroundStrict() && !playerData.isInsideBlock()
+                    if (playerData.isOnGround() && !playerData.isInsideBlock()
                             && flyingYPos % 0.015625 == 0.0
                             && !BlockUtil.isLocationInUnloadedChunk(location)
                             && location.getBlock().isEmpty()
-                            && playerData.getTimeSince(ActionType.SETBACK) > 2000L
+                            && playerData.getTimeSince(ActionType.SETBACK) > 1000L
                             && playerData.getTimeSince(ActionType.LAST_ON_GROUND_LOCATION_SET) > 500L) {
                         playerData.setTimestamp(ActionType.LAST_ON_GROUND_LOCATION_SET);
                         playerData.setLastOnGroundLocation(location);
@@ -1440,7 +1441,9 @@ public class PacketProcessor extends Processor {
             List<Check> checksCopy = new ArrayList<>(playerData.getChecks());
 
             for (Check check : checksCopy) {
-                check.handle(event, timestamp);
+                if (check.getCheckInfo().enabled()) {
+                    check.handle(event, timestamp);
+                }
             }
         }
     }

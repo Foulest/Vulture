@@ -45,7 +45,7 @@ public class InventoryJ extends Check {
                         double yawDiff = Math.abs(yaw - lastYaw);
 
                         if (yawDiff > 20.0) {
-                            flag("yawDiff=" + yawDiff);
+                            flag(false, "yawDiff=" + yawDiff);
                         }
                     }
 

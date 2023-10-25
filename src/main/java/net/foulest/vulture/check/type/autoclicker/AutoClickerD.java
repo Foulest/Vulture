@@ -39,7 +39,7 @@ public class AutoClickerD extends Check {
                 if (clicksList.size() == 50) {
                     if (Math.abs(stdDev - lastStdDev) < 0.05) {
                         if (++buffer > 2) {
-                            flag("stdDev=" + stdDev
+                            flag(false, "stdDev=" + stdDev
                                     + " lastStdDev=" + lastStdDev);
                         }
                     } else {

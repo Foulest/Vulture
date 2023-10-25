@@ -1,7 +1,5 @@
 package net.foulest.vulture.check.type.invalid;
 
-import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
-import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import lombok.NonNull;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
@@ -14,6 +12,7 @@ import net.foulest.vulture.event.MovementEvent;
 public class InvalidB extends Check {
 
     private double lastDeltaY;
+    private double buffer;
     private int ticksRising;
 
     public InvalidB(@NonNull PlayerData playerData) throws ClassNotFoundException {
@@ -22,30 +21,29 @@ public class InvalidB extends Check {
 
     @Override
     public void handle(@NonNull MovementEvent event, long timestamp) {
-        WrappedPacketInFlying to = event.getTo();
-        WrappedPacketInFlying from = event.getFrom();
-
-        Vector3d toPosition = to.getPosition();
-        Vector3d fromPosition = from.getPosition();
-
+        // Checks the player for exemptions.
         if (player.isFlying()
                 || playerData.isOnClimbable()
-                || playerData.isTeleporting(toPosition)
                 || playerData.isNearLiquid()
                 || playerData.getVelocityY() > 0
-                || playerData.getLastVelocityY() > 0) {
+                || playerData.getLastVelocityY() > 0
+                || event.isTeleport(playerData)) {
+            buffer = 0;
             return;
         }
 
-        double deltaY = toPosition.getY() - fromPosition.getY();
-
+        double deltaY = event.getDeltaY();
         boolean rising = deltaY > 0 && deltaY >= lastDeltaY;
 
         if (rising) {
             if (++ticksRising > 2) {
-                flag("deltaY=" + deltaY
-                        + " lastDeltaY=" + lastDeltaY
-                        + " ticksRising=" + ticksRising);
+                if (++buffer >= 2) {
+                    flag(true, "deltaY=" + deltaY
+                            + " lastDeltaY=" + lastDeltaY
+                            + " ticksRising=" + ticksRising);
+                }
+            } else {
+                buffer = Math.max(buffer - 0.25, 0);
             }
         } else {
             ticksRising = 0;

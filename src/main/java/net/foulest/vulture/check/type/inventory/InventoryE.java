@@ -26,7 +26,7 @@ public class InventoryE extends Check {
                        @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
         if (packetId == PacketType.Play.Client.HELD_ITEM_SLOT) {
             if (stage == 2) {
-                flag();
+                flag(false);
             }
 
             stage = 1;

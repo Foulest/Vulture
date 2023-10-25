@@ -51,7 +51,7 @@ public class KillAuraC extends Check {
 
                 double deltaX = to.getX() - from.getX();
                 double deltaZ = to.getZ() - from.getZ();
-                double deltaXZ = Math.sqrt((deltaX * deltaX) + (deltaZ * deltaZ));
+                double deltaXZ = Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
 
                 if (playerData.getLastTarget() == null
                         || playerData.getVelocityH() > 0
@@ -69,7 +69,7 @@ public class KillAuraC extends Check {
 
                         if (acceleration <= 0.05 && deltaXZ > 0.23 && !underBlock) {
                             if (++buffer > 8) {
-                                flag("acceleration=" + acceleration
+                                flag(false, "acceleration=" + acceleration
                                         + " deltaXZ=" + deltaXZ);
                             }
                         } else {

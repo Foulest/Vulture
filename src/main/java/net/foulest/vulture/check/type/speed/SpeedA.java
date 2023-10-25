@@ -1,7 +1,6 @@
 package net.foulest.vulture.check.type.speed;
 
 import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
-import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import lombok.NonNull;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
@@ -26,16 +25,14 @@ public class SpeedA extends Check {
     @Override
     public void handle(@NonNull MovementEvent event, long timestamp) {
         WrappedPacketInFlying to = event.getTo();
-        WrappedPacketInFlying from = event.getFrom();
 
-        Vector3d toPosition = to.getPosition();
-        Vector3d fromPosition = from.getPosition();
-
+        // Checks the player for exemptions.
         if (player.isFlying()
                 || player.getAllowFlight()
                 || player.getGameMode().equals(GameMode.CREATIVE)
+                || player.getGameMode().equals(GameMode.SPECTATOR)
                 || player.isInsideVehicle()
-                || playerData.isTeleporting(toPosition)) {
+                || event.isTeleport(playerData)) {
             return;
         }
 
@@ -48,9 +45,7 @@ public class SpeedA extends Check {
         boolean nearSlimeBlock = playerData.isNearSlimeBlock();
         boolean nearLilyPad = playerData.isNearLilyPad();
 
-        double deltaX = toPosition.getX() - fromPosition.getX();
-        double deltaZ = toPosition.getZ() - fromPosition.getZ();
-        double deltaXZ = Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
+        double deltaXZ = event.getDeltaXZ();
         double maxSpeed = to.isOnGround() && !nearLilyPad ? 0.3125 : 0.35855;
         double velocityHorizontal = playerData.getVelocityHorizontal();
 
@@ -83,14 +78,14 @@ public class SpeedA extends Check {
         if (deltaXZ > maxSpeed) {
             if (inWeb || onSoulSand) {
                 if (++otherBuffer > 2) {
-                    flag("(Terrain)"
+                    flag(true, "(Terrain)"
                             + " deltaXZ=" + deltaXZ
                             + " maxSpeed=" + maxSpeed
                             + " buffer=" + buffer);
                 }
             } else {
                 if (++buffer > 5) {
-                    flag("deltaXZ=" + deltaXZ
+                    flag(true, "deltaXZ=" + deltaXZ
                             + " maxSpeed=" + maxSpeed
                             + " buffer=" + buffer
                             + " timeSinceOnIce=" + timeSinceOnIce
@@ -99,8 +94,8 @@ public class SpeedA extends Check {
             }
 
         } else {
-            buffer = Math.max(buffer - 2, 0);
-            otherBuffer = Math.max(otherBuffer - 2, 0);
+            buffer = Math.max(buffer - 0.25, 0);
+            otherBuffer = Math.max(otherBuffer - 0.25, 0);
         }
     }
 }

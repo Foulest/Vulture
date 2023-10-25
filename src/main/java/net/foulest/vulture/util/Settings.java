@@ -74,10 +74,6 @@ public class Settings {
                 changeAnnotationValue(checkInfo, "enabled", config.get("checks." + name + ".enabled"));
             }
 
-            if (config.contains("checks." + name + ".setback")) {
-                changeAnnotationValue(checkInfo, "setback", config.get("checks." + name + ".setback"));
-            }
-
             if (config.contains("checks." + name + ".maxViolations")) {
                 changeAnnotationValue(checkInfo, "maxViolations", config.get("checks." + name + ".maxViolations"));
             }
@@ -135,14 +131,12 @@ public class Settings {
             CheckInfo checkInfo = check.getAnnotation(CheckInfo.class);
 
             boolean enabled = checkInfo.enabled();
-            boolean setback = checkInfo.setback();
             int maxViolations = checkInfo.maxViolations();
             String banCommand = checkInfo.banCommand();
 
             config.addDefault("checks." + name + ".enabled", enabled);
 
             if (checkInfo.punishable()) {
-                config.addDefault("checks." + name + ".setback", setback);
                 config.addDefault("checks." + name + ".maxViolations", maxViolations);
                 config.addDefault("checks." + name + ".banCommand", banCommand);
             }

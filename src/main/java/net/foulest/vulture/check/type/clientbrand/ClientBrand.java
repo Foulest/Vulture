@@ -274,6 +274,14 @@ public class ClientBrand extends Check {
             new PayloadType("XU2", "Unknown (XU2)", DataType.REGISTER_DATA_OTHER, false),
             new PayloadType("autoconfig", "Unknown (autoconfig)", DataType.REGISTER_DATA_OTHER, false),
             new PayloadType("rc&vswe.steves&10928", "RebornCore", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("tcomplement", "Tinkers Complement", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("recipemod:key", "YARCF", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("tinkerlevel:sync", "Tinkers Tool Leveling", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("artemislib", "ArtemisLib", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("artifacts", "Artifacts", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("llibrary", "LLibrary", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("tcg", "Pixelmon Reforged", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("OE_CHAN", "OreExcavation", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("world_id", "Unknown (world_id)", DataType.REGISTER_DATA_OTHER, false),
             new PayloadType("rc&reborncore.&64769", "RebornCore", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("rc&reborncore.&39932", "RebornCore", DataType.REGISTER_DATA_MOD, false),
@@ -625,7 +633,8 @@ public class ClientBrand extends Check {
                 if (payloadType.blacklisted) {
                     KickUtil.kickPlayer(player, event, "Blacklisted Data: " + payloadType.data);
                 } else {
-                    if (!playerData.getPayloads().contains(payloadType)) {
+                    if (payloadType.getDataType() == DataType.REGISTER_DATA_MOD
+                            && !playerData.getPayloads().contains(payloadType)) {
                         playerData.getPayloads().add(payloadType);
                     }
                 }

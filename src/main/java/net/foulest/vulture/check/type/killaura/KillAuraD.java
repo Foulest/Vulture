@@ -34,7 +34,7 @@ public class KillAuraD extends Check {
 
                     if (heldItemType != Material.BOW && heldItemType != Material.FISHING_ROD) {
                         if (++buffer > 6) {
-                            flag();
+                            flag(false);
                         }
                     } else {
                         buffer = Math.max(buffer - 1, 0);

@@ -28,6 +28,7 @@ public class KillAuraH extends Check {
     @Override
     public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
                        @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+        // Checks the player for exemptions.
         if (playerData.getLastAttackTick() > 2) {
             return;
         }
@@ -55,7 +56,7 @@ public class KillAuraH extends Check {
 
                     if (duplicates >= 6 && average > 0.125 && average < 0.55 && stdDev > 0.165 && stdDev < 0.325) {
                         if (++buffer > 2.25) {
-                            flag("A"
+                            flag(false, "A"
                                     + " (average=" + average
                                     + " duplicates=" + duplicates
                                     + " stdDev=" + stdDev + ")");
@@ -67,7 +68,7 @@ public class KillAuraH extends Check {
                     if ((duplicates >= 4 && average > 0.3 && average < 0.6 && stdDev > 0.3 && stdDev < 0.45)
                             || (duplicates > 2 && Math.abs(stdDev - average) < 0.011)) {
                         if (++buffer2 > 2.5) {
-                            flag("B"
+                            flag(false, "B"
                                     + " (average=" + average
                                     + " duplicates=" + duplicates
                                     + " stdDev=" + stdDev + ")");

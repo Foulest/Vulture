@@ -55,7 +55,7 @@ public class AutoBlockA extends Check {
 
         if (stage == 3) {
             stage = 0;
-            flag();
+            flag(false);
         }
     }
 }

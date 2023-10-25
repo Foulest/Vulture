@@ -23,6 +23,7 @@ public class VelocityB extends Check {
 
     @Override
     public void handle(@NonNull MovementEvent event, long timestamp) {
+        // Checks the player for exemptions.
         if (playerData.isNearLiquid()
                 || playerData.isUnderBlock()
                 || playerData.getLastLocation().getY() % 0.015625 != 0.0
@@ -37,10 +38,7 @@ public class VelocityB extends Check {
         }
 
         WrappedPacketInFlying to = event.getTo();
-        WrappedPacketInFlying from = event.getFrom();
-
         Vector3d toPosition = to.getPosition();
-        Vector3d fromPosition = from.getPosition();
 
         int totalTicks = playerData.getTotalTicks();
         int velocityTicks = playerData.getVelocityTicks();
@@ -48,25 +46,23 @@ public class VelocityB extends Check {
         int velTicks = totalTicks - velocityTicks;
 
         boolean newerThan1_8 = PacketEvents.get().getPlayerUtils().getClientVersion(player).isNewerThan(ClientVersion.v_1_8);
-        boolean isOnGround = toPosition.getY() % 0.015625 == 0.0;
+        boolean isYLevel = event.isYLevel();
         boolean isVelocityCheckTime = velTicks == 1 && lastServerPositionTick > 120;
 
-        double deltaX = toPosition.getX() - fromPosition.getX();
-        double deltaZ = toPosition.getZ() - fromPosition.getZ();
-        double deltaXZ = Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
+        double deltaXZ = event.getDeltaXZ();
         double lastVelocityX = playerData.getLastVelocityX();
         double lastVelocityZ = playerData.getLastVelocityZ();
         double magnitude = MathUtil.hypot(lastVelocityX, lastVelocityZ);
         double scaledVelocity = getVelocity(magnitude, toPosition);
         double velocityHorizontal = playerData.getVelocityHorizontal();
-        double velocityMultiplier = isOnGround ? 0.5 : newerThan1_8 ? 0.65 : 0.99;
-        double velocityLimit = isOnGround ? 0.4 : velocityMultiplier;
+        double velocityMultiplier = isYLevel ? 0.5 : newerThan1_8 ? 0.65 : 0.99;
+        double velocityLimit = isYLevel ? 0.4 : velocityMultiplier;
 
         if (isVelocityCheckTime) {
             if (deltaXZ <= velocityHorizontal * velocityMultiplier
                     && scaledVelocity < velocityLimit && magnitude > 0.2) {
                 if ((buffer += (int) (1.1 - scaledVelocity)) > 3.5) {
-                    flag("vel=" + (isOnGround ? (int) scaledVelocity : scaledVelocity) * 100 + "%");
+                    flag(false, "vel=" + (isYLevel ? (int) scaledVelocity : scaledVelocity) * 100 + "%");
                     buffer = 0;
                 }
             } else {

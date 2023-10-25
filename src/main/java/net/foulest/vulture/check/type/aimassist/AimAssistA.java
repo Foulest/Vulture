@@ -1,6 +1,5 @@
 package net.foulest.vulture.check.type.aimassist;
 
-import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
 import lombok.NonNull;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
@@ -22,11 +21,8 @@ public class AimAssistA extends Check {
 
     @Override
     public void handle(@NonNull RotationEvent event, long timestamp) {
-        WrappedPacketInFlying to = event.getTo();
-        WrappedPacketInFlying from = event.getFrom();
-
-        double deltaYaw = Math.abs(to.getYaw() - from.getYaw());
-        double deltaPitch = Math.abs(to.getPitch() - from.getPitch());
+        double deltaYaw = event.getDeltaYaw();
+        double deltaPitch = event.getDeltaPitch();
 
         double yawAccel = Math.abs(deltaYaw - lastYaw);
         double pitchAccel = Math.abs(deltaPitch - lastPitch);
@@ -36,7 +32,7 @@ public class AimAssistA extends Check {
                 buffer = 0;
 
                 if (++streak > 2) {
-                    flag("pitchAccel=" + pitchAccel
+                    flag(false, "pitchAccel=" + pitchAccel
                             + " deltaPitch=" + deltaPitch);
                 }
             }

@@ -11,6 +11,7 @@ import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 
+// TODO: Need to rewrite this check.
 @CheckInfo(name = "GroundSpoof (B)", type = CheckType.GROUNDSPOOF,
         description = "Detects clients sending invalid on-ground Flying packets.")
 public class GroundSpoofB extends Check {
@@ -22,6 +23,7 @@ public class GroundSpoofB extends Check {
     @Override
     public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
                        @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+        // Checks the player for exemptions.
         if (playerData.getTimeSince(ActionType.RESPAWN) < 1000L
                 || playerData.getTimeSince(ActionType.TELEPORT) < 1000L
                 || playerData.getTimeSince(ActionType.LOGIN) < 1000L
@@ -41,7 +43,7 @@ public class GroundSpoofB extends Check {
                     return;
                 }
 
-                flag("Sent empty Flying packet while falling"
+                flag(true, "Sent empty Flying packet while falling"
                         + " (velocityY=" + velocityY
                         + " airTicksStrict=" + airTicksStrict + ")"
                 );

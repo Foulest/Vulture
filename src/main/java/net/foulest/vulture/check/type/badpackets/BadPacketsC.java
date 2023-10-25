@@ -25,6 +25,7 @@ public class BadPacketsC extends Check {
     @Override
     public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
                        @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+        // Checks the player for exemptions.
         if (!playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8)) {
             return;
         }

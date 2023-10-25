@@ -46,7 +46,7 @@ public class KillAuraG extends Check {
 
                     if (timeDelta < 5) {
                         if (++buffer > 10) {
-                            flag("timeDelta=" + timeDelta);
+                            flag(false, "timeDelta=" + timeDelta);
                         }
                     } else {
                         buffer = 0;

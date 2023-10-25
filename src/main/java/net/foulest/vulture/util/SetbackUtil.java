@@ -1,5 +1,6 @@
 package net.foulest.vulture.util;
 
+import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -17,7 +18,16 @@ public class SetbackUtil {
 
     public static void setback(@NonNull Player player) {
         PlayerData playerData = DataManager.getPlayerData(player);
-        setback(player, playerData.getLastOnGroundLocation());
+
+        if (playerData.getTimestamp(ActionType.LAST_ON_GROUND_LOCATION_SET) == 0) {
+            setback(player, player.getLocation());
+        } else {
+            setback(player, playerData.getLastOnGroundLocation());
+        }
+    }
+
+    public static void setback(@NonNull Player player, @NonNull Vector3d vector3d) {
+        setback(player, new Location(player.getWorld(), vector3d.getX(), vector3d.getY(), vector3d.getZ()));
     }
 
     public static void setback(@NonNull Player player, @NonNull Location location) {

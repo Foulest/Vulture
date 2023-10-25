@@ -28,6 +28,7 @@ public class ReachC extends Check {
 
     @Override
     public void handle(@NonNull MovementEvent event, long timestamp) {
+        // Checks the player for exemptions.
         if (player.getGameMode().equals(GameMode.CREATIVE)
                 || playerData.getLastTarget() == null
                 || playerData.getTimeSince(ActionType.LAG) <= 200L
@@ -104,10 +105,8 @@ public class ReachC extends Check {
         }
 
         if (missed >= 3 && playerData.getTotalTicks() - playerData.getLastPacketDrop() > 10) {
-            debug("misses=" + missed);
-
             if ((buffer += 0.75) > 8.5) {
-                flag("misses=" + missed);
+                flag(false, "misses=" + missed);
             }
         } else {
             buffer = Math.max(buffer - 4.5, 0.0);

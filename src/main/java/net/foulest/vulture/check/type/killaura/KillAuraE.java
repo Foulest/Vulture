@@ -51,7 +51,7 @@ public class KillAuraE extends Check {
                 if ((dist > maxAngle || angle > 2) && range > 1.5) {
                     if (++buffer > 5) {
                         buffer = 0;
-                        flag("dist=" + dist + " maxAngle=" + maxAngle);
+                        flag(false, "dist=" + dist + " maxAngle=" + maxAngle);
                     }
                 } else if (dist < maxAngle && angle < 2) {
                     buffer = Math.max(buffer - 1, 0);

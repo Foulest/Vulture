@@ -47,7 +47,7 @@ public class KillAuraJ extends Check {
                 if (deltaXZ > baseSpeed) {
                     if (deltaXZDiff <= 0.01) {
                         if (++buffer > 9.5) {
-                            flag();
+                            flag(false);
                         }
                     } else {
                         buffer = Math.max(buffer - 0.75, 0);

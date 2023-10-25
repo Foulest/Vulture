@@ -28,12 +28,14 @@ public class BadPacketsB extends Check {
     @Override
     public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
                        @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+        // Checks the player for exemptions.
         if (PacketType.Play.Client.Util.isInstanceOfFlying(packetId)) {
             packetCounts.clear();
             return;
         }
 
         if (isExceededPacketLimit(packetId)) {
+            // Checks the player for exemptions.
             if (playerData.isInCamera() && packetId == -86) {
                 return;
             }
@@ -83,7 +85,7 @@ public class BadPacketsB extends Check {
                 return count > 2;
 
             case PacketType.Play.Client.CUSTOM_PAYLOAD:
-                return count > (olderThan1_8 ? 2 : 25);
+                return count > 25;
 
             case PacketType.Play.Client.ARM_ANIMATION:
                 return count > 20;

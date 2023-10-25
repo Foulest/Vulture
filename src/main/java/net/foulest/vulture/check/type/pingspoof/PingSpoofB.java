@@ -11,19 +11,21 @@ import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
-import net.foulest.vulture.util.data.EvictingList;
 import net.foulest.vulture.util.KickUtil;
+import net.foulest.vulture.util.data.EvictingList;
 import net.foulest.vulture.util.data.Pair;
 
 @CheckInfo(name = "PingSpoof (B)", type = CheckType.PINGSPOOF, acceptsServerPackets = true,
         description = "Detects clients modifying KeepAlive packets.")
 public class PingSpoofB extends Check {
 
-    private final EvictingList<Pair<WrappedPacketOutKeepAlive, Long>> keepAliveOut = new EvictingList<>(10);
+    private final EvictingList<Pair<Long, Long>> keepAliveOut = new EvictingList<>(10);
     private final EvictingList<Long> pingValues = new EvictingList<>(5);
+
     private int keepAliveInCount;
     private int keepAliveOutCount;
     private int negativeStreak;
+
     public static long maxPing;
     public static long maxAveragePing;
     public static long maxPingDeviation;
@@ -40,11 +42,11 @@ public class PingSpoofB extends Check {
 
         if (packetId == PacketType.Play.Server.KEEP_ALIVE) {
             WrappedPacketOutKeepAlive keepAlive = new WrappedPacketOutKeepAlive(nmsPacket);
-            keepAliveOut.add(new Pair<>(keepAlive, timestamp));
+            keepAliveOut.add(new Pair<>(keepAlive.getId(), timestamp));
             keepAliveOutCount++;
 
             // If the client might be cancelling sending KeepAlive packets, kick them.
-            if (keepAliveOutCount - keepAliveInCount >= 3 && !player.isDead()
+            if (keepAliveOutCount - keepAliveInCount >= 4 && !player.isDead()
                     && timeSinceRespawn > 1000L && timeSinceTeleport > 1000L) {
                 KickUtil.kickPlayer(player, event, "Might be cancelling sending KeepAlive packets");
             }
@@ -101,12 +103,12 @@ public class PingSpoofB extends Check {
 
             // If the client has sent a KeepAlive packet that was not sent by the server, kick them.
             if (keepAlive.getId() != 0) {
-                if (keepAliveOut.stream().noneMatch(pair -> pair.getX().getId() == keepAlive.getId())) {
+                if (keepAliveOut.stream().noneMatch(pair -> pair.getX() == keepAlive.getId())) {
                     KickUtil.kickPlayer(player, event, "Sent a KeepAlive packet that was not sent by the server: "
                             + keepAlive.getId());
                 } else {
                     // Remove the KeepAlive packet sent by the server.
-                    keepAliveOut.removeIf(pair -> pair.getX().getId() == keepAlive.getId());
+                    keepAliveOut.removeIf(pair -> pair.getX() == keepAlive.getId());
                 }
             }
         }

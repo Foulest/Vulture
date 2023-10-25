@@ -11,15 +11,16 @@ import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
-import net.foulest.vulture.util.data.EvictingList;
 import net.foulest.vulture.util.KickUtil;
+import net.foulest.vulture.util.data.EvictingList;
 import net.foulest.vulture.util.data.Pair;
 
 @CheckInfo(name = "PingSpoof (A)", type = CheckType.PINGSPOOF, acceptsServerPackets = true,
         description = "Detects clients modifying Transaction packets.")
 public class PingSpoofA extends Check {
 
-    private final EvictingList<Pair<WrappedPacketOutTransaction, Long>> transactionsOut = new EvictingList<>(500);
+    private final EvictingList<Pair<Short, Long>> transactionsOut = new EvictingList<>(500);
+
     private int transactionsInCount;
     private int transactionsOutCount;
 
@@ -32,7 +33,7 @@ public class PingSpoofA extends Check {
                        @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
         if (packetId == PacketType.Play.Server.TRANSACTION) {
             WrappedPacketOutTransaction transaction = new WrappedPacketOutTransaction(nmsPacket);
-            transactionsOut.add(new Pair<>(transaction, timestamp));
+            transactionsOut.add(new Pair<>(transaction.getActionNumber(), timestamp));
             transactionsOutCount++;
 
             // If the client might be cancelling sending Transaction packets, kick them.
@@ -53,7 +54,7 @@ public class PingSpoofA extends Check {
             }
 
             // If the client has sent a Transaction packet that was not sent by the server, kick them.
-            if (transactionsOut.stream().noneMatch(pair -> pair.getX().getActionNumber() == transaction.getActionNumber())) {
+            if (transactionsOut.stream().noneMatch(pair -> pair.getX() == transaction.getActionNumber())) {
                 if (playerData.getTimeSince(ActionType.LOGIN) < 1000
                         || playerData.getTimeSince(ActionType.RESPAWN) < 1000
                         || playerData.getTimeSince(ActionType.TELEPORT) < 1000) {
@@ -64,7 +65,7 @@ public class PingSpoofA extends Check {
                         + transaction.getActionNumber());
             } else {
                 // Remove the Transaction packet sent by the server.
-                transactionsOut.removeIf(pair -> pair.getX().getActionNumber() == transaction.getActionNumber());
+                transactionsOut.removeIf(pair -> pair.getX() == transaction.getActionNumber());
             }
         }
     }

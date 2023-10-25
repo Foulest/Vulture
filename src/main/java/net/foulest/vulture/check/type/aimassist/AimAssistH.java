@@ -1,7 +1,6 @@
 package net.foulest.vulture.check.type.aimassist;
 
 import com.google.common.collect.Lists;
-import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
 import lombok.NonNull;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
@@ -23,10 +22,7 @@ public class AimAssistH extends Check {
 
     @Override
     public void handle(@NonNull RotationEvent event, long timestamp) {
-        WrappedPacketInFlying to = event.getTo();
-        WrappedPacketInFlying from = event.getFrom();
-
-        double deltaPitch = Math.abs(to.getPitch() - from.getPitch());
+        double deltaPitch = event.getDeltaPitch();
 
         if (deltaPitch > 0.0 && deltaPitch < 40.0) {
             samples.add(deltaPitch);
@@ -39,7 +35,7 @@ public class AimAssistH extends Check {
 
             if (average > 19.5 && average < 26.5 && duplicates >= 2) {
                 if (++buffer > 2) {
-                    flag("average=" + average
+                    flag(false, "average=" + average
                             + " duplicates=" + duplicates);
                 }
             } else {

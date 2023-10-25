@@ -67,7 +67,7 @@ public class InventoryC extends Check {
 
         if (stage == 3 && timeDiff < 99) {
             stage = 0;
-            flag("timeDiff=" + timeDiff);
+            flag(false, "timeDiff=" + timeDiff);
         }
     }
 }

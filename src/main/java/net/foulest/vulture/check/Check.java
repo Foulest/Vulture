@@ -10,10 +10,7 @@ import lombok.Setter;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.event.MovementEvent;
 import net.foulest.vulture.event.RotationEvent;
-import net.foulest.vulture.util.KickUtil;
-import net.foulest.vulture.util.MessageUtil;
-import net.foulest.vulture.util.SetbackUtil;
-import net.foulest.vulture.util.Settings;
+import net.foulest.vulture.util.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -88,8 +85,8 @@ public class Check {
      *
      * @param verbose the optional data to include in the flag
      */
-    protected final void flag(@NonNull String... verbose) {
-        flag(false, verbose);
+    protected final void flag(boolean setback, @NonNull String... verbose) {
+        flag(setback, false, verbose);
     }
 
     /**
@@ -98,7 +95,7 @@ public class Check {
      * @param verbose the optional data to include in the flag
      */
     protected final void debug(@NonNull String... verbose) {
-        flag(true, verbose);
+        flag(false, true, verbose);
     }
 
     /**
@@ -108,11 +105,17 @@ public class Check {
      *
      * @param verbose the optional data to include in the flag
      */
-    protected final void flag(boolean debug, @NonNull String... verbose) {
+    protected final void flag(boolean setback, boolean debug, @NonNull String... verbose) {
+        // Checks the player for exemptions.
         if (playerData.isNewViolationsPaused()
                 || PacketEvents.get().getServerUtils().getTPS() < 18
                 || !checkInfo.enabled()) {
             return;
+        }
+
+        // Sets the player back to their previous position.
+        if (setback) {
+            SetbackUtil.setback(player);
         }
 
         String verboseString = verbose.length == 0 ? "" : " &7[" + String.join(", ", verbose) + "]";
@@ -137,11 +140,6 @@ public class Check {
                 }
             }
         } catch (ConcurrentModificationException ignored) {
-        }
-
-        // Pulls the player back if setback is enabled.
-        if (checkInfo.setback()) {
-            SetbackUtil.setback(player);
         }
 
         // Increments the violations.
@@ -169,19 +167,27 @@ public class Check {
         if (violations >= checkInfo.maxViolations() && !checkInfo.experimental() && !checkInfo.banCommand().isEmpty()) {
             playerData.setNewViolationsPaused(true);
 
+            boolean kicking = (checkInfo.banCommand().startsWith("vulture kick")
+                    || checkInfo.banCommand().startsWith("kick"));
+
             // Sends the ban alert message.
-            MessageUtil.sendAlert("&f" + player.getName() + " &7was banned for failing &f"
-                    + checkInfo.name() + " &c(x" + violations + ")" + verboseString);
+            MessageUtil.sendAlert("&f" + player.getName() + " &7has been " + (kicking ? "kicked" : "banned")
+                    + " for failing &f" + checkInfo.name() + " &c(x" + violations + ")" + verboseString);
 
             // Broadcasts the ban message, if one is set.
-            if (!Settings.banMessage.isEmpty()) {
+            if (!Settings.banMessage.isEmpty() && !kicking) {
                 List<String> banMessageEdited = new ArrayList<>(Settings.banMessage);
                 banMessageEdited.replaceAll(s -> s.replace("%player%", player.getName()));
+                banMessageEdited.replaceAll(s -> s.replace("%check%", checkInfo.name()));
                 MessageUtil.broadcastList(banMessageEdited);
             }
 
             // Executes the ban command.
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), checkInfo.banCommand().replace("%player%", player.getName()));
+            TaskUtil.run(() -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), checkInfo.banCommand()
+                    .replace("%player%", player.getName())
+                    .replace("%check%", checkInfo.name())));
+
+            // Kicks the player to ensure they are disconnected.
             KickUtil.kickPlayer(player, "", "Disconnected", false);
         }
     }

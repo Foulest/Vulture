@@ -1,21 +1,19 @@
 package net.foulest.vulture.check.type.inventory;
 
-import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
-import io.github.retrooper.packetevents.utils.vector.Vector3d;
+import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
+import io.github.retrooper.packetevents.packettype.PacketType;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
+import io.github.retrooper.packetevents.packetwrappers.play.in.blockdig.WrappedPacketInBlockDig;
+import io.github.retrooper.packetevents.packetwrappers.play.in.clientcommand.WrappedPacketInClientCommand;
+import io.github.retrooper.packetevents.packetwrappers.play.in.entityaction.WrappedPacketInEntityAction;
 import lombok.NonNull;
-import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
-import net.foulest.vulture.event.MovementEvent;
-import net.foulest.vulture.util.MovementUtil;
-import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.util.Vector;
+import net.foulest.vulture.processor.type.PacketProcessor;
 
-@CheckInfo(name = "Inventory (K)", type = CheckType.INVENTORY, maxViolations = 25,
-        description = "Prevents players from moving with an open inventory.")
+@CheckInfo(name = "Inventory (K)", type = CheckType.INVENTORY)
 public class InventoryK extends Check {
 
     public InventoryK(@NonNull PlayerData playerData) throws ClassNotFoundException {
@@ -23,34 +21,67 @@ public class InventoryK extends Check {
     }
 
     @Override
-    public void handle(@NonNull MovementEvent event, long timestamp) {
-        WrappedPacketInFlying to = event.getTo();
-        WrappedPacketInFlying from = event.getFrom();
+    public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
+                       @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+        if (playerData.isInventoryOpen()) {
+            switch (packetId) {
+                case PacketType.Play.Client.CLOSE_WINDOW:
+                case PacketType.Play.Client.FLYING:
+                case PacketType.Play.Client.HELD_ITEM_SLOT:
+                case PacketType.Play.Client.KEEP_ALIVE:
+                case PacketType.Play.Client.LOOK:
+                case PacketType.Play.Client.POSITION:
+                case PacketType.Play.Client.POSITION_LOOK:
+                case PacketType.Play.Client.SETTINGS:
+                case PacketType.Play.Client.SET_CREATIVE_SLOT:
+                case PacketType.Play.Client.TRANSACTION:
+                case PacketType.Play.Client.VEHICLE_MOVE:
+                case PacketType.Play.Client.WINDOW_CLICK:
+                    break;
 
-        Vector3d toPosition = to.getPosition();
-        Vector3d fromPosition = from.getPosition();
+                case PacketType.Play.Client.BLOCK_DIG:
+                    WrappedPacketInBlockDig blockDig = new WrappedPacketInBlockDig(nmsPacket);
+                    WrappedPacketInBlockDig.PlayerDigType digType = blockDig.getDigType();
 
-        double deltaX = toPosition.getX() - fromPosition.getX();
-        double deltaZ = toPosition.getZ() - fromPosition.getZ();
-        double deltaXZ = Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
+                    if (digType == WrappedPacketInBlockDig.PlayerDigType.START_DESTROY_BLOCK
+                            || digType == WrappedPacketInBlockDig.PlayerDigType.STOP_DESTROY_BLOCK
+                            || digType == WrappedPacketInBlockDig.PlayerDigType.DROP_ALL_ITEMS
+                            || digType == WrappedPacketInBlockDig.PlayerDigType.DROP_ITEM) {
+                        flag(false, "Sent invalid packet while in inventory: "
+                                + PacketProcessor.getPacketFromId(packetId).getSimpleName()
+                                + " (" + digType + ")");
+                    }
+                    break;
 
-        Vector velocity = player.getVelocity();
+                case PacketType.Play.Client.CLIENT_COMMAND:
+                    WrappedPacketInClientCommand clientCommand = new WrappedPacketInClientCommand(nmsPacket);
+                    WrappedPacketInClientCommand.ClientCommand command = clientCommand.getClientCommand();
 
-        long timeSinceOpen = playerData.getTimeSince(ActionType.INVENTORY_OPEN);
+                    if (command != WrappedPacketInClientCommand.ClientCommand.OPEN_INVENTORY_ACHIEVEMENT) {
+                        flag(false, "Sent invalid packet while in inventory: "
+                                + PacketProcessor.getPacketFromId(packetId).getSimpleName()
+                                + " (" + command + ")");
+                    }
+                    break;
 
-        float speedLevel = MovementUtil.getPotionEffectLevel(player, PotionEffectType.SPEED);
-        float slownessLevel = MovementUtil.getPotionEffectLevel(player, PotionEffectType.SPEED);
-        // TODO: factor in slowness level
+                case PacketType.Play.Client.ENTITY_ACTION:
+                    WrappedPacketInEntityAction entityAction = new WrappedPacketInEntityAction(nmsPacket);
+                    WrappedPacketInEntityAction.PlayerAction action = entityAction.getAction();
 
-        double maxSpeed = player.getInventory().getType() == InventoryType.PLAYER ? 0.1 : 0.16;
-        maxSpeed += playerData.getGroundTicks() < 5 ? speedLevel * 0.07 : speedLevel * 0.0573;
-        maxSpeed += Math.abs(playerData.getVelocityHorizontal());
-        maxSpeed += Math.abs(velocity.getX());
-        maxSpeed += Math.abs(velocity.getZ());
+                    if (action == WrappedPacketInEntityAction.PlayerAction.START_SPRINTING
+                            || action == WrappedPacketInEntityAction.PlayerAction.START_SNEAKING
+                            || action == WrappedPacketInEntityAction.PlayerAction.RIDING_JUMP) {
+                        flag(false, "Sent invalid packet while in inventory: "
+                                + PacketProcessor.getPacketFromId(packetId).getSimpleName()
+                                + " (" + action + ")");
+                    }
+                    break;
 
-        // Detects moving while inventory is open.
-        if (playerData.isInventoryOpen() && deltaXZ > maxSpeed && timeSinceOpen > 500) {
-            flag("deltaXZ=" + deltaXZ + " maxSpeed=" + maxSpeed + " timeSinceOpen=" + timeSinceOpen);
+                default:
+                    flag(false, "Sent invalid packet while in inventory: "
+                            + PacketProcessor.getPacketFromId(packetId).getSimpleName());
+                    break;
+            }
         }
     }
 }

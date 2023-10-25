@@ -18,12 +18,12 @@ Vulture is a robust, free, and open-source anticheat plugin designed specificall
 **Movement Checks:**
 - Flight _(x1)_
 - GroundSpoof _(x2)_
-- Invalid _(x4)_
-- Speed _(x5)_
+- Invalid _(x2)_
+- Speed _(x6)_
 - Timer _(x1)_
 
 **Other Checks:**
 - BadPackets _(x8)_
 - ClientBrand _(x1)_
-- Inventory _(x12)_
+- Inventory _(x11)_
 - PingSpoof _(x2)_

@@ -1,6 +1,5 @@
 package net.foulest.vulture.data;
 
-import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
 import io.github.retrooper.packetevents.packetwrappers.play.out.position.WrappedPacketOutPosition;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
@@ -8,17 +7,14 @@ import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import net.foulest.vulture.Vulture;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.Violation;
 import net.foulest.vulture.check.type.clientbrand.type.PayloadType;
 import net.foulest.vulture.util.data.EvictingList;
-import net.foulest.vulture.util.KickUtil;
 import net.foulest.vulture.util.data.Observable;
 import net.foulest.vulture.util.data.Pair;
 import net.foulest.vulture.util.raytrace.BoundingBox;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -118,13 +114,14 @@ public class PlayerData {
 
     // Block data
     private boolean moving;
+    private boolean nearGround;
     private boolean onGround;
-    private boolean onGroundStrict;
     private boolean onSlab;
     private boolean onStairs;
     private boolean nearPiston;
     private boolean nearCactus;
     private boolean inWeb;
+    private boolean inLiquid;
     private boolean nearLiquid;
     private boolean onChest;
     private boolean onClimbable;
@@ -189,16 +186,6 @@ public class PlayerData {
         }
 
         setTimestamp(ActionType.LOGIN);
-
-        Bukkit.getScheduler().runTaskLater(Vulture.instance, () -> {
-            if (player.isOnline()) {
-                version = PacketEvents.get().getPlayerUtils().getClientVersion(player);
-
-                if (version == ClientVersion.UNRESOLVED) {
-                    KickUtil.kickPlayer(player, "Failed to resolve client version", false);
-                }
-            }
-        }, 20L);
     }
 
     /**
