@@ -101,17 +101,6 @@ public class FlightA extends Check {
         double predictionDiffLastVel = Math.abs(deltaY - lastVelocity);
         double predictionDiffNextVel = Math.abs(deltaY - predictionNextVel);
 
-        debug("Falling"
-                + " deltaY=" + deltaY
-                + " velocity=" + velocity + " |"
-                + " predictionY=" + predictionY
-                + " predictionVel=" + predictionVel + " |"
-                + " predictionDiffY=" + predictionDiffY
-                + " predictionDiffVel=" + predictionDiffVel
-                + " predictionDiffLastVel=" + predictionDiffLastVel
-                + " predictionDiffNextVel=" + predictionDiffNextVel + " |"
-                + " fallingTicks=" + fallingTicks + ")");
-
         if (predictionDiffY > 0.001 && (predictionDiffVel > 0.001
                 && predictionDiffLastVel > 0.001 && predictionDiffNextVel > 0.001)) {
 
