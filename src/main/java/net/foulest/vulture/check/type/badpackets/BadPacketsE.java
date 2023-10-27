@@ -11,7 +11,8 @@ import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.util.KickUtil;
 
-@CheckInfo(name = "BadPackets (E)", type = CheckType.BADPACKETS, acceptsServerPackets = true,
+@CheckInfo(name = "BadPackets (E)", type = CheckType.BADPACKETS,
+        acceptsServerPackets = true, punishable = false,
         description = "Detects sending invalid ResourcePackStatus packets.")
 public class BadPacketsE extends Check {
 

@@ -12,7 +12,7 @@ import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.util.KickUtil;
 
-@CheckInfo(name = "BadPackets (C)", type = CheckType.BADPACKETS,
+@CheckInfo(name = "BadPackets (C)", type = CheckType.BADPACKETS, punishable = false,
         description = "Detects sending attack packets without swinging.")
 public class BadPacketsC extends Check {
 

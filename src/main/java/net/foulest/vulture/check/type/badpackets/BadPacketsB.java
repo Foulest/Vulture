@@ -15,7 +15,7 @@ import org.bukkit.GameMode;
 import java.util.HashMap;
 import java.util.Map;
 
-@CheckInfo(name = "BadPackets (B)", type = CheckType.BADPACKETS,
+@CheckInfo(name = "BadPackets (B)", type = CheckType.BADPACKETS, punishable = false,
         description = "Detects sending too many packets in the same tick.")
 public class BadPacketsB extends Check {
 
@@ -40,7 +40,8 @@ public class BadPacketsB extends Check {
                 return;
             }
 
-            KickUtil.kickPlayer(player, event, "Sent too many packets (" + packetId + ")");
+            KickUtil.kickPlayer(player, event, "Sent too many packets (" + packetId + ")" +
+                    " (1_8: " + playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8) + ")");
         }
     }
 
@@ -85,18 +86,22 @@ public class BadPacketsB extends Check {
                 return count > 2;
 
             case PacketType.Play.Client.CUSTOM_PAYLOAD:
-                return count > 25;
+                return count > 26;
 
             case PacketType.Play.Client.ARM_ANIMATION:
                 return count > 20;
 
             case PacketType.Play.Client.BLOCK_DIG:
-            case PacketType.Play.Client.USE_ENTITY:
                 return count > 3;
 
+            case PacketType.Play.Client.USE_ENTITY:
+                return count > (olderThan1_8 ? 3 : 6);
+
             case PacketType.Play.Client.CLOSE_WINDOW:
-            case PacketType.Play.Client.HELD_ITEM_SLOT:
                 return count > (olderThan1_8 ? 1 : 2);
+
+            case PacketType.Play.Client.HELD_ITEM_SLOT:
+                return count > (olderThan1_8 ? 1 : 3);
 
             case PacketType.Play.Client.ENTITY_ACTION:
                 return count > (creative ? 2 : 1);

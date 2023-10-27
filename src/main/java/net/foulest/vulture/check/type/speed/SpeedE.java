@@ -1,6 +1,7 @@
 package net.foulest.vulture.check.type.speed;
 
 import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
+import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import lombok.NonNull;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
@@ -11,7 +12,7 @@ import net.foulest.vulture.event.MovementEvent;
 import net.foulest.vulture.util.MovementUtil;
 import org.bukkit.potion.PotionEffectType;
 
-@CheckInfo(name = "Speed (E)", type = CheckType.SPEED, maxViolations = 25,
+@CheckInfo(name = "Speed (E)", type = CheckType.SPEED,
         description = "Prevents players from using no-slowdown.")
 public class SpeedE extends Check {
 
@@ -24,6 +25,11 @@ public class SpeedE extends Check {
 
     @Override
     public void handle(@NonNull MovementEvent event, long timestamp) {
+        // Checks the player for exemptions.
+        if (event.isTeleport(playerData)) {
+            return;
+        }
+
         WrappedPacketInFlying to = event.getTo();
 
         long timeSinceBlocking = playerData.getTimeSince(ActionType.BLOCKING);
@@ -44,6 +50,7 @@ public class SpeedE extends Check {
         double velocityHorizontal = playerData.getVelocityHorizontal();
         double maxSpeed = to.isOnGround() ? 0.21 : 0.32400000005960464;
 
+        maxSpeed += (playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8) ? 0.0 : 0.2);
         maxSpeed += (walkSpeed - 0.2) * 0.02;
         maxSpeed += (flySpeed - 0.1) * 0.01;
         maxSpeed += velocityHorizontal;

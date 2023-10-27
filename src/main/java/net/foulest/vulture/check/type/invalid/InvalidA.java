@@ -10,7 +10,7 @@ import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.event.MovementEvent;
 
-@CheckInfo(name = "Invalid (A)", type = CheckType.INVALID, maxViolations = 25)
+@CheckInfo(name = "Invalid (A)", type = CheckType.INVALID)
 public class InvalidA extends Check {
 
     private double buffer;

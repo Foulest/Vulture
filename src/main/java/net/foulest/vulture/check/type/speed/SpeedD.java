@@ -14,7 +14,7 @@ import org.bukkit.GameMode;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-@CheckInfo(name = "Speed (D)", type = CheckType.SPEED, maxViolations = 25)
+@CheckInfo(name = "Speed (D)", type = CheckType.SPEED)
 public class SpeedD extends Check {
 
     private double buffer;

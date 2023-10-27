@@ -7,7 +7,7 @@ import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.event.MovementEvent;
 
-@CheckInfo(name = "Invalid (B)", type = CheckType.INVALID, maxViolations = 25,
+@CheckInfo(name = "Invalid (B)", type = CheckType.INVALID,
         description = "Detects players continually rising.")
 public class InvalidB extends Check {
 

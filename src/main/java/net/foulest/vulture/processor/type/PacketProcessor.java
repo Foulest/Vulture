@@ -590,7 +590,7 @@ public class PacketProcessor extends Processor {
 
                 switch (playerAction) {
                     case START_SPRINTING:
-                        if (playerData.isBlocking()
+                        if ((playerData.isBlocking() && playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8))
                                 || playerData.isShootingBow()
                                 || playerData.isEating()
                                 || playerData.isDrinking()
@@ -845,7 +845,7 @@ public class PacketProcessor extends Processor {
                     playerData.setOnGroundPacket(flying.isOnGround());
                     playerData.setLastOnGround(playerData.isNearGround());
                     playerData.setOnGround(BlockUtil.isOnGroundOffset(player, 0.001));
-                    playerData.setNearGround(BlockUtil.isOnGroundOffset(player, 0.5));
+                    playerData.setNearGround(BlockUtil.isOnGroundOffset(player, 0.21)); // Normally 0.105
 
                     // Sets non-strict ground data.
                     if (playerData.isNearGround()) {
@@ -940,7 +940,8 @@ public class PacketProcessor extends Processor {
 
                             // Ignores teleport packets.
                             playerData.setMoving(true);
-                            handleMovementChecks(playerData, new MovementEvent(flying, playerData.getLastPositionPacket(), event));
+                            handleMovementChecks(playerData, new MovementEvent(playerData,
+                                    flying, playerData.getLastPositionPacket(), event));
                         } else {
                             playerData.setMoving(false);
                         }
@@ -1130,7 +1131,11 @@ public class PacketProcessor extends Processor {
                         || playerData.isDigging()
                         || entity == player
                         || entityId < 0) {
-                    KickUtil.kickPlayer(player, event, "Sent invalid UseEntity packet");
+                    KickUtil.kickPlayer(player, event, "Sent invalid UseEntity packet"
+                            + " (" + playerData.isInventoryOpen() + " " + playerData.isPlacingBlock()
+                            + " " + playerData.isShootingBow() + " " + playerData.isEating()
+                            + " " + playerData.isDrinking() + " " + playerData.isDigging()
+                            + " " + (entity == player) + " " + entityId + ")");
                     return;
                 }
 
@@ -1270,6 +1275,8 @@ public class PacketProcessor extends Processor {
     }
 
     @Override
+    // TODO: Look into spoofing entity health to prevent health bar mods.
+    //       Also, look into spoofing player enchants for the same reason.
     public void onPacketPlaySend(@NonNull PacketPlaySendEvent event) {
         Player player = event.getPlayer();
         PlayerData playerData = DataManager.getPlayerData(player);

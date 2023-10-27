@@ -5,6 +5,7 @@ import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
 import lombok.NonNull;
+import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
@@ -13,7 +14,7 @@ import net.foulest.vulture.util.KickUtil;
 import net.foulest.vulture.util.TaskUtil;
 import org.bukkit.Bukkit;
 
-@CheckInfo(name = "BadPackets (D)", type = CheckType.BADPACKETS,
+@CheckInfo(name = "BadPackets (D)", type = CheckType.BADPACKETS, punishable = false,
         description = "Detects ignoring the mandatory Position packet.")
 public class BadPacketsD extends Check {
 
@@ -50,7 +51,8 @@ public class BadPacketsD extends Check {
 
     public void checkDifference() {
         // Checks the player for exemptions.
-        if (player.isDead()) {
+        if (player.isDead() || player.isInsideVehicle()
+                || playerData.getTimeSince(ActionType.LOGIN) < 10000L) {
             return;
         }
 

@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import net.foulest.vulture.cmds.VultureCmd;
-import net.foulest.vulture.listeners.BukkitListener;
 import net.foulest.vulture.listeners.PlayerDataListener;
 import net.foulest.vulture.processor.type.PacketProcessor;
 import net.foulest.vulture.util.Settings;
@@ -17,7 +16,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 /**
  * Main class for Vulture.
- * <p>
  *
  * @author Foulest
  * @project Vulture
@@ -67,7 +65,7 @@ public class Vulture extends JavaPlugin {
 
         // Loads the plugin's listeners.
         Bukkit.getLogger().info("[" + pluginName + "] Loading Listeners...");
-        loadListeners(new PlayerDataListener(), new BukkitListener());
+        loadListeners(new PlayerDataListener());
 
         // Loads the plugin's commands.
         Bukkit.getLogger().info("[" + pluginName + "] Loading Commands...");

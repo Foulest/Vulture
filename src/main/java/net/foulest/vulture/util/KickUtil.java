@@ -76,7 +76,7 @@ public final class KickUtil {
 
             // This may cause "Player not found." to appear in the console.
             // This, for now, is a necessary evil. Some players wouldn't get kicked otherwise.
-            TaskUtil.run(() -> player.kickPlayer(reason));
+            TaskUtil.run(() -> player.kickPlayer(MessageUtil.colorize(reason)));
         }
     }
 }

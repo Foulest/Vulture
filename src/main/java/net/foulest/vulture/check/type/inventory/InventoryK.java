@@ -35,7 +35,9 @@ public class InventoryK extends Check {
                 case PacketType.Play.Client.SETTINGS:
                 case PacketType.Play.Client.SET_CREATIVE_SLOT:
                 case PacketType.Play.Client.TRANSACTION:
+                case PacketType.Play.Client.STEER_VEHICLE:
                 case PacketType.Play.Client.VEHICLE_MOVE:
+                case PacketType.Play.Client.CUSTOM_PAYLOAD:
                 case PacketType.Play.Client.WINDOW_CLICK:
                     break;
 

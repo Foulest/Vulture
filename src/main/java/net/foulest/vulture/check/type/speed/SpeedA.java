@@ -12,7 +12,7 @@ import net.foulest.vulture.util.MovementUtil;
 import org.bukkit.GameMode;
 import org.bukkit.potion.PotionEffectType;
 
-@CheckInfo(name = "Speed (A)", type = CheckType.SPEED, maxViolations = 25)
+@CheckInfo(name = "Speed (A)", type = CheckType.SPEED)
 public class SpeedA extends Check {
 
     private double buffer;

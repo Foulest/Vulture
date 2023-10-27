@@ -5,6 +5,7 @@ import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.play.in.transaction.WrappedPacketInTransaction;
 import io.github.retrooper.packetevents.packetwrappers.play.out.transaction.WrappedPacketOutTransaction;
+import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import lombok.NonNull;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
@@ -15,7 +16,8 @@ import net.foulest.vulture.util.KickUtil;
 import net.foulest.vulture.util.data.EvictingList;
 import net.foulest.vulture.util.data.Pair;
 
-@CheckInfo(name = "PingSpoof (A)", type = CheckType.PINGSPOOF, acceptsServerPackets = true,
+@CheckInfo(name = "PingSpoof (A)", type = CheckType.PINGSPOOF,
+        acceptsServerPackets = true, punishable = false,
         description = "Detects clients modifying Transaction packets.")
 public class PingSpoofA extends Check {
 
@@ -39,6 +41,10 @@ public class PingSpoofA extends Check {
             // If the client might be cancelling sending Transaction packets, kick them.
             // The cancelling streak threshold is 385, which roughly equates to 10 seconds.
             if (transactionsOutCount - transactionsInCount >= 385) {
+                if (!playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8)) {
+                    return;
+                }
+
                 transactionsOutCount = 0; // Resets the count to avoid kicking players twice.
                 KickUtil.kickPlayer(player, event, "Might be cancelling sending Transaction packets");
             }

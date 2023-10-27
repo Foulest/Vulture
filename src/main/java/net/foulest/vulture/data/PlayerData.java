@@ -29,7 +29,7 @@ public class PlayerData {
     // Player data
     private UUID uniqueId;
     private Player player;
-    private ClientVersion version = ClientVersion.UNKNOWN;
+    private ClientVersion version = ClientVersion.TEMP_UNRESOLVED;
     @Getter
     private final List<Check> checks = new ArrayList<>();
 

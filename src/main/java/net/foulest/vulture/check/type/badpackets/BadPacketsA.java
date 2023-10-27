@@ -34,6 +34,7 @@ public class BadPacketsA extends Check {
                 && packetId != PacketType.Play.Client.SETTINGS
                 && packetId != PacketType.Play.Client.CUSTOM_PAYLOAD
                 && packetId != PacketType.Play.Client.ENTITY_ACTION
+                && packetId != PacketType.Play.Client.CLOSE_WINDOW
                 && packetId != PacketType.Play.Client.BLOCK_DIG
                 && packetId != PacketType.Play.Client.BLOCK_PLACE) {
             long timeSinceLag = playerData.getTimeSince(ActionType.LAG);

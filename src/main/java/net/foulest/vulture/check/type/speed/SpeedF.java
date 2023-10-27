@@ -12,7 +12,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-@CheckInfo(name = "Speed (F)", type = CheckType.SPEED, maxViolations = 25,
+@CheckInfo(name = "Speed (F)", type = CheckType.SPEED,
         description = "Prevents players from moving with an open inventory.")
 public class SpeedF extends Check {
 

@@ -39,6 +39,8 @@ public class Settings {
     public static List<String> banMessage;
     public static long resetViolations;
 
+    public static List<String> blacklistedPayloads;
+
     /**
      * Initialize and set up default configuration values.
      */
@@ -61,6 +63,8 @@ public class Settings {
         prefix = config.getString("vulture.prefix");
         banMessage = config.getStringList("vulture.banMessage");
         resetViolations = config.getLong("vulture.resetViolations");
+
+        blacklistedPayloads = config.getStringList("vulture.blacklisted-payloads");
 
         PingSpoofB.maxPing = config.getLong("checks.pingspoof.B.maxPing");
         PingSpoofB.maxAveragePing = config.getLong("checks.pingspoof.B.maxAveragePing");
@@ -91,6 +95,8 @@ public class Settings {
         config.set("vulture.prefix", prefix);
         config.set("vulture.banMessage", banMessage);
         config.set("vulture.resetViolations", resetViolations);
+
+        config.set("vulture.blacklisted-payloads", blacklistedPayloads);
 
         config.set("checks.pingspoof.B.maxPing", PingSpoofB.maxPing);
         config.set("checks.pingspoof.B.maxAveragePing", PingSpoofB.maxAveragePing);
@@ -125,6 +131,8 @@ public class Settings {
         config.addDefault("vulture.prefix", "&e[Vulture]");
         config.addDefault("vulture.banMessage", Collections.singletonList("&c%player% has been removed from the network."));
         config.addDefault("vulture.resetViolations", 600);
+
+        config.addDefault("vulture.blacklisted-payloads", Collections.singletonList("GalactiCraft"));
 
         for (Class<? extends Check> check : CheckManager.CHECK_CLASSES) {
             String name = getCheckName(check);

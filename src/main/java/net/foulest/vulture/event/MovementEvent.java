@@ -7,12 +7,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import net.foulest.vulture.data.PlayerData;
+import org.bukkit.Location;
 
 @Getter
 @Setter
 @AllArgsConstructor
 public class MovementEvent implements CancellableEvent {
 
+    public final PlayerData playerData;
     public final WrappedPacketInFlying to;
     public final WrappedPacketInFlying from;
     public final CancellableNMSPacketEvent event;
@@ -52,5 +54,15 @@ public class MovementEvent implements CancellableEvent {
 
     public boolean isYLevel() {
         return to.getPosition().getY() % 0.015625 == 0.0;
+    }
+
+    public Location getToLocation() {
+        return new Location(playerData.getPlayer().getWorld(), to.getPosition().getX(),
+                to.getPosition().getY(), to.getPosition().getZ());
+    }
+
+    public Location getFromLocation() {
+        return new Location(playerData.getPlayer().getWorld(), from.getPosition().getX(),
+                from.getPosition().getY(), from.getPosition().getZ());
     }
 }

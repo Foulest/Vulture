@@ -7,7 +7,7 @@ import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.event.MovementEvent;
 
-@CheckInfo(name = "Speed (B)", type = CheckType.SPEED, maxViolations = 25)
+@CheckInfo(name = "Speed (B)", type = CheckType.SPEED)
 public class SpeedB extends Check {
 
     private double buffer;

@@ -20,7 +20,7 @@ public class MovementUtil {
 
     public static int getPotionEffectLevel(@NonNull Player player, @NonNull PotionEffectType effectType) {
         for (PotionEffect effect : player.getActivePotionEffects()) {
-            if (effect.getType().getName().equals(effectType.getName())) {
+            if (effect.getType() == effectType) {
                 return effect.getAmplifier() + 1;
             }
         }
@@ -28,14 +28,15 @@ public class MovementUtil {
     }
 
     public static int getDepthStriderLevel(@NonNull Player player) {
-        if (player.getInventory().getBoots() != null
-                && hasEnchantment(player.getInventory().getBoots(), Enchantment.getByName("DEPTH_STRIDER"))) {
-            return player.getInventory().getBoots().getEnchantments().get(Enchantment.getByName("DEPTH_STRIDER"));
+        ItemStack boots = player.getInventory().getBoots();
+
+        if (boots != null) {
+            Enchantment depthStrider = Enchantment.getByName("DEPTH_STRIDER");
+
+            if (boots.getEnchantments().containsKey(depthStrider)) {
+                return boots.getEnchantments().get(depthStrider);
+            }
         }
         return 0;
-    }
-
-    public static boolean hasEnchantment(@NonNull ItemStack itemStack, @NonNull Enchantment enchantment) {
-        return itemStack.getEnchantments().containsKey(enchantment);
     }
 }

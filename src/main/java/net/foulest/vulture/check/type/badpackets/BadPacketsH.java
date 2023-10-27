@@ -25,11 +25,7 @@ public class BadPacketsH extends Check {
     @Override
     public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
                        @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
-        if (!playerData.isInBed()) {
-            ticksInBed = 0;
-        } else {
-            ticksInBed++;
-        }
+        ticksInBed = !playerData.isInBed() ? 0 : ticksInBed + 1;
 
         // Checks the player for exemptions.
         if (ticksInBed < 10) {

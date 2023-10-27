@@ -9,8 +9,6 @@ import net.foulest.vulture.check.type.autoblock.AutoBlockC;
 import net.foulest.vulture.check.type.autoblock.AutoBlockD;
 import net.foulest.vulture.check.type.autoclicker.AutoClickerA;
 import net.foulest.vulture.check.type.autoclicker.AutoClickerB;
-import net.foulest.vulture.check.type.autoclicker.AutoClickerC;
-import net.foulest.vulture.check.type.autoclicker.AutoClickerD;
 import net.foulest.vulture.check.type.badpackets.*;
 import net.foulest.vulture.check.type.clientbrand.ClientBrand;
 import net.foulest.vulture.check.type.flight.FlightA;
@@ -50,9 +48,6 @@ public class CheckManager {
      * @see Check
      */
     public static final List<Class<? extends Check>> CHECK_CLASSES = Collections.unmodifiableList(Arrays.asList(
-            // Non-Traditional Checks
-            ClientBrand.class,
-
             // AimAssist
             AimAssistA.class, AimAssistB.class, AimAssistC.class, AimAssistD.class, AimAssistE.class,
             AimAssistF.class, AimAssistG.class, AimAssistH.class, AimAssistI.class,
@@ -61,11 +56,14 @@ public class CheckManager {
             AutoBlockA.class, AutoBlockB.class, AutoBlockC.class, AutoBlockD.class,
 
             // AutoClicker
-            AutoClickerA.class, AutoClickerB.class, AutoClickerC.class, AutoClickerD.class,
+            AutoClickerA.class, AutoClickerB.class,
 
             // BadPackets
             BadPacketsA.class, BadPacketsB.class, BadPacketsC.class, BadPacketsD.class, BadPacketsE.class,
             BadPacketsF.class, BadPacketsG.class, BadPacketsH.class,
+
+            // ClientBrand
+            ClientBrand.class,
 
             // Flight
             FlightA.class,

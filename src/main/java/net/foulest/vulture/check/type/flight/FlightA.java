@@ -12,7 +12,7 @@ import net.foulest.vulture.util.block.BlockUtil;
 import org.bukkit.GameMode;
 import org.bukkit.potion.PotionEffectType;
 
-@CheckInfo(name = "Flight (A)", type = CheckType.FLIGHT, maxViolations = 25,
+@CheckInfo(name = "Flight (A)", type = CheckType.FLIGHT,
         description = "Checks for invalid y-axis movement when falling.")
 public class FlightA extends Check {
 
@@ -30,6 +30,8 @@ public class FlightA extends Check {
 
     private int fallingTicks;
     private int risingTicks;
+    private int nearGroundTicks;
+    private int flatDeltaYTicks;
 
     public FlightA(@NonNull PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
@@ -47,6 +49,9 @@ public class FlightA extends Check {
                 || playerData.getTimeSince(ActionType.STEER_VEHICLE) < 500L
                 || playerData.isInLiquid()
                 || playerData.isOnClimbable()
+                || BlockUtil.isPlayerInUnloadedChunk(player)
+                || BlockUtil.isLocationInUnloadedChunk(event.getToLocation())
+                || BlockUtil.isLocationInUnloadedChunk(event.getFromLocation())
                 || event.isTeleport(playerData)) {
             lastDeltaY = deltaY;
             lastVelocity = velocity;
@@ -57,13 +62,16 @@ public class FlightA extends Check {
 
         boolean rising = velocity > ON_GROUND_VELOCITY;
         boolean falling = velocity < ON_GROUND_VELOCITY;
-        boolean onGround = BlockUtil.isOnGroundOffset(player, 0.105);
+        boolean nearGround = playerData.isNearGround();
+
+        nearGroundTicks = nearGround ? nearGroundTicks + 1 : 0;
+        flatDeltaYTicks = deltaY == 0.0 ? flatDeltaYTicks + 1 : 0;
 
         if (rising) {
-            handleRising(onGround, deltaY, velocity, predictionY);
+            handleRising(nearGround, deltaY, velocity, predictionY);
         } else if (falling) {
-            handleFalling(onGround, deltaY, velocity, predictionY);
-        } else if (onGround) {
+            handleFalling(nearGround, deltaY, velocity, predictionY);
+        } else if (nearGround) {
             handleOnGround(deltaY, velocity, predictionY);
         }
 
@@ -72,87 +80,27 @@ public class FlightA extends Check {
     }
 
     /**
-     * Handles when the player is falling.
-     *
-     * @param onGround    Whether the player is on the ground.
-     * @param deltaY      The change in y-axis.
-     * @param velocity    The player's velocity.
-     * @param predictionY The predicted y-axis.
-     */
-    private void handleFalling(boolean onGround, double deltaY, double velocity, double predictionY) {
-        risingTicks = 0;
-
-        if (onGround) {
-            fallingTicks = 0;
-        } else {
-            ++fallingTicks;
-        }
-
-        double predictionVel = ON_GROUND_VELOCITY;
-
-        // Optimize this loop to avoid unnecessary calculations
-        double subtractedValue = GRAVITY_DECAY * fallingTicks;
-        double multiplier = Math.pow(GRAVITY_MULTIPLIER, fallingTicks);
-        predictionVel = (predictionVel - subtractedValue) * multiplier;
-
-        double predictionNextVel = (predictionVel - GRAVITY_DECAY) * GRAVITY_MULTIPLIER;
-        double predictionDiffY = Math.abs(deltaY - predictionY);
-        double predictionDiffVel = Math.abs(deltaY - predictionVel);
-        double predictionDiffLastVel = Math.abs(deltaY - lastVelocity);
-        double predictionDiffNextVel = Math.abs(deltaY - predictionNextVel);
-
-        if (predictionDiffY > 0.001 && (predictionDiffVel > 0.001
-                && predictionDiffLastVel > 0.001 && predictionDiffNextVel > 0.001)) {
-
-            if (predictionDiffVel > 0.30 && predictionDiffLastVel > 0.30 && predictionDiffNextVel > 0.30) {
-                if (++fallingBuffer >= 2) {
-                    flag(true, "Falling"
-                            + " deltaY=" + deltaY
-                            + " velocity=" + velocity + " |"
-                            + " predictionY=" + predictionY
-                            + " predictionVel=" + predictionVel + " |"
-                            + " predictionDiffY=" + predictionDiffY
-                            + " predictionDiffVel=" + predictionDiffVel
-                            + " predictionDiffLastVel=" + predictionDiffLastVel
-                            + " predictionDiffNextVel=" + predictionDiffNextVel + " |"
-                            + " fallingTicks=" + fallingTicks + ")");
-                }
-            }
-        } else {
-            fallingBuffer = 0;
-        }
-    }
-
-    /**
      * Handles when the player is rising.
      *
-     * @param onGround    Whether the player is on the ground.
+     * @param nearGround  Whether the player is near the ground.
      * @param deltaY      The change in y-axis.
      * @param velocity    The player's velocity.
      * @param predictionY The predicted y-axis.
      */
-    private void handleRising(boolean onGround, double deltaY, double velocity, double predictionY) {
+    private void handleRising(boolean nearGround, double deltaY, double velocity, double predictionY) {
         fallingTicks = 0;
+        risingTicks = nearGround ? 0 : risingTicks + 1;
 
-        if (onGround) {
-            risingTicks = 0;
-        } else {
-            ++risingTicks;
-        }
-
-        double predictionVel = lastDeltaY;
-
-        // Optimize this loop to avoid unnecessary calculations
-        double subtractedValue = GRAVITY_DECAY * risingTicks;
-        double multiplier = Math.pow(GRAVITY_MULTIPLIER, risingTicks);
-        predictionVel = (predictionVel - subtractedValue) * multiplier;
-
+        // Calculate the predicted velocity without having intermediate variables
+        double predictionVel = (lastDeltaY - GRAVITY_DECAY * risingTicks) * Math.pow(GRAVITY_MULTIPLIER, risingTicks);
         double predictionNextVel = (predictionVel - GRAVITY_DECAY) * GRAVITY_MULTIPLIER;
+
+        // Calculate differences once
         double predictionDiffY = Math.abs(deltaY - predictionY);
         double predictionDiffNextVel = Math.abs(deltaY - predictionNextVel);
 
         if (predictionDiffY > 0.001 && predictionDiffNextVel > 0.15) {
-            if (onGround) {
+            if (nearGround) {
                 risingInAirBuffer = 0;
 
                 if (predictionDiffY > 0.65 || predictionDiffNextVel > 0.6) {
@@ -170,7 +118,7 @@ public class FlightA extends Check {
             } else {
                 risingNearGroundBuffer = 0;
 
-                if (++risingInAirBuffer >= 2 && risingTicks >= 2) {
+                if (++risingInAirBuffer >= 3 && risingTicks >= 2) {
                     flag(true, "Rising, In Air"
                             + " (deltaY=" + deltaY
                             + " velocity=" + velocity + " |"
@@ -178,12 +126,72 @@ public class FlightA extends Check {
                             + " predictionVel=" + predictionVel + " |"
                             + " predictionDiffY=" + predictionDiffY
                             + " predictionDiffNextVel=" + predictionDiffNextVel + " |"
-                            + " risingTicks=" + risingTicks + ")");
+                            + " risingTicks=" + risingTicks
+                            + " nearGroundTicks=" + nearGroundTicks + ")");
                 }
             }
         } else {
-            risingInAirBuffer = Math.max(risingInAirBuffer - 0.25, 0);
-            risingNearGroundBuffer = Math.max(risingNearGroundBuffer - 0.25, 0);
+            risingInAirBuffer = Math.max(risingInAirBuffer - 0.75, 0);
+            risingNearGroundBuffer = Math.max(risingNearGroundBuffer - 0.75, 0);
+        }
+    }
+
+    /**
+     * Handles when the player is falling.
+     *
+     * @param nearGround  Whether the player is near the ground.
+     * @param deltaY      The change in y-axis.
+     * @param velocity    The player's velocity.
+     * @param predictionY The predicted y-axis.
+     */
+    private void handleFalling(boolean nearGround, double deltaY, double velocity, double predictionY) {
+        risingTicks = 0;
+        fallingTicks = nearGround ? 0 : fallingTicks + 1;
+
+        // Calculate the predicted velocity without having intermediate variables
+        double predictionVel = (ON_GROUND_VELOCITY - GRAVITY_DECAY * fallingTicks) * Math.pow(GRAVITY_MULTIPLIER, fallingTicks);
+        double predictionNextVel = (predictionVel - GRAVITY_DECAY) * GRAVITY_MULTIPLIER;
+
+        // Calculate differences once
+        double predictionDiffY = Math.abs(deltaY - predictionY);
+        double predictionDiffVel = Math.abs(deltaY - predictionVel);
+        double predictionDiffLastVel = Math.abs(deltaY - lastVelocity);
+        double predictionDiffNextVel = Math.abs(deltaY - predictionNextVel);
+
+        long timeSinceTeleport = playerData.getTimeSince(ActionType.TELEPORT);
+
+        if (predictionDiffY > 0.001 && (predictionDiffVel > 0.001
+                && predictionDiffLastVel > 0.001 && predictionDiffNextVel > 0.001)) {
+
+            if (predictionDiffVel > 0.30 && predictionDiffLastVel > 0.30 && predictionDiffNextVel > 0.30) {
+                // Fixes false flags when near climables.
+                if (playerData.isNearClimbable()) {
+                    return;
+                }
+
+                // Fixes false flags when teleporting.
+                if (deltaY == -0.09800000190735147 && timeSinceTeleport <= 1000) {
+                    return;
+                }
+
+                if (++fallingBuffer >= 2) {
+                    flag(true, "Falling"
+                            + " deltaY=" + deltaY
+                            + " velocity=" + velocity + " |"
+                            + " predictionY=" + predictionY
+                            + " predictionVel=" + predictionVel + " |"
+                            + " predictionDiffY=" + predictionDiffY
+                            + " predictionDiffVel=" + predictionDiffVel
+                            + " predictionDiffLastVel=" + predictionDiffLastVel
+                            + " predictionDiffNextVel=" + predictionDiffNextVel + " |"
+                            + " timeSinceTeleport=" + timeSinceTeleport
+                            + " fallingTicks=" + fallingTicks
+                            + " flatDeltaYTicks=" + flatDeltaYTicks
+                            + " nearGroundTicks=" + nearGroundTicks + ")");
+                }
+            }
+        } else {
+            fallingBuffer = 0;
         }
     }
 

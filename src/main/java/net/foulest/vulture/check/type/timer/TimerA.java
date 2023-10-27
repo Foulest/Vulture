@@ -3,6 +3,7 @@ package net.foulest.vulture.check.type.timer;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
+import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import lombok.NonNull;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
@@ -13,8 +14,9 @@ import net.foulest.vulture.util.KickUtil;
 import net.foulest.vulture.util.MathUtil;
 import net.foulest.vulture.util.data.EvictingList;
 
-@CheckInfo(name = "Timer (A)", type = CheckType.TIMER, maxViolations = 25,
-        acceptsServerPackets = true, description = "Detects modifying your game speed.")
+@CheckInfo(name = "Timer (A)", type = CheckType.TIMER,
+        acceptsServerPackets = true, punishable = false,
+        description = "Detects modifying your game speed.")
 public class TimerA extends Check {
 
     private final EvictingList<Long> flyingDiffs = new EvictingList<>(40);
@@ -52,12 +54,13 @@ public class TimerA extends Check {
                 double average = flyingDiffs.stream().mapToDouble(d -> d).average().orElse(0.0);
                 double speed = 50 / average;
                 double modifier = MathUtil.getPingToTimer(transPing + 50);
+                double maxSpeed = (!playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8) ? 1.50 : 1.01) + modifier;
 
-                // Detects Timer speeds of 101.0% or higher.
+                // Detects Timer speeds of 101.0% or higher on 1.8 and 150.0% or higher on 1.9+.
                 if (flyingDiffs.isFull()) {
-                    if (speed >= (1.01 + modifier)) {
+                    if (speed >= maxSpeed) {
                         if (++buffer > 50) {
-                            KickUtil.kickPlayer(player, event, "Timer (A)");
+                            KickUtil.kickPlayer(player, event, "Timer (A): " + speed);
                         }
                     } else {
                         buffer = Math.max(buffer - 0.9, 0.0);

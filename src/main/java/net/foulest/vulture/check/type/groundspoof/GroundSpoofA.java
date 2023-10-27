@@ -37,6 +37,7 @@ public class GroundSpoofA extends Check {
         boolean isYLevel = event.isYLevel();
         boolean underBlock = playerData.isUnderBlock();
         boolean onGround = playerData.isOnGround();
+        boolean nearGround = playerData.isNearGround();
 
         int underBlockTicks = playerData.getUnderBlockTicks();
 
@@ -56,6 +57,11 @@ public class GroundSpoofA extends Check {
         if (to.isOnGround()) {
             ++onGroundTicks;
 
+            // Fixes a false flag when landing. (hopefully)
+            if (onGroundTicks == 1 && nearGround) {
+                return;
+            }
+
             if (!onGround && !isYLevel) {
                 flag(true, "Sending On Ground"
                         + " (Y=" + toPosition.getY()
@@ -63,6 +69,7 @@ public class GroundSpoofA extends Check {
                         + " velocity=" + velocity
                         + " underBlock=" + underBlock
                         + " underBlockTicks=" + underBlockTicks
+                        + " nearGround=" + nearGround
                         + " onGroundTicks=" + onGroundTicks
                 );
             }

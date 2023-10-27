@@ -13,7 +13,7 @@ import net.foulest.vulture.util.block.BlockUtil;
 import org.bukkit.GameMode;
 import org.bukkit.potion.PotionEffectType;
 
-@CheckInfo(name = "Speed (C)", type = CheckType.SPEED, maxViolations = 25)
+@CheckInfo(name = "Speed (C)", type = CheckType.SPEED)
 public class SpeedC extends Check {
 
     private double lastDeltaXZ;
