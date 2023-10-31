@@ -874,7 +874,7 @@ public class PacketProcessor extends Processor {
                     playerData.setOnGroundPacket(flying.isOnGround());
                     playerData.setLastOnGround(playerData.isNearGround());
                     playerData.setOnGround(BlockUtil.isOnGroundOffset(player, 0.001));
-                    playerData.setNearGround(BlockUtil.isOnGroundOffset(player, 0.21)); // Normally 0.105
+                    playerData.setNearGround(BlockUtil.isOnGroundOffset(player, 0.25)); // Normally 0.21, or 0.105
 
                     // Sets non-strict ground data.
                     if (playerData.isNearGround()) {
@@ -926,7 +926,10 @@ public class PacketProcessor extends Processor {
                     playerData.setOnSnowLayer(BlockUtil.isOnSnowLayer(player));
 
                     playerData.setOnIce(BlockUtil.isOnIce(player));
-                    playerData.setTimestamp(ActionType.ON_ICE);
+
+                    if (BlockUtil.isOnIce(player)) {
+                        playerData.setTimestamp(ActionType.ON_ICE);
+                    }
 
                     playerData.setOnSoulSand(BlockUtil.isOnSoulSand(player));
                     playerData.setNearTrapdoor(BlockUtil.isNearTrapdoor(player));
@@ -948,7 +951,7 @@ public class PacketProcessor extends Processor {
                     playerData.setCollidingBlock(BlockUtil.getCollidingBlock(player));
 
                     // Sets the last on ground location.
-                    if (playerData.isOnGround() && !playerData.isInsideBlock()
+                    if (playerData.isNearGround() && !playerData.isInsideBlock()
                             && flyingYPos % 0.015625 == 0.0
                             && !BlockUtil.isLocationInUnloadedChunk(location)
                             && location.getBlock().isEmpty()

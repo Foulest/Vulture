@@ -14,7 +14,8 @@ import org.bukkit.GameMode;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-@CheckInfo(name = "Speed (D)", type = CheckType.SPEED)
+@CheckInfo(name = "Speed (D)", type = CheckType.SPEED,
+        description = "Checks for invalid movement when sprinting.")
 public class SpeedD extends Check {
 
     private double buffer;
@@ -39,7 +40,7 @@ public class SpeedD extends Check {
                 || playerData.getVelocityH() > 0
                 || player.getGameMode().equals(GameMode.CREATIVE)
                 || player.getGameMode().equals(GameMode.SPECTATOR)
-                || !playerData.isNearGround()
+                || !playerData.isOnGround()
                 || event.isTeleport(playerData)) {
             return;
         }

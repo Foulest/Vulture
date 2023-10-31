@@ -24,7 +24,7 @@ public class SpeedB extends Check {
         // Checks the player for exemptions.
         if (player.getAllowFlight()
                 || playerData.isNearLiquid()
-                || playerData.isNearGround()
+                || playerData.isOnGround()
                 || playerData.isOnClimbable()
                 || playerData.getVelocityH() > 0
                 || player.getWalkSpeed() != 0.2

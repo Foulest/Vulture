@@ -124,7 +124,7 @@ public class BlockUtil {
             return false;
         }
 
-        BoundingBox boundingBox = getPlayerCustomBoundingBox(player, 0.25, -1.0, 1.0);
+        BoundingBox boundingBox = getPlayerCustomBoundingBox(player, 0.35, -1.0, 1.0);
         return collidesWithSolid(player, boundingBox);
     }
 

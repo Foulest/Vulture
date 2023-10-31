@@ -16,7 +16,7 @@ import org.bukkit.potion.PotionEffectType;
 public class SpeedA extends Check {
 
     private double buffer;
-    private double otherBuffer;
+    private double terrainBuffer;
 
     public SpeedA(@NonNull PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
@@ -64,38 +64,42 @@ public class SpeedA extends Check {
 
         maxSpeed += groundTicks < 5 ? speedLevel * 0.07 : speedLevel * 0.0573;
         maxSpeed -= groundTicks < 5 ? slownessLevel * 0.07 : slownessLevel * 0.0573;
-        maxSpeed *= timeSinceOnIce < 100 ? 4.4 : 1.0; // TODO: This is a bit high
-        maxSpeed *= onSoulSand && groundTicksStrict > 2 ? 0.6 : 1.0;
-        maxSpeed *= nearSlimeBlock ? 1.25 : 1.0;
+
         maxSpeed += underBlock ? 0.26 : 0.0;
         maxSpeed += nearLiquid ? depthStriderLevel * 0.45 : 0.0;
         maxSpeed += (walkSpeed - 0.2) * 2.5;
         maxSpeed += (flySpeed - 0.1) * 2.5;
-        maxSpeed *= (onStairs || onSlab) ? 1.5 : 1.0;
         maxSpeed += velocityHorizontal;
+
+        maxSpeed *= (onStairs || onSlab) ? 1.5 : 1.0;
         maxSpeed *= inWeb ? 0.11 : 1.0;
+        maxSpeed *= timeSinceOnIce < 100 ? 4.4 : 1.0; // TODO: This is a bit high
+        maxSpeed *= onSoulSand && groundTicksStrict > 2 ? 0.6 : 1.0;
+        maxSpeed *= nearSlimeBlock ? 1.25 : 1.0;
+
+        double difference = deltaXZ - maxSpeed;
 
         if (deltaXZ > maxSpeed) {
             if (inWeb || onSoulSand) {
-                if (++otherBuffer > 2) {
+                if (++terrainBuffer > 2) {
                     flag(true, "(Terrain)"
                             + " deltaXZ=" + deltaXZ
                             + " maxSpeed=" + maxSpeed
                             + " buffer=" + buffer);
                 }
             } else {
-                if (++buffer > 5) {
+                buffer += 0.1 + difference;
+
+                if (buffer > 1) {
                     flag(true, "deltaXZ=" + deltaXZ
                             + " maxSpeed=" + maxSpeed
-                            + " buffer=" + buffer
-                            + " timeSinceOnIce=" + timeSinceOnIce
-                            + " timeSinceUnderBlock=" + timeSinceUnderBlock);
+                            + " difference=" + difference
+                            + " buffer=" + buffer);
                 }
             }
-
         } else {
             buffer = Math.max(buffer - 0.25, 0);
-            otherBuffer = Math.max(otherBuffer - 0.25, 0);
+            terrainBuffer = Math.max(terrainBuffer - 0.25, 0);
         }
     }
 }

@@ -20,7 +20,7 @@ public class MovementUtil {
 
     public static int getPotionEffectLevel(@NonNull Player player, @NonNull PotionEffectType effectType) {
         for (PotionEffect effect : player.getActivePotionEffects()) {
-            if (effect.getType() == effectType) {
+            if (effect.getType().getName().equals(effectType.getName())) {
                 return effect.getAmplifier() + 1;
             }
         }

@@ -30,6 +30,8 @@ public class FlightA extends Check {
 
     private int fallingTicks;
     private int risingTicks;
+
+    private int offGroundTicks;
     private int nearGroundTicks;
     private int flatDeltaYTicks;
 
@@ -59,20 +61,37 @@ public class FlightA extends Check {
         }
 
         double predictionY = (lastDeltaY - GRAVITY_DECAY) * GRAVITY_MULTIPLIER;
+        double predictionDiffY = Math.abs(deltaY - predictionY);
 
         boolean rising = velocity > ON_GROUND_VELOCITY;
         boolean falling = velocity < ON_GROUND_VELOCITY;
         boolean nearGround = playerData.isNearGround();
+        boolean underBlock = playerData.isUnderBlock();
 
         nearGroundTicks = nearGround ? nearGroundTicks + 1 : 0;
+        offGroundTicks = !nearGround ? offGroundTicks + 1 : 0;
         flatDeltaYTicks = deltaY == 0.0 ? flatDeltaYTicks + 1 : 0;
 
         if (rising) {
+            // Handles in-air movement when the player is rising.
+            // This method catches select Flight modules.
             handleRising(nearGround, deltaY, velocity, predictionY);
+
         } else if (falling) {
+            // Handles in-air movement when the player is falling.
+            // This method catches almost all Flight modules.
             handleFalling(nearGround, deltaY, velocity, predictionY);
+
         } else if (nearGround) {
+            // The on-ground check handles on-ground movement.
+            // This method catches modules like HighJump and V-Clip.
             handleOnGround(deltaY, velocity, predictionY);
+        }
+
+        if (!nearGround) {
+            // The last method handles other invalid movements.
+            // This method catches most Y-port based speed modules.
+            handlePredictionY(underBlock, deltaY, velocity, predictionY, predictionDiffY);
         }
 
         lastDeltaY = deltaY;
@@ -240,6 +259,45 @@ public class FlightA extends Check {
                     + " velocity=" + velocity + " |"
                     + " predictionY=" + predictionY
                     + " maxDeltaY=" + maxDeltaY + ")");
+        }
+    }
+
+    /**
+     * Handles invalid y-axis movements without accounting for velocity.
+     *
+     * @param underBlock      Whether the player is under a block.
+     * @param deltaY          The change in y-axis.
+     * @param velocity        The player's velocity.
+     * @param predictionY     The predicted y-axis.
+     * @param predictionDiffY The difference between the predicted y-axis and the actual y-axis.
+     */
+    private void handlePredictionY(boolean underBlock,
+                                   double deltaY, double velocity,
+                                   double predictionY, double predictionDiffY) {
+        if (deltaY == 0.0 || velocity == -0.0784000015258789) {
+            return;
+        }
+
+        double combined = Math.abs(predictionDiffY - velocity);
+
+        double threshold = 0.1;
+        threshold += (underBlock ? 0.1 : 0.0);
+
+        if (predictionDiffY > threshold) {
+            if (combined > 0.6) {
+                return;
+            }
+
+            flag(true, "Prediction Y"
+                    + " (deltaY=" + deltaY
+                    + " lastDeltaY=" + lastDeltaY
+                    + " predictionY=" + predictionY
+                    + " predictionDiffY=" + predictionDiffY
+                    + " velocity=" + velocity
+                    + " combined=" + combined
+                    + " nearGroundTicks=" + nearGroundTicks
+                    + " offGroundTicks=" + offGroundTicks
+                    + ")");
         }
     }
 }
