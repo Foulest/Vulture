@@ -118,6 +118,13 @@ public class FlightA extends Check {
             } else {
                 risingNearGroundBuffer = 0;
 
+                // Fixes false flags when colliding with boats.
+                if (playerData.isNearbyBoat(0.6, 0.6, 0.6)) {
+                    if (deltaY == 0.0) {
+                        return;
+                    }
+                }
+
                 if (++risingInAirBuffer >= 3 && risingTicks >= 2) {
                     flag(true, "Rising, In Air"
                             + " (deltaY=" + deltaY
@@ -160,10 +167,18 @@ public class FlightA extends Check {
 
         long timeSinceTeleport = playerData.getTimeSince(ActionType.TELEPORT);
 
-        if (predictionDiffY > 0.001 && (predictionDiffVel > 0.001
-                && predictionDiffLastVel > 0.001 && predictionDiffNextVel > 0.001)) {
+        if (fallingTicks >= 1 && ((predictionDiffY > 0.005 && (predictionDiffVel > 0.005
+                && predictionDiffLastVel > 0.005 && predictionDiffNextVel > 0.005))
+                || predictionDiffVel > 1.00 || predictionDiffLastVel > 0.60 || predictionDiffNextVel > 1.05)) {
 
-            if (predictionDiffVel > 0.30 && predictionDiffLastVel > 0.30 && predictionDiffNextVel > 0.30) {
+            if (predictionDiffVel > 0.25 || predictionDiffLastVel > 0.25 || predictionDiffNextVel > 0.25) {
+                // Fixes false flags when colliding with boats.
+                if (playerData.isNearbyBoat(0.6, 0.6, 0.6)) {
+                    if (deltaY == 0.0) {
+                        return;
+                    }
+                }
+
                 // Fixes false flags when near climables.
                 if (playerData.isNearClimbable()) {
                     return;
@@ -174,7 +189,8 @@ public class FlightA extends Check {
                     return;
                 }
 
-                if (++fallingBuffer >= 2) {
+                if (++fallingBuffer >= 2 || predictionDiffVel > 1.00
+                        || predictionDiffLastVel > 0.60 || predictionDiffNextVel > 1.05) {
                     flag(true, "Falling"
                             + " deltaY=" + deltaY
                             + " velocity=" + velocity + " |"
@@ -187,7 +203,9 @@ public class FlightA extends Check {
                             + " timeSinceTeleport=" + timeSinceTeleport
                             + " fallingTicks=" + fallingTicks
                             + " flatDeltaYTicks=" + flatDeltaYTicks
-                            + " nearGroundTicks=" + nearGroundTicks + ")");
+                            + " nearGroundTicks=" + nearGroundTicks
+                            + " fallingBuffer=" + fallingBuffer
+                            + ")");
                 }
             }
         } else {
@@ -210,7 +228,14 @@ public class FlightA extends Check {
         double maxDeltaY = 0.42 + jumpBoostLevel * 0.1;
 
         if ((deltaY > maxDeltaY || deltaY < -0.7171) && Math.abs(deltaY - predictionY) > 0.001) {
-            flag(true, "Rising, On Ground"
+            // Fixes false flags when colliding with boats.
+            if (playerData.isNearbyBoat(0.6, 0.6, 0.6)) {
+                if (deltaY == 0.0 || deltaY == 0.6000000238418579) {
+                    return;
+                }
+            }
+
+            flag(true, "Rising, Near Ground"
                     + " (deltaY=" + deltaY
                     + " velocity=" + velocity + " |"
                     + " predictionY=" + predictionY

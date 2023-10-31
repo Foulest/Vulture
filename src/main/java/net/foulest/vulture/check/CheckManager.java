@@ -12,6 +12,7 @@ import net.foulest.vulture.check.type.autoclicker.AutoClickerB;
 import net.foulest.vulture.check.type.badpackets.*;
 import net.foulest.vulture.check.type.clientbrand.ClientBrand;
 import net.foulest.vulture.check.type.flight.FlightA;
+import net.foulest.vulture.check.type.flight.FlightB;
 import net.foulest.vulture.check.type.groundspoof.GroundSpoofA;
 import net.foulest.vulture.check.type.groundspoof.GroundSpoofB;
 import net.foulest.vulture.check.type.invalid.InvalidA;
@@ -60,13 +61,13 @@ public class CheckManager {
 
             // BadPackets
             BadPacketsA.class, BadPacketsB.class, BadPacketsC.class, BadPacketsD.class, BadPacketsE.class,
-            BadPacketsF.class, BadPacketsG.class, BadPacketsH.class,
+            BadPacketsF.class, BadPacketsG.class,
 
             // ClientBrand
             ClientBrand.class,
 
             // Flight
-            FlightA.class,
+            FlightA.class, FlightB.class,
 
             // GroundSpoof
             GroundSpoofA.class, GroundSpoofB.class,

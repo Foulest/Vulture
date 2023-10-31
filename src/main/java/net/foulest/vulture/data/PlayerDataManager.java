@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class DataManager {
+public class PlayerDataManager {
 
     private static final Map<UUID, PlayerData> playerDataMap = new HashMap<>();
 

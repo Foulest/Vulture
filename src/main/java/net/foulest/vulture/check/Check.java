@@ -10,6 +10,7 @@ import lombok.Setter;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.event.MovementEvent;
 import net.foulest.vulture.event.RotationEvent;
+import net.foulest.vulture.hamster.HamsterAPI;
 import net.foulest.vulture.util.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -108,6 +109,7 @@ public class Check {
     protected final void flag(boolean setback, boolean debug, @NonNull String... verbose) {
         // Checks the player for exemptions.
         if (playerData.isNewViolationsPaused()
+                || KickUtil.isPlayerBeingKicked(player)
                 || PacketEvents.get().getServerUtils().getTPS() < 18
                 || !checkInfo.enabled()) {
             return;
@@ -187,8 +189,8 @@ public class Check {
                     .replace("%player%", player.getName())
                     .replace("%check%", checkInfo.name())));
 
-            // Kicks the player to ensure they are disconnected.
-            KickUtil.kickPlayer(player, "", "Disconnected", false);
+            // Closes the player's channel to ensure they are disconnected.
+            HamsterAPI.closeChannel(playerData);
         }
     }
 }

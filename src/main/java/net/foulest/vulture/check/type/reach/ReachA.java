@@ -8,7 +8,7 @@ import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
-import net.foulest.vulture.data.DataManager;
+import net.foulest.vulture.data.PlayerDataManager;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.event.MovementEvent;
 import net.foulest.vulture.util.MathUtil;
@@ -51,7 +51,7 @@ public class ReachA extends Check {
         Vector3d toPosition = to.getPosition();
 
         Player target = playerData.getLastTarget();
-        PlayerData targetData = DataManager.getPlayerData(target);
+        PlayerData targetData = PlayerDataManager.getPlayerData(target);
 
         if (targetData.getLastServerPositionTick() < 100
                 || targetData.getTotalTicks() - targetData.getLastPacketDrop() < 15) {

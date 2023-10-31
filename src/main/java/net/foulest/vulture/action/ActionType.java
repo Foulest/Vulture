@@ -7,6 +7,7 @@ public enum ActionType {
     CHANGE_SLOT,
     CHATTING,
     CLOSE_WINDOW,
+    DAMAGE,
     DELAYED_PACKET,
     DIGGING,
     ENTITY_INTERACT,

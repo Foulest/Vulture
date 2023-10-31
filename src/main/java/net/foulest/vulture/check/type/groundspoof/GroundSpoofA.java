@@ -57,12 +57,17 @@ public class GroundSpoofA extends Check {
         if (to.isOnGround()) {
             ++onGroundTicks;
 
-            // Fixes a false flag when landing. (hopefully)
-            if (onGroundTicks == 1 && nearGround) {
-                return;
-            }
-
             if (!onGround && !isYLevel) {
+                // Fixes a false flag when landing. (hopefully)
+                if (onGroundTicks == 1 && nearGround) {
+                    return;
+                }
+
+                // Fixes false flags when colliding with boats.
+                if (playerData.isNearbyBoat(0.6, 0.6, 0.6)) {
+                    return;
+                }
+
                 flag(true, "Sending On Ground"
                         + " (Y=" + toPosition.getY()
                         + " deltaY=" + deltaY

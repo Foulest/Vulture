@@ -3,7 +3,7 @@ package net.foulest.vulture.util.block;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import net.foulest.vulture.data.DataManager;
+import net.foulest.vulture.data.PlayerDataManager;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.util.data.ConcurrentStream;
 import net.foulest.vulture.util.raytrace.BoundingBox;
@@ -56,7 +56,7 @@ public class BlockUtil {
     }
 
     public static Block getCollidingBlock(@NonNull Player player) {
-        PlayerData playerData = DataManager.getPlayerData(player);
+        PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
         if (isPlayerInUnloadedChunk(player)) {
             playerData.setInsideBlock(false);
@@ -116,7 +116,6 @@ public class BlockUtil {
         BoundingBox boundingBox = new BoundingBox(player).expand(0.0, 0.0, 0.0)
                 .expandMin(0.0, offset, 0.0)
                 .expandMax(0.0, -1.0, 0.0);
-
         return collidesWithSolid(player, boundingBox);
     }
 
@@ -213,7 +212,7 @@ public class BlockUtil {
             return false;
         }
 
-        BoundingBox boundingBox = getPlayerCustomBoundingBox(player, 0.0, 0.001, 0.0);
+        BoundingBox boundingBox = getPlayerCustomBoundingBox(player, 0.0, -0.001, 0.0);
         ConcurrentStream<Block> collidingBlocks = getCollidingBlocks(player, boundingBox);
 
         return collidingBlocks.any(block -> block.getType() == Material.LAVA
@@ -280,7 +279,6 @@ public class BlockUtil {
 
         BoundingBox boundingBox = getPlayerFeetBoundingBox(player);
         ConcurrentStream<Block> collidingBlocks = getCollidingBlocks(player, boundingBox);
-
         return collidingBlocks.any(block -> block.getType() == Material.SNOW);
     }
 
@@ -303,7 +301,6 @@ public class BlockUtil {
 
         BoundingBox boundingBox = getPlayerCustomBoundingBox(player, 0.0, 0.0, 0.0);
         ConcurrentStream<Block> collidingBlocks = getCollidingBlocks(player, boundingBox);
-
         return collidingBlocks.any(block -> block.getType() == Material.SOUL_SAND);
     }
 
@@ -326,7 +323,6 @@ public class BlockUtil {
 
         BoundingBox boundingBox = getPlayerNearBoundingBox(player);
         ConcurrentStream<Block> collidingBlocks = getCollidingBlocks(player, boundingBox);
-
         return collidingBlocks.any(block -> block.getType() == Material.FENCE_GATE);
     }
 
@@ -337,7 +333,6 @@ public class BlockUtil {
 
         BoundingBox boundingBox = getPlayerCustomBoundingBox(player, 0.0, 1.2, 1.2);
         ConcurrentStream<Block> collidingBlocks = getCollidingBlocks(player, boundingBox);
-
         return collidingBlocks.any(block -> block.getType() == Material.WATER_LILY);
     }
 
@@ -348,7 +343,6 @@ public class BlockUtil {
 
         BoundingBox boundingBox = getPlayerNearBoundingBox(player);
         ConcurrentStream<Block> collidingBlocks = getCollidingBlocks(player, boundingBox);
-
         return collidingBlocks.any(block -> block.getType() == Material.ANVIL);
     }
 
@@ -359,7 +353,6 @@ public class BlockUtil {
 
         BoundingBox boundingBox = getPlayerCustomBoundingBox(player, 0.1, 1.3, 0.0);
         ConcurrentStream<Block> collidingBlocks = getCollidingBlocks(player, boundingBox);
-
         return collidingBlocks.any(block -> block.getType() == Material.SLIME_BLOCK);
     }
 
@@ -381,7 +374,7 @@ public class BlockUtil {
     }
 
     public static double getBlockFriction(@NonNull Player player) {
-        PlayerData playerData = DataManager.getPlayerData(player);
+        PlayerData playerData = PlayerDataManager.getPlayerData(player);
         return playerData.isOnIce() ? 0.98 : 0.60;
     }
 }

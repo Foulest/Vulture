@@ -10,6 +10,7 @@ import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.event.MovementEvent;
 import net.foulest.vulture.util.MovementUtil;
+import org.bukkit.GameMode;
 import org.bukkit.potion.PotionEffectType;
 
 @CheckInfo(name = "Speed (E)", type = CheckType.SPEED,
@@ -26,7 +27,11 @@ public class SpeedE extends Check {
     @Override
     public void handle(@NonNull MovementEvent event, long timestamp) {
         // Checks the player for exemptions.
-        if (event.isTeleport(playerData)) {
+        if (player.isFlying()
+                || player.getAllowFlight()
+                || player.getGameMode().equals(GameMode.CREATIVE)
+                || player.getGameMode().equals(GameMode.SPECTATOR)
+                || event.isTeleport(playerData)) {
             return;
         }
 

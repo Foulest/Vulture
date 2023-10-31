@@ -41,10 +41,12 @@ import lombok.Cleanup;
 import lombok.NonNull;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
-import net.foulest.vulture.data.DataManager;
 import net.foulest.vulture.data.PlayerData;
+import net.foulest.vulture.data.PlayerDataManager;
 import net.foulest.vulture.event.MovementEvent;
 import net.foulest.vulture.event.RotationEvent;
+import net.foulest.vulture.hamster.HamsterAPI;
+import net.foulest.vulture.hamster.events.PacketDecodeEvent;
 import net.foulest.vulture.processor.Processor;
 import net.foulest.vulture.util.KickUtil;
 import net.foulest.vulture.util.MessageUtil;
@@ -60,6 +62,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -82,6 +85,32 @@ import java.util.logging.Level;
  */
 public class PacketProcessor extends Processor {
 
+    @EventHandler
+    public void onPacketDecode(PacketDecodeEvent event) {
+        PlayerData playerData = event.getPlayerData();
+        Player player = playerData.getPlayer();
+        int maxPacketsPerSecond = (player.isDead() ? 150 : 75);
+
+        // Cancels incoming packets for offline players.
+        if (!player.isOnline()) {
+            event.setCancelled(true);
+            return;
+        }
+
+        // Iterate packets sent per tick (resets on server transaction).
+        int packetsSentInTick = playerData.getPacketsSentInTick();
+        playerData.setPacketsSentInTick(packetsSentInTick + 1);
+        packetsSentInTick++;
+
+        // If the player has sent too many packets in one tick, kick them.
+        if (packetsSentInTick >= maxPacketsPerSecond) {
+            event.setCancelled(true);
+            HamsterAPI.closeChannel(playerData);
+            KickUtil.kickPlayer(player, "Sent too many packets in one tick"
+                    + " (" + packetsSentInTick + ")", true);
+        }
+    }
+
     @Override
     @SuppressWarnings("deprecation")
     public void onPacketPlayReceive(@NonNull PacketPlayReceiveEvent event) {
@@ -91,9 +120,9 @@ public class PacketProcessor extends Processor {
         }
 
         Player player = event.getPlayer();
-        PlayerData playerData = DataManager.getPlayerData(player);
+        PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
-        if (!player.isOnline() || playerData.isKicking()) {
+        if (!player.isOnline()) {
             event.setCancelled(true);
             return;
         }
@@ -184,7 +213,7 @@ public class PacketProcessor extends Processor {
                     Location blockLocation = new Location(player.getWorld(), digXPos, digYPos, digZPos);
                     double distance = playerLocation.distance(blockLocation);
 
-                    if (distance > 6.0) {
+                    if (distance > 6.2) {
                         KickUtil.kickPlayer(player, event, "Sent BlockDig packet with invalid distance: "
                                 + distance + " (x=" + digXPos + " y=" + digYPos + " z=" + digZPos + ")");
                         return;
@@ -251,7 +280,7 @@ public class PacketProcessor extends Processor {
                     Location blockLocation = new Location(player.getWorld(), placeXPos, placeYPos, placeZPos);
                     double distance = player.getLocation().distance(blockLocation);
 
-                    if (distance > 6.0) {
+                    if (distance > 6.2) {
                         KickUtil.kickPlayer(player, event, "Sent BlockPlace packet with invalid distance: "
                                 + distance);
                         return;
@@ -1078,6 +1107,8 @@ public class PacketProcessor extends Processor {
                     return;
                 }
 
+                playerData.setPacketsSentInTick(0);
+
                 if (playerData.getVelocityIds().containsKey(transactionActionNumber)) {
                     Vector velocity = playerData.getVelocityIds().get(transactionActionNumber);
                     playerData.setVelocityH((int) (((velocity.getX() + velocity.getZ()) / 2.0D + 2.0D) * 15.0D));
@@ -1128,14 +1159,12 @@ public class PacketProcessor extends Processor {
                         || playerData.isShootingBow()
                         || playerData.isEating()
                         || playerData.isDrinking()
-                        || playerData.isDigging()
                         || entity == player
                         || entityId < 0) {
                     KickUtil.kickPlayer(player, event, "Sent invalid UseEntity packet"
                             + " (" + playerData.isInventoryOpen() + " " + playerData.isPlacingBlock()
                             + " " + playerData.isShootingBow() + " " + playerData.isEating()
-                            + " " + playerData.isDrinking() + " " + playerData.isDigging()
-                            + " " + (entity == player) + " " + entityId + ")");
+                            + " " + playerData.isDrinking() + " " + " " + (entity == player) + " " + entityId + ")");
                     return;
                 }
 
@@ -1279,7 +1308,7 @@ public class PacketProcessor extends Processor {
     //       Also, look into spoofing player enchants for the same reason.
     public void onPacketPlaySend(@NonNull PacketPlaySendEvent event) {
         Player player = event.getPlayer();
-        PlayerData playerData = DataManager.getPlayerData(player);
+        PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
         switch (event.getPacketId()) {
             case PacketType.Play.Server.ABILITIES:
@@ -1366,6 +1395,7 @@ public class PacketProcessor extends Processor {
             case PacketType.Play.Server.TRANSACTION:
                 WrappedPacketOutTransaction transaction = new WrappedPacketOutTransaction(event.getNMSPacket());
                 playerData.getTransactionSentMap().put(transaction.getActionNumber(), System.currentTimeMillis());
+                playerData.setPacketsSentInTick(0);
                 break;
 
             case PacketType.Play.Server.OPEN_WINDOW:
@@ -1457,21 +1487,21 @@ public class PacketProcessor extends Processor {
 
     private void steerVehicleCheck(@NonNull Player player, @NonNull PacketPlayReceiveEvent event,
                                    @NonNull WrappedPacketInSteerVehicle steerVehicle, float value) {
-        if (value == 0.98f || value == -0.98f) {
+        if (Math.abs(value) == 0.98f) {
             if (steerVehicle.isDismount()) {
                 event.setCancelled(true);
                 KickUtil.kickPlayer(player, "Sent SteerVehicle packet with invalid dismount value");
             }
 
-        } else if (value == 0.29400003f || value == -0.29400003) {
+        } else if (Math.abs(value) == 0.29400003f) {
             if (!steerVehicle.isDismount()) {
                 event.setCancelled(true);
                 KickUtil.kickPlayer(player, "Sent SteerVehicle packet with invalid non-dismount value");
             }
 
-        } else if (value != 0.0) {
+        } else if (value != 0.0f) {
             event.setCancelled(true);
-            KickUtil.kickPlayer(player, "Sent SteerVehicle packet with invalid value");
+            KickUtil.kickPlayer(player, "Sent SteerVehicle packet with invalid value: " + value);
         }
     }
 

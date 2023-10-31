@@ -13,6 +13,7 @@ import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.processor.type.PacketProcessor;
 
+@SuppressWarnings("deprecation")
 @CheckInfo(name = "Inventory (K)", type = CheckType.INVENTORY)
 public class InventoryK extends Check {
 

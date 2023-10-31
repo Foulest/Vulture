@@ -5,7 +5,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import net.foulest.vulture.Vulture;
 import net.foulest.vulture.check.type.clientbrand.type.PayloadType;
-import net.foulest.vulture.data.DataManager;
+import net.foulest.vulture.data.PlayerDataManager;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.util.KickUtil;
 import net.foulest.vulture.util.MessageUtil;
@@ -60,7 +60,7 @@ public class VultureCmd {
                 }
 
                 Player player = args.getPlayer();
-                PlayerData playerData = DataManager.getPlayerData(player);
+                PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
                 playerData.setAlertsEnabled(!playerData.isAlertsEnabled());
                 MessageUtil.messagePlayer(player, Settings.prefix + " &7Alerts have been &f"
@@ -85,7 +85,7 @@ public class VultureCmd {
                     return;
                 }
 
-                PlayerData targetData = DataManager.getPlayerData(infoTarget);
+                PlayerData targetData = PlayerDataManager.getPlayerData(infoTarget);
 
                 MessageUtil.messagePlayer(sender, "");
                 MessageUtil.messagePlayer(sender, "&e" + infoTarget.getName() + "'s Info");

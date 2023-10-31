@@ -48,8 +48,7 @@ public class MovementEvent implements CancellableEvent {
     }
 
     public boolean isTeleport(PlayerData playerData) {
-        return playerData.isTeleporting(to.getPosition())
-                || playerData.isTeleporting(from.getPosition());
+        return playerData.isTeleporting(to.getPosition());
     }
 
     public boolean isYLevel() {

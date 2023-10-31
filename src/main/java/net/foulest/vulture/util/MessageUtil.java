@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import net.foulest.vulture.Vulture;
-import net.foulest.vulture.data.DataManager;
+import net.foulest.vulture.data.PlayerDataManager;
 import net.foulest.vulture.data.PlayerData;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -48,7 +48,7 @@ public final class MessageUtil {
 
     public static void sendAlert(@NonNull String message) {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            PlayerData playerData = DataManager.getPlayerData(player);
+            PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
             if (playerData.isAlertsEnabled()) {
                 messagePlayer(player, Settings.prefix + " " + message);

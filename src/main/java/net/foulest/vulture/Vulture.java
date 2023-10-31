@@ -6,11 +6,16 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import net.foulest.vulture.cmds.VultureCmd;
+import net.foulest.vulture.data.PlayerData;
+import net.foulest.vulture.data.PlayerDataManager;
+import net.foulest.vulture.hamster.HamsterAPI;
+import net.foulest.vulture.listeners.CommandListener;
 import net.foulest.vulture.listeners.PlayerDataListener;
 import net.foulest.vulture.processor.type.PacketProcessor;
 import net.foulest.vulture.util.Settings;
 import net.foulest.vulture.util.command.CommandFramework;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -44,6 +49,9 @@ public class Vulture extends JavaPlugin {
     @Override
     @SneakyThrows
     public void onEnable() {
+        // Kick all online players.
+        Bukkit.getOnlinePlayers().forEach(player -> player.kickPlayer("Disconnected"));
+
         // Initializes the Command Framework.
         Bukkit.getLogger().info("[" + pluginName + "] Initializing Command Framework...");
         framework = new CommandFramework(this);
@@ -54,8 +62,12 @@ public class Vulture extends JavaPlugin {
                 .checkForUpdates(false)
                 .bStats(false));
 
+        // Initializes HamsterAPI.
+        Bukkit.getLogger().info("[" + pluginName + "] Initializing HamsterAPI...");
+        HamsterAPI.initialize();
+
         // Loads the plugin's commands.
-        Bukkit.getLogger().info("[" + pluginName + "] Loading Packet Processor...");
+        Bukkit.getLogger().info("[" + pluginName + "] Loading Packet Processors...");
         packetProcessor = new PacketProcessor();
 
         // Creates the default settings config.
@@ -65,7 +77,7 @@ public class Vulture extends JavaPlugin {
 
         // Loads the plugin's listeners.
         Bukkit.getLogger().info("[" + pluginName + "] Loading Listeners...");
-        loadListeners(new PlayerDataListener());
+        loadListeners(new PlayerDataListener(), new CommandListener());
 
         // Loads the plugin's commands.
         Bukkit.getLogger().info("[" + pluginName + "] Loading Commands...");
@@ -80,6 +92,18 @@ public class Vulture extends JavaPlugin {
         // Terminates PacketEvents.
         Bukkit.getLogger().info("[" + pluginName + "] Terminating PacketEvents...");
         packetEvents.terminate();
+
+        // Saves all online players' player data.
+        Bukkit.getLogger().info("[" + pluginName + "] Saving player data...");
+        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+            PlayerData playerData = PlayerDataManager.getPlayerData(player);
+
+            if (playerData != null) {
+                HamsterAPI.uninject(playerData);
+            }
+
+            PlayerDataManager.removePlayerData(player);
+        }
 
         // Saves the settings.
         Bukkit.getLogger().info("[" + pluginName + "] Saving Settings...");

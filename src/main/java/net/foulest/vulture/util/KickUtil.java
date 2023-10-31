@@ -5,9 +5,15 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import net.foulest.vulture.Vulture;
-import net.foulest.vulture.data.DataManager;
 import net.foulest.vulture.data.PlayerData;
+import net.foulest.vulture.data.PlayerDataManager;
+import net.foulest.vulture.hamster.HamsterAPI;
 import org.bukkit.entity.Player;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Utility class for kicking players.
@@ -18,6 +24,8 @@ import org.bukkit.entity.Player;
 @Getter
 @Setter
 public final class KickUtil {
+
+    private static final Set<UUID> currentlyKicking = Collections.synchronizedSet(new HashSet<>());
 
     private KickUtil() {
         throw new UnsupportedOperationException("KickUtil should not be instantiated.");
@@ -59,7 +67,16 @@ public final class KickUtil {
     public static void kick(@NonNull Player player, CancellableEvent eventToCancel,
                             @NonNull String debugMessage,
                             @NonNull String reason, boolean announceKick) {
-        PlayerData playerData = DataManager.getPlayerData(player);
+        synchronized (currentlyKicking) {
+            if (currentlyKicking.contains(player.getUniqueId())) {
+                // Already in the process of kicking this player.
+                return;
+            }
+
+            currentlyKicking.add(player.getUniqueId());
+        }
+
+        PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
         if (announceKick) {
             MessageUtil.sendAlert("&f" + player.getName() + " &7has been kicked for cheating."
@@ -70,13 +87,32 @@ public final class KickUtil {
             eventToCancel.setCancelled(true);
         }
 
-        if (Vulture.instance.isEnabled() && !playerData.isKicking()) {
-            playerData.setKicking(true);
-            playerData.setNewViolationsPaused(true);
+        // Kicks the player with a message.
+        if (Vulture.instance.isEnabled()) {
+            TaskUtil.run(() -> {
+                if (player.isOnline()) {
+                    player.kickPlayer(MessageUtil.colorize(reason));
+                } else {
+                    HamsterAPI.closeChannel(playerData);
+                }
 
-            // This may cause "Player not found." to appear in the console.
-            // This, for now, is a necessary evil. Some players wouldn't get kicked otherwise.
-            TaskUtil.run(() -> player.kickPlayer(MessageUtil.colorize(reason)));
+                currentlyKicking.remove(player.getUniqueId());
+            });
+        } else {
+            HamsterAPI.closeChannel(playerData);
+            currentlyKicking.remove(player.getUniqueId());
+        }
+    }
+
+    /**
+     * Checks if the specified player is being kicked.
+     *
+     * @param player The player to check.
+     * @return If the player is being kicked.
+     */
+    public static boolean isPlayerBeingKicked(@NonNull Player player) {
+        synchronized (currentlyKicking) {
+            return currentlyKicking.contains(player.getUniqueId());
         }
     }
 }

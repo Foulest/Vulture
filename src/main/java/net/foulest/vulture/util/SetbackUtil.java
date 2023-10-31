@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import net.foulest.vulture.action.ActionType;
-import net.foulest.vulture.data.DataManager;
+import net.foulest.vulture.data.PlayerDataManager;
 import net.foulest.vulture.data.PlayerData;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -17,7 +17,7 @@ import org.bukkit.util.Vector;
 public class SetbackUtil {
 
     public static void setback(@NonNull Player player) {
-        PlayerData playerData = DataManager.getPlayerData(player);
+        PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
         if (playerData.getTimestamp(ActionType.LAST_ON_GROUND_LOCATION_SET) == 0) {
             setback(player, player.getLocation());
@@ -31,7 +31,7 @@ public class SetbackUtil {
     }
 
     public static void setback(@NonNull Player player, @NonNull Location location) {
-        PlayerData playerData = DataManager.getPlayerData(player);
+        PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
         if (player.isInsideVehicle()) {
             return;

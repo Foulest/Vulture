@@ -4,6 +4,7 @@ import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPac
 import io.github.retrooper.packetevents.packetwrappers.play.out.position.WrappedPacketOutPosition;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
+import io.netty.channel.Channel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -17,9 +18,12 @@ import net.foulest.vulture.util.data.Pair;
 import net.foulest.vulture.util.raytrace.BoundingBox;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import java.lang.reflect.Method;
 import java.util.*;
 
 @Getter
@@ -32,6 +36,20 @@ public class PlayerData {
     private ClientVersion version = ClientVersion.TEMP_UNRESOLVED;
     @Getter
     private final List<Check> checks = new ArrayList<>();
+
+    // HamsterAPI
+    @Getter
+    private Object playerConnection;
+    @Getter
+    private Object networkManager;
+    @Getter
+    private Channel channel;
+    private Class<?> iChatBaseComponentClass;
+    private Method toChatBaseComponent;
+    private Method sendPacketMethod;
+    private boolean setup = false;
+    private boolean injected = false;
+    private int packetsSentInTick = 0;
 
     // Timestamps
     private Map<ActionType, Long> actionTimestamps = new HashMap<>();
@@ -65,7 +83,6 @@ public class PlayerData {
 
     // Other data
     private boolean alertsEnabled = false;
-    private boolean kicking = false;
     private boolean newViolationsPaused = false;
     private int positionCheckerTaskId;
     private List<Violation> violations = new ArrayList<>();
@@ -284,5 +301,14 @@ public class PlayerData {
                 && lastTeleportPosition.getX() == toPosition.getX()
                 && lastTeleportPosition.getY() == toPosition.getY()
                 && lastTeleportPosition.getZ() == toPosition.getZ();
+    }
+
+    public boolean isNearbyBoat(double x, double y, double z) {
+        for (Entity entity : player.getNearbyEntities(x, y, z)) {
+            if (entity.getType() == EntityType.BOAT) {
+                return true;
+            }
+        }
+        return false;
     }
 }
