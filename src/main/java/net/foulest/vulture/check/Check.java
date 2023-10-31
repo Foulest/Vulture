@@ -10,7 +10,7 @@ import lombok.Setter;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.event.MovementEvent;
 import net.foulest.vulture.event.RotationEvent;
-import net.foulest.vulture.hamster.HamsterAPI;
+import net.foulest.vulture.hamsterapi.HamsterAPI;
 import net.foulest.vulture.util.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

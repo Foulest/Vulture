@@ -1,4 +1,4 @@
-package net.foulest.vulture.hamster.enums;
+package net.foulest.vulture.hamsterapi.enums;
 
 public enum PacketType {
     // Out packets

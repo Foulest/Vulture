@@ -1,6 +1,6 @@
-package net.foulest.vulture.hamster.events;
+package net.foulest.vulture.hamsterapi.events;
 
-import net.foulest.vulture.hamster.wrappers.PacketWrapper;
+import net.foulest.vulture.hamsterapi.wrappers.PacketWrapper;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.Getter;
 import net.foulest.vulture.data.PlayerData;

@@ -1,12 +1,12 @@
-package net.foulest.vulture.hamster.handlers;
+package net.foulest.vulture.hamsterapi.handlers;
 
-import net.foulest.vulture.hamster.wrappers.PacketWrapper;
+import net.foulest.vulture.hamsterapi.wrappers.PacketWrapper;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import net.foulest.vulture.data.PlayerData;
-import net.foulest.vulture.hamster.events.PacketReceiveEvent;
-import net.foulest.vulture.hamster.events.PacketSendEvent;
+import net.foulest.vulture.hamsterapi.events.PacketReceiveEvent;
+import net.foulest.vulture.hamsterapi.events.PacketSendEvent;
 import org.bukkit.Server;
 import org.bukkit.plugin.PluginManager;
 

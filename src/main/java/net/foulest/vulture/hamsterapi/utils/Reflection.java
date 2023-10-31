@@ -1,4 +1,4 @@
-package net.foulest.vulture.hamster.utils;
+package net.foulest.vulture.hamsterapi.utils;
 
 import lombok.AllArgsConstructor;
 

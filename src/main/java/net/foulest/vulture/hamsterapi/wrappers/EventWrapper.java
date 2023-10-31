@@ -1,4 +1,4 @@
-package net.foulest.vulture.hamster.wrappers;
+package net.foulest.vulture.hamsterapi.wrappers;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;

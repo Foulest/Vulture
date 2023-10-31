@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.data.PlayerDataManager;
-import net.foulest.vulture.hamster.HamsterAPI;
+import net.foulest.vulture.hamsterapi.HamsterAPI;
 import net.foulest.vulture.util.KickUtil;
 import net.foulest.vulture.util.MessageUtil;
 import org.bukkit.Material;

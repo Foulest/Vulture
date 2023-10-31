@@ -1,11 +1,11 @@
-package net.foulest.vulture.hamster.handlers;
+package net.foulest.vulture.hamsterapi.handlers;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import net.foulest.vulture.data.PlayerData;
-import net.foulest.vulture.hamster.events.PacketDecodeEvent;
-import net.foulest.vulture.hamster.wrappers.ByteBufWrapper;
+import net.foulest.vulture.hamsterapi.events.PacketDecodeEvent;
+import net.foulest.vulture.hamsterapi.wrappers.ByteBufWrapper;
 import org.bukkit.Server;
 import org.bukkit.plugin.PluginManager;
 

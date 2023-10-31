@@ -1,4 +1,4 @@
-package net.foulest.vulture.hamster.events;
+package net.foulest.vulture.hamsterapi.events;
 
 import io.netty.channel.ChannelHandlerContext;
 import lombok.Getter;

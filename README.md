@@ -2,7 +2,7 @@
 Vulture is a robust, free, and open-source anticheat plugin designed specifically for Minecraft 1.8.9 servers.
 
 ## Technical Details
-- Employs **PacketEvents** for efficient packet handling.
+- Employs **PacketEvents** and **HamsterAPI** for efficient packet handling.
 - Built upon the robust framework provided by **Rainnny7**.
 - Exclusively compatible with 1.8.9 servers.
 
@@ -16,14 +16,14 @@ Vulture is a robust, free, and open-source anticheat plugin designed specificall
 - Velocity _(x2)_
 
 **Movement Checks:**
-- Flight _(x1)_
+- Flight _(x2)_
 - GroundSpoof _(x2)_
 - Invalid _(x2)_
 - Speed _(x6)_
 - Timer _(x1)_
 
 **Other Checks:**
-- BadPackets _(x8)_
+- BadPackets _(x7)_
 - ClientBrand _(x1)_
 - Inventory _(x11)_
 - PingSpoof _(x2)_
