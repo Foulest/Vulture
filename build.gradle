@@ -30,7 +30,7 @@ dependencies {
     compileOnly group: 'org.spigotmc', name: 'spigot', version: '1.8.8-R0.1-SNAPSHOT'
 
     // https://github.com/retrooper/packetevents
-    provided group: 'com.github.retrooper', name: 'packetevents', version: 'v1.8.4'
+    provided group: 'com.github.retrooper', name: 'packetevents', version: '2.1.0'
 
     // https://projectlombok.org
     implementation group: 'org.projectlombok', name: 'lombok', version: '1.18.30'
