@@ -45,8 +45,8 @@ import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.data.PlayerDataManager;
 import net.foulest.vulture.event.MovementEvent;
 import net.foulest.vulture.event.RotationEvent;
-import net.foulest.vulture.hamsterapi.HamsterAPI;
-import net.foulest.vulture.hamsterapi.events.PacketDecodeEvent;
+import dev._2lstudios.hamsterapi.HamsterAPI;
+import dev._2lstudios.hamsterapi.events.PacketDecodeEvent;
 import net.foulest.vulture.processor.Processor;
 import net.foulest.vulture.util.KickUtil;
 import net.foulest.vulture.util.MessageUtil;
@@ -260,6 +260,9 @@ public class PacketProcessor extends Processor {
 
                     case START_DESTROY_BLOCK: // Ignored; digging set in Bukkit events
                         break;
+
+                    default:
+                        break;
                 }
                 break;
 
@@ -384,6 +387,9 @@ public class PacketProcessor extends Processor {
                             case BOW:
                                 playerData.setShootingBow(true);
                                 break;
+
+                            default:
+                                break;
                         }
                     } else if (itemStack.getType().isBlock() && itemStack.getType() != Material.AIR) {
                         playerData.setPlacingBlock(true);
@@ -449,6 +455,9 @@ public class PacketProcessor extends Processor {
                         break;
 
                     case REQUEST_STATS: // Ignored
+                        break;
+
+                    default:
                         break;
                 }
                 break;
@@ -696,6 +705,9 @@ public class PacketProcessor extends Processor {
                             KickUtil.kickPlayer(player, event, "Sent invalid Riding Jump packet");
                             return;
                         }
+                        break;
+
+                    default:
                         break;
                 }
                 break;
@@ -1186,6 +1198,9 @@ public class PacketProcessor extends Processor {
                     case INTERACT_AT:
                         playerData.setTimestamp(ActionType.ENTITY_INTERACT);
                         break;
+
+                    default:
+                        break;
                 }
 
                 if (entity instanceof Player) {
@@ -1288,6 +1303,9 @@ public class PacketProcessor extends Processor {
                                 && windowButton != 6) {
                             KickUtil.kickPlayer(player, event, "Sent WindowClick packet with invalid PickupAll button");
                         }
+                        break;
+
+                    default:
                         break;
                 }
 

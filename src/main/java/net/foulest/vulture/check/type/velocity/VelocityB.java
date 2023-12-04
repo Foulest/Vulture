@@ -46,7 +46,7 @@ public class VelocityB extends Check {
         int velTicks = totalTicks - velocityTicks;
 
         boolean newerThan1_8 = PacketEvents.get().getPlayerUtils().getClientVersion(player).isNewerThan(ClientVersion.v_1_8);
-        boolean isYLevel = event.isYLevel();
+        boolean isYLevel = event.isYLevel(toPosition.getY());
         boolean isVelocityCheckTime = velTicks == 1 && lastServerPositionTick > 120;
 
         double deltaXZ = event.getDeltaXZ();

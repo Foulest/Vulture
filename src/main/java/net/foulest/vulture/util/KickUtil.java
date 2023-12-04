@@ -7,7 +7,7 @@ import lombok.Setter;
 import net.foulest.vulture.Vulture;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.data.PlayerDataManager;
-import net.foulest.vulture.hamsterapi.HamsterAPI;
+import dev._2lstudios.hamsterapi.HamsterAPI;
 import org.bukkit.entity.Player;
 
 import java.util.Collections;

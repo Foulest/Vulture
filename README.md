@@ -1,4 +1,7 @@
 # Vulture
+
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/238ed4bb02fe4c2192f199953705c3da)](https://app.codacy.com/gh/Foulest/Vulture/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+
 Vulture is a robust, free, and open-source anticheat plugin designed specifically for Minecraft 1.8.9 servers.
 
 ## Technical Details

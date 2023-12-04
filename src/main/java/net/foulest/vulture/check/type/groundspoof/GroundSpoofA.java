@@ -34,7 +34,7 @@ public class GroundSpoofA extends Check {
         double deltaY = event.getDeltaY();
         double velocity = player.getVelocity().getY();
 
-        boolean isYLevel = event.isYLevel();
+        boolean isYLevel = event.isYLevel(toPosition.getY());
         boolean underBlock = playerData.isUnderBlock();
         boolean onGround = playerData.isOnGround();
         boolean nearGround = playerData.isNearGround();

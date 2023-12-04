@@ -8,7 +8,7 @@ import lombok.SneakyThrows;
 import net.foulest.vulture.cmds.VultureCmd;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.data.PlayerDataManager;
-import net.foulest.vulture.hamsterapi.HamsterAPI;
+import dev._2lstudios.hamsterapi.HamsterAPI;
 import net.foulest.vulture.listeners.CommandListener;
 import net.foulest.vulture.listeners.PlayerDataListener;
 import net.foulest.vulture.processor.type.PacketProcessor;

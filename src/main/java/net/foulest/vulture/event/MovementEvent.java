@@ -51,8 +51,8 @@ public class MovementEvent implements CancellableEvent {
         return playerData.isTeleporting(to.getPosition());
     }
 
-    public boolean isYLevel() {
-        return to.getPosition().getY() % 0.015625 == 0.0;
+    public boolean isYLevel(double y) {
+        return y % 0.015625 == 0.0;
     }
 
     public Location getToLocation() {

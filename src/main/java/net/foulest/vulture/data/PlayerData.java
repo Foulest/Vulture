@@ -105,10 +105,16 @@ public class PlayerData {
     private boolean teleportReset;
 
     // Attacker data
-    private double attackerX, attackerY, attackerZ;
-    private double attackerX2, attackerY2, attackerZ2;
-    private float attackerYaw, attackerPitch;
-    private float attackerYaw2, attackerPitch2;
+    private double attackerX;
+    private double attackerY;
+    private double attackerZ;
+    private double attackerX2;
+    private double attackerY2;
+    private double attackerZ2;
+    private float attackerYaw;
+    private float attackerPitch;
+    private float attackerYaw2;
+    private float attackerPitch2;
 
     // Target data
     private Observable<Player> target = new Observable<>(null);

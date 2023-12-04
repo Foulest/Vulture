@@ -113,8 +113,10 @@ public class BadPacketsA extends Check {
 
             case PacketType.Play.Client.TAB_COMPLETE:
                 return count > (olderThan1_8 ? 1 : 30);
-        }
 
+            default:
+                break;
+        }
         return false;
     }
 }

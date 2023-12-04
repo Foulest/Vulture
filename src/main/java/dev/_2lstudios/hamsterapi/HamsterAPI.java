@@ -1,4 +1,4 @@
-package net.foulest.vulture.hamsterapi;
+package dev._2lstudios.hamsterapi;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
@@ -6,9 +6,9 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import lombok.Getter;
 import net.foulest.vulture.data.PlayerData;
-import net.foulest.vulture.hamsterapi.handlers.HamsterChannelHandler;
-import net.foulest.vulture.hamsterapi.handlers.HamsterDecoderHandler;
-import net.foulest.vulture.hamsterapi.utils.Reflection;
+import dev._2lstudios.hamsterapi.handlers.HamsterChannelHandler;
+import dev._2lstudios.hamsterapi.handlers.HamsterDecoderHandler;
+import dev._2lstudios.hamsterapi.utils.Reflection;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 

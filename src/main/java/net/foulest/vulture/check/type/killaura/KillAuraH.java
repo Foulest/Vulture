@@ -19,7 +19,8 @@ import java.util.Deque;
 public class KillAuraH extends Check {
 
     private final Deque<Float> samples = Lists.newLinkedList();
-    private double buffer, buffer2;
+    private double buffer;
+    private double buffer2;
 
     public KillAuraH(@NonNull PlayerData playerData) throws ClassNotFoundException {
         super(playerData);

@@ -31,6 +31,7 @@ public class SpeedA extends Check {
                 || player.getAllowFlight()
                 || player.getGameMode().equals(GameMode.CREATIVE)
                 || player.getGameMode().equals(GameMode.SPECTATOR)
+                || playerData.getTimeSince(ActionType.STEER_VEHICLE) < 500L
                 || player.isInsideVehicle()
                 || event.isTeleport(playerData)) {
             return;

@@ -1,9 +1,9 @@
-package net.foulest.vulture.hamsterapi.wrappers;
+package dev._2lstudios.hamsterapi.wrappers;
 
 import lombok.Getter;
-import net.foulest.vulture.hamsterapi.HamsterAPI;
-import net.foulest.vulture.hamsterapi.enums.PacketType;
-import net.foulest.vulture.hamsterapi.utils.Reflection;
+import dev._2lstudios.hamsterapi.HamsterAPI;
+import dev._2lstudios.hamsterapi.enums.PacketType;
+import dev._2lstudios.hamsterapi.utils.Reflection;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Field;
