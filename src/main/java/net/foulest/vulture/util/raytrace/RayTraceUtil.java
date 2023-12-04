@@ -47,7 +47,7 @@ public class RayTraceUtil {
             Collection<Entity> nearbyEntities = player.getWorld().getNearbyEntities(vector.toLocation(player.getWorld()), 0.5, 0.5, 0.5);
 
             for (Entity entity : nearbyEntities) {
-                if (entity != player) {
+                if (!entity.equals(player)) {
                     BoundingBox entityBoundingBox = new BoundingBox(entity);
 
                     if (rayTrace.intersects(entityBoundingBox, distance, 0.01)) {

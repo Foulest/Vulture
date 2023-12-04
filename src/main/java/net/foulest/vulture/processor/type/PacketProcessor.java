@@ -1168,12 +1168,12 @@ public class PacketProcessor extends Processor {
                         || playerData.isShootingBow()
                         || playerData.isEating()
                         || playerData.isDrinking()
-                        || entity == player
+                        || entity.equals(player)
                         || entityId < 0) {
                     KickUtil.kickPlayer(player, event, "Sent invalid UseEntity packet"
                             + " (" + playerData.isInventoryOpen() + " " + playerData.isPlacingBlock()
                             + " " + playerData.isShootingBow() + " " + playerData.isEating()
-                            + " " + playerData.isDrinking() + " " + " " + (entity == player) + " " + entityId + ")");
+                            + " " + playerData.isDrinking() + " " + " " + (entity.equals(player)) + " " + entityId + ")");
                     return;
                 }
 
