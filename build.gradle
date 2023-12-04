@@ -3,9 +3,10 @@ plugins {
 }
 
 group = 'net.foulest'
-version = '1.4.1'
+version = '1.4.2'
 description = 'Vulture'
 compileJava.options.encoding = 'UTF-8'
+java.sourceCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
     // Maven central repository

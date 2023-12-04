@@ -199,21 +199,21 @@ public enum EnumFacing implements IStringSerializable {
      * Get a Facing by its index (0-5). The order is D-U-N-S-W-E. Named getFront for legacy reasons.
      */
     public static EnumFacing getFront(int index) {
-        return VALUES[MathUtil.abs_int(index % VALUES.length)];
+        return VALUES[MathUtil.absInt(index % VALUES.length)];
     }
 
     /**
      * Get a Facing by its horizontal index (0-3). The order is S-W-N-E.
      */
     public static EnumFacing getHorizontal(int index) {
-        return HORIZONTALS[MathUtil.abs_int(index % HORIZONTALS.length)];
+        return HORIZONTALS[MathUtil.absInt(index % HORIZONTALS.length)];
     }
 
     /**
      * Get the Facing corresponding to the given angle (0-360). An angle of 0 is SOUTH, an angle of 90 would be WEST.
      */
     public static EnumFacing fromAngle(double angle) {
-        return getHorizontal(MathUtil.floor_double(angle / 90.0D + 0.5D) & 3);
+        return getHorizontal(MathUtil.floorDouble(angle / 90.0D + 0.5D) & 3);
     }
 
     /**

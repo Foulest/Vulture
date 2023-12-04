@@ -605,7 +605,7 @@ public class ClientBrand extends Check {
             new PayloadType("\fLunar-Client", "Lunar Client Spoof", DataType.REGISTER_DATA_OTHER, true)
     );
 
-    private static final List<PayloadType> PAYLOADS = Arrays.asList(
+    private static final List<PayloadType> CHANNELS = Arrays.asList(
             new PayloadType("AE2", "AE2", DataType.CHANNEL, false),
             new PayloadType("AS_IF", "ASMC", DataType.CHANNEL, false),
             new PayloadType("AS_MM", "ASMC", DataType.CHANNEL, false),
@@ -890,65 +890,41 @@ public class ClientBrand extends Check {
                        @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
         if (packetId == PacketType.Play.Client.CUSTOM_PAYLOAD) {
             WrappedPacketInCustomPayload payload = new WrappedPacketInCustomPayload(nmsPacket);
-            String data = new String(payload.getData(), StandardCharsets.UTF_8);
+            String data = new String(payload.getData(), StandardCharsets.UTF_8).replace(" (Velocity)", "");
             String channelName = payload.getChannelName();
 
-            if (channelName.equals("minecraft:brand")
-                    || channelName.equals("MC|Brand")) {
-                // Kicks players that register empty data.
-                if (data.isEmpty()) {
-                    KickUtil.kickPlayer(player, event, "Empty Brand");
-                    return;
-                }
-
-                checkBrand(event, data);
-
-            } else if (channelName.equals("minecraft:register")
-                    || channelName.equals("REGISTER")) {
-                // Kicks players that register empty data.
-                if (data.isEmpty()) {
-                    KickUtil.kickPlayer(player, event, "Empty Data");
-                    return;
-                }
-
-                // Splits the null spaces from the data and checks lines individually.
-                if (data.contains("\0")) {
-                    String[] splitData = data.split("\0");
-
-                    for (String line : splitData) {
-                        checkData(event, line);
-                    }
-                } else {
-                    checkData(event, data);
-                }
-
+            // Handles and validates the payload sent by the player.
+            if (channelName.equals("minecraft:brand") || channelName.equals("MC|Brand")) {
+                handleBrandData(data, event);
+            } else if (channelName.equals("minecraft:register") || channelName.equals("REGISTER")) {
+                handleRegisterData(data, event);
             } else {
-                // Player sends an unknown channel, check it.
-                checkPayload(event, channelName);
+                validateAndProcessPayload(CHANNELS, event, data, DataType.CHANNEL);
             }
 
-            // Checks for blacklisted mods.
-            for (PayloadType payloadType : playerData.getPayloads()) {
-                List<String> blacklistedPayload = Settings.blacklistedPayloads;
-
-                if (blacklistedPayload.contains(payloadType.name)) {
-                    KickUtil.kickPlayer(player, event, "Blacklisted Mod: " + payloadType.name,
-                            "&c" + payloadType.name + " is not allowed on this server.");
-                    return;
-                }
-            }
+            // Checks for blacklisted mods registered by the player.
+            checkForBlacklistedMods(event);
         }
     }
 
-    public void checkBrand(@NonNull CancellableNMSPacketEvent event, @NonNull String data) {
+    /**
+     * Handles the brand data sent by the player.
+     *
+     * @param data  The data sent by the player.
+     * @param event The event to cancel.
+     */
+    private void handleBrandData(String data, CancellableNMSPacketEvent event) {
         // Kicks players on Crystalware.
         if (data.contains("CRYSTAL|") || data.contains("Winterware")) {
             KickUtil.kickPlayer(player, event, "Blacklisted Brand: Crystalware");
             return;
         }
 
-        // Remove Velocity's brand suffix.
-        data = data.replace(" (Velocity)", "");
+        // Kicks players that register empty brands.
+        if (data.isEmpty()) {
+            KickUtil.kickPlayer(player, event, "Empty Brand");
+            return;
+        }
 
         // Checks for Lunar Client.
         if (data.matches("\u0013lunarclient:.*$")
@@ -964,135 +940,106 @@ public class ClientBrand extends Check {
             return;
         }
 
-        // Kicks players with blacklisted brands.
-        for (PayloadType payloadType : BRANDS) {
-            if (payloadType.data.equals(data)) {
-                if (payloadType.blacklisted) {
-                    KickUtil.kickPlayer(player, event, "Blacklisted Brand: " + payloadType.data);
-                } else {
-                    // If the player's getPayloads() doesn't contain the payload's name, add it.
-                    boolean nameExists = playerData.getPayloads().stream()
-                            .anyMatch(p -> p.getName().equals(payloadType.getName()));
-
-                    if (!nameExists) {
-                        playerData.getPayloads().add(payloadType);
-                    }
-                }
-
-                if (payloadType.getDataType() != DataType.BRAND
-                        && payloadType.getDataType() != DataType.REGISTER_DATA_OTHER) {
-                    // Cancels the packets to prevent the server from registering the channels.
-                    // This is needed to prevent the server from crashing / errors in console.
-                    event.setCancelled(true);
-                }
-                return;
-            }
-        }
-
-        // Prints warnings for players with unknown brands.
-        MessageUtil.sendAlert("&f" + player.getName() + " &7sent an unknown brand to the server. &8(Brand: " + data + ")");
-
-        // Prints unknown brands to a text file.
-        try {
-            @Cleanup BufferedWriter writer = new BufferedWriter(new FileWriter("unknown-brand.txt"));
-            writer.write(data);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-
-        // Cancels the packets to prevent the server from registering the channels.
-        // This is needed to prevent the server from crashing / errors in console.
-        event.setCancelled(true);
+        // Checks the sent payload against the brand list.
+        validateAndProcessPayload(BRANDS, event, data, DataType.BRAND);
     }
 
-    public void checkData(@NonNull CancellableNMSPacketEvent event, @NonNull String data) {
-        // Kicks players with blacklisted registered data.
-        for (PayloadType payloadType : REGISTER_DATA) {
-            if (payloadType.data.equals(data)) {
-                if (payloadType.blacklisted) {
-                    KickUtil.kickPlayer(player, event, "Blacklisted Data: " + payloadType.data);
-                } else {
-                    // If the player's getPayloads() doesn't contain the payload's name, add it.
-                    boolean nameExists = playerData.getPayloads().stream()
-                            .anyMatch(p -> p.getName().equals(payloadType.getName()));
-
-                    if (!nameExists) {
-                        playerData.getPayloads().add(payloadType);
-                    }
-                }
-
-                if (payloadType.getDataType() != DataType.BRAND
-                        && payloadType.getDataType() != DataType.REGISTER_DATA_OTHER) {
-                    // Cancels the packets to prevent the server from registering the channels.
-                    // This is needed to prevent the server from crashing / errors in console.
-                    event.setCancelled(true);
-                }
-                return;
-            }
-        }
-
-        // Prints warnings for players with unknown registered data.
-        MessageUtil.sendAlert("&f" + player.getName() + " &7sent unknown data to the server. &8(Data: " + data + ")");
-
-        // Prints unknown data to a text file.
-        try {
-            @Cleanup BufferedWriter writer = new BufferedWriter(new FileWriter("unknown-data.txt"));
-            writer.write(data);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-
-        // Cancels the packets to prevent the server from registering the channels.
-        // This is needed to prevent the server from crashing / errors in console.
-        event.setCancelled(true);
-    }
-
-    public void checkPayload(@NonNull CancellableNMSPacketEvent event, @NonNull String channelName) {
-        // Kicks players on Crystalware.
-        if (channelName.contains("CRYSTAL|") || channelName.contains("Winterware")) {
-            KickUtil.kickPlayer(player, event, "Blacklisted Payload: Crystalware");
+    /**
+     * Handles the register data sent by the player.
+     *
+     * @param data  The data sent by the player.
+     * @param event The event to cancel.
+     */
+    private void handleRegisterData(String data, CancellableNMSPacketEvent event) {
+        // Kicks players that register empty data.
+        if (data.isEmpty()) {
+            KickUtil.kickPlayer(player, event, "Empty Data");
             return;
         }
 
-        // Kicks players with blacklisted payloads.
-        for (PayloadType payloadType : PAYLOADS) {
-            if (payloadType.data.equals(channelName)) {
-                if (payloadType.blacklisted) {
-                    KickUtil.kickPlayer(player, event, "Blacklisted Payload: " + payloadType.data);
-                    return;
-                } else {
-                    // If the player's getPayloads() doesn't contain the payload's name, add it.
-                    boolean nameExists = playerData.getPayloads().stream()
-                            .anyMatch(p -> p.getName().equals(payloadType.getName()));
+        // Splits the null spaces from the data and checks lines individually.
+        if (data.contains("\0")) {
+            String[] splitData = data.split("\0");
 
-                    if (!nameExists) {
-                        playerData.getPayloads().add(payloadType);
-                    }
+            for (String line : splitData) {
+                validateAndProcessPayload(REGISTER_DATA, event, line, DataType.REGISTER_DATA_OTHER);
+            }
+        } else {
+            validateAndProcessPayload(REGISTER_DATA, event, data, DataType.REGISTER_DATA_OTHER);
+        }
+    }
+
+    /**
+     * Checks for blacklisted mods registered by the player.
+     *
+     * @param event The event to cancel.
+     */
+    private void checkForBlacklistedMods(CancellableNMSPacketEvent event) {
+        for (PayloadType payloadType : playerData.getPayloads()) {
+            List<String> blacklistedPayload = Settings.blacklistedPayloads;
+
+            // If the payload is blacklisted, kick the player.
+            if (blacklistedPayload.contains(payloadType.name)) {
+                KickUtil.kickPlayer(player, event, "Blacklisted Mod: " + payloadType.name,
+                        "&c" + payloadType.name + " is not allowed on this server.");
+                return;
+            }
+        }
+    }
+
+    /**
+     * Validates and processes a payload by checking it against a list of payload types.
+     *
+     * @param payloadTypeList The payload type list to check.
+     * @param event           The event to cancel.
+     * @param data            The data to check.
+     */
+    private void validateAndProcessPayload(@NonNull List<PayloadType> payloadTypeList,
+                                           @NonNull CancellableNMSPacketEvent event,
+                                           @NonNull String data,
+                                           @NonNull DataType dataType) {
+        // Checks if the data is present in the payload type list.
+        for (PayloadType payloadType : payloadTypeList) {
+            if (payloadType.data.equals(data)) {
+                // If the payload is blacklisted, kick the player.
+                if (payloadType.blacklisted) {
+                    KickUtil.kickPlayer(player, event, "Blacklisted "
+                            + dataType.getName() + ": " + payloadType.data);
+                    return;
                 }
 
-                if (payloadType.getDataType() != DataType.BRAND
-                        && payloadType.getDataType() != DataType.REGISTER_DATA_OTHER) {
-                    // Cancels the packets to prevent the server from registering the channels.
-                    // This is needed to prevent the server from crashing / errors in console.
-                    event.setCancelled(true);
+                // Adds the payload type to the player's list of sent payloads.
+                if (playerData.getPayloads().stream().noneMatch(p -> p.getName().equals(payloadType.getName()))) {
+                    playerData.getPayloads().add(payloadType);
                 }
                 return;
             }
         }
 
-        // Prints warnings for players with unknown payloads.
-        MessageUtil.sendAlert("&f" + player.getName() + " &7sent an unknown payload to the server. &8(Payload: " + channelName + ")");
+        // Payload was not found in the list; handle as unknown data.
+        MessageUtil.sendAlert("&f" + player.getName() + " &7sent unknown data to the server."
+                + " &8(Type: " + dataType.getName() + ") (Data: " + data + ")");
 
-        // Prints unknown data to a text file.
-        try {
-            @Cleanup BufferedWriter writer = new BufferedWriter(new FileWriter("unknown-payload.txt"));
-            writer.write(channelName);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+        // Prints the unknown data to a randomly generated text file.
+        printDataToFile(data, "unknown-data-" + System.currentTimeMillis() + ".txt");
 
         // Cancels the packets to prevent the server from registering the channels.
         // This is needed to prevent the server from crashing / errors in console.
         event.setCancelled(true);
+    }
+
+    /**
+     * Prints data to a text file.
+     *
+     * @param data     The data to print.
+     * @param fileName The file name to print to.
+     */
+    private void printDataToFile(String data, String fileName) {
+        try {
+            @Cleanup BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
+            writer.write(data);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 }

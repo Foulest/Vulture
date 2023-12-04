@@ -13,7 +13,7 @@ public enum DataType {
             case REGISTER_DATA_MOD:
                 return "Mod";
             case REGISTER_DATA_OTHER:
-                return "Other";
+                return "Register Data";
             case CHANNEL:
                 return "Channel";
             default:

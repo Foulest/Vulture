@@ -13,7 +13,9 @@ import java.util.Map;
 
 public class MathUtil {
 
+    private static final float[] SIN_TABLE = new float[65536];
     private static final float[] SIN_TABLE_FAST = new float[4096];
+    private static final int[] multiplyDeBruijnBitPosition;
     public static boolean fastMath = false;
 
     public static float getDistanceBetweenAngles(float angle1, float angle2) {
@@ -103,9 +105,6 @@ public class MathUtil {
                 .orElseThrow(NullPointerException::new).getX();
     }
 
-    private static final float[] SIN_TABLE = new float[65536];
-    private static final int[] multiplyDeBruijnBitPosition;
-
     /**
      * sin looked up in a table
      */
@@ -125,7 +124,7 @@ public class MathUtil {
     /**
      * Returns the greatest integer less than or equal to the double argument
      */
-    public static int floor_double(double value) {
+    public static int floorDouble(double value) {
         int i = (int) value;
         return value < i ? i - 1 : i;
     }
@@ -137,7 +136,7 @@ public class MathUtil {
     /**
      * Returns the unsigned value of an int.
      */
-    public static int abs_int(int value) {
+    public static int absInt(int value) {
         return value >= 0 ? value : -value;
     }
 
