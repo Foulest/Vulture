@@ -48,4 +48,4 @@ Vulture enhances Minecraft server integrity through advanced cheat detection and
 - [Usage](https://github.com/Foulest/Vulture/wiki/Usage)
 
 ## Getting Help
-For support or queries, please open an issue in the [Issues](https://github.com/Foulest/Vulture/issues) section.
+For support or queries, please open an issue in the [Issues section](https://github.com/Foulest/Vulture/issues).
