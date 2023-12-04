@@ -33,11 +33,9 @@ public class InventoryB extends Check {
             WrappedPacketInWindowClick windowClick = new WrappedPacketInWindowClick(nmsPacket);
             int windowId = windowClick.getWindowId();
 
-            if (windowId == 0) {
-                if (stage == 0) {
-                    ++stage;
-                    start = System.currentTimeMillis();
-                }
+            if (windowId == 0 && stage == 0) {
+                ++stage;
+                start = System.currentTimeMillis();
             }
 
         } else if (packetId == PacketType.Play.Client.HELD_ITEM_SLOT) {
@@ -56,10 +54,9 @@ public class InventoryB extends Check {
                 if ((itemType == Material.MUSHROOM_SOUP
                         || itemType == Material.POTION
                         || itemType == Material.BOWL)
-                        && direction == Direction.OTHER) {
-                    if (stage == 2) {
-                        ++stage;
-                    }
+                        && direction == Direction.OTHER
+                        && stage == 2) {
+                    ++stage;
                 }
             }
 

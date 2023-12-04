@@ -38,19 +38,17 @@ public class KillAuraG extends Check {
             int totalTicks = playerData.getTotalTicks();
             int lastPacketDrop = playerData.getLastPacketDrop();
 
-            if (action == WrappedPacketInUseEntity.EntityUseAction.ATTACK) {
-                if (timeSinceLag > 200 && timeSinceAttacking < 1000
-                        && lastServerPositionTick > 60
-                        && totalTicks - lastPacketDrop > 20) {
-                    long timeDelta = System.currentTimeMillis() - lastFlyingTime;
+            if (action == WrappedPacketInUseEntity.EntityUseAction.ATTACK
+                    && timeSinceLag > 200 && timeSinceAttacking < 1000
+                    && lastServerPositionTick > 60 && totalTicks - lastPacketDrop > 20) {
+                long timeDelta = System.currentTimeMillis() - lastFlyingTime;
 
-                    if (timeDelta < 5) {
-                        if (++buffer > 10) {
-                            flag(false, "timeDelta=" + timeDelta);
-                        }
-                    } else {
-                        buffer = 0;
+                if (timeDelta < 5) {
+                    if (++buffer > 10) {
+                        flag(false, "timeDelta=" + timeDelta);
                     }
+                } else {
+                    buffer = 0;
                 }
             }
 

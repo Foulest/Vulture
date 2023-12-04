@@ -41,20 +41,16 @@ public class InventoryA extends Check {
             int windowId = windowClick.getWindowId();
             int windowMode = windowClick.getMode();
 
-            if (windowId == 0 && windowMode == 2) {
-                if (stage == 1 || stage == 3) {
-                    ++stage;
-                }
+            if (windowId == 0 && windowMode == 2 && (stage == 1 || stage == 3)) {
+                ++stage;
             }
 
         } else if (packetId == PacketType.Play.Client.USE_ENTITY) {
             WrappedPacketInUseEntity useEntity = new WrappedPacketInUseEntity(nmsPacket);
             WrappedPacketInUseEntity.EntityUseAction action = useEntity.getAction();
 
-            if (action == WrappedPacketInUseEntity.EntityUseAction.ATTACK) {
-                if (stage == 2) {
-                    ++stage;
-                }
+            if (action == WrappedPacketInUseEntity.EntityUseAction.ATTACK && stage == 2) {
+                ++stage;
             }
 
         } else if (PacketType.Play.Client.Util.isInstanceOfFlying(packetId)) {

@@ -380,7 +380,7 @@ public enum EnumFacing implements IStringSerializable {
                 case 2:
                     return new EnumFacing[]{UP, DOWN};
                 default:
-                    throw new Error("Someone's been tampering with the universe!");
+                    throw new IllegalStateException("Unable to get axis planes for " + this);
             }
         }
 

@@ -28,10 +28,8 @@ public class AutoBlockA extends Check {
             WrappedPacketInBlockDig blockDig = new WrappedPacketInBlockDig(nmsPacket);
             WrappedPacketInBlockDig.PlayerDigType digType = blockDig.getDigType();
 
-            if (digType == WrappedPacketInBlockDig.PlayerDigType.RELEASE_USE_ITEM) {
-                if (stage == 0) {
-                    ++stage;
-                }
+            if (digType == WrappedPacketInBlockDig.PlayerDigType.RELEASE_USE_ITEM && stage == 0) {
+                ++stage;
             }
 
         } else if (packetId == PacketType.Play.Client.ARM_ANIMATION) {
@@ -43,10 +41,8 @@ public class AutoBlockA extends Check {
             WrappedPacketInUseEntity useEntity = new WrappedPacketInUseEntity(nmsPacket);
             WrappedPacketInUseEntity.EntityUseAction action = useEntity.getAction();
 
-            if (action == WrappedPacketInUseEntity.EntityUseAction.ATTACK) {
-                if (stage == 2) {
-                    ++stage;
-                }
+            if (action == WrappedPacketInUseEntity.EntityUseAction.ATTACK && stage == 2) {
+                ++stage;
             }
 
         } else if (PacketType.Play.Client.Util.isInstanceOfFlying(packetId)) {

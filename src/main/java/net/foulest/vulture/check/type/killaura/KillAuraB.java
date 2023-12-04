@@ -38,10 +38,8 @@ public class KillAuraB extends Check {
                 sentInteract = true;
             }
 
-        } else if (packetId == PacketType.Play.Client.BLOCK_PLACE) {
-            if (sentAttack && !sentInteract) {
-                flag(false);
-            }
+        } else if (packetId == PacketType.Play.Client.BLOCK_PLACE && sentAttack && !sentInteract) {
+            flag(false);
         }
     }
 }

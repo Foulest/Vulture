@@ -1,5 +1,6 @@
 package net.foulest.vulture.check;
 
+import dev._2lstudios.hamsterapi.HamsterAPI;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
@@ -10,7 +11,6 @@ import lombok.Setter;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.event.MovementEvent;
 import net.foulest.vulture.event.RotationEvent;
-import dev._2lstudios.hamsterapi.HamsterAPI;
 import net.foulest.vulture.util.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -129,6 +129,22 @@ public class Check {
             return;
         }
 
+        // Handles adding a violation.
+        handleNewViolation(verbose);
+
+        // Handles sending the alert message.
+        handleAlert(verboseString);
+
+        // Handles the punishment to execute.
+        handlePunishment(verboseString);
+    }
+
+    /**
+     * Handles adding a new violation to the player's data.
+     *
+     * @param verbose The verbose to add to the violation.
+     */
+    private void handleNewViolation(String... verbose) {
         // Removes older violations before adding new ones.
         try {
             for (Violation violation : playerData.getViolations()) {
@@ -160,23 +176,37 @@ public class Check {
 
         // Adds the violation to the player's violations.
         playerData.getViolations().add(violation);
+    }
 
-        // Sends the alert message.
-        MessageUtil.sendAlert("&f" + player.getName() + " &7failed &f" + checkInfo.name()
-                + " &c(x" + violations + ")" + verboseString);
+    /**
+     * Handles sending the alert message.
+     *
+     * @param verbose The verbose to add to the alert message.
+     */
+    private void handleAlert(String verbose) {
+        MessageUtil.sendAlert("&f" + player.getName() + " &7failed &f"
+                + checkInfo.name() + " &c(x" + violations + ")" + verbose);
+    }
 
-        // Handles the ban/kick.
+    /**
+     * Handles the punishment to execute.
+     *
+     * @param verbose The verbose to add to the punishment.
+     */
+    private void handlePunishment(String verbose) {
         if (violations >= checkInfo.maxViolations() && !checkInfo.experimental() && !checkInfo.banCommand().isEmpty()) {
+            // Pauses any new violations from being added.
             playerData.setNewViolationsPaused(true);
 
             boolean kicking = (checkInfo.banCommand().startsWith("vulture kick")
                     || checkInfo.banCommand().startsWith("kick"));
 
-            // Sends the ban alert message.
+            // Sends the private punishment message.
             MessageUtil.sendAlert("&f" + player.getName() + " &7has been " + (kicking ? "kicked" : "banned")
-                    + " for failing &f" + checkInfo.name() + " &c(x" + violations + ")" + verboseString);
+                    + " for failing &f" + checkInfo.name() + " &c(x" + violations + ")" + verbose);
 
-            // Broadcasts the ban message, if one is set.
+            // Sends the public punishment message, if one is set.
+            // Punishment messages are not sent if the player is being kicked.
             if (!Settings.banMessage.isEmpty() && !kicking) {
                 List<String> banMessageEdited = new ArrayList<>(Settings.banMessage);
                 banMessageEdited.replaceAll(s -> s.replace("%player%", player.getName()));
@@ -184,7 +214,7 @@ public class Check {
                 MessageUtil.broadcastList(banMessageEdited);
             }
 
-            // Executes the ban command.
+            // Executes the punishment command.
             TaskUtil.run(() -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), checkInfo.banCommand()
                     .replace("%player%", player.getName())
                     .replace("%check%", checkInfo.name())));

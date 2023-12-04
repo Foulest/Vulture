@@ -1,9 +1,9 @@
 package dev._2lstudios.hamsterapi.wrappers;
 
-import lombok.Getter;
 import dev._2lstudios.hamsterapi.HamsterAPI;
 import dev._2lstudios.hamsterapi.enums.PacketType;
 import dev._2lstudios.hamsterapi.utils.Reflection;
+import lombok.Getter;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Field;
@@ -14,7 +14,6 @@ import java.util.Map;
 public class PacketWrapper {
 
     private final Class<?> craftItemStackClass;
-    private final Class<?> nmsItemStackClass;
     @Getter
     private final Object packet;
     @Getter
@@ -41,7 +40,7 @@ public class PacketWrapper {
         Class<?> itemStackClass = reflection.getItemStack();
 
         this.craftItemStackClass = reflection.getCraftItemStack();
-        this.nmsItemStackClass = reflection.getItemStack();
+        Class<?> nmsItemStackClass = reflection.getItemStack();
         this.packet = packet;
         this.name = packetClass.getSimpleName();
 

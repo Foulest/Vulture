@@ -36,10 +36,8 @@ public class InventoryD extends Check {
             WrappedPacketInClientCommand clientCommand = new WrappedPacketInClientCommand(nmsPacket);
             WrappedPacketInClientCommand.ClientCommand command = clientCommand.getClientCommand();
 
-            if (command == WrappedPacketInClientCommand.ClientCommand.OPEN_INVENTORY_ACHIEVEMENT) {
-                if (stage == 0) {
-                    ++stage;
-                }
+            if (command == WrappedPacketInClientCommand.ClientCommand.OPEN_INVENTORY_ACHIEVEMENT && stage == 0) {
+                ++stage;
             }
 
         } else if (packetId == PacketType.Play.Client.WINDOW_CLICK) {
@@ -47,20 +45,16 @@ public class InventoryD extends Check {
             int windowId = windowClick.getWindowId();
             int windowMode = windowClick.getMode();
 
-            if (windowId == 0 && (windowMode == 1 || windowMode == 4)) {
-                if (stage == 1) {
-                    ++stage;
-                }
+            if (windowId == 0 && (windowMode == 1 || windowMode == 4) && stage == 1) {
+                ++stage;
             }
 
         } else if (packetId == PacketType.Play.Client.CLOSE_WINDOW) {
             WrappedPacketInCloseWindow closeWindow = new WrappedPacketInCloseWindow(nmsPacket);
             int windowId = closeWindow.getWindowId();
 
-            if (windowId == 0) {
-                if (stage == 2) {
-                    ++stage;
-                }
+            if (windowId == 0 && stage == 2) {
+                ++stage;
             }
 
         } else if (PacketType.Play.Client.Util.isInstanceOfFlying(packetId)) {

@@ -129,7 +129,7 @@ public class RayTraceUtil {
             } else if (position.getY() < min.getY() || position.getY() > max.getY()) {
                 return false;
             } else {
-                return !(position.getZ() < min.getZ()) && !(position.getZ() > max.getZ());
+                return position.getZ() >= min.getZ() && position.getZ() <= max.getZ();
             }
         }
 

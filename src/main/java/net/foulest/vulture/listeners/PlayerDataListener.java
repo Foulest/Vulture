@@ -1,12 +1,12 @@
 package net.foulest.vulture.listeners;
 
+import dev._2lstudios.hamsterapi.HamsterAPI;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import lombok.AllArgsConstructor;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.data.PlayerDataManager;
-import dev._2lstudios.hamsterapi.HamsterAPI;
 import net.foulest.vulture.util.KickUtil;
 import net.foulest.vulture.util.MessageUtil;
 import org.bukkit.Material;
@@ -110,15 +110,14 @@ public class PlayerDataListener implements Listener {
         }
 
         // Prevents players from placing blocks on liquids & air.
-        if (event.getBlockAgainst().getType() == Material.AIR
+        if ((event.getBlockAgainst().getType() == Material.AIR
                 || event.getBlockAgainst().getType() == Material.WATER
                 || event.getBlockAgainst().getType() == Material.STATIONARY_WATER
                 || event.getBlockAgainst().getType() == Material.LAVA
-                || event.getBlockAgainst().getType() == Material.STATIONARY_LAVA) {
-            if (event.getBlockPlaced().getType() != Material.WATER_LILY) {
-                event.setCancelled(true);
-                KickUtil.kickPlayer(player, "Tried to place block against invalid block");
-            }
+                || event.getBlockAgainst().getType() == Material.STATIONARY_LAVA)
+                && event.getBlockPlaced().getType() != Material.WATER_LILY) {
+            event.setCancelled(true);
+            KickUtil.kickPlayer(player, "Tried to place block against invalid block");
         }
     }
 

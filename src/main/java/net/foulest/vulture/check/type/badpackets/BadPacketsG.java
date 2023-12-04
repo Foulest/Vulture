@@ -41,10 +41,8 @@ public class BadPacketsG extends Check {
                 stage = 1;
 
             } else if (digType == WrappedPacketInBlockDig.PlayerDigType.START_DESTROY_BLOCK) {
-                if (stage == 2) {
-                    if (ticks != 1 || playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8)) {
-                        flag(false, "Break speed" + " (ticks=" + ticks + ")");
-                    }
+                if (stage == 2 && (ticks != 1 || playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8))) {
+                    flag(false, "Break speed" + " (ticks=" + ticks + ")");
                 }
 
                 stage = 0;

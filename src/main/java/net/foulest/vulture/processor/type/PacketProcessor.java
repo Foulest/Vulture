@@ -1,5 +1,7 @@
 package net.foulest.vulture.processor.type;
 
+import dev._2lstudios.hamsterapi.HamsterAPI;
+import dev._2lstudios.hamsterapi.events.PacketDecodeEvent;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
 import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
@@ -45,8 +47,6 @@ import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.data.PlayerDataManager;
 import net.foulest.vulture.event.MovementEvent;
 import net.foulest.vulture.event.RotationEvent;
-import dev._2lstudios.hamsterapi.HamsterAPI;
-import dev._2lstudios.hamsterapi.events.PacketDecodeEvent;
 import net.foulest.vulture.processor.Processor;
 import net.foulest.vulture.util.KickUtil;
 import net.foulest.vulture.util.MessageUtil;
@@ -142,38 +142,35 @@ public class PacketProcessor extends Processor {
                         return;
                     }
 
-                    if (abilities.isFlightAllowed().isPresent()) {
-                        if (abilities.isFlightAllowed().get() != playerData.isFlightAllowed()) {
-                            KickUtil.kickPlayer(player, event, "Sent invalid Abilities flight allowed values");
-                            return;
-                        }
+                    if (abilities.isFlightAllowed().isPresent()
+                            && abilities.isFlightAllowed().get() != playerData.isFlightAllowed()) {
+                        KickUtil.kickPlayer(player, event, "Sent invalid Abilities flight allowed values");
+                        return;
                     }
 
-                    if (abilities.canInstantlyBuild().isPresent()) {
-                        if (abilities.canInstantlyBuild().get() != playerData.isInstantBuild()) {
-                            KickUtil.kickPlayer(player, event, "Sent invalid Abilities instant build values");
-                            return;
-                        }
+                    if (abilities.canInstantlyBuild().isPresent()
+                            && abilities.canInstantlyBuild().get() != playerData.isInstantBuild()) {
+                        KickUtil.kickPlayer(player, event, "Sent invalid Abilities instant build values");
+                        return;
                     }
 
-                    if (abilities.isVulnerable().isPresent()) {
-                        if (abilities.isVulnerable().get() != playerData.isVulnerable()) {
-                            KickUtil.kickPlayer(player, event, "Sent invalid Abilities invulnerable values");
-                            return;
-                        }
+                    if (abilities.isVulnerable().isPresent()
+                            && abilities.isVulnerable().get() != playerData.isVulnerable()) {
+                        KickUtil.kickPlayer(player, event, "Sent invalid Abilities invulnerable values");
+                        return;
                     }
 
-                    if (abilities.getFlySpeed().isPresent()) {
-                        if (!playerData.isFlightAllowed() && abilities.getFlySpeed().get() != playerData.getFlySpeed()) {
-                            KickUtil.kickPlayer(player, event, "Sent invalid Abilities fly speed values");
-                            return;
-                        }
+                    if (abilities.getFlySpeed().isPresent()
+                            && !playerData.isFlightAllowed()
+                            && abilities.getFlySpeed().get() != playerData.getFlySpeed()) {
+                        KickUtil.kickPlayer(player, event, "Sent invalid Abilities fly speed values");
+                        return;
                     }
 
-                    if (abilities.getWalkSpeed().isPresent()) {
-                        if (abilities.getWalkSpeed().get() != playerData.getWalkSpeed()) {
-                            KickUtil.kickPlayer(player, event, "Sent invalid Abilities walk speed values");
-                        }
+                    if (abilities.getWalkSpeed().isPresent()
+                            && abilities.getWalkSpeed().get() != playerData.getWalkSpeed()) {
+                        KickUtil.kickPlayer(player, event, "Sent invalid Abilities walk speed values");
+                        return;
                     }
                 }
 
@@ -190,7 +187,6 @@ public class PacketProcessor extends Processor {
                     KickUtil.kickPlayer(player, event, "Sent invalid ArmAnimation packet");
                     return;
                 }
-
 
                 playerData.setTimestamp(ActionType.ARM_ANIMATION);
                 break;
@@ -570,25 +566,23 @@ public class PacketProcessor extends Processor {
                     }
 
                     // Checks for invalid book edit payloads.
-                    if (channelName.equals("MC|BEdit")) {
-                        if (!data.startsWith("\u0001ï¿½\u0001\u0000\u0000\n\u0000\u0000\t\u0000\u0005pages\b"
-                                + "\u0000\u0000\u0000\u0001\u0000\f")
-                                && !data.endsWith("\u0000")) {
-                            KickUtil.kickPlayer(player, event, "Sent invalid book edit payload");
-                            return;
-                        }
+                    if (channelName.equals("MC|BEdit")
+                            && !data.startsWith("\u0001ï¿½\u0001\u0000\u0000\n\u0000\u0000\t"
+                            + "\u0000\u0005pages\b\u0000\u0000\u0000\u0001\u0000\f")
+                            && !data.endsWith("\u0000")) {
+                        KickUtil.kickPlayer(player, event, "Sent invalid book edit payload");
+                        return;
                     }
 
                     // Checks for invalid book sign payloads.
-                    if (channelName.equals("MC|BSign")) {
-                        if (!data.startsWith("\u0001ï¿½\u0001\u0000\u0000\n\u0000\u0000\t\u0000\u0005pages\b"
-                                + "\u0000\u0000\u0000\u0001\u0000\f")
-                                && !data.endsWith("\u0000")
-                                && !data.contains("\b\u0000\u0006author\u0000\u0007")
-                                && !data.contains("\b\u0000\u0005title\u0000\u0004")) {
-                            KickUtil.kickPlayer(player, event, "Sent invalid book sign payload");
-                            return;
-                        }
+                    if (channelName.equals("MC|BSign")
+                            && !data.startsWith("\u0001ï¿½\u0001\u0000\u0000\n\u0000\u0000\t"
+                            + "\u0000\u0005pages\b\u0000\u0000\u0000\u0001\u0000\f")
+                            && !data.endsWith("\u0000")
+                            && !data.contains("\b\u0000\u0006author\u0000\u0007")
+                            && !data.contains("\b\u0000\u0005title\u0000\u0004")) {
+                        KickUtil.kickPlayer(player, event, "Sent invalid book sign payload");
+                        return;
                     }
 
                     ItemStack itemInHand = playerData.getPlayer().getInventory().getItemInHand();

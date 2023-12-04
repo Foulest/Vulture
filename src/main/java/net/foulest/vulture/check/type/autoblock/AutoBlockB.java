@@ -27,10 +27,8 @@ public class AutoBlockB extends Check {
             WrappedPacketInBlockDig blockDig = new WrappedPacketInBlockDig(nmsPacket);
             WrappedPacketInBlockDig.PlayerDigType digType = blockDig.getDigType();
 
-            if (digType == WrappedPacketInBlockDig.PlayerDigType.RELEASE_USE_ITEM) {
-                if (++buffer > 2) {
-                    flag(false);
-                }
+            if (digType == WrappedPacketInBlockDig.PlayerDigType.RELEASE_USE_ITEM && ++buffer > 2) {
+                flag(false);
             }
 
         } else if (PacketType.Play.Client.Util.isInstanceOfFlying(packetId)) {

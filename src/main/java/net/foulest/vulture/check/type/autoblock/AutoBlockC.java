@@ -37,10 +37,8 @@ public class AutoBlockC extends Check {
             WrappedPacketInBlockDig blockDig = new WrappedPacketInBlockDig(nmsPacket);
             WrappedPacketInBlockDig.PlayerDigType digType = blockDig.getDigType();
 
-            if (digType == WrappedPacketInBlockDig.PlayerDigType.RELEASE_USE_ITEM) {
-                if (++buffer > 1) {
-                    flag(false);
-                }
+            if (digType == WrappedPacketInBlockDig.PlayerDigType.RELEASE_USE_ITEM && ++buffer > 1) {
+                flag(false);
             }
         }
     }

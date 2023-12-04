@@ -31,34 +31,32 @@ public class AutoClickerA extends Check {
             boolean placingBlock = playerData.isPlacingBlock();
             boolean digging = playerData.isDigging();
 
-            if (swung && !placingBlock && !digging) {
-                if (flyingCount < 8) {
-                    flyingCountQueue.add(flyingCount);
+            if (swung && !placingBlock && !digging && flyingCount < 8) {
+                flyingCountQueue.add(flyingCount);
 
-                    if (flyingCountQueue.size() == 100) {
-                        double average = flyingCountQueue.stream().mapToDouble(d -> d).average().orElse(0.0);
-                        double stdDev = 0.0;
+                if (flyingCountQueue.size() == 100) {
+                    double average = flyingCountQueue.stream().mapToDouble(d -> d).average().orElse(0.0);
+                    double stdDev = 0.0;
 
-                        for (Integer i : flyingCountQueue) {
-                            stdDev += Math.pow(i.doubleValue() - average, 2.0);
-                        }
-
-                        stdDev /= flyingCountQueue.size();
-
-                        if (stdDev <= 0.28) {
-                            if (++buffer > 5) {
-                                flag(false, "stdDev=" + stdDev
-                                        + "buffer=" + buffer);
-                            }
-                        } else {
-                            buffer = Math.max(buffer - 1.5, 0.0);
-                        }
-
-                        flyingCountQueue.clear();
+                    for (Integer i : flyingCountQueue) {
+                        stdDev += Math.pow(i.doubleValue() - average, 2.0);
                     }
 
-                    flyingCount = 0;
+                    stdDev /= flyingCountQueue.size();
+
+                    if (stdDev <= 0.28) {
+                        if (++buffer > 5) {
+                            flag(false, "stdDev=" + stdDev
+                                    + "buffer=" + buffer);
+                        }
+                    } else {
+                        buffer = Math.max(buffer - 1.5, 0.0);
+                    }
+
+                    flyingCountQueue.clear();
                 }
+
+                flyingCount = 0;
             }
 
             swung = false;

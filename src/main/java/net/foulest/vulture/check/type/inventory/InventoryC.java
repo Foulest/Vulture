@@ -48,10 +48,9 @@ public class InventoryC extends Check {
                 if ((itemType == Material.MUSHROOM_SOUP
                         || itemType == Material.POTION
                         || itemType == Material.BOWL)
-                        && direction == Direction.OTHER) {
-                    if (stage == 1) {
-                        ++stage;
-                    }
+                        && direction == Direction.OTHER
+                        && stage == 1) {
+                    ++stage;
                 }
             }
 
