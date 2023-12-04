@@ -33,8 +33,8 @@ public class PlayerDataManager {
                     Check checkInstance = constructor.newInstance(data);
                     data.getChecks().add(checkInstance);
                 } catch (NoSuchMethodException | IllegalAccessException | InstantiationException |
-                         InvocationTargetException e) {
-                    e.printStackTrace();
+                         InvocationTargetException ex) {
+                    ex.printStackTrace();
                 }
             }
 

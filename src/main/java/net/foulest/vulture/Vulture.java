@@ -94,7 +94,7 @@ public class Vulture extends JavaPlugin {
         packetEvents.terminate();
 
         // Saves all online players' player data.
-        Bukkit.getLogger().info("[" + pluginName + "] Saving player data...");
+        Bukkit.getLogger().info("[" + pluginName + "] Saving Player Data...");
         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
             PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
