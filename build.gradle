@@ -35,7 +35,7 @@ dependencies {
 
     // PacketEvents - for listening to packets
     // https://github.com/retrooper/packetevents
-    provided group: 'com.github.retrooper', name: 'packetevents', version: 'v1.8.4'
+    provided group: 'com.github.retrooper', name: 'packetevents', version: 'v2.2.0'
 
     // Lombok - for reducing boilerplate code
     // https://projectlombok.org
