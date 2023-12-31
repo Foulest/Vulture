@@ -41,7 +41,6 @@ public class SpeedA extends Check {
         boolean onSoulSand = playerData.isOnSoulSand();
         boolean onStairs = playerData.isOnStairs();
         boolean onSlab = playerData.isOnSlab();
-        boolean underBlock = playerData.isUnderBlock();
         boolean nearLiquid = playerData.isNearLiquid();
         boolean nearSlimeBlock = playerData.isNearSlimeBlock();
         boolean nearLilyPad = playerData.isNearLilyPad();
