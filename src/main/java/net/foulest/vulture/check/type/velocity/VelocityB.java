@@ -54,7 +54,7 @@ public class VelocityB extends Check {
         double lastVelocityZ = playerData.getLastVelocityZ();
         double magnitude = MathUtil.hypot(lastVelocityX, lastVelocityZ);
         double scaledVelocity = getVelocity(magnitude, toPosition);
-        double velocityHorizontal = playerData.getVelocityHorizontal();
+        double velocityHorizontal = playerData.getVelocityXZ();
         double velocityMultiplier = isYLevel ? 0.5 : newerThan1_8 ? 0.65 : 0.99;
         double velocityLimit = isYLevel ? 0.4 : velocityMultiplier;
 

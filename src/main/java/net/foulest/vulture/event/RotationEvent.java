@@ -14,14 +14,29 @@ public class RotationEvent {
     public final WrappedPacketInFlying to;
     public final WrappedPacketInFlying from;
 
+    /**
+     * Gets the change in yaw.
+     *
+     * @return The change in yaw.
+     */
     public double getDeltaYaw() {
         return Math.abs(to.getYaw() - from.getYaw());
     }
 
+    /**
+     * Gets the change in pitch.
+     *
+     * @return The change in pitch.
+     */
     public double getDeltaPitch() {
         return Math.abs(to.getPitch() - from.getPitch());
     }
 
+    /**
+     * Checks if the player is teleporting.
+     *
+     * @return Whether or not the player is teleporting.
+     */
     public boolean isTeleport(PlayerData playerData) {
         return playerData.isTeleporting(to.getPosition());
     }

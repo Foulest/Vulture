@@ -52,7 +52,7 @@ public class SpeedE extends Check {
         int groundTicks = playerData.getGroundTicks();
 
         double deltaXZ = event.getDeltaXZ();
-        double velocityHorizontal = playerData.getVelocityHorizontal();
+        double velocityHorizontal = playerData.getVelocityXZ();
         double maxSpeed = to.isOnGround() ? 0.21 : 0.32400000005960464;
 
         maxSpeed += (playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8) ? 0.0 : 0.2);

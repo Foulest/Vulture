@@ -23,7 +23,7 @@ public class InvalidB extends Check {
     public void handle(@NonNull MovementEvent event, long timestamp) {
         // Checks the player for exemptions.
         if (player.isFlying()
-                || playerData.isOnClimbable()
+                || playerData.isNearClimbable()
                 || playerData.isNearLiquid()
                 || playerData.getVelocityY() > 0
                 || playerData.getLastVelocityY() > 0

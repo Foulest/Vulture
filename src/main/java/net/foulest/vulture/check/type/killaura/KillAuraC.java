@@ -54,8 +54,8 @@ public class KillAuraC extends Check {
                 double deltaXZ = Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
 
                 if (playerData.getLastTarget() == null
-                        || playerData.getVelocityH() > 0
-                        || playerData.getVelocityV() > 0) {
+                        || playerData.getVelocityY() > 0
+                        || playerData.getVelocityXZ() > 0) {
                     lastDeltaXZ = deltaXZ;
                     return;
                 }

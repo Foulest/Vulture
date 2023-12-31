@@ -64,7 +64,7 @@ public class BlockUtil {
         }
 
         BoundingBox boundingBox = new BoundingBox(player)
-                .expand(-0.1, -0.1, -0.1);
+                .expand(-0.1, -0.01, -0.1);
 
         ConcurrentStream<Block> collidingBlocks = getCollidingBlocks(player, boundingBox);
 
@@ -156,6 +156,29 @@ public class BlockUtil {
         }
 
         BoundingBox boundingBox = getPlayerFeetBoundingBox(player);
+        ConcurrentStream<Block> collidingBlocks = getCollidingBlocks(player, boundingBox);
+
+        return collidingBlocks.any(block -> block.getType() == Material.WOOD_STAIRS
+                || block.getType() == Material.ACACIA_STAIRS
+                || block.getType() == Material.BIRCH_WOOD_STAIRS
+                || block.getType() == Material.BRICK_STAIRS
+                || block.getType() == Material.COBBLESTONE_STAIRS
+                || block.getType() == Material.DARK_OAK_STAIRS
+                || block.getType() == Material.JUNGLE_WOOD_STAIRS
+                || block.getType() == Material.NETHER_BRICK_STAIRS
+                || block.getType() == Material.QUARTZ_STAIRS
+                || block.getType() == Material.RED_SANDSTONE_STAIRS
+                || block.getType() == Material.SANDSTONE_STAIRS
+                || block.getType() == Material.SMOOTH_STAIRS
+                || block.getType() == Material.SPRUCE_WOOD_STAIRS);
+    }
+
+    public static boolean isNearStairs(@NonNull Player player) {
+        if (isPlayerInUnloadedChunk(player)) {
+            return false;
+        }
+
+        BoundingBox boundingBox = getPlayerCustomBoundingBox(player, 0.5, 1.3, -1.0);
         ConcurrentStream<Block> collidingBlocks = getCollidingBlocks(player, boundingBox);
 
         return collidingBlocks.any(block -> block.getType() == Material.WOOD_STAIRS
@@ -265,7 +288,7 @@ public class BlockUtil {
             return false;
         }
 
-        BoundingBox boundingBox = getPlayerCustomBoundingBox(player, 1.0, 0.3, 0.3);
+        BoundingBox boundingBox = getPlayerCustomBoundingBox(player, 0.6385, 0.0, 0.3);
         ConcurrentStream<Block> collidingBlocks = getCollidingBlocks(player, boundingBox);
 
         return collidingBlocks.any(block -> block.getType() == Material.LADDER

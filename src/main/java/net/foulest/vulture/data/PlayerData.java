@@ -72,9 +72,7 @@ public class PlayerData {
     private int lastPosition;
     private int lastServerPositionTick;
     private int lastTeleportReset;
-    private int velocityH;
     private int velocityTicks;
-    private int velocityV;
 
     // Packets
     private WrappedPacketOutPosition lastTeleportPacket;
@@ -121,11 +119,13 @@ public class PlayerData {
     private Player lastLastTarget;
     private Player lastTarget;
 
-    // Velocity data
+    // Velocity check data
+    // This data is retrieved a tick later than the other data.
     private double lastVelocityX;
     private double lastVelocityY;
     private double lastVelocityZ;
-    private double velocityHorizontal;
+    private double lastVelocityXZ;
+    private double velocityXZ;
     private double velocityX;
     private double velocityY;
     private double velocityZ;
@@ -141,6 +141,7 @@ public class PlayerData {
     private boolean onGround;
     private boolean onSlab;
     private boolean onStairs;
+    private boolean nearStairs;
     private boolean nearPiston;
     private boolean nearCactus;
     private boolean inWeb;
@@ -309,6 +310,14 @@ public class PlayerData {
                 && lastTeleportPosition.getZ() == toPosition.getZ();
     }
 
+    /**
+     * Checks if the player is near a boat.
+     *
+     * @param x The X radius to check.
+     * @param y The Y radius to check.
+     * @param z The Z radius to check.
+     * @return If the player is near a boat.
+     */
     public boolean isNearbyBoat(double x, double y, double z) {
         for (Entity entity : player.getNearbyEntities(x, y, z)) {
             if (entity.getType() == EntityType.BOAT) {

@@ -2,7 +2,6 @@ package net.foulest.vulture.processor.type;
 
 import dev._2lstudios.hamsterapi.HamsterAPI;
 import dev._2lstudios.hamsterapi.events.PacketDecodeEvent;
-import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
 import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketPlaySendEvent;
@@ -50,7 +49,6 @@ import net.foulest.vulture.event.RotationEvent;
 import net.foulest.vulture.processor.Processor;
 import net.foulest.vulture.util.KickUtil;
 import net.foulest.vulture.util.MessageUtil;
-import net.foulest.vulture.util.TaskUtil;
 import net.foulest.vulture.util.block.BlockUtil;
 import net.foulest.vulture.util.data.Pair;
 import net.foulest.vulture.util.raytrace.BoundingBox;
@@ -65,7 +63,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.util.Vector;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -75,7 +72,6 @@ import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.logging.Level;
 
 /**
  * Handles all incoming & outgoing packets.
@@ -85,6 +81,11 @@ import java.util.logging.Level;
  */
 public class PacketProcessor extends Processor {
 
+    /**
+     * Handles incoming packets as they are decoded.
+     *
+     * @param event PacketDecodeEvent
+     */
     @EventHandler
     public void onPacketDecode(PacketDecodeEvent event) {
         PlayerData playerData = event.getPlayerData();
@@ -97,7 +98,7 @@ public class PacketProcessor extends Processor {
             return;
         }
 
-        // Iterate packets sent per tick (resets on server transaction).
+        // Iterate packets sent per tick.
         int packetsSentInTick = playerData.getPacketsSentInTick();
         playerData.setPacketsSentInTick(packetsSentInTick + 1);
         packetsSentInTick++;
@@ -111,6 +112,11 @@ public class PacketProcessor extends Processor {
         }
     }
 
+    /**
+     * Handles incoming packets after they are decoded.
+     *
+     * @param event PacketPlayReceiveEvent
+     */
     @Override
     @SuppressWarnings("deprecation")
     public void onPacketPlayReceive(@NonNull PacketPlayReceiveEvent event) {
@@ -377,7 +383,10 @@ public class PacketProcessor extends Processor {
                                 break;
 
                             case POTION:
-                                playerData.setDrinking(true);
+                                // Excludes splash potions.
+                                if (itemStack.getDurability() == 0) {
+                                    playerData.setDrinking(true);
+                                }
                                 break;
 
                             case BOW:
@@ -751,6 +760,18 @@ public class PacketProcessor extends Processor {
                 playerData.setLastAttackTick(playerData.getLastAttackTick() + 1);
                 playerData.setLastServerPositionTick(playerData.getLastServerPositionTick() + 1);
 
+                // Handles resetting velocity data.
+                if (playerData.getTotalTicks() - playerData.getVelocityTicks() > 1) {
+                    playerData.setLastVelocityX(playerData.getVelocityX());
+                    playerData.setLastVelocityY(playerData.getVelocityY());
+                    playerData.setLastVelocityZ(playerData.getVelocityZ());
+                    playerData.setLastVelocityXZ(playerData.getVelocityXZ());
+                    playerData.setVelocityX(0);
+                    playerData.setVelocityY(0);
+                    playerData.setVelocityZ(0);
+                    playerData.setVelocityXZ(0);
+                }
+
                 // Handles teleport resets.
                 if (flying.isMoving()) {
                     if (playerData.isTeleportReset()) {
@@ -767,15 +788,6 @@ public class PacketProcessor extends Processor {
                             playerData.setTeleportReset(true);
                         }
                     }
-                }
-
-                // Handles setting velocity data.
-                if (playerData.getVelocityH() > 0 || playerData.getVelocityV() > 0) {
-                    playerData.setVelocityH(playerData.getVelocityH() - 1);
-                    playerData.setVelocityV(playerData.getVelocityV() - 1);
-                } else if (playerData.getVelocityIds().isEmpty()) {
-                    playerData.setVelocityHorizontal(0);
-                    playerData.setVelocityY(0);
                 }
 
                 // Handles dropped packets.
@@ -871,7 +883,7 @@ public class PacketProcessor extends Processor {
                     if (player.isInsideVehicle() && !player.getVehicle().isValid()) {
                         event.setCancelled(true);
                         player.getVehicle().eject();
-                        MessageUtil.log(Level.INFO, "Flying packet ignored for " + player.getName() + " (invalid vehicle)");
+                        MessageUtil.debug("Flying packet ignored for " + player.getName() + " (invalid vehicle)");
                     }
 
                     // Set ground data
@@ -921,6 +933,7 @@ public class PacketProcessor extends Processor {
                     // Set block data
                     playerData.setOnSlab(BlockUtil.isOnSlab(player));
                     playerData.setOnStairs(BlockUtil.isOnStairs(player));
+                    playerData.setNearStairs(BlockUtil.isNearStairs(player));
                     playerData.setNearPiston(BlockUtil.isNearPiston(player));
                     playerData.setNearCactus(BlockUtil.isNearCactus(player));
                     playerData.setInWeb(BlockUtil.isInWeb(player));
@@ -930,7 +943,6 @@ public class PacketProcessor extends Processor {
                     playerData.setOnClimbable(BlockUtil.isOnClimbable(player));
                     playerData.setNearClimbable(BlockUtil.isNearClimbable(player));
                     playerData.setOnSnowLayer(BlockUtil.isOnSnowLayer(player));
-
                     playerData.setOnIce(BlockUtil.isOnIce(player));
 
                     if (BlockUtil.isOnIce(player)) {
@@ -961,7 +973,7 @@ public class PacketProcessor extends Processor {
                             && flyingYPos % 0.015625 == 0.0
                             && !BlockUtil.isLocationInUnloadedChunk(location)
                             && location.getBlock().isEmpty()
-                            && playerData.getTimeSince(ActionType.SETBACK) > 1000L
+                            && playerData.getTimeSince(ActionType.SETBACK) > 500L
                             && playerData.getTimeSince(ActionType.LAST_ON_GROUND_LOCATION_SET) > 500L) {
                         playerData.setTimestamp(ActionType.LAST_ON_GROUND_LOCATION_SET);
                         playerData.setLastOnGroundLocation(location);
@@ -1118,21 +1130,7 @@ public class PacketProcessor extends Processor {
 
                 playerData.setPacketsSentInTick(0);
 
-                if (playerData.getVelocityIds().containsKey(transactionActionNumber)) {
-                    Vector velocity = playerData.getVelocityIds().get(transactionActionNumber);
-                    playerData.setVelocityH((int) (((velocity.getX() + velocity.getZ()) / 2.0D + 2.0D) * 15.0D));
-                    playerData.setVelocityV((int) (Math.pow(velocity.getY() + 2.0D, 2.0D) * 5.0D));
-                    playerData.setLastVelocityX(playerData.getVelocityX());
-                    playerData.setLastVelocityY(playerData.getVelocityY());
-                    playerData.setLastVelocityZ(playerData.getVelocityZ());
-                    playerData.setVelocityX(velocity.getX());
-                    playerData.setVelocityY(velocity.getY());
-                    playerData.setVelocityZ(velocity.getZ());
-                    playerData.setVelocityTicks(playerData.getTotalTicks());
-                    playerData.setVelocityHorizontal(Math.hypot(velocity.getX(), velocity.getZ()));
-                    playerData.getVelocityIds().remove(transactionActionNumber);
-
-                } else if (playerData.getTransactionTime().containsKey(transactionActionNumber)) {
+                if (playerData.getTransactionTime().containsKey(transactionActionNumber)) {
                     long transactionStamp = playerData.getTransactionTime().get(transactionActionNumber);
                     playerData.setTransPing(System.currentTimeMillis() - transactionStamp);
                     playerData.getTransactionSentMap().remove(transactionActionNumber);
@@ -1173,7 +1171,7 @@ public class PacketProcessor extends Processor {
                     KickUtil.kickPlayer(player, event, "Sent invalid UseEntity packet"
                             + " (" + playerData.isInventoryOpen() + " " + playerData.isPlacingBlock()
                             + " " + playerData.isShootingBow() + " " + playerData.isEating()
-                            + " " + playerData.isDrinking() + " " + " " + (entity.equals(player)) + " " + entityId + ")");
+                            + " " + playerData.isDrinking() + " " + " " + (entity == player) + " " + entityId + ")");
                     return;
                 }
 
@@ -1311,16 +1309,19 @@ public class PacketProcessor extends Processor {
                 break;
 
             default:
-                MessageUtil.log(Level.INFO, "Unhandled packet: " + event.getPacketId());
+                MessageUtil.debug("Unhandled packet: " + event.getPacketId());
                 break;
         }
 
         handlePacketChecks(playerData, event, false);
     }
 
+    /**
+     * Handles outgoing packets before they are encoded.
+     *
+     * @param event The packet event.
+     */
     @Override
-    // TODO: Look into spoofing entity health to prevent health bar mods.
-    //       Also, look into spoofing player enchants for the same reason.
     public void onPacketPlaySend(@NonNull PacketPlaySendEvent event) {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
@@ -1345,6 +1346,14 @@ public class PacketProcessor extends Processor {
                 }
                 break;
 
+            case PacketType.Play.Server.ATTACH_ENTITY:
+                if (player.isInsideVehicle()) {
+                    playerData.setTimestamp(ActionType.ENTER_VEHICLE);
+                } else {
+                    playerData.setTimestamp(ActionType.LEAVE_VEHICLE);
+                }
+                break;
+
             case PacketType.Play.Server.RESPAWN:
                 playerData.setSprinting(false);
                 playerData.setSneaking(false);
@@ -1365,13 +1374,17 @@ public class PacketProcessor extends Processor {
                 Vector3d velocity = entityVelocity.getVelocity();
 
                 if (entityVelocity.getEntityId() == player.getEntityId()) {
-                    short randomID = (short) new Random().nextInt(16);
+                    playerData.setLastVelocityX(playerData.getVelocityX());
+                    playerData.setLastVelocityY(playerData.getVelocityY());
+                    playerData.setLastVelocityZ(playerData.getVelocityZ());
+                    playerData.setLastVelocityXZ(playerData.getVelocityXZ());
 
-                    playerData.getVelocityIds().put((short) -(randomID),
-                            new Vector(velocity.getX(), velocity.getY(), velocity.getZ()));
+                    playerData.setVelocityX(velocity.getX());
+                    playerData.setVelocityY(velocity.getY());
+                    playerData.setVelocityZ(velocity.getZ());
+                    playerData.setVelocityXZ(Math.hypot(velocity.getX(), velocity.getZ()));
 
-                    TaskUtil.run(() -> PacketEvents.get().getPlayerUtils().sendPacket(event.getPlayer(),
-                            new WrappedPacketOutTransaction(0, (short) -(randomID), false)));
+                    playerData.setVelocityTicks(playerData.getTotalTicks());
                 }
                 break;
 
@@ -1382,13 +1395,13 @@ public class PacketProcessor extends Processor {
 
                 if (scheme == null) {
                     event.setCancelled(true);
-                    MessageUtil.log(Level.INFO, "ResourcePackSend packet cancelled; contained null URI scheme");
+                    MessageUtil.debug("ResourcePackSend packet cancelled; contained null URI scheme");
                     return;
                 }
 
                 if (!scheme.equals("https") && !scheme.equals("http") && !scheme.equals("level")) {
                     event.setCancelled(true);
-                    MessageUtil.log(Level.INFO, "ResourcePackSend packet cancelled; contained invalid URI scheme");
+                    MessageUtil.debug("ResourcePackSend packet cancelled; contained invalid URI scheme");
                     return;
                 }
 
@@ -1396,13 +1409,13 @@ public class PacketProcessor extends Processor {
                     url = URLDecoder.decode(url.substring("level://".length()), StandardCharsets.UTF_8.toString());
                 } catch (UnsupportedEncodingException e) {
                     event.setCancelled(true);
-                    MessageUtil.log(Level.INFO, "ResourcePackSend packet cancelled; could not decode URL");
+                    MessageUtil.debug("ResourcePackSend packet cancelled; could not decode URL");
                     return;
                 }
 
                 if (scheme.equals("level") && (url.contains("..") || !url.endsWith("/resources.zip"))) {
                     event.setCancelled(true);
-                    MessageUtil.log(Level.INFO, "ResourcePackSend packet cancelled; contained invalid level URL");
+                    MessageUtil.debug("ResourcePackSend packet cancelled; contained invalid level URL");
                     return;
                 }
                 break;
@@ -1410,7 +1423,6 @@ public class PacketProcessor extends Processor {
             case PacketType.Play.Server.TRANSACTION:
                 WrappedPacketOutTransaction transaction = new WrappedPacketOutTransaction(event.getNMSPacket());
                 playerData.getTransactionSentMap().put(transaction.getActionNumber(), System.currentTimeMillis());
-                playerData.setPacketsSentInTick(0);
                 break;
 
             case PacketType.Play.Server.OPEN_WINDOW:
@@ -1500,6 +1512,14 @@ public class PacketProcessor extends Processor {
         }
     }
 
+    /**
+     * Checks for valid SteerVehicle packets.
+     *
+     * @param player       The player.
+     * @param event        The packet event.
+     * @param steerVehicle The SteerVehicle packet.
+     * @param value        The value to check.
+     */
     private void steerVehicleCheck(@NonNull Player player, @NonNull PacketPlayReceiveEvent event,
                                    @NonNull WrappedPacketInSteerVehicle steerVehicle, float value) {
         if (Math.abs(value) == 0.98f) {

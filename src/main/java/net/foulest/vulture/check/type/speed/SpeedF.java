@@ -36,7 +36,7 @@ public class SpeedF extends Check {
 
         maxSpeed += playerData.getGroundTicks() < 5 ? speedLevel * 0.07 : speedLevel * 0.0573;
         maxSpeed -= playerData.getGroundTicks() < 5 ? slownessLevel * 0.07 : slownessLevel * 0.0573;
-        maxSpeed += Math.abs(playerData.getVelocityHorizontal());
+        maxSpeed += Math.abs(playerData.getVelocityXZ());
         maxSpeed += Math.abs(velocity.getX());
         maxSpeed += Math.abs(velocity.getZ());
 

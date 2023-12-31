@@ -68,7 +68,7 @@ public class FlightB extends Check {
      */
     public void checkForInvalidY(double deltaY, double velocity) {
         int jumpBoostLevel = MovementUtil.getPotionEffectLevel(player, PotionEffectType.JUMP);
-        double maxDeltaY = 0.45 + jumpBoostLevel * 0.1;
+        double maxDeltaY = 0.461 + jumpBoostLevel * 0.1;
 
         if (deltaY > maxDeltaY) {
             flag(true, "deltaY=" + deltaY

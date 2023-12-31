@@ -37,7 +37,6 @@ public class SpeedD extends Check {
                 || playerData.isNearLiquid()
                 || player.isFlying()
                 || playerData.isInWeb()
-                || playerData.getVelocityH() > 0
                 || player.getGameMode().equals(GameMode.CREATIVE)
                 || player.getGameMode().equals(GameMode.SPECTATOR)
                 || !playerData.isOnGround()

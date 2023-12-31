@@ -88,6 +88,7 @@ public class ClientBrand extends Check {
             new PayloadType("GEN", "Unknown (GEN)", DataType.REGISTER_DATA_OTHER, false),
             new PayloadType("autoconfig", "Unknown (autoconfig)", DataType.REGISTER_DATA_OTHER, false),
 
+            new PayloadType("refinedstorage", "RefinedStorage", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("AE2", "AE2", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("AS_BT", "ASMC", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("AS_IF", "ASMC", DataType.REGISTER_DATA_MOD, false),
@@ -899,7 +900,7 @@ public class ClientBrand extends Check {
             } else if (channelName.equals("minecraft:register") || channelName.equals("REGISTER")) {
                 handleRegisterData(data, event);
             } else {
-                validateAndProcessPayload(CHANNELS, event, data, DataType.CHANNEL);
+                validateAndProcessPayload(CHANNELS, event, channelName, DataType.CHANNEL);
             }
 
             // Checks for blacklisted mods registered by the player.

@@ -48,7 +48,7 @@ public class SpeedA extends Check {
 
         double deltaXZ = event.getDeltaXZ();
         double maxSpeed = to.isOnGround() && !nearLilyPad ? 0.3125 : 0.35855;
-        double velocityHorizontal = playerData.getVelocityHorizontal();
+        double velocityHorizontal = playerData.getVelocityXZ();
 
         int groundTicks = playerData.getGroundTicks();
         int groundTicksStrict = playerData.getGroundTicksStrict();
@@ -66,7 +66,7 @@ public class SpeedA extends Check {
         maxSpeed += groundTicks < 5 ? speedLevel * 0.07 : speedLevel * 0.0573;
         maxSpeed -= groundTicks < 5 ? slownessLevel * 0.07 : slownessLevel * 0.0573;
 
-        maxSpeed += underBlock ? 0.26 : 0.0;
+        maxSpeed += timeSinceUnderBlock < 100 ? 0.26 : 0.0;
         maxSpeed += nearLiquid ? depthStriderLevel * 0.45 : 0.0;
         maxSpeed += (walkSpeed - 0.2) * 2.5;
         maxSpeed += (flySpeed - 0.1) * 2.5;

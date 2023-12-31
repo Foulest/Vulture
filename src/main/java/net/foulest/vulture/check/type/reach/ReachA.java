@@ -8,8 +8,8 @@ import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
-import net.foulest.vulture.data.PlayerDataManager;
 import net.foulest.vulture.data.PlayerData;
+import net.foulest.vulture.data.PlayerDataManager;
 import net.foulest.vulture.event.MovementEvent;
 import net.foulest.vulture.util.MathUtil;
 import net.foulest.vulture.util.MessageUtil;
@@ -19,8 +19,6 @@ import net.foulest.vulture.util.raytrace.RayTraceUtil;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-
-import java.util.logging.Level;
 
 @CheckInfo(name = "Reach (A)", type = CheckType.REACH)
 public class ReachA extends Check {
@@ -97,7 +95,7 @@ public class ReachA extends Check {
             }
         }
 
-        MessageUtil.log(Level.INFO, "distance=" + distance + " collided=" + collided
+        MessageUtil.debug("distance=" + distance + " collided=" + collided
                 + " looking=" + RayTraceUtil.getBlockPlayerLookingAt(player, 3.05));
 
         if (distance > 3.05 && collided > 2) {

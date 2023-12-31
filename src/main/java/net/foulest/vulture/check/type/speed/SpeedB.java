@@ -26,7 +26,6 @@ public class SpeedB extends Check {
                 || playerData.isNearLiquid()
                 || playerData.isOnGround()
                 || playerData.isOnClimbable()
-                || playerData.getVelocityH() > 0
                 || player.getWalkSpeed() != 0.2
                 || playerData.isInWeb()
                 || deltaXZ <= 0.005) {

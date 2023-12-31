@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -35,11 +36,28 @@ public class Settings {
     public static File file;
     public static FileConfiguration config;
 
-    public static String prefix;
-    public static List<String> banMessage;
-    public static long resetViolations;
+    // General settings
+    public static String prefix = "&e[Vulture]";
+    public static List<String> banMessage = Collections.singletonList("&c%player% has been removed from the network.");
+    public static long resetViolations = 600;
 
-    public static List<String> blacklistedPayloads;
+    // Blacklisted payloads
+    public static List<String> blacklistedPayloads = Collections.singletonList("GalactiCraft");
+
+    // Blacklisted commands
+    public static List<String> blacklistedCommands = Arrays.asList(
+            // WorldEdit
+            "/calc", "/eval", "/solve",
+
+            // Holographic Displays
+            "/h.* readtext",
+
+            // PermissionsEx
+            "/pe.*x promote", "/pe.*x demote", "/promote", "/demote",
+
+            // Multiverse
+            "/m.*v.* \\^", "/m.*v.*help <", "/\\$"
+    );
 
     /**
      * Initialize and set up default configuration values.
@@ -61,10 +79,12 @@ public class Settings {
         config = YamlConfiguration.loadConfiguration(file);
 
         prefix = config.getString("vulture.prefix");
+
         banMessage = config.getStringList("vulture.banMessage");
         resetViolations = config.getLong("vulture.resetViolations");
 
-        blacklistedPayloads = config.getStringList("vulture.blacklisted-payloads");
+        blacklistedPayloads = config.getStringList("blacklisted.payloads");
+        blacklistedCommands = config.getStringList("blacklisted.commands");
 
         PingSpoofB.maxPing = config.getLong("checks.pingspoof.B.maxPing");
         PingSpoofB.maxAveragePing = config.getLong("checks.pingspoof.B.maxAveragePing");
@@ -96,7 +116,8 @@ public class Settings {
         config.set("vulture.banMessage", banMessage);
         config.set("vulture.resetViolations", resetViolations);
 
-        config.set("vulture.blacklisted-payloads", blacklistedPayloads);
+        config.set("blacklisted.payloads", blacklistedPayloads);
+        config.set("blacklisted.commands", blacklistedCommands);
 
         config.set("checks.pingspoof.B.maxPing", PingSpoofB.maxPing);
         config.set("checks.pingspoof.B.maxAveragePing", PingSpoofB.maxAveragePing);
@@ -128,11 +149,12 @@ public class Settings {
      * Sets the default values for the configuration file.
      */
     private static void setDefaultConfigValues() {
-        config.addDefault("vulture.prefix", "&e[Vulture]");
-        config.addDefault("vulture.banMessage", Collections.singletonList("&c%player% has been removed from the network."));
-        config.addDefault("vulture.resetViolations", 600);
+        config.addDefault("vulture.prefix", prefix);
+        config.addDefault("vulture.banMessage", banMessage);
+        config.addDefault("vulture.resetViolations", resetViolations);
 
-        config.addDefault("vulture.blacklisted-payloads", Collections.singletonList("GalactiCraft"));
+        config.addDefault("blacklisted.payloads", blacklistedPayloads);
+        config.addDefault("blacklisted.commands", blacklistedCommands);
 
         for (Class<? extends Check> check : CheckManager.CHECK_CLASSES) {
             String name = getCheckName(check);
@@ -171,9 +193,9 @@ public class Settings {
     }
 
     /**
-     * Gets the name of the check.
+     * Gets the name of a check.
      *
-     * @param check The check class.
+     * @param check The check.
      * @return The name of the check.
      */
     private static String getCheckName(Class<? extends Check> check) {
@@ -192,8 +214,11 @@ public class Settings {
     }
 
     /**
-     * Changes the annotation value for the given key of the given annotation to newValue and returns
-     * the previous value.
+     * Changes the value of an annotation.
+     *
+     * @param annotation The annotation.
+     * @param key        The key.
+     * @param newValue   The new value.
      */
     @SuppressWarnings("unchecked")
     public static void changeAnnotationValue(@NonNull Annotation annotation,

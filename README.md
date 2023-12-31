@@ -10,8 +10,8 @@ Vulture is a robust, free, and open-source anticheat plugin designed specificall
 ## Features
 Vulture enhances Minecraft server integrity through advanced cheat detection and prevention mechanisms:
 
-- **Efficient Packet Handling:** Utilizes [PacketEvents](https://github.com/retrooper/packetevents) and [HamsterAPI](https://github.com/arkflame/HamsterAPI).
-- **Robust Framework:** Built upon the framework provided by [Rainnny7](https://github.com/Rainnny7/Anticheat-Framework).
+- **Efficient Packet Handling:** Utilizes **[PacketEvents](https://github.com/retrooper/packetevents)** and **[HamsterAPI](https://github.com/arkflame/HamsterAPI)**.
+- **Robust Framework:** Built upon the framework provided by **[Rainnny7](https://github.com/Rainnny7/Anticheat-Framework)**.
 - **Server Compatibility:** Exclusively compatible with Spigot 1.8.9 servers.
 
 **Combat Checks:**
@@ -36,9 +36,9 @@ Vulture enhances Minecraft server integrity through advanced cheat detection and
 - PingSpoof _(x2)_
 
 ## Dependencies
-- [Spigot 1.8.9](https://papermc.io/downloads/all)
-- [PacketEvents](https://github.com/retrooper/packetevents) *included*
-- [HamsterAPI](https://github.com/arkflame/HamsterAPI) *included*
+- **[Spigot 1.8.9](https://papermc.io/downloads/all)**
+- **[PacketEvents](https://github.com/retrooper/packetevents)** *included*
+- **[HamsterAPI](https://github.com/arkflame/HamsterAPI)** *included*
 
 ## Useful Links
 - [Contribution Guidelines](https://github.com/Foulest/Vulture/wiki/Contribution-Guidelines)

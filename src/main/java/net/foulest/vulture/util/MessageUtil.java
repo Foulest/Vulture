@@ -32,6 +32,12 @@ public final class MessageUtil {
         Bukkit.getLogger().log(level, "[" + Vulture.instance.getPluginName() + "] " + message);
     }
 
+    public static void debug(@NonNull String message) {
+        if (Vulture.instance.debug) {
+            log(Level.INFO, "[DEBUG] " + message);
+        }
+    }
+
     public static void broadcast(@NonNull String message) {
         for (Player player : Bukkit.getOnlinePlayers()) {
             messagePlayer(player, message);

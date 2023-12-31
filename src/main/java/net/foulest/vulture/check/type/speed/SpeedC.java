@@ -59,7 +59,7 @@ public class SpeedC extends Check {
         float walkSpeed = player.getWalkSpeed();
 
         double jumpHeight = 0.42 + (jumpLevel * 0.2);
-        double velocityHorizontal = playerData.getVelocityHorizontal();
+        double velocityHorizontal = playerData.getVelocityXZ();
         double blockFriction = BlockUtil.getBlockFriction(player);
 
         double movementSpeed;

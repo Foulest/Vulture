@@ -29,37 +29,78 @@ public class MovementEvent implements CancellableEvent {
         event.setCancelled(cancelled);
     }
 
+    /**
+     * Gets the change in X.
+     *
+     * @return The change in X.
+     */
     public double getDeltaX() {
         return to.getPosition().getX() - from.getPosition().getX();
     }
 
+    /**
+     * Gets the change in Y.
+     *
+     * @return The change in Y.
+     */
     public double getDeltaY() {
         return to.getPosition().getY() - from.getPosition().getY();
     }
 
+    /**
+     * Gets the change in Z.
+     *
+     * @return The change in Z.
+     */
     public double getDeltaZ() {
         return to.getPosition().getZ() - from.getPosition().getZ();
     }
 
+    /**
+     * Gets the change in XZ.
+     *
+     * @return The change in XZ.
+     */
     public double getDeltaXZ() {
         double deltaX = getDeltaX();
         double deltaZ = getDeltaZ();
         return Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
     }
 
+    /**
+     * Checks if the player is teleporting.
+     *
+     * @return Whether or not the player is teleporting.
+     */
     public boolean isTeleport(PlayerData playerData) {
         return playerData.isTeleporting(to.getPosition());
     }
 
+    /**
+     * Checks if the player's Y level is a whole number.
+     * This is used to check if the player is on the ground.
+     *
+     * @return Whether or not the player's Y level is a whole number.
+     */
     public boolean isYLevel(double y) {
         return y % 0.015625 == 0.0;
     }
 
+    /**
+     * Gets the player's to location.
+     *
+     * @return The player's to location.
+     */
     public Location getToLocation() {
         return new Location(playerData.getPlayer().getWorld(), to.getPosition().getX(),
                 to.getPosition().getY(), to.getPosition().getZ());
     }
 
+    /**
+     * Gets the player's from location.
+     *
+     * @return The player's from location.
+     */
     public Location getFromLocation() {
         return new Location(playerData.getPlayer().getWorld(), from.getPosition().getX(),
                 from.getPosition().getY(), from.getPosition().getZ());

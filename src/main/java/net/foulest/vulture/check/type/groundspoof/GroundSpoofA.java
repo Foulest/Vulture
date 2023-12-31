@@ -41,7 +41,7 @@ public class GroundSpoofA extends Check {
 
         int underBlockTicks = playerData.getUnderBlockTicks();
 
-        if (!to.isOnGround() && onGround && isYLevel && velocity != 0.0) {
+        if (!to.isOnGround() && onGround && isYLevel && velocity != 0.0 && !playerData.isNearClimbable()) {
             if (++offGroundTicks >= 2) {
                 flag(true, "Sending Off Ground"
                         + " (Y=" + toPosition.getY()

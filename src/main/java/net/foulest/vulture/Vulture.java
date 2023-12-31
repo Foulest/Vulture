@@ -1,5 +1,6 @@
 package net.foulest.vulture;
 
+import dev._2lstudios.hamsterapi.HamsterAPI;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import lombok.Getter;
@@ -8,11 +9,11 @@ import lombok.SneakyThrows;
 import net.foulest.vulture.cmds.VultureCmd;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.data.PlayerDataManager;
-import dev._2lstudios.hamsterapi.HamsterAPI;
 import net.foulest.vulture.listeners.CommandListener;
 import net.foulest.vulture.listeners.PlayerDataListener;
 import net.foulest.vulture.processor.type.PacketProcessor;
 import net.foulest.vulture.util.Settings;
+import net.foulest.vulture.util.TaskUtil;
 import net.foulest.vulture.util.command.CommandFramework;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -31,9 +32,11 @@ public class Vulture extends JavaPlugin {
     public static Vulture instance;
     public final String pluginName = "Vulture";
     public boolean loaded = false;
+    public boolean debug = false;
     public CommandFramework framework;
     public PacketEvents packetEvents;
     public PacketProcessor packetProcessor;
+    public Runnable packetCounter;
 
     @Override
     public void onLoad() {
@@ -49,8 +52,17 @@ public class Vulture extends JavaPlugin {
     @Override
     @SneakyThrows
     public void onEnable() {
-        // Kick all online players.
+        // Kicks all online players.
         Bukkit.getOnlinePlayers().forEach(player -> player.kickPlayer("Disconnected"));
+
+        // Resets the packets sent in the tick for all players every tick.
+        Bukkit.getLogger().info("[" + pluginName + "] Initializing Packet Counter...");
+        packetCounter = () -> {
+            for (PlayerData playerData : PlayerDataManager.playerDataMap.values()) {
+                playerData.setPacketsSentInTick(0);
+            }
+        };
+        TaskUtil.runSyncRepeating(packetCounter, 0L, 1L);
 
         // Initializes the Command Framework.
         Bukkit.getLogger().info("[" + pluginName + "] Initializing Command Framework...");
@@ -114,7 +126,6 @@ public class Vulture extends JavaPlugin {
 
     /**
      * Loads the plugin's listeners.
-     * <p>
      *
      * @param listeners Listener to load.
      */
@@ -126,7 +137,6 @@ public class Vulture extends JavaPlugin {
 
     /**
      * Loads the plugin's commands.
-     * <p>
      *
      * @param commands Command to load.
      */

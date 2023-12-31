@@ -12,8 +12,15 @@ import java.util.UUID;
 
 public class PlayerDataManager {
 
-    private static final Map<UUID, PlayerData> playerDataMap = new HashMap<>();
+    // Map of player UUIDs to their stored data.
+    public static final Map<UUID, PlayerData> playerDataMap = new HashMap<>();
 
+    /**
+     * Gets a player's data from the map.
+     *
+     * @param player The player to get.
+     * @return The player's data.
+     */
     public static PlayerData getPlayerData(Player player) {
         if (playerDataMap.containsKey(player.getUniqueId())) {
             return playerDataMap.get(player.getUniqueId());
@@ -23,25 +30,37 @@ public class PlayerDataManager {
         return playerDataMap.get(player.getUniqueId());
     }
 
+    /**
+     * Adds a player's data to the map.
+     *
+     * @param player The player to add.
+     */
     public static void addPlayerData(Player player) {
         if (!playerDataMap.containsKey(player.getUniqueId())) {
             PlayerData data = new PlayerData(player.getUniqueId(), player);
 
+            // Initialize checks for the player.
             for (Class<? extends Check> checkClass : CheckManager.CHECK_CLASSES) {
                 try {
                     Constructor<? extends Check> constructor = checkClass.getConstructor(PlayerData.class);
                     Check checkInstance = constructor.newInstance(data);
                     data.getChecks().add(checkInstance);
-                } catch (NoSuchMethodException | IllegalAccessException | InstantiationException |
-                         InvocationTargetException ex) {
+                } catch (NoSuchMethodException | IllegalAccessException | InstantiationException
+                         | InvocationTargetException ex) {
                     ex.printStackTrace();
                 }
             }
 
+            // Add the player's data to the map.
             playerDataMap.put(player.getUniqueId(), data);
         }
     }
 
+    /**
+     * Removes a player's data from the map.
+     *
+     * @param player The player to remove.
+     */
     public static void removePlayerData(Player player) {
         playerDataMap.remove(player.getUniqueId());
     }

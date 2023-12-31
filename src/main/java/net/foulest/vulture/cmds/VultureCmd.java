@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Command for reloading the plugin's config file.
+ * Main command for Vulture.
  *
  * @author Foulest
  * @project Vulture
@@ -29,7 +29,7 @@ import java.util.List;
 @Setter
 public class VultureCmd {
 
-    @Command(name = "vulture", description = "Reloads the plugin's config file.",
+    @Command(name = "vulture", description = "Main command for Vulture.",
             permission = "vulture.main", usage = "/vulture")
     public void onCommand(@NonNull CommandArgs args) {
         CommandSender sender = args.getSender();
@@ -67,6 +67,22 @@ public class VultureCmd {
                         + (playerData.isAlertsEnabled() ? "enabled" : "disabled") + "&7.");
                 break;
 
+            case "debug":
+                if (!sender.hasPermission("vulture.debug")) {
+                    MessageUtil.messagePlayer(sender, "&cNo permission.");
+                    return;
+                }
+
+                if (args.length() != 1) {
+                    MessageUtil.messagePlayer(sender, "&cUsage: /vulture debug");
+                    return;
+                }
+
+                Vulture.instance.debug = !Vulture.instance.debug;
+                MessageUtil.messagePlayer(sender, Settings.prefix + " &7Debug mode has been &f"
+                        + (Vulture.instance.debug ? "enabled" : "disabled") + "&7.");
+                break;
+
             case "info":
                 if (!sender.hasPermission("vulture.info")) {
                     MessageUtil.messagePlayer(sender, "&cNo permission.");
@@ -102,6 +118,7 @@ public class VultureCmd {
                                 + " &7(" + payloadType.getDataType().getName() + ")");
                     }
                 }
+
                 MessageUtil.messagePlayer(sender, "");
                 break;
 
@@ -124,6 +141,7 @@ public class VultureCmd {
                 }
 
                 StringBuilder reasonBuilder = new StringBuilder();
+
                 for (int i = 2; i < args.length(); i++) {
                     reasonBuilder.append(args.getArgs(i)).append(" ");
                 }
@@ -155,7 +173,7 @@ public class VultureCmd {
     }
 
     private void handleHelp(@NonNull CommandSender sender, @NonNull CommandArgs args) {
-        if (!sender.hasPermission("vulture.help")) {
+        if (!sender.hasPermission("vulture.main")) {
             MessageUtil.messagePlayer(sender, "&cNo permission.");
             return;
         }
@@ -163,9 +181,10 @@ public class VultureCmd {
         // A list of available commands with their usages.
         List<String> commands = Arrays.asList(
                 "&7* &f/vulture alerts &7- Toggles alerts.",
-                "&7* &f/vulture reload &7- Reloads Vulture.",
+                "&7* &f/vulture reload &7- Reloads the config.",
                 "&7* &f/vulture info <player> &7- View player info.",
-                "&7* &f/vulture kick <player> <reason> &7- Kicks a player."
+                "&7* &f/vulture kick <player> <reason> &7- Kicks a player.",
+                "&7* &f/vulture debug &7- Toggles debug mode."
         );
 
         int itemsPerPage = 4;

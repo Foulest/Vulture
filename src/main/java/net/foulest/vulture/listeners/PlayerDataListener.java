@@ -21,16 +21,13 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.*;
 
-import java.util.logging.Level;
-
 @AllArgsConstructor
 public class PlayerDataListener implements Listener {
 
     /**
      * Handles player join events.
-     * This is used to initialize the player's data.
      *
-     * @param event The event.
+     * @param event PlayerJoinEvent
      */
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onJoin(PlayerJoinEvent event) {
@@ -38,37 +35,39 @@ public class PlayerDataListener implements Listener {
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
         ClientVersion clientVersion = PacketEvents.get().getPlayerUtils().getClientVersion(player);
 
+        // Resolves the player's client version.
         if (!clientVersion.isResolved() || clientVersion == ClientVersion.UNKNOWN) {
-            MessageUtil.log(Level.INFO, player.getName() + " failed to resolve client version");
+            MessageUtil.debug(player.getName() + " failed to resolve client version");
             KickUtil.kickPlayer(player, "Failed to resolve client version", true);
         } else {
-            MessageUtil.log(Level.INFO, player.getName() + " resolved client version: " + clientVersion);
+            MessageUtil.debug(player.getName() + " resolved client version: " + clientVersion);
             playerData.setVersion(clientVersion);
         }
 
+        // Injects the player into HamsterAPI.
         if (!HamsterAPI.tryInject(playerData)) {
-            MessageUtil.log(Level.INFO, player.getName() + " failed to inject player");
+            MessageUtil.debug(player.getName() + " failed to inject player");
             KickUtil.kickPlayer(player, "Failed to inject player", true);
         }
     }
 
     /**
      * Handles player quit events.
-     * This is used to remove the player's data.
      *
-     * @param event The event.
+     * @param event PlayerQuitEvent
      */
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
+
+        // Removes the player's data from the map.
         PlayerDataManager.removePlayerData(player);
     }
 
     /**
      * Handles block break events.
-     * This is used to prevent players from breaking liquids & air.
      *
-     * @param event The event.
+     * @param event BlockBreakEvent
      */
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
@@ -76,6 +75,7 @@ public class PlayerDataListener implements Listener {
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
         Block targetBlock = event.getBlock();
 
+        // Returns if the block is null.
         if (targetBlock == null) {
             return;
         }
@@ -91,20 +91,21 @@ public class PlayerDataListener implements Listener {
             return;
         }
 
+        // Sets digging to false.
         playerData.setDigging(false);
     }
 
     /**
      * Handles block place events.
-     * This is used to prevent players from placing blocks on liquids & air.
      *
-     * @param event The event.
+     * @param event BlockPlaceEvent
      */
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
         Player player = event.getPlayer();
         Block targetBlock = event.getBlock();
 
+        // Returns if the block is null.
         if (targetBlock == null) {
             return;
         }
@@ -123,9 +124,8 @@ public class PlayerDataListener implements Listener {
 
     /**
      * Handles block damage events.
-     * This is used to reliably set digging to true.
      *
-     * @param event The event.
+     * @param event BlockDamageEvent
      */
     @EventHandler
     public void onBlockDamage(BlockDamageEvent event) {
@@ -133,10 +133,13 @@ public class PlayerDataListener implements Listener {
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
         Block targetBlock = event.getBlock();
 
+        // Returns if the block is null.
         if (targetBlock == null) {
             return;
         }
 
+        // Sets digging to true if the block is not insta-break.
+        // This is used to reliably set digging to true 100% of the time.
         if (!event.getInstaBreak()) {
             playerData.setDigging(true);
             playerData.setTimestamp(ActionType.DIGGING);
@@ -145,62 +148,70 @@ public class PlayerDataListener implements Listener {
 
     /**
      * Handles player item consume events.
-     * This is used to reliably set eating & drinking to false.
      *
-     * @param event The event.
+     * @param event PlayerItemConsumeEvent
      */
     @EventHandler
     public void onPlayerItemConsume(PlayerItemConsumeEvent event) {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
+        // Sets eating and drinking to false.
         playerData.setEating(false);
         playerData.setDrinking(false);
     }
 
     /**
      * Handles player bed enter events.
-     * This is used to reliably set inBed to true.
      *
-     * @param event The event.
+     * @param event PlayerBedEnterEvent
      */
     @EventHandler
     public void onBedEnterEvent(PlayerBedEnterEvent event) {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
+
+        // Sets inBed to true.
         playerData.setInBed(true);
     }
 
     /**
      * Handles player bed leave events.
-     * This is used to reliably set inBed to false.
      *
-     * @param event The event.
+     * @param event PlayerBedLeaveEvent
      */
     @EventHandler
     public void onBedLeaveEvent(PlayerBedLeaveEvent event) {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
+
+        // Sets inBed to false.
         playerData.setInBed(false);
     }
 
     /**
      * Handles player respawn events.
-     * This is used to reliably set sprinting & sneaking to false.
      *
-     * @param event The event.
+     * @param event PlayerRespawnEvent
      */
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
+        // Sets sprinting and sneaking to false.
         playerData.setSprinting(false);
         playerData.setSneaking(false);
     }
 
+    /**
+     * Handles player damage events.
+     *
+     * @param event EntityDamageEvent
+     */
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDamage(EntityDamageEvent event) {
+        // Returns if the entity is not a player.
         if (!(event.getEntity() instanceof Player)) {
             return;
         }
@@ -208,6 +219,7 @@ public class PlayerDataListener implements Listener {
         Player player = (Player) event.getEntity();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
+        // Sets the player's last damage timestamp.
         playerData.setTimestamp(ActionType.DAMAGE);
     }
 }
