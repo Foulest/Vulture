@@ -37,8 +37,8 @@ Vulture enhances Minecraft server integrity through advanced cheat detection and
 
 ## Dependencies
 - **[Spigot 1.8.9](https://papermc.io/downloads/all)**
-- **[PacketEvents](https://github.com/retrooper/packetevents)** *included*
-- **[HamsterAPI](https://github.com/arkflame/HamsterAPI)** *included*
+- **[PacketEvents](https://github.com/retrooper/packetevents)** *(included)*
+- **[HamsterAPI](https://github.com/arkflame/HamsterAPI)** *(included)*
 
 ## Useful Links
 - [Contribution Guidelines](https://github.com/Foulest/Vulture/wiki/Contribution-Guidelines)
