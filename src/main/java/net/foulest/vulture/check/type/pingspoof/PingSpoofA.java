@@ -22,7 +22,6 @@ import net.foulest.vulture.util.data.Pair;
 public class PingSpoofA extends Check {
 
     private final EvictingList<Pair<Short, Long>> transactionsOut = new EvictingList<>(500);
-
     private int transactionsInCount;
     private int transactionsOutCount;
 

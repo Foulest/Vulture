@@ -26,15 +26,10 @@ public class KillAuraA extends Check {
                        @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
         if (PacketType.Play.Client.Util.isInstanceOfFlying(packetId)) {
             if (lastUseEntity != null) {
-                boolean droppedPackets = playerData.isDroppedPackets();
-                boolean hasFast = playerData.hasFast();
-
-                long timeSinceLag = playerData.getTimeSince(ActionType.LAG);
-
                 double delay = System.currentTimeMillis() - lastUseEntity;
 
-                if (delay < 100 && delay > 40 && !hasFast
-                        && !droppedPackets && timeSinceLag > 250) {
+                if (delay > 40 && delay < 100 && !playerData.hasFast() && !playerData.isDroppedPackets()
+                        && playerData.getTimeSince(ActionType.LAG) > 250) {
                     if (++buffer > 3) {
                         flag(false, "delay=" + delay);
                         lastUseEntity = null;

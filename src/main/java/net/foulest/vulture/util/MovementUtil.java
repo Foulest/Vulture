@@ -13,6 +13,16 @@ import org.bukkit.potion.PotionEffectType;
 @Setter
 public class MovementUtil {
 
+    /**
+     * Checks if the player's Y level is a whole number.
+     * This is used to check if the player is on the ground.
+     *
+     * @return Whether or not the player's Y level is a whole number.
+     */
+    public static boolean isYLevel(double y) {
+        return y % 0.015625 == 0.0;
+    }
+
     public static float getBaseSpeed(@NonNull Player player) {
         return 0.26f + (getPotionEffectLevel(player, PotionEffectType.SPEED) * 0.03001f)
                 + ((player.getWalkSpeed() - 0.2f) * 1.6f);

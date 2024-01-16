@@ -11,6 +11,7 @@ import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.event.MovementEvent;
 import net.foulest.vulture.util.MathUtil;
+import net.foulest.vulture.util.MessageUtil;
 import net.foulest.vulture.util.data.MovingObjectPosition;
 import net.foulest.vulture.util.data.Pair;
 import net.foulest.vulture.util.raytrace.BoundingBox;
@@ -30,13 +31,13 @@ public class ReachB extends Check {
     public void handle(@NonNull MovementEvent event, long timestamp) {
         // Checks the player for exemptions.
         if (player.getGameMode().equals(GameMode.CREATIVE)
-                || playerData.getLastTarget() == null
-                || playerData.getTimeSince(ActionType.LAG) <= 200L
-                || playerData.getPastLocsB().size() < 10
                 || playerData.getLastAttackTick() > 1
-                || playerData.getTotalTicks() - playerData.getLastPacketDrop() <= 5
+                || playerData.getLastServerPositionTick() <= 100 + Math.min(MathUtil.getPingInTicks(playerData.getTransPing()), 5)
+                || playerData.getLastTarget() == null
+                || playerData.getPastLocsB().size() < 10
                 || playerData.getTimeSince(ActionType.DELAYED_PACKET) <= 160L
-                || playerData.getLastServerPositionTick() <= 100 + Math.min(MathUtil.getPingInTicks(playerData.getTransPing()), 5)) {
+                || playerData.getTimeSince(ActionType.LAG) <= 200L
+                || playerData.getTotalTicks() - playerData.getLastPacketDrop() <= 5) {
             return;
         }
 
@@ -79,7 +80,7 @@ public class ReachB extends Check {
 
         int nowTicks = playerData.getTotalTicks();
         int pingTicks = MathUtil.getPingInTicks(playerData.getTransPing()) + 3;
-        int colliding = 0;
+        int collided = 0;
 
         double distance = -1;
 
@@ -106,7 +107,7 @@ public class ReachB extends Check {
                     distance = Math.min(distanceToIntersection, distanceToIntersectionMD);
 
                     if (distance > 3.03) {
-                        ++colliding;
+                        ++collided;
                     }
                 } else {
                     if (intersection == null && intersectionMD == null) {
@@ -116,10 +117,12 @@ public class ReachB extends Check {
             }
         }
 
-        if (distance > 3.03 && colliding > 2) {
+        MessageUtil.debug("(B) distance=" + distance + " collided=" + collided);
+
+        if (distance > 3.03 && collided > 2) {
             if ((buffer += 1.5) > 3.5) {
-                flag(false, "distance=" + distance);
                 event.setCancelled(true);
+                flag(false, "distance=" + distance);
             }
         } else {
             buffer = Math.max(buffer - 0.5, 0);

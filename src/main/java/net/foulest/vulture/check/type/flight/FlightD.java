@@ -1,4 +1,4 @@
-package net.foulest.vulture.check.type.invalid;
+package net.foulest.vulture.check.type.flight;
 
 import lombok.NonNull;
 import net.foulest.vulture.check.Check;
@@ -7,15 +7,15 @@ import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.event.MovementEvent;
 
-@CheckInfo(name = "Invalid (B)", type = CheckType.INVALID,
+@CheckInfo(name = "Flight (D)", type = CheckType.FLIGHT,
         description = "Detects players continually rising.")
-public class InvalidB extends Check {
+public class FlightD extends Check {
 
     private double lastDeltaY;
     private double buffer;
     private int ticksRising;
 
-    public InvalidB(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public FlightD(@NonNull PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
@@ -33,9 +33,9 @@ public class InvalidB extends Check {
         }
 
         double deltaY = event.getDeltaY();
-        boolean rising = deltaY > 0 && deltaY >= lastDeltaY;
 
-        if (rising) {
+        // Checks if the player is continually rising for more than 2 ticks.
+        if (deltaY > 0 && deltaY >= lastDeltaY) {
             if (++ticksRising > 2) {
                 if (++buffer >= 2) {
                     flag(true, "deltaY=" + deltaY

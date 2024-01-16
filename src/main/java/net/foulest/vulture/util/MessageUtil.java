@@ -4,8 +4,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import net.foulest.vulture.Vulture;
-import net.foulest.vulture.data.PlayerDataManager;
 import net.foulest.vulture.data.PlayerData;
+import net.foulest.vulture.data.PlayerDataManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Utility class for sending messages.
@@ -24,12 +25,14 @@ import java.util.logging.Level;
 @Setter
 public final class MessageUtil {
 
+    public static Logger logger = Bukkit.getLogger();
+
     public static void messagePlayer(@NonNull CommandSender sender, @NonNull String message) {
         sender.sendMessage(colorize(message));
     }
 
     public static void log(@NonNull Level level, @NonNull String message) {
-        Bukkit.getLogger().log(level, "[" + Vulture.instance.getPluginName() + "] " + message);
+        logger.log(level, "[Vulture] " + message);
     }
 
     public static void debug(@NonNull String message) {

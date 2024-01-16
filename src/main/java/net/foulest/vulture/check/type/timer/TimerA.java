@@ -5,6 +5,7 @@ import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import lombok.NonNull;
+import net.foulest.vulture.Vulture;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
@@ -37,6 +38,12 @@ public class TimerA extends Check {
             int totalTicks = playerData.getTotalTicks();
             int lastDroppedPackets = playerData.getLastDroppedPackets();
 
+            // Checks the player for exemptions.
+            if (Vulture.timeSinceLaggingFast() <= 500 || Vulture.timeSinceLaggingSlow() <= 500) {
+                return;
+            }
+
+            // Checks the player for exemptions.
             if (totalTicks < 300 && timeSinceLag > 100 && totalTicks - lastDroppedPackets < 5) {
                 return;
             }
@@ -72,7 +79,7 @@ public class TimerA extends Check {
 
         } else if (packetId == PacketType.Play.Server.POSITION) {
             // Compensates for teleports.
-            flyingDiffs.add(150L);
+            flyingDiffs.add(200L);
         }
     }
 }

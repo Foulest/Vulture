@@ -34,7 +34,7 @@ public class BadPacketsF extends Check {
 
         } else if (packetId == PacketType.Play.Client.UPDATE_SIGN) {
             if (!sentSignEditor) {
-                flag(false, "Sent UpdateSign packet without SignEditor");
+                flag(false, event, "Sent UpdateSign packet without SignEditor");
             }
 
             sentUpdateSign = true;

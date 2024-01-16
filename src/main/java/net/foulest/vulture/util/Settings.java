@@ -24,7 +24,6 @@ import java.util.logging.Level;
 
 /**
  * Utility class for settings.
- * <p>
  *
  * @author Foulest
  * @project Vulture

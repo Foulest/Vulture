@@ -11,11 +11,12 @@ import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 
+@SuppressWarnings("deprecation")
 @CheckInfo(name = "Inventory (G)", type = CheckType.INVENTORY)
 public class InventoryG extends Check {
 
-    private boolean wasWindowOpenPreviously;
-    private boolean isWindowCurrentlyOpen;
+    private boolean wasOpen;
+    private boolean open;
 
     public InventoryG(@NonNull PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
@@ -25,12 +26,12 @@ public class InventoryG extends Check {
     public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
                        @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
         // Checks the player for exemptions.
-        if (!playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8)) {
+        if (playerData.getVersion().isNewerThan(ClientVersion.v_1_8)) {
             return;
         }
 
         if (packetId == PacketType.Play.Client.CLOSE_WINDOW) {
-            if (wasWindowOpenPreviously) {
+            if (wasOpen) {
                 flag(false, "CLOSE_WINDOW");
             }
 
@@ -39,20 +40,20 @@ public class InventoryG extends Check {
             WrappedPacketInClientCommand.ClientCommand command = clientCommand.getClientCommand();
 
             if (command == WrappedPacketInClientCommand.ClientCommand.OPEN_INVENTORY_ACHIEVEMENT) {
-                isWindowCurrentlyOpen = true;
+                open = true;
             }
 
         } else if (packetId == PacketType.Play.Client.WINDOW_CLICK) {
-            wasWindowOpenPreviously = isWindowCurrentlyOpen;
+            wasOpen = open;
 
-            if (isWindowCurrentlyOpen) {
+            if (open) {
                 flag(false, "WINDOW_CLICK");
-                isWindowCurrentlyOpen = false;
+                open = false;
             }
 
         } else if (PacketType.Play.Client.Util.isInstanceOfFlying(packetId)) {
-            isWindowCurrentlyOpen = false;
-            wasWindowOpenPreviously = false;
+            open = false;
+            wasOpen = false;
         }
     }
 }

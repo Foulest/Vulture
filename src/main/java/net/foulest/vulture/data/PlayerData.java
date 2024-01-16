@@ -49,7 +49,10 @@ public class PlayerData {
     private Method sendPacketMethod;
     private boolean setup = false;
     private boolean injected = false;
-    private int packetsSentInTick = 0;
+
+    // Packet Counts
+    private final Map<Byte, Integer> packetCounts = new HashMap<>();
+    private int packetsSentPerTick = 0;
 
     // Timestamps
     private Map<ActionType, Long> actionTimestamps = new HashMap<>();
@@ -150,11 +153,13 @@ public class PlayerData {
     private boolean onChest;
     private boolean onClimbable;
     private boolean nearClimbable;
+    private boolean nearPortal;
     private boolean onSnowLayer;
     private boolean onIce;
     private boolean onSoulSand;
     private boolean nearTrapdoor;
     private boolean nearFenceGate;
+    private boolean onLilyPad;
     private boolean nearLilyPad;
     private boolean nearAnvil;
     private boolean nearSlimeBlock;
@@ -163,6 +168,9 @@ public class PlayerData {
     private boolean isInsideBlock;
     private Block collidingBlock;
     private boolean inCamera;
+    private boolean inUnloadedChunk;
+    private boolean touchedGroundSinceLogin;
+    private boolean underEffectOfSlime = false;
 
     // Abilities packet
     private boolean flying;

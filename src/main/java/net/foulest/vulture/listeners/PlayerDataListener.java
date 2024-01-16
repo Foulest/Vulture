@@ -35,6 +35,13 @@ public class PlayerDataListener implements Listener {
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
         ClientVersion clientVersion = PacketEvents.get().getPlayerUtils().getClientVersion(player);
 
+        // Returns if the player's data is null.
+        if (playerData == null) {
+            MessageUtil.debug(player.getName() + " failed to load player data");
+            KickUtil.kickPlayer(player, "Failed to load player data", true);
+            return;
+        }
+
         // Resolves the player's client version.
         if (!clientVersion.isResolved() || clientVersion == ClientVersion.UNKNOWN) {
             MessageUtil.debug(player.getName() + " failed to resolve client version");

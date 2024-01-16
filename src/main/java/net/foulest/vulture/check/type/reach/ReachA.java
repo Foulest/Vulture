@@ -15,7 +15,6 @@ import net.foulest.vulture.util.MathUtil;
 import net.foulest.vulture.util.MessageUtil;
 import net.foulest.vulture.util.data.Pair;
 import net.foulest.vulture.util.raytrace.BoundingBox;
-import net.foulest.vulture.util.raytrace.RayTraceUtil;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -33,15 +32,15 @@ public class ReachA extends Check {
     public void handle(@NonNull MovementEvent event, long timestamp) {
         // Checks the player for exemptions.
         if (player.getGameMode().equals(GameMode.CREATIVE)
-                || playerData.getLastTarget() == null
-                || playerData.getLastAttackTick() > 1
-                || playerData.getTotalTicks() - playerData.getLastPacketDrop() <= 20
-                || playerData.getPastLocsA().size() < 20
-                || playerData.getLastTeleportPacket() != null
                 || player.isInsideVehicle()
-                || playerData.getTimeSince(ActionType.TELEPORT) <= 5000L
+                || playerData.getLastAttackTick() > 1
+                || playerData.getLastTarget() == null
+                || playerData.getLastTeleportPacket() != null
+                || playerData.getPastLocsA().size() < 20
+                || playerData.getTimeSince(ActionType.DELAYED_PACKET) <= 100L
                 || playerData.getTimeSince(ActionType.LAG) <= 250L
-                || playerData.getTimeSince(ActionType.DELAYED_PACKET) <= 100L) {
+                || playerData.getTimeSince(ActionType.TELEPORT) <= 5000L
+                || playerData.getTotalTicks() - playerData.getLastPacketDrop() <= 20) {
             return;
         }
 
@@ -95,13 +94,12 @@ public class ReachA extends Check {
             }
         }
 
-        MessageUtil.debug("distance=" + distance + " collided=" + collided
-                + " looking=" + RayTraceUtil.getBlockPlayerLookingAt(player, 3.05));
+        MessageUtil.debug("(A) distance=" + distance + " collided=" + collided);
 
         if (distance > 3.05 && collided > 2) {
             if ((buffer += 1.5) > 3.5) {
-                flag(false, "distance=" + distance);
                 event.setCancelled(true);
+                flag(false, "distance=" + distance);
             }
         } else {
             buffer = Math.max(buffer - 0.75, 0);

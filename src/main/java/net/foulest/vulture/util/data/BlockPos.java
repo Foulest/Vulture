@@ -1,4 +1,4 @@
-package net.foulest.vulture.util.block;
+package net.foulest.vulture.util.data;
 
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import net.foulest.vulture.util.MathUtil;
-import net.foulest.vulture.util.data.EnumFacing;
 
 @Getter
 @Setter

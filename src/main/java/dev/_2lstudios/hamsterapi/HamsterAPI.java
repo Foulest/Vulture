@@ -106,9 +106,21 @@ public class HamsterAPI {
             ChannelDuplexHandler hamsterChannelHandler = new HamsterChannelHandler(playerData);
 
             if (pipeline.get("decompress") != null) {
+                // Check if vulture_decoder is already in the pipeline
+                if (pipeline.get(DECODER_CHANNEL) != null) {
+                    pipeline.remove(DECODER_CHANNEL);
+                }
+
                 pipeline.addAfter("decompress", DECODER_CHANNEL, hamsterDecoderHandler);
+
             } else if (pipeline.get("splitter") != null) {
+                // Check if vulture_decoder is already in the pipeline
+                if (pipeline.get(DECODER_CHANNEL) != null) {
+                    pipeline.remove(DECODER_CHANNEL);
+                }
+
                 pipeline.addAfter("splitter", DECODER_CHANNEL, hamsterDecoderHandler);
+
             } else {
                 throw new IllegalAccessException("No ChannelHandler was found on the pipeline to inject " + DECODER_CHANNEL);
             }

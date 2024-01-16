@@ -24,6 +24,11 @@ public class SpeedF extends Check {
 
     @Override
     public void handle(@NonNull MovementEvent event, long timestamp) {
+        // Checks the player for exemptions.
+        if (player.isFlying()) {
+            return;
+        }
+
         Vector velocity = player.getVelocity();
 
         float speedLevel = MovementUtil.getPotionEffectLevel(player, PotionEffectType.SPEED);

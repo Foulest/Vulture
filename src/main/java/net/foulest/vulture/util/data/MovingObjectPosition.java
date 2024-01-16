@@ -4,7 +4,6 @@ import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import net.foulest.vulture.util.block.BlockPos;
 import org.bukkit.entity.Entity;
 
 @Getter

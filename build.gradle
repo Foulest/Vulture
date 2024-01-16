@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'net.foulest'
-version = '1.4.3'
+version = '1.4.4'
 description = 'Vulture'
 compileJava.options.encoding = 'UTF-8'
 java.sourceCompatibility = JavaVersion.VERSION_1_8

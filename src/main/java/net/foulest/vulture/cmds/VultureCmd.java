@@ -180,11 +180,11 @@ public class VultureCmd {
 
         // A list of available commands with their usages.
         List<String> commands = Arrays.asList(
-                "&7* &f/vulture alerts &7- Toggles alerts.",
-                "&7* &f/vulture reload &7- Reloads the config.",
-                "&7* &f/vulture info <player> &7- View player info.",
-                "&7* &f/vulture kick <player> <reason> &7- Kicks a player.",
-                "&7* &f/vulture debug &7- Toggles debug mode."
+                "&f/vulture alerts &7- Toggles alerts.",
+                "&f/vulture reload &7- Reloads the config.",
+                "&f/vulture info <player> &7- View player info.",
+                "&f/vulture kick <player> <reason> &7- Kicks a player.",
+                "&f/vulture debug &7- Toggles debug mode."
         );
 
         int itemsPerPage = 4;
@@ -207,7 +207,7 @@ public class VultureCmd {
         int endIndex = Math.min(commands.size(), startIndex + itemsPerPage);
 
         MessageUtil.messagePlayer(sender, "");
-        MessageUtil.messagePlayer(sender, "&eVulture Help &7&o(Page " + page + "/" + maxPages + ")");
+        MessageUtil.messagePlayer(sender, "&eVulture Help &7(Page " + page + "/" + maxPages + ")");
 
         for (int i = startIndex; i < endIndex; i++) {
             MessageUtil.messagePlayer(sender, commands.get(i));

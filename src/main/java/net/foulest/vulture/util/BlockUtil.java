@@ -1,4 +1,4 @@
-package net.foulest.vulture.util.block;
+package net.foulest.vulture.util;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -258,6 +258,19 @@ public class BlockUtil {
                 || block.getType() == Material.STATIONARY_WATER);
     }
 
+    public static boolean isNearChest(@NonNull Player player) {
+        if (isPlayerInUnloadedChunk(player)) {
+            return false;
+        }
+
+        BoundingBox boundingBox = getPlayerCustomBoundingBox(player, 0.25, 1.2, -1.0);
+        ConcurrentStream<Block> collidingBlocks = getCollidingBlocks(player, boundingBox);
+
+        return collidingBlocks.any(block -> block.getType() == Material.CHEST
+                || block.getType() == Material.ENDER_CHEST
+                || block.getType() == Material.TRAPPED_CHEST);
+    }
+
     public static boolean isOnChest(@NonNull Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;
@@ -281,6 +294,17 @@ public class BlockUtil {
 
         return collidingBlocks.any(block -> block.getType() == Material.LADDER
                 || block.getType() == Material.VINE);
+    }
+
+    public static boolean isNearPortal(@NonNull Player player) {
+        if (isPlayerInUnloadedChunk(player)) {
+            return false;
+        }
+
+        BoundingBox boundingBox = getPlayerCustomBoundingBox(player, 0.5, 0.1, 0.1);
+        ConcurrentStream<Block> collidingBlocks = getCollidingBlocks(player, boundingBox);
+
+        return collidingBlocks.any(block -> block.getType() == Material.PORTAL);
     }
 
     public static boolean isNearClimbable(@NonNull Player player) {
@@ -339,14 +363,76 @@ public class BlockUtil {
                 || block.getType() == Material.IRON_TRAPDOOR);
     }
 
+    public static boolean isNearFlowerPot(@NonNull Player player) {
+        if (isPlayerInUnloadedChunk(player)) {
+            return false;
+        }
+
+        BoundingBox boundingBox = getPlayerCustomBoundingBox(player, 0.25, 1.2, -1.0);
+        ConcurrentStream<Block> collidingBlocks = getCollidingBlocks(player, boundingBox);
+        return collidingBlocks.any(block -> block.getType() == Material.FLOWER_POT);
+    }
+
+    public static boolean isNearHopper(@NonNull Player player) {
+        if (isPlayerInUnloadedChunk(player)) {
+            return false;
+        }
+
+        BoundingBox boundingBox = getPlayerCustomBoundingBox(player, 0.25, 1.2, -1.0);
+        ConcurrentStream<Block> collidingBlocks = getCollidingBlocks(player, boundingBox);
+        return collidingBlocks.any(block -> block.getType() == Material.HOPPER);
+    }
+
+    public static boolean isNearBrewingStand(@NonNull Player player) {
+        if (isPlayerInUnloadedChunk(player)) {
+            return false;
+        }
+
+        BoundingBox boundingBox = getPlayerCustomBoundingBox(player, 0.25, 1.2, -1.0);
+        ConcurrentStream<Block> collidingBlocks = getCollidingBlocks(player, boundingBox);
+        return collidingBlocks.any(block -> block.getType() == Material.BREWING_STAND);
+    }
+
+    public static boolean isNearFence(@NonNull Player player) {
+        if (isPlayerInUnloadedChunk(player)) {
+            return false;
+        }
+
+        BoundingBox boundingBox = getPlayerCustomBoundingBox(player, 0.25, 1.2, -1.0);
+        ConcurrentStream<Block> collidingBlocks = getCollidingBlocks(player, boundingBox);
+        return collidingBlocks.any(block -> block.getType() == Material.FENCE
+                || block.getType() == Material.ACACIA_FENCE
+                || block.getType() == Material.BIRCH_FENCE
+                || block.getType() == Material.DARK_OAK_FENCE
+                || block.getType() == Material.JUNGLE_FENCE
+                || block.getType() == Material.NETHER_FENCE
+                || block.getType() == Material.SPRUCE_FENCE
+                || block.getType() == Material.COBBLE_WALL);
+    }
+
     public static boolean isNearFenceGate(@NonNull Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;
         }
 
-        BoundingBox boundingBox = getPlayerNearBoundingBox(player);
+        BoundingBox boundingBox = getPlayerCustomBoundingBox(player, 0.25, 1.2, -1.0);
         ConcurrentStream<Block> collidingBlocks = getCollidingBlocks(player, boundingBox);
-        return collidingBlocks.any(block -> block.getType() == Material.FENCE_GATE);
+        return collidingBlocks.any(block -> block.getType() == Material.FENCE_GATE
+                || block.getType() == Material.ACACIA_FENCE_GATE
+                || block.getType() == Material.BIRCH_FENCE_GATE
+                || block.getType() == Material.DARK_OAK_FENCE_GATE
+                || block.getType() == Material.JUNGLE_FENCE_GATE
+                || block.getType() == Material.SPRUCE_FENCE_GATE);
+    }
+
+    public static boolean isOnLilyPad(@NonNull Player player) {
+        if (isPlayerInUnloadedChunk(player)) {
+            return false;
+        }
+
+        BoundingBox boundingBox = getPlayerFeetBoundingBox(player);
+        ConcurrentStream<Block> collidingBlocks = getCollidingBlocks(player, boundingBox);
+        return collidingBlocks.any(block -> block.getType() == Material.WATER_LILY);
     }
 
     public static boolean isNearLilyPad(@NonNull Player player) {
@@ -354,9 +440,42 @@ public class BlockUtil {
             return false;
         }
 
-        BoundingBox boundingBox = getPlayerCustomBoundingBox(player, 0.0, 1.2, 1.2);
+        BoundingBox boundingBox = getPlayerCustomBoundingBox(player, 0.25, 1.2, 0.1);
         ConcurrentStream<Block> collidingBlocks = getCollidingBlocks(player, boundingBox);
         return collidingBlocks.any(block -> block.getType() == Material.WATER_LILY);
+    }
+
+    public static boolean isNearSlab(@NonNull Player player) {
+        if (isPlayerInUnloadedChunk(player)) {
+            return false;
+        }
+
+        BoundingBox boundingBox = getPlayerCustomBoundingBox(player, 0.25, 1.2, 0.1);
+        ConcurrentStream<Block> collidingBlocks = getCollidingBlocks(player, boundingBox);
+
+        return collidingBlocks.any(block -> block.getType() == Material.STEP
+                || block.getType() == Material.WOOD_STEP
+                || block.getType() == Material.STONE_SLAB2);
+    }
+
+    public static boolean isNearSnowLayer(@NonNull Player player) {
+        if (isPlayerInUnloadedChunk(player)) {
+            return false;
+        }
+
+        BoundingBox boundingBox = getPlayerCustomBoundingBox(player, 0.25, 1.2, -1.0);
+        ConcurrentStream<Block> collidingBlocks = getCollidingBlocks(player, boundingBox);
+        return collidingBlocks.any(block -> block.getType() == Material.SNOW);
+    }
+
+    public static boolean isNearCarpet(@NonNull Player player) {
+        if (isPlayerInUnloadedChunk(player)) {
+            return false;
+        }
+
+        BoundingBox boundingBox = getPlayerCustomBoundingBox(player, 0.25, 1.2, -1.0);
+        ConcurrentStream<Block> collidingBlocks = getCollidingBlocks(player, boundingBox);
+        return collidingBlocks.any(block -> block.getType() == Material.CARPET);
     }
 
     public static boolean isNearAnvil(@NonNull Player player) {
@@ -374,7 +493,7 @@ public class BlockUtil {
             return false;
         }
 
-        BoundingBox boundingBox = getPlayerCustomBoundingBox(player, 0.1, 1.3, 0.0);
+        BoundingBox boundingBox = getPlayerCustomBoundingBox(player, -0.001, 1.5, -1.0);
         ConcurrentStream<Block> collidingBlocks = getCollidingBlocks(player, boundingBox);
         return collidingBlocks.any(block -> block.getType() == Material.SLIME_BLOCK);
     }

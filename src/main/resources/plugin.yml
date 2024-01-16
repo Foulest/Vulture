@@ -1,5 +1,5 @@
 name: Vulture
-version: '1.4.3'
+version: '1.4.4'
 main: net.foulest.vulture.Vulture
 author: Foulest
 load: POSTWORLD

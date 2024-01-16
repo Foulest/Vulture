@@ -51,7 +51,6 @@ public class BadPacketsE extends Check {
                     KickUtil.kickPlayer(player, event, "Sent two ResourcePackStatus ACCEPTED packets in a row");
                     return;
                 }
-
                 accepted = true;
             } else {
                 accepted = false;

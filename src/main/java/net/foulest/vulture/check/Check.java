@@ -2,6 +2,7 @@ package net.foulest.vulture.check;
 
 import dev._2lstudios.hamsterapi.HamsterAPI;
 import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
@@ -79,6 +80,17 @@ public class Check {
      * @see MovementEvent
      */
     public void handle(@NonNull MovementEvent event, long timestamp) {
+    }
+
+    /**
+     * This method is used to flag the player without debugging and cancel an event.
+     *
+     * @param event   the event to cancel
+     * @param verbose the optional data to include in the flag
+     */
+    protected final void flag(boolean setback, CancellableEvent event, @NonNull String... verbose) {
+        event.setCancelled(true);
+        flag(setback, false, verbose);
     }
 
     /**

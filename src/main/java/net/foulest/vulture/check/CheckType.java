@@ -14,7 +14,6 @@ public enum CheckType {
     CLIENTBRAND,
     FLIGHT,
     GROUNDSPOOF,
-    INVALID,
     INVENTORY,
     KILLAURA,
     PINGSPOOF,

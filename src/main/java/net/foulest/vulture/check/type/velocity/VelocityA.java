@@ -1,58 +1,58 @@
 package net.foulest.vulture.check.type.velocity;
 
+import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
+import io.github.retrooper.packetevents.packettype.PacketType;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
+import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
+import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import lombok.NonNull;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
-import net.foulest.vulture.event.MovementEvent;
-import net.foulest.vulture.util.MathUtil;
 
-@CheckInfo(name = "Velocity (A)", type = CheckType.VELOCITY)
+@CheckInfo(name = "Velocity (A)", type = CheckType.VELOCITY,
+        description = "Checks for incorrect vertical velocity.")
 public class VelocityA extends Check {
 
-    private int buffer;
+    private double lastY;
 
     public VelocityA(@NonNull PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull MovementEvent event, long timestamp) {
-        // Checks the player for exemptions.
-        if (playerData.isNearLiquid()
-                || playerData.isUnderBlock()
-                || playerData.isInWeb()
-                || playerData.isOnClimbable()
-                || player.isInsideVehicle()) {
-            return;
-        }
+    public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
+                       @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+        if (PacketType.Play.Client.Util.isInstanceOfFlying(packetId)) {
+            WrappedPacketInFlying flying = new WrappedPacketInFlying(nmsPacket);
+            Vector3d flyingPosition = flying.getPosition();
+            double deltaY = (flying.isMoving() ? flyingPosition.getY() - lastY : 0.0);
+            double takenVelocity = playerData.getVelocityY();
+            double threshold = 0.003017;
 
-        long transPing = playerData.getTransPing();
-
-        int totalTicks = playerData.getTotalTicks();
-        int velocityTicks = playerData.getVelocityTicks();
-        int lastServerPositionTick = playerData.getLastServerPositionTick();
-
-        double velocityY = playerData.getVelocityY();
-        double deltaY = event.getDeltaY();
-        double lastLastY = playerData.getLastLastLocation().getY();
-
-        if (velocityY > 0.2 && lastLastY % 0.015625 == 0.0) {
-            double scaledVelocity = (deltaY / velocityY) * 100.0 + 0.01;
-
-            int velTicks = totalTicks - velocityTicks;
-            int limit = MathUtil.getPingInTicks(transPing) + 5;
-
-            if (velTicks <= MathUtil.getPingInTicks(transPing) + 2 && lastServerPositionTick > 55) {
-                if (scaledVelocity < 75.0 || scaledVelocity > 105.0) {
-                    if (++buffer >= limit) {
-                        flag(false, "velocity=" + scaledVelocity + "%");
-                    }
-                } else {
-                    buffer = 0;
-                }
+            // Checks the player for exemptions.
+            if (playerData.isNearLiquid()
+                    || playerData.isUnderBlock()
+                    || playerData.isInWeb()
+                    || playerData.isOnClimbable()
+                    || player.isInsideVehicle()
+                    || takenVelocity <= 0.0) {
+                lastY = (flying.isMoving() ? flyingPosition.getY() : lastY);
+                return;
             }
+
+            if (Math.abs(deltaY - takenVelocity) > threshold) {
+                flag(true, "deltaY=" + deltaY
+                        + " takenVelocity=" + takenVelocity
+                );
+            } else {
+                System.out.println("deltaY=" + deltaY
+                        + " takenVelocity=" + takenVelocity
+                );
+            }
+
+            lastY = (flying.isMoving() ? flyingPosition.getY() : lastY);
         }
     }
 }

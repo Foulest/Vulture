@@ -47,20 +47,22 @@ import net.foulest.vulture.data.PlayerDataManager;
 import net.foulest.vulture.event.MovementEvent;
 import net.foulest.vulture.event.RotationEvent;
 import net.foulest.vulture.processor.Processor;
+import net.foulest.vulture.util.BeaconUtil;
+import net.foulest.vulture.util.BlockUtil;
 import net.foulest.vulture.util.KickUtil;
-import net.foulest.vulture.util.MessageUtil;
-import net.foulest.vulture.util.block.BlockUtil;
 import net.foulest.vulture.util.data.Pair;
 import net.foulest.vulture.util.raytrace.BoundingBox;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Beacon;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
@@ -72,6 +74,8 @@ import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+
+import static net.foulest.vulture.util.MessageUtil.debug;
 
 /**
  * Handles all incoming & outgoing packets.
@@ -90,7 +94,7 @@ public class PacketProcessor extends Processor {
     public void onPacketDecode(PacketDecodeEvent event) {
         PlayerData playerData = event.getPlayerData();
         Player player = playerData.getPlayer();
-        int maxPacketsPerSecond = (player.isDead() ? 150 : 75);
+        int maxPacketsPerSecond = 230;
 
         // Cancels incoming packets for offline players.
         if (!player.isOnline()) {
@@ -98,9 +102,15 @@ public class PacketProcessor extends Processor {
             return;
         }
 
+        // Cancels incoming packets for players being kicked.
+        if (KickUtil.isPlayerBeingKicked(player)) {
+            event.setCancelled(true);
+            return;
+        }
+
         // Iterate packets sent per tick.
-        int packetsSentInTick = playerData.getPacketsSentInTick();
-        playerData.setPacketsSentInTick(packetsSentInTick + 1);
+        int packetsSentInTick = playerData.getPacketsSentPerTick();
+        playerData.setPacketsSentPerTick(packetsSentInTick + 1);
         packetsSentInTick++;
 
         // If the player has sent too many packets in one tick, kick them.
@@ -120,6 +130,7 @@ public class PacketProcessor extends Processor {
     @Override
     @SuppressWarnings("deprecation")
     public void onPacketPlayReceive(@NonNull PacketPlayReceiveEvent event) {
+        // Cancels incoming packets for invalid players.
         if (Bukkit.getPlayer(event.getPlayer().getUniqueId()) == null) {
             event.setCancelled(true);
             return;
@@ -128,7 +139,14 @@ public class PacketProcessor extends Processor {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
+        // Cancels incoming packets for offline players.
         if (!player.isOnline()) {
+            event.setCancelled(true);
+            return;
+        }
+
+        // Cancels incoming packets for players being kicked.
+        if (KickUtil.isPlayerBeingKicked(player)) {
             event.setCancelled(true);
             return;
         }
@@ -180,7 +198,14 @@ public class PacketProcessor extends Processor {
                     }
                 }
 
-                playerData.setFlying(abilities.isFlying());
+                if (abilities.isFlying()) {
+                    playerData.setFlying(true);
+                    playerData.setTimestamp(ActionType.START_FLYING);
+                } else {
+                    playerData.setFlying(false);
+                    playerData.setTimestamp(ActionType.STOP_FLYING);
+                }
+
                 abilities.isFlightAllowed().ifPresent(playerData::setFlightAllowed);
                 abilities.canInstantlyBuild().ifPresent(playerData::setInstantBuild);
                 abilities.isVulnerable().ifPresent(playerData::setVulnerable);
@@ -215,7 +240,7 @@ public class PacketProcessor extends Processor {
                     Location blockLocation = new Location(player.getWorld(), digXPos, digYPos, digZPos);
                     double distance = playerLocation.distance(blockLocation);
 
-                    if (distance > 6.2) {
+                    if (distance > 7.03) {
                         KickUtil.kickPlayer(player, event, "Sent BlockDig packet with invalid distance: "
                                 + distance + " (x=" + digXPos + " y=" + digYPos + " z=" + digZPos + ")");
                         return;
@@ -285,7 +310,7 @@ public class PacketProcessor extends Processor {
                     Location blockLocation = new Location(player.getWorld(), placeXPos, placeYPos, placeZPos);
                     double distance = player.getLocation().distance(blockLocation);
 
-                    if (distance > 6.2) {
+                    if (distance > 7.03) {
                         KickUtil.kickPlayer(player, event, "Sent BlockPlace packet with invalid distance: "
                                 + distance);
                         return;
@@ -330,6 +355,10 @@ public class PacketProcessor extends Processor {
                     ItemStack itemStack = blockPlace.getItemStack().get();
 
                     if (itemStack.getType() != Material.AIR && !player.getInventory().contains(itemStack)) {
+                        if (player.getInventory().contains(itemStack.getType()) && !itemStack.hasItemMeta()) {
+                            break;
+                        }
+
                         KickUtil.kickPlayer(player, event, "Sent BlockPlace packet with invalid item"
                                 + " (" + itemStack + ")"
                                 + " (" + Arrays.toString(player.getInventory().getContents()) + ")");
@@ -434,9 +463,9 @@ public class PacketProcessor extends Processor {
 
                 switch (clientCommand.getClientCommand()) {
                     case OPEN_INVENTORY_ACHIEVEMENT:
-                        if (playerData.isInventoryOpen()) {
-                            KickUtil.kickPlayer(player, event, "Sent invalid OpenInventory packet");
-                            return;
+                        // Players can't open their inventory in portals.
+                        if (playerData.isNearPortal()) {
+                            break;
                         }
 
                         playerData.setInventoryOpen(true);
@@ -545,18 +574,58 @@ public class PacketProcessor extends Processor {
 
                 // Checks for invalid beacon payloads.
                 if (channelName.equals("MC|Beacon")) {
-                    if (data.startsWith("\u0000\u0000\u0000")
-                            && data.endsWith("\u0000\u0000\u0000\u0000")) {
-                        if (data.charAt(2) != '\u0001'
-                                && data.charAt(2) != '\u0003'
-                                && data.charAt(2) != '\u0005'
-                                && data.charAt(2) != '\u0008'
-                                && data.charAt(2) != '\u0010'
-                                && data.charAt(2) != '\u0011') {
+                    if (player.getOpenInventory().getType() != InventoryType.BEACON) {
+                        KickUtil.kickPlayer(player, event, "Sent beacon payload without open beacon inventory");
+                        return;
+                    }
+
+                    Beacon beacon = (Beacon) player.getOpenInventory().getTopInventory().getHolder();
+                    int tier = BeaconUtil.getTier(beacon.getLocation());
+
+                    if (data.charAt(0) == '\u0000'
+                            && data.charAt(1) == '\u0000'
+                            && data.charAt(2) == '\u0000'
+                            && data.charAt(4) == '\u0000'
+                            && data.charAt(5) == '\u0000'
+                            && data.charAt(6) == '\u0000'
+                            && (data.charAt(7) == '\u0000' || data.charAt(7) == '\n' || data.charAt(7) == '\u0001'
+                            || data.charAt(7) == '\u0003' || data.charAt(7) == '\u000B' || data.charAt(7) == '\u0008'
+                            || data.charAt(7) == '\u0005')) {
+
+                        // Checks for invalid beacon effect payloads.
+                        if (data.charAt(3) != '\u0001' // Speed
+                                && data.charAt(3) != '\u0003' // Haste
+                                && data.charAt(3) != '\u000B' // Resistance
+                                && data.charAt(3) != '\u0008' // Jump Boost
+                                && data.charAt(3) != '\u0005' // Strength
+                        ) {
                             KickUtil.kickPlayer(player, event, "Sent beacon payload with invalid effect");
                             return;
                         }
-                    } else if (!data.equals("\u0000\u0000\u0000\u0001\u0000\u0000\u0000\u0001")) {
+
+                        // Checks for players sending beacon effects that don't match the beacon tier.
+                        switch (tier) {
+                            case 1:
+                                if (data.charAt(3) == '\u000B'
+                                        || data.charAt(3) == '\u0008'
+                                        || data.charAt(3) == '\u0005') {
+                                    KickUtil.kickPlayer(player, event, "Sent beacon payload with invalid effect");
+                                    return;
+                                }
+                                break;
+
+                            case 2:
+                                if (data.charAt(3) == '\u0005') {
+                                    KickUtil.kickPlayer(player, event, "Sent beacon payload with invalid effect");
+                                    return;
+                                }
+                                break;
+
+                            default:
+                                break;
+                        }
+
+                    } else {
                         KickUtil.kickPlayer(player, event, "Sent invalid beacon payload");
                         return;
                     }
@@ -596,7 +665,7 @@ public class PacketProcessor extends Processor {
 
                     ItemStack itemInHand = playerData.getPlayer().getInventory().getItemInHand();
 
-                    if (itemInHand != null && !itemInHand.getType().toString().toLowerCase().contains("book")) {
+                    if (itemInHand == null || !itemInHand.getType().toString().toLowerCase().contains("book")) {
                         KickUtil.kickPlayer(player, event, "Sent book payload without a book");
                         return;
                     }
@@ -617,7 +686,7 @@ public class PacketProcessor extends Processor {
 
             case PacketType.Play.Client.DIFFICULTY_CHANGE: // Players shouldn't be able to send this packet
                 event.setCancelled(true);
-                return;
+                break;
 
             case PacketType.Play.Client.ENTITY_ACTION:
                 WrappedPacketInEntityAction entityAction = new WrappedPacketInEntityAction(event.getNMSPacket());
@@ -681,6 +750,11 @@ public class PacketProcessor extends Processor {
                                     break;
                                 }
                             }
+                        }
+
+                        // Players can't open their inventory in portals.
+                        if (playerData.isNearPortal()) {
+                            break;
                         }
 
                         playerData.setInventoryOpen(true);
@@ -880,10 +954,18 @@ public class PacketProcessor extends Processor {
 
                 // Handles player movement.
                 if (flying.isMoving()) {
-                    if (player.isInsideVehicle() && !player.getVehicle().isValid()) {
+                    boolean chunkUnloaded = BlockUtil.isLocationInUnloadedChunk(location);
+                    playerData.setInUnloadedChunk(chunkUnloaded);
+
+                    if (chunkUnloaded) {
+                        playerData.setTimestamp(ActionType.IN_UNLOADED_CHUNK);
+                    }
+
+                    if (player.isInsideVehicle() && playerData.getTimeSince(ActionType.ENTER_VEHICLE) > 100L) {
                         event.setCancelled(true);
                         player.getVehicle().eject();
-                        MessageUtil.debug("Flying packet ignored for " + player.getName() + " (invalid vehicle)");
+                        debug("Flying packet ignored for " + player.getName() + " (inside vehicle) "
+                                + playerData.getTimeSince(ActionType.ENTER_VEHICLE));
                     }
 
                     // Set ground data
@@ -942,19 +1024,31 @@ public class PacketProcessor extends Processor {
                     playerData.setOnChest(BlockUtil.isOnChest(player));
                     playerData.setOnClimbable(BlockUtil.isOnClimbable(player));
                     playerData.setNearClimbable(BlockUtil.isNearClimbable(player));
+                    playerData.setNearPortal(BlockUtil.isNearPortal(player));
                     playerData.setOnSnowLayer(BlockUtil.isOnSnowLayer(player));
                     playerData.setOnIce(BlockUtil.isOnIce(player));
-
-                    if (BlockUtil.isOnIce(player)) {
-                        playerData.setTimestamp(ActionType.ON_ICE);
-                    }
-
                     playerData.setOnSoulSand(BlockUtil.isOnSoulSand(player));
                     playerData.setNearTrapdoor(BlockUtil.isNearTrapdoor(player));
                     playerData.setNearFenceGate(BlockUtil.isNearFenceGate(player));
+                    playerData.setOnLilyPad(BlockUtil.isOnLilyPad(player));
                     playerData.setNearLilyPad(BlockUtil.isNearLilyPad(player));
                     playerData.setNearAnvil(BlockUtil.isNearAnvil(player));
                     playerData.setNearSlimeBlock(BlockUtil.isNearSlimeBlock(player));
+
+                    if (playerData.isNearSlimeBlock() && !playerData.isOnGround()) {
+                        playerData.setUnderEffectOfSlime(true);
+                    } else if (!playerData.isNearSlimeBlock() && playerData.isOnGround()) {
+                        playerData.setTouchedGroundSinceLogin(true);
+                        playerData.setUnderEffectOfSlime(false);
+                    } else if (playerData.isOnGround()) {
+                        playerData.setTouchedGroundSinceLogin(true);
+                    }
+
+                    if (playerData.isNearClimbable()
+                            || playerData.isNearLiquid()
+                            || player.isFlying()) {
+                        playerData.setUnderEffectOfSlime(false);
+                    }
 
                     if (BlockUtil.isUnderBlock(player)) {
                         playerData.setUnderBlockTicks(playerData.getUnderBlockTicks() + 1);
@@ -968,15 +1062,12 @@ public class PacketProcessor extends Processor {
                     playerData.setAgainstBlock(BlockUtil.isAgainstBlock(player));
                     playerData.setCollidingBlock(BlockUtil.getCollidingBlock(player));
 
-                    // Sets the last on ground location.
-                    if (playerData.isNearGround() && !playerData.isInsideBlock()
-                            && flyingYPos % 0.015625 == 0.0
-                            && !BlockUtil.isLocationInUnloadedChunk(location)
-                            && location.getBlock().isEmpty()
-                            && playerData.getTimeSince(ActionType.SETBACK) > 500L
-                            && playerData.getTimeSince(ActionType.LAST_ON_GROUND_LOCATION_SET) > 500L) {
-                        playerData.setTimestamp(ActionType.LAST_ON_GROUND_LOCATION_SET);
-                        playerData.setLastOnGroundLocation(location);
+                    if (playerData.isOnIce()) {
+                        playerData.setTimestamp(ActionType.ON_ICE);
+                    }
+
+                    if (playerData.isInLiquid()) {
+                        playerData.setTimestamp(ActionType.IN_LIQUID);
                     }
 
                     if (playerData.getLastPositionPacket() != null) {
@@ -1042,7 +1133,7 @@ public class PacketProcessor extends Processor {
                     return;
                 }
 
-                if (creativeSlot < -1 || creativeSlot > 44) {
+                if ((creativeSlot < -1 || creativeSlot > 44) && creativeSlot != -999) {
                     KickUtil.kickPlayer(player, event, "Sent SetCreativeSlot packet with invalid slot: " + creativeSlot);
                     return;
                 }
@@ -1084,14 +1175,15 @@ public class PacketProcessor extends Processor {
                         && !steerVehicle.isJump() && !player.isInsideVehicle()) {
                     if (player.getNearbyEntities(3, 3, 3).stream().anyMatch(entity -> entity.getType() == EntityType.HORSE)) {
                         playerData.setTimestamp(ActionType.STEER_VEHICLE);
-                        return;
+                        break;
                     }
 
                     KickUtil.kickPlayer(player, event, "Sent invalid SteerVehicle packet");
                     return;
 
                 } else if (!player.isInsideVehicle()) {
-                    KickUtil.kickPlayer(player, event, "Sent invalid SteerVehicle packet");
+                    event.setCancelled(true);
+                    debug("SteerVehicle packet ignored for " + player.getName() + " (not inside vehicle)");
                     return;
                 }
 
@@ -1128,8 +1220,6 @@ public class PacketProcessor extends Processor {
                     return;
                 }
 
-                playerData.setPacketsSentInTick(0);
-
                 if (playerData.getTransactionTime().containsKey(transactionActionNumber)) {
                     long transactionStamp = playerData.getTransactionTime().get(transactionActionNumber);
                     playerData.setTransPing(System.currentTimeMillis() - transactionStamp);
@@ -1158,6 +1248,13 @@ public class PacketProcessor extends Processor {
                         || entity.isDead()
                         || entity.getWorld() != player.getWorld()) {
                     event.setCancelled(true);
+                    break;
+                }
+
+                double distance = entity.getLocation().distance(player.getLocation());
+
+                if (distance > 7.03) {
+                    KickUtil.kickPlayer(player, event, "Sent EntityAction packet with invalid distance: " + distance);
                     return;
                 }
 
@@ -1224,7 +1321,7 @@ public class PacketProcessor extends Processor {
                 int windowButton = windowClick.getWindowButton();
 
                 if (windowId == 0) {
-                    if (!playerData.isInventoryOpen() && playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8)) {
+                    if (!playerData.isInventoryOpen() && !playerData.getVersion().isNewerThan(ClientVersion.v_1_8)) {
                         KickUtil.kickPlayer(player, event, "Sent WindowClick packet with closed inventory");
                         return;
                     }
@@ -1243,15 +1340,17 @@ public class PacketProcessor extends Processor {
                     case 0:
                         if (windowButton != 0 && windowButton != 1) {
                             KickUtil.kickPlayer(player, event, "Sent WindowClick packet invalid Pickup button");
+                            return;
                         }
-                        return;
+                        break;
 
                     case 1:
                         if (windowButton != 0 && windowButton != 1
                                 && windowButton != 2 && windowButton != 5) {
                             KickUtil.kickPlayer(player, event, "Sent WindowClick packet with invalid QuickMove button");
+                            return;
                         }
-                        return;
+                        break;
 
                     case 2:
                         if (windowButton != 0 && windowButton != 1
@@ -1259,24 +1358,27 @@ public class PacketProcessor extends Processor {
                                 && windowButton != 4 && windowButton != 8
                                 && windowButton != 40) {
                             KickUtil.kickPlayer(player, event, "Sent WindowClick packet with invalid Swap button");
+                            return;
                         }
-                        return;
+                        break;
 
                     case 3:
                         if (windowButton != 0 && windowButton != 1
                                 && windowButton != 2 && windowButton != 4
                                 && windowButton != 5) {
                             KickUtil.kickPlayer(player, event, "Sent WindowClick packet with invalid Clone button");
+                            return;
                         }
-                        return;
+                        break;
 
                     case 4:
                         if (windowButton != 0 && windowButton != 1
                                 && windowButton != 2 && windowButton != 4
                                 && windowButton != 5 && windowButton != 6) {
                             KickUtil.kickPlayer(player, event, "Sent WindowClick packet with invalid Throw button");
+                            return;
                         }
-                        return;
+                        break;
 
                     case 5:
                         if (windowButton != 0 && windowButton != 1
@@ -1285,8 +1387,9 @@ public class PacketProcessor extends Processor {
                                 && windowButton != 8 && windowButton != 9
                                 && windowButton != 10) {
                             KickUtil.kickPlayer(player, event, "Sent WindowClick packet with invalid QuickCraft button");
+                            return;
                         }
-                        return;
+                        break;
 
                     case 6:
                         if (windowButton != 0 && windowButton != 1
@@ -1294,6 +1397,7 @@ public class PacketProcessor extends Processor {
                                 && windowButton != 4 && windowButton != 5
                                 && windowButton != 6) {
                             KickUtil.kickPlayer(player, event, "Sent WindowClick packet with invalid PickupAll button");
+                            return;
                         }
                         break;
 
@@ -1309,11 +1413,47 @@ public class PacketProcessor extends Processor {
                 break;
 
             default:
-                MessageUtil.debug("Unhandled packet: " + event.getPacketId());
+                debug("Unhandled packet: " + event.getPacketId());
                 break;
         }
 
+        // Handles packet checks.
         handlePacketChecks(playerData, event, false);
+
+        // Sets the last on ground location for setback purposes.
+        // This has to be done after the packet checks are handled.
+        switch (event.getPacketId()) {
+            case PacketType.Play.Client.POSITION:
+            case PacketType.Play.Client.POSITION_LOOK:
+            case PacketType.Play.Client.LOOK:
+            case PacketType.Play.Client.FLYING:
+                WrappedPacketInFlying flying = new WrappedPacketInFlying(event.getNMSPacket());
+                Vector3d flyingPosition = flying.getPosition();
+                double flyingXPos = flyingPosition.getX();
+                double flyingYPos = flyingPosition.getY();
+                double flyingZPos = flyingPosition.getZ();
+
+                if (flying.isMoving()) {
+                    Location currentLocation = playerData.getLocation();
+
+                    if (currentLocation == null) {
+                        currentLocation = player.getLocation();
+                    }
+
+                    Location location = new Location(player.getWorld(), flyingXPos, flyingYPos, flyingZPos,
+                            currentLocation.getYaw(), currentLocation.getPitch());
+
+                    // Sets the last on ground location.
+                    if (playerData.isNearGround() && flyingYPos % 0.015625 == 0.0 && !playerData.isInUnloadedChunk()
+                            && !playerData.isInsideBlock() && location.getBlock().isEmpty()
+                            && playerData.getTimeSince(ActionType.SETBACK) > 40L
+                            && playerData.getTimeSince(ActionType.LAST_ON_GROUND_LOCATION_SET) > 40L) {
+                        playerData.setTimestamp(ActionType.LAST_ON_GROUND_LOCATION_SET);
+                        playerData.setLastOnGroundLocation(location);
+                    }
+                }
+                break;
+        }
     }
 
     /**
@@ -1336,6 +1476,12 @@ public class PacketProcessor extends Processor {
                 playerData.setWalkSpeed(abilities.getWalkSpeed());
                 playerData.setInstantBuild(abilities.canBuildInstantly());
                 playerData.setVulnerable(abilities.isVulnerable());
+
+                if (abilities.isFlying()) {
+                    playerData.setTimestamp(ActionType.START_FLYING);
+                } else {
+                    playerData.setTimestamp(ActionType.STOP_FLYING);
+                }
                 break;
 
             case PacketType.Play.Server.ANIMATION:
@@ -1395,28 +1541,28 @@ public class PacketProcessor extends Processor {
 
                 if (scheme == null) {
                     event.setCancelled(true);
-                    MessageUtil.debug("ResourcePackSend packet cancelled; contained null URI scheme");
-                    return;
+                    debug("ResourcePackSend packet cancelled; contained null URI scheme");
+                    break;
                 }
 
                 if (!scheme.equals("https") && !scheme.equals("http") && !scheme.equals("level")) {
                     event.setCancelled(true);
-                    MessageUtil.debug("ResourcePackSend packet cancelled; contained invalid URI scheme");
-                    return;
+                    debug("ResourcePackSend packet cancelled; contained invalid URI scheme");
+                    break;
                 }
 
                 try {
                     url = URLDecoder.decode(url.substring("level://".length()), StandardCharsets.UTF_8.toString());
                 } catch (UnsupportedEncodingException e) {
                     event.setCancelled(true);
-                    MessageUtil.debug("ResourcePackSend packet cancelled; could not decode URL");
-                    return;
+                    debug("ResourcePackSend packet cancelled; could not decode URL");
+                    break;
                 }
 
                 if (scheme.equals("level") && (url.contains("..") || !url.endsWith("/resources.zip"))) {
                     event.setCancelled(true);
-                    MessageUtil.debug("ResourcePackSend packet cancelled; contained invalid level URL");
-                    return;
+                    debug("ResourcePackSend packet cancelled; contained invalid level URL");
+                    break;
                 }
                 break;
 
@@ -1426,21 +1572,36 @@ public class PacketProcessor extends Processor {
                 break;
 
             case PacketType.Play.Server.OPEN_WINDOW:
+                // Players can't open their inventory in portals.
+                if (playerData.isNearPortal()) {
+                    break;
+                }
+
                 playerData.setInventoryOpen(true);
                 playerData.setTimestamp(ActionType.INVENTORY_OPEN);
                 break;
 
             case PacketType.Play.Server.POSITION:
                 WrappedPacketOutPosition position = new WrappedPacketOutPosition(event.getNMSPacket());
+                Location teleportLoc = new Location(player.getWorld(), position.getPosition().getX(),
+                        position.getPosition().getY(), position.getPosition().getZ(),
+                        position.getYaw(), position.getPitch());
+
                 playerData.setLastServerPositionTick(0);
                 playerData.setLastTeleportPacket(position);
                 playerData.setTimestamp(ActionType.TELEPORT);
+
+                if (BlockUtil.isLocationInUnloadedChunk(teleportLoc)) {
+                    playerData.setInUnloadedChunk(true);
+                    playerData.setTimestamp(ActionType.IN_UNLOADED_CHUNK);
+                }
                 break;
 
             default:
                 break;
         }
 
+        // Handles packet checks.
         handlePacketChecks(playerData, event, true);
     }
 

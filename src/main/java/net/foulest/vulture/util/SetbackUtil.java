@@ -18,6 +18,7 @@ public class SetbackUtil {
 
     public static void setback(@NonNull Player player) {
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
+        playerData.setTimestamp(ActionType.SETBACK);
 
         if (playerData.getTimestamp(ActionType.LAST_ON_GROUND_LOCATION_SET) == 0) {
             setback(player, player.getLocation());
@@ -31,15 +32,11 @@ public class SetbackUtil {
     }
 
     public static void setback(@NonNull Player player, @NonNull Location location) {
-        PlayerData playerData = PlayerDataManager.getPlayerData(player);
-
         if (player.isInsideVehicle()) {
             return;
         }
 
         TaskUtil.run(() -> {
-            playerData.setTimestamp(ActionType.SETBACK);
-
             location.setPitch(player.getLocation().getPitch());
             location.setYaw(player.getLocation().getYaw());
 

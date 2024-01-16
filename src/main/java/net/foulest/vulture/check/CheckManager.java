@@ -13,10 +13,10 @@ import net.foulest.vulture.check.type.badpackets.*;
 import net.foulest.vulture.check.type.clientbrand.ClientBrand;
 import net.foulest.vulture.check.type.flight.FlightA;
 import net.foulest.vulture.check.type.flight.FlightB;
+import net.foulest.vulture.check.type.flight.FlightC;
+import net.foulest.vulture.check.type.flight.FlightD;
 import net.foulest.vulture.check.type.groundspoof.GroundSpoofA;
 import net.foulest.vulture.check.type.groundspoof.GroundSpoofB;
-import net.foulest.vulture.check.type.invalid.InvalidA;
-import net.foulest.vulture.check.type.invalid.InvalidB;
 import net.foulest.vulture.check.type.inventory.*;
 import net.foulest.vulture.check.type.killaura.*;
 import net.foulest.vulture.check.type.pingspoof.PingSpoofA;
@@ -27,7 +27,6 @@ import net.foulest.vulture.check.type.reach.ReachC;
 import net.foulest.vulture.check.type.speed.*;
 import net.foulest.vulture.check.type.timer.TimerA;
 import net.foulest.vulture.check.type.velocity.VelocityA;
-import net.foulest.vulture.check.type.velocity.VelocityB;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -67,18 +66,15 @@ public class CheckManager {
             ClientBrand.class,
 
             // Flight
-            FlightA.class, FlightB.class,
+            FlightA.class, FlightB.class, FlightC.class, FlightD.class,
 
             // GroundSpoof
             GroundSpoofA.class, GroundSpoofB.class,
 
-            // Invalid
-            InvalidA.class, InvalidB.class,
-
             // Inventory
             InventoryA.class, InventoryB.class, InventoryC.class, InventoryD.class, InventoryE.class,
             InventoryF.class, InventoryG.class, InventoryH.class, InventoryI.class, InventoryJ.class,
-            InventoryK.class,
+            InventoryK.class, InventoryL.class,
 
             // KillAura
             KillAuraA.class, KillAuraB.class, KillAuraC.class, KillAuraD.class, KillAuraE.class,
@@ -98,6 +94,6 @@ public class CheckManager {
             TimerA.class,
 
             // Velocity
-            VelocityA.class, VelocityB.class
+            VelocityA.class
     ));
 }

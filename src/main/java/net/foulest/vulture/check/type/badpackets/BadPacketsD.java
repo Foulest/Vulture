@@ -11,8 +11,6 @@ import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.util.KickUtil;
-import net.foulest.vulture.util.TaskUtil;
-import org.bukkit.Bukkit;
 
 @CheckInfo(name = "BadPackets (D)", type = CheckType.BADPACKETS, punishable = false,
         description = "Detects ignoring the mandatory Position packet.")
@@ -25,13 +23,6 @@ public class BadPacketsD extends Check {
         super(playerData);
         lastPosition = System.currentTimeMillis();
         lastTransaction = System.currentTimeMillis();
-
-        // Schedule a repeating task that runs every 1 second (20 ticks)
-        if (playerData.getPositionCheckerTaskId() != 0) {
-            Bukkit.getScheduler().cancelTask(playerData.getPositionCheckerTaskId());
-        }
-
-        playerData.setPositionCheckerTaskId(TaskUtil.runSyncRepeating(this::checkDifference, 20L, 20L));
     }
 
     @Override
@@ -46,6 +37,9 @@ public class BadPacketsD extends Check {
 
         } else if (packetId == PacketType.Play.Client.TRANSACTION) {
             lastTransaction = System.currentTimeMillis();
+
+        } else if (packetId == PacketType.Play.Client.KEEP_ALIVE) {
+            checkDifference();
         }
     }
 

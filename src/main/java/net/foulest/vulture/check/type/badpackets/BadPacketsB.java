@@ -37,16 +37,16 @@ public class BadPacketsB extends Check {
             Vector3d flyingPosition = flying.getPosition();
 
             if (flying.isRotating()) {
-                flag(false, "Sent invalid Rotation packet while in bed" + " (ticks=" + ticksInBed + ")");
+                flag(true, "Sent invalid Rotation packet while in bed" + " (ticks=" + ticksInBed + ")");
             }
 
             if (flying.isMoving() && playerData.isMoving() && !playerData.isTeleporting(flyingPosition)) {
-                flag(false, "Sent invalid Position packet while in bed" + " (ticks=" + ticksInBed + ")");
+                flag(true, "Sent invalid Position packet while in bed" + " (ticks=" + ticksInBed + ")");
             }
 
         } else if (packetId != PacketType.Play.Client.CHAT
                 && packetId != PacketType.Play.Client.KEEP_ALIVE) {
-            flag(false, "Sent invalid packet while in bed: " + PacketProcessor.getPacketFromId(packetId).getSimpleName());
+            flag(false, event, "Sent invalid packet while in bed: " + PacketProcessor.getPacketFromId(packetId).getSimpleName());
         }
     }
 }

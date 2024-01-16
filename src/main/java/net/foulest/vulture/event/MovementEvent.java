@@ -77,16 +77,6 @@ public class MovementEvent implements CancellableEvent {
     }
 
     /**
-     * Checks if the player's Y level is a whole number.
-     * This is used to check if the player is on the ground.
-     *
-     * @return Whether or not the player's Y level is a whole number.
-     */
-    public boolean isYLevel(double y) {
-        return y % 0.015625 == 0.0;
-    }
-
-    /**
      * Gets the player's to location.
      *
      * @return The player's to location.

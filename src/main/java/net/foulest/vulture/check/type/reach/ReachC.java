@@ -11,6 +11,7 @@ import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.event.MovementEvent;
 import net.foulest.vulture.util.MathUtil;
+import net.foulest.vulture.util.MessageUtil;
 import net.foulest.vulture.util.data.MovingObjectPosition;
 import net.foulest.vulture.util.data.Pair;
 import net.foulest.vulture.util.raytrace.BoundingBox;
@@ -30,13 +31,13 @@ public class ReachC extends Check {
     public void handle(@NonNull MovementEvent event, long timestamp) {
         // Checks the player for exemptions.
         if (player.getGameMode().equals(GameMode.CREATIVE)
-                || playerData.getLastTarget() == null
-                || playerData.getTimeSince(ActionType.LAG) <= 200L
-                || playerData.getPastLocsC().size() < 10
                 || playerData.getLastAttackTick() > 1
-                || playerData.getTotalTicks() - playerData.getLastPacketDrop() <= 5
+                || playerData.getLastServerPositionTick() <= 100 + Math.min(MathUtil.getPingInTicks(playerData.getTransPing()), 5)
+                || playerData.getLastTarget() == null
+                || playerData.getPastLocsC().size() < 10
                 || playerData.getTimeSince(ActionType.DELAYED_PACKET) <= 160L
-                || playerData.getLastServerPositionTick() <= 100 + Math.min(MathUtil.getPingInTicks(playerData.getTransPing()), 5)) {
+                || playerData.getTimeSince(ActionType.LAG) <= 200L
+                || playerData.getTotalTicks() - playerData.getLastPacketDrop() <= 5) {
             return;
         }
 
@@ -79,7 +80,7 @@ public class ReachC extends Check {
 
         int nowTicks = playerData.getTotalTicks();
         int pingTicks = MathUtil.getPingInTicks(playerData.getTransPing()) + 3;
-        int missed = 0;
+        int misses = 0;
 
         for (Pair<BoundingBox, Integer> pair : playerData.getPastLocsC()) {
             if (Math.abs(nowTicks - pair.getY() - pingTicks) < 2) {
@@ -99,14 +100,16 @@ public class ReachC extends Check {
                 MovingObjectPosition intersectionMD = BoundingBox.calculateIntercept(eyeLocation, eyeLocationFixedMD);
 
                 if (intersection == null && intersectionMD == null && !BoundingBox.isVecInside(eyeLocation)) {
-                    ++missed;
+                    ++misses;
                 }
             }
         }
 
-        if (missed >= 3 && playerData.getTotalTicks() - playerData.getLastPacketDrop() > 10) {
+        MessageUtil.debug("misses=" + misses);
+
+        if (misses >= 3 && playerData.getTotalTicks() - playerData.getLastPacketDrop() > 10) {
             if ((buffer += 0.75) > 8.5) {
-                flag(false, "misses=" + missed);
+                flag(false, "misses=" + misses);
             }
         } else {
             buffer = Math.max(buffer - 4.5, 0.0);
