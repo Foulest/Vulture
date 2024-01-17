@@ -1,5 +1,6 @@
 package net.foulest.vulture.check.type.aimassist;
 
+import com.google.common.collect.Lists;
 import lombok.NonNull;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
@@ -7,10 +8,16 @@ import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.event.RotationEvent;
 
+import java.util.Deque;
+
 @CheckInfo(name = "AimAssist (D)", type = CheckType.AIMASSIST)
 public class AimAssistD extends Check {
 
+    private final Deque<Double> yawSamples = Lists.newLinkedList();
+    private final Deque<Double> pitchSamples = Lists.newLinkedList();
     private double buffer;
+    private double lastAverageYaw;
+    private double lastAveragePitch;
 
     public AimAssistD(@NonNull PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
@@ -18,20 +25,35 @@ public class AimAssistD extends Check {
 
     @Override
     public void handle(@NonNull RotationEvent event, long timestamp) {
-        // Checks the player for exemptions.
-        if (event.isTeleport(playerData)) {
-            return;
+        double deltaYaw = event.getDeltaYaw();
+        double deltaPitch = event.getDeltaPitch();
+
+        if (deltaYaw > 0.0 && deltaYaw < 30.0 && deltaPitch > 0.0 && deltaPitch < 30.0) {
+            yawSamples.add(deltaYaw);
+            pitchSamples.add(deltaPitch);
         }
 
-        double deltaYaw = event.getDeltaYaw();
+        if (yawSamples.size() >= 20 && pitchSamples.size() >= 20) {
+            double averageYaw = yawSamples.stream().mapToDouble(d -> d).average().orElse(0.0);
+            double averagePitch = pitchSamples.stream().mapToDouble(d -> d).average().orElse(0.0);
 
-        if (deltaYaw % 0.5 == 0.0 && deltaYaw > 0) {
-            if (++buffer >= 5) {
-                flag(false, "deltaYaw=" + deltaYaw);
-                buffer = 0;
+            double finalYaw = averageYaw - lastAverageYaw;
+            double finalPitch = averagePitch - lastAveragePitch;
+
+            if (finalYaw > 3.859 && finalYaw < 5.2 && finalPitch > 0.827 && finalPitch < 1.186) {
+                if (++buffer > 3) {
+                    flag(false, " finalYaw=" + finalYaw
+                            + "finalPitch=" + finalPitch);
+                }
+            } else {
+                buffer = Math.max(buffer - 1.25, 0);
             }
-        } else {
-            buffer = Math.max(buffer - 0.9, 0);
+
+            yawSamples.clear();
+            pitchSamples.clear();
+
+            lastAverageYaw = averageYaw;
+            lastAveragePitch = averagePitch;
         }
     }
 }

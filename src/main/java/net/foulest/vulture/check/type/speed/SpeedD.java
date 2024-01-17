@@ -52,10 +52,10 @@ public class SpeedD extends Check {
 
         int groundTicks = playerData.getGroundTicks();
 
-        Vector direction = MathUtil.getDirection(player);
+        Vector direction = MathUtil.getEyeDirection(player);
 
         double speedDelta = MathUtil.getVectorSpeed(fromPosition, toPosition).distanceSquared(direction);
-        double maxDelta = 0.221;
+        double maxDelta = 0.25; // was 0.221; changed to fix false flags with Controllable mod
         double speedLevel = MovementUtil.getPotionEffectLevel(player, PotionEffectType.SPEED);
 
         maxDelta += groundTicks < 5 ? speedLevel * 0.07 : speedLevel * 0.0573;
@@ -65,9 +65,10 @@ public class SpeedD extends Check {
 
         if (speedDelta > maxDelta) {
             if (++buffer > 8) {
-                flag(true, "speedDelta=" + speedDelta
-                        + " maxDelta=" + maxDelta
-                        + " direction=" + direction);
+                flag(true,
+                        "speedDelta=" + speedDelta
+                                + " maxDelta=" + maxDelta
+                                + " direction=" + direction);
             }
         } else {
             buffer = Math.max(buffer - 0.5, 0);

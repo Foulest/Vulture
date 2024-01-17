@@ -1,12 +1,11 @@
 package net.foulest.vulture.util;
 
-import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import net.foulest.vulture.action.ActionType;
-import net.foulest.vulture.data.PlayerDataManager;
 import net.foulest.vulture.data.PlayerData;
+import net.foulest.vulture.data.PlayerDataManager;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -16,6 +15,11 @@ import org.bukkit.util.Vector;
 @Setter
 public class SetbackUtil {
 
+    /**
+     * Sets the player back to their last on ground location.
+     *
+     * @param player The player to set back.
+     */
     public static void setback(@NonNull Player player) {
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
         playerData.setTimestamp(ActionType.SETBACK);
@@ -27,16 +31,18 @@ public class SetbackUtil {
         }
     }
 
-    public static void setback(@NonNull Player player, @NonNull Vector3d vector3d) {
-        setback(player, new Location(player.getWorld(), vector3d.getX(), vector3d.getY(), vector3d.getZ()));
-    }
-
+    /**
+     * Sets the player back to the specified location.
+     *
+     * @param player   The player to set back.
+     * @param location The location to set the player back to.
+     */
     public static void setback(@NonNull Player player, @NonNull Location location) {
         if (player.isInsideVehicle()) {
             return;
         }
 
-        TaskUtil.run(() -> {
+        TaskUtil.runTask(() -> {
             location.setPitch(player.getLocation().getPitch());
             location.setYaw(player.getLocation().getYaw());
 

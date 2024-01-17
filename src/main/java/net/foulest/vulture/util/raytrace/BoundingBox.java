@@ -30,6 +30,7 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
+@SuppressWarnings("unused")
 public class BoundingBox {
 
     public Vector min;

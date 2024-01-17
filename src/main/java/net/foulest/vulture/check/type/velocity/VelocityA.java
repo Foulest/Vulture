@@ -47,7 +47,7 @@ public class VelocityA extends Check {
                         + " takenVelocity=" + takenVelocity
                 );
             } else {
-                System.out.println("deltaY=" + deltaY
+                debug("deltaY=" + deltaY
                         + " takenVelocity=" + takenVelocity
                 );
             }

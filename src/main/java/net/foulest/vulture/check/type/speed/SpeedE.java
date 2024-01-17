@@ -14,7 +14,7 @@ import org.bukkit.GameMode;
 import org.bukkit.potion.PotionEffectType;
 
 @CheckInfo(name = "Speed (E)", type = CheckType.SPEED,
-        description = "Prevents players from using no-slowdown.")
+        description = "Prevents players from using NoSlowdown.")
 public class SpeedE extends Check {
 
     public double bufferStandard;

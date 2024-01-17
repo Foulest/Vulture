@@ -18,6 +18,7 @@ import java.util.Collection;
 
 @Getter
 @Setter
+@SuppressWarnings("unused")
 public class RayTraceUtil {
 
     public static Block getBlockPlayerLookingAt(@NonNull Player player, double distance) {

@@ -4,7 +4,6 @@ import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEve
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.play.in.custompayload.WrappedPacketInCustomPayload;
-import lombok.Cleanup;
 import lombok.NonNull;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
@@ -12,13 +11,11 @@ import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.check.type.clientbrand.type.DataType;
 import net.foulest.vulture.check.type.clientbrand.type.PayloadType;
 import net.foulest.vulture.data.PlayerData;
+import net.foulest.vulture.util.FileUtil;
 import net.foulest.vulture.util.KickUtil;
 import net.foulest.vulture.util.MessageUtil;
 import net.foulest.vulture.util.Settings;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
@@ -1022,25 +1019,10 @@ public class ClientBrand extends Check {
                 + " &8(Type: " + dataType.getName() + ") (Data: " + data + ")");
 
         // Prints the unknown data to a randomly generated text file.
-        printDataToFile(data, "unknown-data-" + System.currentTimeMillis() + ".txt");
+        FileUtil.printDataToFile(data, "unknown-data-" + System.currentTimeMillis() + ".txt");
 
         // Cancels the packets to prevent the server from registering the channels.
         // This is needed to prevent the server from crashing / errors in console.
         event.setCancelled(true);
-    }
-
-    /**
-     * Prints data to a text file.
-     *
-     * @param data     The data to print.
-     * @param fileName The file name to print to.
-     */
-    private void printDataToFile(String data, String fileName) {
-        try {
-            @Cleanup BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
-            writer.write(data);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
     }
 }

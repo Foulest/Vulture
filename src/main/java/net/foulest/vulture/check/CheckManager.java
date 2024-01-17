@@ -8,7 +8,6 @@ import net.foulest.vulture.check.type.autoblock.AutoBlockB;
 import net.foulest.vulture.check.type.autoblock.AutoBlockC;
 import net.foulest.vulture.check.type.autoblock.AutoBlockD;
 import net.foulest.vulture.check.type.autoclicker.AutoClickerA;
-import net.foulest.vulture.check.type.autoclicker.AutoClickerB;
 import net.foulest.vulture.check.type.badpackets.*;
 import net.foulest.vulture.check.type.clientbrand.ClientBrand;
 import net.foulest.vulture.check.type.flight.FlightA;
@@ -50,13 +49,13 @@ public class CheckManager {
     public static final List<Class<? extends Check>> CHECK_CLASSES = Collections.unmodifiableList(Arrays.asList(
             // AimAssist
             AimAssistA.class, AimAssistB.class, AimAssistC.class, AimAssistD.class, AimAssistE.class,
-            AimAssistF.class, AimAssistG.class, AimAssistH.class, AimAssistI.class,
+            AimAssistF.class, AimAssistG.class, AimAssistH.class, AimAssistD.class,
 
             // AutoBlock
             AutoBlockA.class, AutoBlockB.class, AutoBlockC.class, AutoBlockD.class,
 
             // AutoClicker
-            AutoClickerA.class, AutoClickerB.class,
+            AutoClickerA.class,
 
             // BadPackets
             BadPacketsA.class, BadPacketsB.class, BadPacketsC.class, BadPacketsD.class, BadPacketsE.class,

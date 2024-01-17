@@ -18,7 +18,7 @@ import org.bukkit.potion.PotionEffectType;
 public class FlightA extends Check {
 
     // TODO: Patch players moving through blocks using Phase sand modules.
-    // TODO: Write full predictions for slime blocks.
+    // TODO: Test slime block predictions thoroughly.
 
     private static final double GRAVITY_DECAY = 0.08;
     private static final double GRAVITY_MULTIPLIER = 0.9800000190735147;
@@ -94,8 +94,6 @@ public class FlightA extends Check {
         double diffVPredY = Math.abs(velocity - predDeltaY);
         double diffVLastY = Math.abs(velocity - lastDeltaY);
         double diffVLastV = Math.abs(velocity - lastVelocity);
-        double diffVPredVY = Math.abs(velocity - predVelocityY);
-        double diffVPredVV = Math.abs(velocity - predVelocityVel);
         double diffVTakenV = Math.abs(velocity - takenVelocity);
         double diffVLastTakenV = Math.abs(velocity - lastTakenVelocity);
         double diffVRaw = Math.abs(velocity - deltaY);
@@ -202,14 +200,13 @@ public class FlightA extends Check {
         // Checks if the predicted Y difference is greater than the threshold.
         if (diffYPredY > thresholdJump) {
             // Fixes false flags when colliding with boats.
-            if (playerData.isNearbyBoat(0.6, 0.6, 0.6)) {
-                if ((deltaY == 0.0 && lastDeltaY == 0.0) || deltaY == 0.5625
-                        || Math.abs(deltaY - jumpY) < threshold
-                        || Math.abs(lastDeltaY - jumpY) < threshold) {
-                    MessageUtil.debug("FlightA: " + player.getName() + " failed (Boat) (Y=" + deltaY + ")");
-                    setLastValues(deltaY, velocity);
-                    return;
-                }
+            if (playerData.isNearbyBoat(0.6, 0.6, 0.6)
+                    && ((deltaY == 0.0 && lastDeltaY == 0.0) || deltaY == 0.5625
+                    || Math.abs(deltaY - jumpY) < threshold
+                    || Math.abs(lastDeltaY - jumpY) < threshold)) {
+                MessageUtil.debug("FlightA: " + player.getName() + " failed (Boat) (Y=" + deltaY + ")");
+                setLastValues(deltaY, velocity);
+                return;
             }
 
             // Ignores weird falling behavior in clients above 1.8.
@@ -325,7 +322,7 @@ public class FlightA extends Check {
             // Ignores players who are teleporting to unloaded chunks.
             if (deltaY == -0.09800000190735147
                     && (playerData.getTimeSince(ActionType.IN_UNLOADED_CHUNK) < 1500L
-                    || playerData.getTimeSince(ActionType.TELEPORT) < 200L)) {
+                    || playerData.getTimeSince(ActionType.TELEPORT) < 250L)) {
                 MessageUtil.debug("FlightA: " + player.getName() + " failed (G1) (Y=" + deltaY + ")"
                         + " (T=" + playerData.getTimeSince(ActionType.IN_UNLOADED_CHUNK) + ")");
                 setLastValues(deltaY, velocity);
@@ -618,6 +615,7 @@ public class FlightA extends Check {
                     + " teleport=" + playerData.getTimeSince(ActionType.TELEPORT)
                     + " liquid=" + playerData.getTimeSince(ActionType.IN_LIQUID)
                     + " stopFlying=" + playerData.getTimeSince(ActionType.STOP_FLYING)
+                    + " inUnloadedChunk=" + playerData.getTimeSince(ActionType.IN_UNLOADED_CHUNK)
                     + " |"
                     + " underBlock=" + underBlock
                     + " againstBlock=" + againstBlock

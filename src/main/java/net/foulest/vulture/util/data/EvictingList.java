@@ -18,6 +18,7 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
+@SuppressWarnings("unused")
 public final class EvictingList<T> extends LinkedList<T> {
 
     private final int maxSize;

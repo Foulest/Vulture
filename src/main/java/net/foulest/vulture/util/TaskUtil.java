@@ -5,42 +5,73 @@ import lombok.NonNull;
 import lombok.Setter;
 import net.foulest.vulture.Vulture;
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.scheduler.BukkitWorker;
+
+import java.util.List;
 
 @Getter
 @Setter
+@SuppressWarnings("unused")
 public class TaskUtil {
 
-    public static void run(@NonNull Runnable runnable) {
+    public static void runTask(@NonNull Runnable runnable) {
         Bukkit.getScheduler().runTask(Vulture.instance, runnable);
     }
 
-    private static BukkitTask taskTimer(@NonNull Runnable runnable, @NonNull Plugin plugin) {
-        return Bukkit.getScheduler().runTaskTimer(plugin, runnable, 0L, 1L);
+    public static void runTaskAsynchronously(@NonNull Runnable runnable) {
+        Bukkit.getScheduler().runTaskAsynchronously(Vulture.instance, runnable);
     }
 
-    public static BukkitTask taskTimer(@NonNull Runnable runnable) {
-        return taskTimer(runnable, Vulture.instance);
+    public static void runTaskLater(@NonNull Runnable runnable, long delay) {
+        Bukkit.getScheduler().runTaskLater(Vulture.instance, runnable, delay);
     }
 
-    private static BukkitTask taskAsync(@NonNull Runnable runnable, @NonNull Plugin plugin) {
-        return Bukkit.getScheduler().runTaskAsynchronously(plugin, runnable);
+    public static void runTaskLaterAsynchronously(@NonNull Runnable runnable, long delay) {
+        Bukkit.getScheduler().runTaskLaterAsynchronously(Vulture.instance, runnable, delay);
     }
 
-    public static BukkitTask taskAsync(@NonNull Runnable runnable) {
-        return taskAsync(runnable, Vulture.instance);
+    public static void runTaskTimer(@NonNull Runnable runnable, long delay, long period) {
+        Bukkit.getScheduler().runTaskTimer(Vulture.instance, runnable, delay, period);
     }
 
-    private static BukkitTask taskTimerAsync(@NonNull Runnable runnable, @NonNull Plugin plugin) {
-        return Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, runnable, 0L, 1L);
+    public static void runTaskTimerAsynchronously(@NonNull Runnable runnable, long delay, long period) {
+        Bukkit.getScheduler().runTaskTimerAsynchronously(Vulture.instance, runnable, delay, period);
     }
 
-    public static BukkitTask taskTimerAsync(@NonNull Runnable runnable) {
-        return taskTimerAsync(runnable, Vulture.instance);
+    public static void scheduleSyncDelayedTask(@NonNull Runnable runnable) {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(Vulture.instance, runnable);
     }
 
-    public static int runSyncRepeating(@NonNull Runnable runnable, long delay, long period) {
-        return Bukkit.getScheduler().scheduleSyncRepeatingTask(Vulture.instance, runnable, delay, period);
+    public static void scheduleSyncDelayedTask(@NonNull Runnable runnable, long period) {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(Vulture.instance, runnable, period);
+    }
+
+    public static void scheduleSyncRepeatingTask(@NonNull Runnable runnable, long delay, long period) {
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(Vulture.instance, runnable, delay, period);
+    }
+
+    public static void cancelAllTasks() {
+        Bukkit.getScheduler().cancelAllTasks();
+    }
+
+    public static void cancelTask(int taskId) {
+        Bukkit.getScheduler().cancelTask(taskId);
+    }
+
+    public static boolean isCurrentlyRunning(int taskId) {
+        return Bukkit.getScheduler().isCurrentlyRunning(taskId);
+    }
+
+    public static boolean isQueued(int taskId) {
+        return Bukkit.getScheduler().isQueued(taskId);
+    }
+
+    public static List<BukkitWorker> getActiveWorkers() {
+        return Bukkit.getScheduler().getActiveWorkers();
+    }
+
+    public static List<BukkitTask> getPendingTasks() {
+        return Bukkit.getScheduler().getPendingTasks();
     }
 }

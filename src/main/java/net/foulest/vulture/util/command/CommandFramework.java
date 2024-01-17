@@ -50,6 +50,7 @@ public class CommandFramework implements CommandExecutor {
                 field.setAccessible(true);
                 map = (CommandMap) field.get(manager);
             } catch (IllegalArgumentException | NoSuchFieldException | IllegalAccessException | SecurityException ex) {
+                MessageUtil.log(Level.WARNING, "Failed to initialize command framework!");
                 ex.printStackTrace();
             }
         }
@@ -105,8 +106,10 @@ public class CommandFramework implements CommandExecutor {
                     key.invoke(value, new CommandArgs(sender, cmd, label, args,
                             cmdLabel.split("\\.").length - 1));
                 } catch (IllegalArgumentException | IllegalAccessException ex) {
+                    MessageUtil.log(Level.WARNING, "Failed to execute command: " + cmdLabel);
                     ex.printStackTrace();
                 } catch (InvocationTargetException ex) {
+                    MessageUtil.log(Level.WARNING, ex.getTargetException().getMessage());
                     ex.getTargetException().printStackTrace();
                 }
                 return;
@@ -217,10 +220,11 @@ public class CommandFramework implements CommandExecutor {
                     completer.addCompleter(label, method, obj);
 
                 } else {
-                    MessageUtil.log(Level.WARNING, "&cUnable to register tab completer " + method.getName()
+                    MessageUtil.log(Level.WARNING, "&cUnable to register tab completer: " + method.getName()
                             + ". A tab completer is already registered for that command!");
                 }
             } catch (Exception ex) {
+                MessageUtil.log(Level.WARNING, "Failed to register tab completer: " + method.getName());
                 ex.printStackTrace();
             }
         }

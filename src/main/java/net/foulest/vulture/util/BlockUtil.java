@@ -18,6 +18,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@SuppressWarnings("unused")
 public class BlockUtil {
 
     public static boolean isPlayerInUnloadedChunk(@NonNull Player player) {

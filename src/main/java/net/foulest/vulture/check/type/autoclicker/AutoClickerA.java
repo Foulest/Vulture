@@ -8,17 +8,20 @@ import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
+import net.foulest.vulture.util.MathUtil;
+import net.foulest.vulture.util.data.EvictingList;
 
 import java.util.LinkedList;
 import java.util.Queue;
 
-@CheckInfo(name = "AutoClicker (A)", type = CheckType.AUTOCLICKER)
+@CheckInfo(name = "AutoClicker (A)", type = CheckType.AUTOCLICKER,
+        description = "Checks for unusually low standard deviation in click times.")
 public class AutoClickerA extends Check {
 
-    private double buffer;
-    public boolean swung;
-    public final Queue<Integer> flyingCountQueue = new LinkedList<>();
-    public int flyingCount;
+    private boolean swung;
+    private int flyingCount;
+    private final Queue<Integer> flyingCountQueue = new LinkedList<>();
+    private final EvictingList<Double> stdDeviations = new EvictingList<>(5);
 
     public AutoClickerA(@NonNull PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
@@ -31,29 +34,31 @@ public class AutoClickerA extends Check {
             boolean placingBlock = playerData.isPlacingBlock();
             boolean digging = playerData.isDigging();
 
-            if (swung && !placingBlock && !digging && flyingCount < 8) {
-                flyingCountQueue.add(flyingCount);
+            if (swung && !placingBlock && !digging) {
+                if (flyingCount <= 10) {
+                    flyingCountQueue.add(flyingCount);
 
-                if (flyingCountQueue.size() == 100) {
-                    double average = flyingCountQueue.stream().mapToDouble(d -> d).average().orElse(0.0);
-                    double stdDev = 0.0;
+                    // Checks the last 10 clicks and clears the queue after.
+                    if (flyingCountQueue.size() == 10) {
+                        double stdDev = MathUtil.getStandardDeviation(flyingCountQueue);
+                        stdDeviations.add(stdDev);
 
-                    for (Integer i : flyingCountQueue) {
-                        stdDev += Math.pow(i.doubleValue() - average, 2.0);
-                    }
+                        // Gets the combined standard deviation of the last 50 clicks.
+                        if (stdDeviations.isFull()) {
+                            double stdDevCombined = MathUtil.getStandardDeviation(stdDeviations);
 
-                    stdDev /= flyingCountQueue.size();
+                            // This is a very low standard deviation that only appears when using
+                            // an autoclicker with a very limited range (e.g. 8-10 CPS).
+                            // Any good autoclicker with a range of four or more numbers will not be detected by this.
+                            if (stdDevCombined < 0.40) { // TODO: Test this against clicking with a mouse; repeatedly.
+                                flag(false, "stdDevCombined=" + stdDevCombined);
+                            }
 
-                    if (stdDev <= 0.28) {
-                        if (++buffer > 5) {
-                            flag(false, "stdDev=" + stdDev
-                                    + "buffer=" + buffer);
+                            stdDeviations.clear();
                         }
-                    } else {
-                        buffer = Math.max(buffer - 1.5, 0.0);
-                    }
 
-                    flyingCountQueue.clear();
+                        flyingCountQueue.clear();
+                    }
                 }
 
                 flyingCount = 0;

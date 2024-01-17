@@ -4,32 +4,28 @@ import dev._2lstudios.hamsterapi.HamsterAPI;
 import dev._2lstudios.hamsterapi.enums.PacketType;
 import dev._2lstudios.hamsterapi.utils.Reflection;
 import lombok.Getter;
+import net.foulest.vulture.util.MessageUtil;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 
+@Getter
 public class PacketWrapper {
 
-    private final Class<?> craftItemStackClass;
-    @Getter
     private final Object packet;
-    @Getter
     private final String name;
-    @Getter
+    private final Class<?> craftItemStackClass;
+
     private final Map<String, String> strings = new HashMap<>();
     private final Map<String, Double> doubles = new HashMap<>();
-    @Getter
     private final Map<String, Float> floats = new HashMap<>();
-    @Getter
     private final Map<String, Integer> integers = new HashMap<>();
-    @Getter
     private final Map<String, Boolean> booleans = new HashMap<>();
-    @Getter
     private final Map<String, ItemStack> items = new HashMap<>();
-    @Getter
     private final Map<String, Object> objects = new HashMap<>();
 
     public PacketWrapper(Object packet) {
@@ -38,11 +34,11 @@ public class PacketWrapper {
         Class<?> minecraftKeyClass = reflection.getMinecraftKey();
         Class<?> packetClass = packet.getClass();
         Class<?> itemStackClass = reflection.getItemStack();
-
-        this.craftItemStackClass = reflection.getCraftItemStack();
         Class<?> nmsItemStackClass = reflection.getItemStack();
+
         this.packet = packet;
         this.name = packetClass.getSimpleName();
+        this.craftItemStackClass = reflection.getCraftItemStack();
 
         for (Field field : packetClass.getDeclaredFields()) {
             try {
@@ -77,6 +73,7 @@ public class PacketWrapper {
 
                 field.setAccessible(false);
             } catch (Exception ex) {
+                MessageUtil.log(Level.WARNING, "Failed to read field " + field.getName() + " in " + packetClass.getName());
                 ex.printStackTrace();
             }
         }
@@ -106,6 +103,7 @@ public class PacketWrapper {
             field.set(packet, value);
             field.setAccessible(false);
         } catch (Exception ex) {
+            MessageUtil.log(Level.WARNING, "Failed to write field " + key + " in " + this.packet.getClass().getName());
             ex.printStackTrace();
         }
     }
@@ -120,6 +118,7 @@ public class PacketWrapper {
             field.set(packet, nmsItemStack);
             field.setAccessible(false);
         } catch (Exception ex) {
+            MessageUtil.log(Level.WARNING, "Failed to write field " + key + " in " + this.packet.getClass().getName());
             ex.printStackTrace();
         }
     }

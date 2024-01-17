@@ -44,7 +44,7 @@ public class KillAuraE extends Check {
                 Vector vec = lastTarget.getLocation().clone().toVector().setY(0.0).subtract(playerEyeLocation.clone().toVector().setY(0.0));
                 float angle = playerEyeLocation.getDirection().angle(vec);
 
-                double direction = MathUtil.getDirection(playerEyeLocation, targetEyeLocation);
+                double direction = MathUtil.getEyeDirection(playerEyeLocation, targetEyeLocation);
                 double dist = MathUtil.getDistanceBetweenAngles360(playerEyeLocation.getYaw(), direction);
                 double maxAngle = 35.0 + MathUtil.pingFormula(transPing) + 5;
 

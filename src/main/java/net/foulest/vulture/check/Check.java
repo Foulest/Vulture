@@ -227,7 +227,7 @@ public class Check {
             }
 
             // Executes the punishment command.
-            TaskUtil.run(() -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), checkInfo.banCommand()
+            TaskUtil.runTask(() -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), checkInfo.banCommand()
                     .replace("%player%", player.getName())
                     .replace("%check%", checkInfo.name())));
 

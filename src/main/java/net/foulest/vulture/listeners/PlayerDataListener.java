@@ -16,7 +16,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.*;
@@ -76,7 +75,7 @@ public class PlayerDataListener implements Listener {
      *
      * @param event BlockBreakEvent
      */
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
@@ -126,30 +125,6 @@ public class PlayerDataListener implements Listener {
                 && event.getBlockPlaced().getType() != Material.WATER_LILY) {
             event.setCancelled(true);
             KickUtil.kickPlayer(player, "Tried to place block against invalid block");
-        }
-    }
-
-    /**
-     * Handles block damage events.
-     *
-     * @param event BlockDamageEvent
-     */
-    @EventHandler
-    public void onBlockDamage(BlockDamageEvent event) {
-        Player player = event.getPlayer();
-        PlayerData playerData = PlayerDataManager.getPlayerData(player);
-        Block targetBlock = event.getBlock();
-
-        // Returns if the block is null.
-        if (targetBlock == null) {
-            return;
-        }
-
-        // Sets digging to true if the block is not insta-break.
-        // This is used to reliably set digging to true 100% of the time.
-        if (!event.getInstaBreak()) {
-            playerData.setDigging(true);
-            playerData.setTimestamp(ActionType.DIGGING);
         }
     }
 

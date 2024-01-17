@@ -8,6 +8,7 @@ import org.bukkit.entity.Entity;
 
 @Getter
 @Setter
+@SuppressWarnings("unused")
 public class MovingObjectPosition {
 
     private BlockPos blockPos;
@@ -45,4 +46,3 @@ public class MovingObjectPosition {
         ENTITY
     }
 }
-

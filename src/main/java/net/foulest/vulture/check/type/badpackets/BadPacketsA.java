@@ -68,14 +68,6 @@ public class BadPacketsA extends Check {
                     }
                     break;
 
-                case PacketType.Play.Client.BLOCK_DIG:
-                    if (count >= (olderThan1_8 ? 3 : 4)) {
-                        KickUtil.kickPlayer(player, event, "packet=" + packetName + " count=" + count
-                                + " fast=" + (System.currentTimeMillis() - Vulture.instance.lastLaggingFast)
-                                + " slow=" + (System.currentTimeMillis() - Vulture.instance.lastLaggingSlow));
-                    }
-                    break;
-
                 case PacketType.Play.Client.WINDOW_CLICK:
                     if (count >= (olderThan1_8 ? 3 : 6)) {
                         KickUtil.kickPlayer(player, event, "packet=" + packetName + " count=" + count
@@ -84,6 +76,7 @@ public class BadPacketsA extends Check {
                     }
                     break;
 
+                case PacketType.Play.Client.BLOCK_DIG:
                 case PacketType.Play.Client.USE_ENTITY:
                     if (count >= 4) {
                         KickUtil.kickPlayer(player, event, "packet=" + packetName + " count=" + count

@@ -60,7 +60,7 @@ public class TimerA extends Check {
                 flyingDiffs.add(System.currentTimeMillis() - lastFlyingPacket);
                 double average = flyingDiffs.stream().mapToDouble(d -> d).average().orElse(0.0);
                 double speed = 50 / average;
-                double modifier = MathUtil.getPingToTimer(transPing + 50);
+                double modifier = MathUtil.getPingToTimer(transPing + 50); // TODO: Check if this is needed and test on high ping.
                 double maxSpeed = (!playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8) ? 1.50 : 1.01) + modifier;
 
                 // Detects Timer speeds of 101.0% or higher on 1.8 and 150.0% or higher on 1.9+.

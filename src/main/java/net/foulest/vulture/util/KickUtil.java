@@ -49,8 +49,22 @@ public final class KickUtil {
         kick(player, event, debugMessage, "Disconnected", true);
     }
 
+    public static void kickPlayer(@NonNull Player player, @NonNull CancellableEvent event,
+                                  boolean valueToCheck, @NonNull String debugMessage) {
+        if (valueToCheck) {
+            kick(player, event, debugMessage, "Disconnected", true);
+        }
+    }
+
     public static void kickPlayer(@NonNull Player player, @NonNull String debugMessage, boolean announceKick) {
         kick(player, null, debugMessage, "Disconnected", announceKick);
+    }
+
+    public static void kickPlayer(@NonNull Player player, @NonNull String debugMessage,
+                                  boolean valueToCheck, boolean announceKick) {
+        if (valueToCheck) {
+            kick(player, null, debugMessage, "Disconnected", announceKick);
+        }
     }
 
     public static void kickPlayer(@NonNull Player player, @NonNull String debugMessage,
@@ -89,7 +103,7 @@ public final class KickUtil {
 
         // Kicks the player with a message.
         if (Vulture.instance.isEnabled()) {
-            TaskUtil.run(() -> {
+            TaskUtil.runTask(() -> {
                 if (player.isOnline()) {
                     player.kickPlayer(MessageUtil.colorize(reason));
                 } else {

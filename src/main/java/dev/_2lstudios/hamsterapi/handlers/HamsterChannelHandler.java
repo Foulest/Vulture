@@ -1,14 +1,17 @@
 package dev._2lstudios.hamsterapi.handlers;
 
+import dev._2lstudios.hamsterapi.events.PacketReceiveEvent;
+import dev._2lstudios.hamsterapi.events.PacketSendEvent;
 import dev._2lstudios.hamsterapi.wrappers.PacketWrapper;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import net.foulest.vulture.data.PlayerData;
-import dev._2lstudios.hamsterapi.events.PacketReceiveEvent;
-import dev._2lstudios.hamsterapi.events.PacketSendEvent;
+import net.foulest.vulture.util.MessageUtil;
 import org.bukkit.Server;
 import org.bukkit.plugin.PluginManager;
+
+import java.util.logging.Level;
 
 public class HamsterChannelHandler extends ChannelDuplexHandler {
 
@@ -22,6 +25,14 @@ public class HamsterChannelHandler extends ChannelDuplexHandler {
         this.playerData = playerData;
     }
 
+    /**
+     * Called when a packet is sent to the client.
+     *
+     * @param channelHandlerContext The channel handler context.
+     * @param packet                The packet sent.
+     * @param channelPromise        The channel promise.
+     * @throws Exception If an error occurs.
+     */
     @Override
     public void write(ChannelHandlerContext channelHandlerContext, Object packet,
                       ChannelPromise channelPromise) throws Exception {
@@ -32,6 +43,7 @@ public class HamsterChannelHandler extends ChannelDuplexHandler {
         try {
             this.pluginManager.callEvent(event);
         } catch (Exception ex) {
+            MessageUtil.log(Level.WARNING, "Failed to call PacketSendEvent!");
             ex.printStackTrace();
         }
 
@@ -40,6 +52,13 @@ public class HamsterChannelHandler extends ChannelDuplexHandler {
         }
     }
 
+    /**
+     * Called when a packet is received from the client.
+     *
+     * @param channelHandlerContext The channel handler context.
+     * @param packet                The packet received.
+     * @throws Exception If an error occurs.
+     */
     @Override
     public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
         PacketWrapper packetWrapper = new PacketWrapper(packet);
@@ -49,6 +68,7 @@ public class HamsterChannelHandler extends ChannelDuplexHandler {
         try {
             this.pluginManager.callEvent(event);
         } catch (Exception ex) {
+            MessageUtil.log(Level.WARNING, "Failed to call PacketReceiveEvent!");
             ex.printStackTrace();
         }
 

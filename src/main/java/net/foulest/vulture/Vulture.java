@@ -97,7 +97,7 @@ public class Vulture extends JavaPlugin {
             // Sets the last timestamp to the current time.
             lastTimestamp = now;
         };
-        TaskUtil.runSyncRepeating(lagTracker, 0L, 1L);
+        TaskUtil.runTaskTimer(lagTracker, 0L, 1L);
 
         // Resets the packets sent in the tick for all players every tick.
         MessageUtil.log(Level.INFO, "Initializing Packet Tracker...");
@@ -111,7 +111,7 @@ public class Vulture extends JavaPlugin {
                 playerData.setPacketsSentPerTick(0);
             }
         };
-        TaskUtil.runSyncRepeating(packetTracker, 0L, 1L);
+        TaskUtil.runTaskTimer(packetTracker, 0L, 1L);
 
         // Initializes the Command Framework.
         MessageUtil.log(Level.INFO, "Initializing Command Framework...");

@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Getter
 @Setter
 @AllArgsConstructor
+@SuppressWarnings("unused")
 public final class Observable<T> {
 
     final Set<ChangeObserver<T>> observers = Collections.newSetFromMap(new ConcurrentHashMap<>());

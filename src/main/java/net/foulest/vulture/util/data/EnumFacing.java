@@ -16,6 +16,7 @@ import java.util.Random;
 
 @Getter
 @AllArgsConstructor
+@SuppressWarnings("unused")
 public enum EnumFacing implements IStringSerializable {
     DOWN("DOWN", 0, 1, -1, "down", AxisDirection.NEGATIVE, Axis.Y, new Vector3i(0, -1, 0)),
     UP("UP", 1, 0, -1, "up", AxisDirection.POSITIVE, Axis.Y, new Vector3i(0, 1, 0)),
@@ -199,14 +200,14 @@ public enum EnumFacing implements IStringSerializable {
      * Get a Facing by its index (0-5). The order is D-U-N-S-W-E. Named getFront for legacy reasons.
      */
     public static EnumFacing getFront(int index) {
-        return VALUES[MathUtil.absInt(index % VALUES.length)];
+        return VALUES[Math.abs(index % VALUES.length)];
     }
 
     /**
      * Get a Facing by its horizontal index (0-3). The order is S-W-N-E.
      */
     public static EnumFacing getHorizontal(int index) {
-        return HORIZONTALS[MathUtil.absInt(index % HORIZONTALS.length)];
+        return HORIZONTALS[Math.abs(index % HORIZONTALS.length)];
     }
 
     /**
@@ -393,6 +394,7 @@ public enum EnumFacing implements IStringSerializable {
             return facing.getAxis().getPlane() == this;
         }
 
+        @SuppressWarnings("NullableProblems")
         public Iterator<EnumFacing> iterator() {
             return Iterators.forArray(facings());
         }

@@ -2,6 +2,7 @@ package net.foulest.vulture.data;
 
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckManager;
+import net.foulest.vulture.util.MessageUtil;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Constructor;
@@ -9,6 +10,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Level;
 
 public class PlayerDataManager {
 
@@ -47,6 +49,7 @@ public class PlayerDataManager {
                     data.getChecks().add(checkInstance);
                 } catch (NoSuchMethodException | IllegalAccessException | InstantiationException
                          | InvocationTargetException ex) {
+                    MessageUtil.log(Level.WARNING, "Failed to initialize check: " + checkClass.getSimpleName());
                     ex.printStackTrace();
                 }
             }

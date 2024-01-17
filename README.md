@@ -14,9 +14,9 @@ Vulture is a robust, free, and open-source anticheat plugin designed specificall
 - **Server Compatibility:** Exclusively compatible with Spigot 1.8.9 servers.
 
 **Combat Checks**
-- AimAssist _(x9)_
+- AimAssist _(x8)_
 - AutoBlock _(x4)_
-- AutoClicker _(x2)_
+- AutoClicker _(x1)_
 - KillAura _(x10)_
 - Reach _(x3)_
 - Velocity _(x1)_

@@ -3,6 +3,7 @@ package net.foulest.vulture.util.command;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import net.foulest.vulture.util.MessageUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -11,6 +12,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.logging.Level;
 
 /**
  * @author minnymin3
@@ -51,6 +53,7 @@ public class BukkitCompleter implements TabCompleter {
                     return (List<String>) entry.getKey().invoke(entry.getValue(),
                             new CommandArgs(sender, command, label, args, cmdLabel.split("\\.").length - 1));
                 } catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException ex) {
+                    MessageUtil.log(Level.WARNING, "Failed to tab complete command: " + cmdLabel);
                     ex.printStackTrace();
                 }
             }

@@ -22,7 +22,7 @@ public class Reflection {
 
         try {
             obtainedClass = Class.forName(className);
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException ignored) {
             // Executed when class is not found
         } finally {
             this.classes.put(className, obtainedClass);

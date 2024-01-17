@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 
 @Getter
 @Setter
+@SuppressWarnings("unused")
 public final class ConcurrentStream<T> {
 
     private final Supplier<Stream<T>> supplier;
