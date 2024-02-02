@@ -17,13 +17,13 @@ public class InventoryE extends Check {
 
     private int stage;
 
-    public InventoryE(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public InventoryE(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
-                       @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+    public void handle(CancellableNMSPacketEvent event, byte packetId,
+                       NMSPacket nmsPacket, Object packet, long timestamp) {
         if (packetId == PacketType.Play.Client.HELD_ITEM_SLOT) {
             if (stage == 2) {
                 flag(false);

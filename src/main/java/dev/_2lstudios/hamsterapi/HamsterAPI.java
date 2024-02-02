@@ -1,16 +1,18 @@
 package dev._2lstudios.hamsterapi;
 
+import dev._2lstudios.hamsterapi.handlers.HamsterChannelHandler;
+import dev._2lstudios.hamsterapi.handlers.HamsterDecoderHandler;
+import dev._2lstudios.hamsterapi.utils.Reflection;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import lombok.Getter;
 import net.foulest.vulture.data.PlayerData;
-import dev._2lstudios.hamsterapi.handlers.HamsterChannelHandler;
-import dev._2lstudios.hamsterapi.handlers.HamsterDecoderHandler;
-import dev._2lstudios.hamsterapi.utils.Reflection;
+import net.foulest.vulture.util.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.InvocationTargetException;
 import java.nio.channels.ClosedChannelException;
@@ -34,7 +36,7 @@ public class HamsterAPI {
      *
      * @param playerData The player's data.
      */
-    public static void closeChannel(PlayerData playerData) {
+    public static void closeChannel(@NotNull PlayerData playerData) {
         Channel channel = playerData.getChannel();
 
         if (channel != null && channel.isActive()) {
@@ -47,7 +49,7 @@ public class HamsterAPI {
      *
      * @param playerData The player's data.
      */
-    public static void uninject(PlayerData playerData) {
+    public static void uninject(@NotNull PlayerData playerData) {
         Channel channel = playerData.getChannel();
         boolean injected = playerData.isInjected();
 
@@ -69,7 +71,7 @@ public class HamsterAPI {
      *
      * @param playerData The player's data.
      */
-    public static void setup(PlayerData playerData) throws IllegalAccessException,
+    public static void setup(@NotNull PlayerData playerData) throws IllegalAccessException,
             InvocationTargetException, NoSuchMethodException, NoSuchFieldException {
         Player player = playerData.getPlayer();
 
@@ -90,8 +92,8 @@ public class HamsterAPI {
      *
      * @param playerData The player's data.
      */
-    public static void inject(PlayerData playerData) throws IllegalAccessException, InvocationTargetException,
-            NoSuchMethodException, NoSuchFieldException, ClosedChannelException {
+    public static void inject(@NotNull PlayerData playerData) throws IllegalAccessException,
+            InvocationTargetException, NoSuchMethodException, NoSuchFieldException, ClosedChannelException {
         if (!playerData.isInjected()) {
             setup(playerData);
 
@@ -146,7 +148,8 @@ public class HamsterAPI {
             setup(playerData);
             inject(playerData);
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException
-                 | NoSuchFieldException | ClosedChannelException ignored) {
+                 | NoSuchFieldException | ClosedChannelException ex) {
+            MessageUtil.printException(ex);
             return false;
         }
         return true;

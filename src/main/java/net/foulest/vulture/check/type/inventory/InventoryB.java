@@ -22,13 +22,13 @@ public class InventoryB extends Check {
     private long start;
     private int stage;
 
-    public InventoryB(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public InventoryB(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
-                       @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+    public void handle(CancellableNMSPacketEvent event, byte packetId,
+                       NMSPacket nmsPacket, Object packet, long timestamp) {
         if (packetId == PacketType.Play.Client.WINDOW_CLICK) {
             WrappedPacketInWindowClick windowClick = new WrappedPacketInWindowClick(nmsPacket);
             int windowId = windowClick.getWindowId();

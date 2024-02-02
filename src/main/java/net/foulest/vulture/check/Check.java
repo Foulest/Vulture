@@ -7,7 +7,6 @@ import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEve
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.event.MovementEvent;
@@ -16,10 +15,12 @@ import net.foulest.vulture.util.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  * Abstract class for checks.
@@ -36,7 +37,7 @@ public class Check {
     private final CheckInfo checkInfo;
     private int violations;
 
-    public Check(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public Check(PlayerData playerData) throws ClassNotFoundException {
         if (!getClass().isAnnotationPresent(CheckInfo.class)) {
             throw new ClassNotFoundException("Check is missing @CheckInfo annotation.");
         }
@@ -56,8 +57,8 @@ public class Check {
      * @see PacketType
      * @see NMSPacket
      */
-    public void handle(@NonNull CancellableNMSPacketEvent nmsPacketEvent, byte packetId,
-                       @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+    public void handle(CancellableNMSPacketEvent nmsPacketEvent, byte packetId,
+                       NMSPacket nmsPacket, Object packet, long timestamp) {
     }
 
     /**
@@ -68,7 +69,7 @@ public class Check {
      * @see Location
      * @see RotationEvent
      */
-    public void handle(@NonNull RotationEvent event, long timestamp) {
+    public void handle(RotationEvent event, long timestamp) {
     }
 
     /**
@@ -79,7 +80,7 @@ public class Check {
      * @see Location
      * @see MovementEvent
      */
-    public void handle(@NonNull MovementEvent event, long timestamp) {
+    public void handle(MovementEvent event, long timestamp) {
     }
 
     /**
@@ -88,7 +89,7 @@ public class Check {
      * @param event   the event to cancel
      * @param verbose the optional data to include in the flag
      */
-    protected final void flag(boolean setback, CancellableEvent event, @NonNull String... verbose) {
+    protected final void flag(boolean setback, @NotNull CancellableEvent event, String... verbose) {
         event.setCancelled(true);
         flag(setback, false, verbose);
     }
@@ -98,7 +99,7 @@ public class Check {
      *
      * @param verbose the optional data to include in the flag
      */
-    protected final void flag(boolean setback, @NonNull String... verbose) {
+    protected final void flag(boolean setback, String... verbose) {
         flag(setback, false, verbose);
     }
 
@@ -107,7 +108,7 @@ public class Check {
      *
      * @param verbose the optional data to include in the flag
      */
-    protected final void debug(@NonNull String... verbose) {
+    protected final void debug(String... verbose) {
         flag(false, true, verbose);
     }
 
@@ -118,7 +119,7 @@ public class Check {
      *
      * @param verbose the optional data to include in the flag
      */
-    protected final void flag(boolean setback, boolean debug, @NonNull String... verbose) {
+    protected final void flag(boolean setback, boolean debug, String... verbose) {
         // Checks the player for exemptions.
         if (playerData.isNewViolationsPaused()
                 || KickUtil.isPlayerBeingKicked(player)
@@ -169,7 +170,8 @@ public class Check {
                     }
                 }
             }
-        } catch (ConcurrentModificationException ignored) {
+        } catch (ConcurrentModificationException ex) {
+            MessageUtil.printException(ex);
         }
 
         // Increments the violations.
@@ -223,7 +225,7 @@ public class Check {
                 List<String> banMessageEdited = new ArrayList<>(Settings.banMessage);
                 banMessageEdited.replaceAll(s -> s.replace("%player%", player.getName()));
                 banMessageEdited.replaceAll(s -> s.replace("%check%", checkInfo.name()));
-                MessageUtil.broadcastList(banMessageEdited);
+                MessageUtil.broadcast(banMessageEdited);
             }
 
             // Executes the punishment command.

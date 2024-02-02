@@ -3,6 +3,7 @@ package net.foulest.vulture.util;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,7 +20,7 @@ public class BeaconUtil {
      * @param beaconLocation The location of the beacon.
      * @return The tier of the beacon.
      */
-    public static int getTier(Location beaconLocation) {
+    public static int getTier(@NotNull Location beaconLocation) {
         Block beaconBlock = beaconLocation.getBlock();
         int calculatedTier = 0;
 

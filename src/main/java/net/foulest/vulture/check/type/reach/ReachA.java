@@ -24,12 +24,12 @@ public class ReachA extends Check {
 
     private double buffer;
 
-    public ReachA(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public ReachA(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull MovementEvent event, long timestamp) {
+    public void handle(MovementEvent event, long timestamp) {
         // Checks the player for exemptions.
         if (player.getGameMode().equals(GameMode.CREATIVE)
                 || player.isInsideVehicle()

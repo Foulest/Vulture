@@ -38,7 +38,6 @@ import io.github.retrooper.packetevents.utils.player.Direction;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import io.github.retrooper.packetevents.utils.vector.Vector3f;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
-import lombok.NonNull;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.data.PlayerData;
@@ -63,6 +62,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -86,7 +86,7 @@ public class PacketProcessor extends Processor {
      * @param event PacketDecodeEvent
      */
     @EventHandler
-    public void onPacketDecode(PacketDecodeEvent event) {
+    public void onPacketDecode(@NotNull PacketDecodeEvent event) {
         PlayerData playerData = event.getPlayerData();
         Player player = playerData.getPlayer();
 
@@ -128,7 +128,7 @@ public class PacketProcessor extends Processor {
      */
     @Override
     @SuppressWarnings("deprecation")
-    public void onPacketPlayReceive(@NonNull PacketPlayReceiveEvent event) {
+    public void onPacketPlayReceive(@NotNull PacketPlayReceiveEvent event) {
         // Cancels incoming packets for invalid players.
         if (Bukkit.getPlayer(event.getPlayer().getUniqueId()) == null) {
             event.setCancelled(true);
@@ -1784,7 +1784,7 @@ public class PacketProcessor extends Processor {
      * @param event The packet event.
      */
     @Override
-    public void onPacketPlaySend(@NonNull PacketPlaySendEvent event) {
+    public void onPacketPlaySend(@NotNull PacketPlaySendEvent event) {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
@@ -1933,8 +1933,8 @@ public class PacketProcessor extends Processor {
      * @param playerData The player data.
      * @param event      The packet event.
      */
-    private void handlePacketChecks(@NonNull PlayerData playerData,
-                                    @NonNull CancellableNMSPacketEvent event,
+    private void handlePacketChecks(@NotNull PlayerData playerData,
+                                    @NotNull CancellableNMSPacketEvent event,
                                     boolean sendingServerPackets) {
         long timestamp = System.currentTimeMillis();
         NMSPacket nmsPacket = event.getNMSPacket();
@@ -1961,7 +1961,7 @@ public class PacketProcessor extends Processor {
      * @param playerData The player data.
      * @param event      The rotation event.
      */
-    private void handleRotationChecks(@NonNull PlayerData playerData, @NonNull RotationEvent event) {
+    private void handleRotationChecks(@NotNull PlayerData playerData, RotationEvent event) {
         long timestamp = System.currentTimeMillis();
 
         // Create a copy of the checks list to avoid ConcurrentModificationException
@@ -1980,7 +1980,7 @@ public class PacketProcessor extends Processor {
      * @param playerData The player data.
      * @param event      The movement event.
      */
-    private void handleMovementChecks(@NonNull PlayerData playerData, @NonNull MovementEvent event) {
+    private void handleMovementChecks(@NotNull PlayerData playerData, MovementEvent event) {
         long timestamp = System.currentTimeMillis();
 
         // Create a copy of the checks list to avoid ConcurrentModificationException
@@ -2003,8 +2003,8 @@ public class PacketProcessor extends Processor {
      * @param steerVehicle The SteerVehicle packet.
      * @param value        The value to check.
      */
-    private void steerVehicleCheck(@NonNull Player player, @NonNull PacketPlayReceiveEvent event,
-                                   @NonNull WrappedPacketInSteerVehicle steerVehicle, float value) {
+    private void steerVehicleCheck(Player player, PacketPlayReceiveEvent event,
+                                   WrappedPacketInSteerVehicle steerVehicle, float value) {
         if (Math.abs(value) == 0.98f) {
             if (steerVehicle.isDismount()) {
                 KickUtil.kickPlayer(player, event, Settings.steerVehicleInvalidDismountValue,
@@ -2032,7 +2032,7 @@ public class PacketProcessor extends Processor {
      * @param packetId The packet id.
      * @return The packet class.
      */
-    public static Class<?> getPacketFromId(@NonNull Byte packetId) {
+    public static Class<?> getPacketFromId(Byte packetId) {
         return PacketType.packetIDMap.entrySet().stream()
                 .filter(entry -> Objects.equals(entry.getValue(), packetId))
                 .map(Map.Entry::getKey)

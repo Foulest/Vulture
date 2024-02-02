@@ -19,15 +19,15 @@ public class BadPacketsD extends Check {
     private long lastPosition;
     private long lastTransaction;
 
-    public BadPacketsD(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public BadPacketsD(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
         lastPosition = System.currentTimeMillis();
         lastTransaction = System.currentTimeMillis();
     }
 
     @Override
-    public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
-                       @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+    public void handle(CancellableNMSPacketEvent event, byte packetId,
+                       NMSPacket nmsPacket, Object packet, long timestamp) {
         if (PacketType.Play.Client.Util.isInstanceOfFlying(packetId)) {
             WrappedPacketInFlying flying = new WrappedPacketInFlying(nmsPacket);
 

@@ -16,13 +16,13 @@ public class AutoBlockC extends Check {
 
     private int buffer;
 
-    public AutoBlockC(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public AutoBlockC(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
-                       @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+    public void handle(CancellableNMSPacketEvent event, byte packetId,
+                       NMSPacket nmsPacket, Object packet, long timestamp) {
         if (packetId == PacketType.Play.Client.BLOCK_PLACE) {
             boolean blocking = playerData.isBlocking();
             boolean eating = playerData.isEating();

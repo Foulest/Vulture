@@ -2,7 +2,6 @@ package net.foulest.vulture.util.raytrace;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -12,6 +11,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,7 +21,7 @@ import java.util.Collection;
 @SuppressWarnings("unused")
 public class RayTraceUtil {
 
-    public static Block getBlockPlayerLookingAt(@NonNull Player player, double distance) {
+    public static Block getBlockPlayerLookingAt(Player player, double distance) {
         RayTrace rayTrace = new RayTrace(player.getEyeLocation().toVector(), player.getEyeLocation().getDirection());
         ArrayList<Vector> positions = rayTrace.traverse(distance, 0.01);
 
@@ -37,7 +37,7 @@ public class RayTraceUtil {
         return null;
     }
 
-    public static Entity getEntityPlayerLookingAt(@NonNull Player player, double distance) {
+    public static Entity getEntityPlayerLookingAt(@NotNull Player player, double distance) {
         RayTrace rayTrace = new RayTrace(player.getEyeLocation().toVector(), player.getEyeLocation().getDirection());
         ArrayList<Vector> positions = rayTrace.traverse(distance, 0.01);
 
@@ -82,7 +82,7 @@ public class RayTraceUtil {
         }
 
         // Checks if a position is on contained within the position
-        public boolean isOnLine(@NonNull Vector position) {
+        public boolean isOnLine(@NotNull Vector position) {
             double t = (position.getX() - origin.getX()) / direction.getX();
             return position.getBlockY() == origin.getY() + (t * direction.getY())
                     && position.getBlockZ() == origin.getZ() + (t * direction.getZ());
@@ -99,7 +99,7 @@ public class RayTraceUtil {
         }
 
         // Intersection detection for current raytrace
-        public boolean intersects(@NonNull Vector min, @NonNull Vector max,
+        public boolean intersects(Vector min, Vector max,
                                   double blocksAway, double accuracy) {
             ArrayList<Vector> positions = traverse(blocksAway, accuracy);
 
@@ -112,7 +112,7 @@ public class RayTraceUtil {
         }
 
         // BoundingBox instead of Vector
-        public boolean intersects(@NonNull BoundingBox boundingBox, double blocksAway, double accuracy) {
+        public boolean intersects(BoundingBox boundingBox, double blocksAway, double accuracy) {
             ArrayList<Vector> positions = traverse(blocksAway, accuracy);
 
             for (Vector position : positions) {
@@ -124,7 +124,7 @@ public class RayTraceUtil {
         }
 
         // General intersection detection
-        public static boolean intersects(@NonNull Vector position, @NonNull Vector min, @NonNull Vector max) {
+        public static boolean intersects(@NotNull Vector position, @NotNull Vector min, Vector max) {
             if (position.getX() < min.getX() || position.getX() > max.getX()) {
                 return false;
             } else if (position.getY() < min.getY() || position.getY() > max.getY()) {
@@ -135,7 +135,7 @@ public class RayTraceUtil {
         }
 
         // Intersection detection for current raytrace with return
-        public Vector positionOfIntersect(@NonNull Vector min, @NonNull Vector max,
+        public Vector positionOfIntersect(Vector min, Vector max,
                                           double blocksAway, double accuracy) {
             ArrayList<Vector> positions = traverse(blocksAway, accuracy);
 
@@ -148,7 +148,7 @@ public class RayTraceUtil {
         }
 
         // BoundingBox instead of Vector
-        public Vector positionOfIntersect(@NonNull BoundingBox boundingBox, double blocksAway, double accuracy) {
+        public Vector positionOfIntersect(BoundingBox boundingBox, double blocksAway, double accuracy) {
             ArrayList<Vector> positions = traverse(blocksAway, accuracy);
 
             for (Vector position : positions) {
@@ -160,7 +160,7 @@ public class RayTraceUtil {
         }
 
         // debug / effects
-        public void highlight(@NonNull World world, double blocksAway, double accuracy) {
+        public void highlight(World world, double blocksAway, double accuracy) {
             for (Vector position : traverse(blocksAway, accuracy)) {
                 world.playEffect(position.toLocation(world), Effect.COLOURED_DUST, 0);
             }

@@ -1,7 +1,6 @@
 package net.foulest.vulture.check.type.flight;
 
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
-import lombok.NonNull;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
@@ -12,6 +11,7 @@ import net.foulest.vulture.util.BlockUtil;
 import net.foulest.vulture.util.MessageUtil;
 import net.foulest.vulture.util.MovementUtil;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.NotNull;
 
 @CheckInfo(name = "Flight (A)", type = CheckType.FLIGHT,
         description = "Checks for invalid y-axis movement when falling.")
@@ -33,12 +33,12 @@ public class FlightA extends Check {
     private int notOnGroundTicks;
     private int flatDeltaYTicks;
 
-    public FlightA(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public FlightA(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull MovementEvent event, long timestamp) {
+    public void handle(@NotNull MovementEvent event, long timestamp) {
         double deltaY = event.getDeltaY();
         double velocity = player.getVelocity().getY();
         double takenVelocity = playerData.getVelocityY();

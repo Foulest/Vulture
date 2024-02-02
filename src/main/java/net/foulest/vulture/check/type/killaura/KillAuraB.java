@@ -16,13 +16,13 @@ public class KillAuraB extends Check {
     private boolean sentInteract;
     private boolean sentAttack;
 
-    public KillAuraB(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public KillAuraB(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
-                       @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+    public void handle(CancellableNMSPacketEvent event, byte packetId,
+                       NMSPacket nmsPacket, Object packet, long timestamp) {
         if (PacketType.Play.Client.Util.isInstanceOfFlying(packetId)) {
             sentInteract = false;
             sentAttack = false;

@@ -28,12 +28,12 @@ public final class Observable<T> {
         observers.forEach((it) -> it.handle(oldValue, value));
     }
 
-    public ChangeObserver<T> observe(@NonNull ChangeObserver<T> onChange) {
+    public ChangeObserver<T> observe(ChangeObserver<T> onChange) {
         observers.add(onChange);
         return onChange;
     }
 
-    public void unobserve(@NonNull ChangeObserver<T> onChange) {
+    public void unobserve(ChangeObserver<T> onChange) {
         observers.remove(onChange);
     }
 

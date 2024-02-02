@@ -6,6 +6,7 @@ import dev._2lstudios.hamsterapi.utils.Reflection;
 import lombok.Getter;
 import net.foulest.vulture.util.MessageUtil;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -28,7 +29,7 @@ public class PacketWrapper {
     private final Map<String, ItemStack> items = new HashMap<>();
     private final Map<String, Object> objects = new HashMap<>();
 
-    public PacketWrapper(Object packet) {
+    public PacketWrapper(@NotNull Object packet) {
         Reflection reflection = HamsterAPI.reflection;
 
         Class<?> minecraftKeyClass = reflection.getMinecraftKey();
@@ -37,8 +38,8 @@ public class PacketWrapper {
         Class<?> nmsItemStackClass = reflection.getItemStack();
 
         this.packet = packet;
-        this.name = packetClass.getSimpleName();
-        this.craftItemStackClass = reflection.getCraftItemStack();
+        name = packetClass.getSimpleName();
+        craftItemStackClass = reflection.getCraftItemStack();
 
         for (Field field : packetClass.getDeclaredFields()) {
             try {
@@ -48,48 +49,47 @@ public class PacketWrapper {
                 Object value = field.get(packet);
 
                 if (value instanceof String) {
-                    this.strings.put(fieldName, (String) value);
+                    strings.put(fieldName, (String) value);
                 } else if (value instanceof Integer) {
-                    this.integers.put(fieldName, (Integer) value);
+                    integers.put(fieldName, (Integer) value);
                 } else if (value instanceof Float) {
-                    this.floats.put(fieldName, (Float) value);
+                    floats.put(fieldName, (Float) value);
                 } else if (value instanceof Double) {
-                    this.doubles.put(fieldName, (Double) value);
+                    doubles.put(fieldName, (Double) value);
                 } else if (value instanceof Boolean) {
-                    this.booleans.put(fieldName, (Boolean) value);
+                    booleans.put(fieldName, (Boolean) value);
                 } else if (minecraftKeyClass != null && minecraftKeyClass.isInstance(value)) {
-                    this.strings.put(fieldName, value.toString());
+                    strings.put(fieldName, value.toString());
                 }
 
                 if (itemStackClass.isInstance(value)) {
                     Method asBukkitCopy = craftItemStackClass.getMethod("asBukkitCopy", nmsItemStackClass);
                     ItemStack itemStack = (ItemStack) asBukkitCopy.invoke(null, value);
 
-                    this.items.put(fieldName, itemStack);
-                    this.objects.put(fieldName, itemStack);
+                    items.put(fieldName, itemStack);
+                    objects.put(fieldName, itemStack);
                 } else {
-                    this.objects.put(fieldName, value);
+                    objects.put(fieldName, value);
                 }
 
                 field.setAccessible(false);
             } catch (Exception ex) {
-                MessageUtil.log(Level.WARNING, "Failed to read field " + field.getName() + " in " + packetClass.getName());
-                ex.printStackTrace();
+                MessageUtil.printException(ex);
             }
         }
     }
 
     public boolean isPacketType(String packetName) {
-        return this.name.equals(packetName);
+        return name.equals(packetName);
     }
 
-    public boolean isPacketType(PacketType packetType) {
-        return this.name.contains(packetType.toString());
+    public boolean isPacketType(@NotNull PacketType packetType) {
+        return name.contains(packetType.toString());
     }
 
     public PacketType getType() {
         for (PacketType packetType : PacketType.values()) {
-            if (packetType.name().equals(this.name)) {
+            if (packetType.name().equals(name)) {
                 return packetType;
             }
         }
@@ -98,19 +98,18 @@ public class PacketWrapper {
 
     public void write(String key, Object value) {
         try {
-            Field field = this.packet.getClass().getDeclaredField(key);
+            Field field = packet.getClass().getDeclaredField(key);
             field.setAccessible(true);
             field.set(packet, value);
             field.setAccessible(false);
         } catch (Exception ex) {
-            MessageUtil.log(Level.WARNING, "Failed to write field " + key + " in " + this.packet.getClass().getName());
-            ex.printStackTrace();
+            MessageUtil.printException(ex);
         }
     }
 
     public void write(String key, ItemStack itemStack) {
         try {
-            Field field = this.packet.getClass().getDeclaredField(key);
+            Field field = packet.getClass().getDeclaredField(key);
             Method asNmsCopy = craftItemStackClass.getMethod("asNMSCopy", ItemStack.class);
             Object nmsItemStack = asNmsCopy.invoke(null, itemStack);
 
@@ -118,40 +117,39 @@ public class PacketWrapper {
             field.set(packet, nmsItemStack);
             field.setAccessible(false);
         } catch (Exception ex) {
-            MessageUtil.log(Level.WARNING, "Failed to write field " + key + " in " + this.packet.getClass().getName());
-            ex.printStackTrace();
+            MessageUtil.printException(ex);
         }
     }
 
     public String getString(String key) {
-        return this.strings.get(key);
+        return strings.get(key);
     }
 
     public int getInteger(String key) {
-        return this.integers.get(key);
+        return integers.get(key);
     }
 
     public boolean getBoolean(String key) {
-        return this.booleans.get(key);
+        return booleans.get(key);
     }
 
     public double getDouble(String key) {
-        return this.doubles.get(key);
+        return doubles.get(key);
     }
 
     public float getFloat(String key) {
-        return this.floats.get(key);
+        return floats.get(key);
     }
 
     public ItemStack getItem(String key) {
-        return this.items.get(key);
+        return items.get(key);
     }
 
     public Map<String, Double> getDouble() {
-        return this.doubles;
+        return doubles;
     }
 
     public String toString() {
-        return this.packet.toString();
+        return packet.toString();
     }
 }

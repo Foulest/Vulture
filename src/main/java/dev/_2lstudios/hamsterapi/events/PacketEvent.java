@@ -15,7 +15,7 @@ public class PacketEvent extends Event implements Cancellable {
     private final ChannelHandlerContext channelHandlerContext;
     private final PlayerData playerData;
     @Setter
-    private boolean cancelled = false;
+    private boolean cancelled;
 
     public PacketEvent(ChannelHandlerContext channelHandlerContext, PlayerData playerData, boolean async) {
         super(async);

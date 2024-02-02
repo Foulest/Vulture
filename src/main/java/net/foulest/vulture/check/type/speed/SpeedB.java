@@ -1,11 +1,11 @@
 package net.foulest.vulture.check.type.speed;
 
-import lombok.NonNull;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.event.MovementEvent;
+import org.jetbrains.annotations.NotNull;
 
 @CheckInfo(name = "Speed (B)", type = CheckType.SPEED)
 public class SpeedB extends Check {
@@ -13,12 +13,12 @@ public class SpeedB extends Check {
     private double buffer;
     private double lastDeltaXZ;
 
-    public SpeedB(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public SpeedB(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull MovementEvent event, long timestamp) {
+    public void handle(@NotNull MovementEvent event, long timestamp) {
         double deltaXZ = event.getDeltaXZ();
 
         // Checks the player for exemptions.

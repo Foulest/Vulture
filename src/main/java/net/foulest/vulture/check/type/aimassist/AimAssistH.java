@@ -1,12 +1,12 @@
 package net.foulest.vulture.check.type.aimassist;
 
 import com.google.common.collect.Lists;
-import lombok.NonNull;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.event.RotationEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Deque;
 
@@ -16,12 +16,12 @@ public class AimAssistH extends Check {
     private final Deque<Double> samples = Lists.newLinkedList();
     private double buffer;
 
-    public AimAssistH(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public AimAssistH(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull RotationEvent event, long timestamp) {
+    public void handle(@NotNull RotationEvent event, long timestamp) {
         double deltaPitch = event.getDeltaPitch();
 
         if (deltaPitch > 0.0 && deltaPitch < 40.0) {

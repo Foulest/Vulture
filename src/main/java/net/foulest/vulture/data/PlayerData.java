@@ -6,7 +6,6 @@ import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import io.netty.channel.Channel;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
@@ -22,6 +21,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -47,19 +47,19 @@ public class PlayerData {
     private Class<?> iChatBaseComponentClass;
     private Method toChatBaseComponent;
     private Method sendPacketMethod;
-    private boolean setup = false;
-    private boolean injected = false;
+    private boolean setup;
+    private boolean injected;
 
     // Packet Counts
     private final Map<Byte, Integer> packetCounts = new HashMap<>();
-    private int packetsSentPerTick = 0;
+    private int packetsSentPerTick;
 
     // Timestamps
     private Map<ActionType, Long> actionTimestamps = new HashMap<>();
     private long transPing;
 
     // Ticks
-    private int totalTicks = 0;
+    private int totalTicks;
     private int aboveBlockTicks;
     private int aboveBlockTicksStrict;
     private int underBlockTicks;
@@ -83,8 +83,8 @@ public class PlayerData {
     private WrappedPacketInFlying lastPositionPacket;
 
     // Other data
-    private boolean alertsEnabled = false;
-    private boolean newViolationsPaused = false;
+    private boolean alertsEnabled;
+    private boolean newViolationsPaused;
     private int positionCheckerTaskId;
     private List<Violation> violations = new ArrayList<>();
     private List<PayloadType> payloads = new ArrayList<>();
@@ -170,7 +170,7 @@ public class PlayerData {
     private boolean inCamera;
     private boolean inUnloadedChunk;
     private boolean touchedGroundSinceLogin;
-    private boolean underEffectOfSlime = false;
+    private boolean underEffectOfSlime;
 
     // Abilities packet
     private boolean flying;
@@ -181,29 +181,29 @@ public class PlayerData {
     private float walkSpeed;
 
     // Other packets
-    private boolean eating = false;
-    private boolean drinking = false;
+    private boolean eating;
+    private boolean drinking;
 
     // Animation packet
-    private boolean inBed = false;
+    private boolean inBed;
 
     // BlockDig packet
-    private boolean digging = false;
+    private boolean digging;
 
     // BlockPlace packet
-    private boolean blocking = false;
-    private boolean shootingBow = false;
-    private boolean placingBlock = false;
+    private boolean blocking;
+    private boolean shootingBow;
+    private boolean placingBlock;
 
     // EntityAction packet
-    private boolean sprinting = false;
-    private boolean sneaking = false;
-    private boolean inventoryOpen = false;
+    private boolean sprinting;
+    private boolean sneaking;
+    private boolean inventoryOpen;
 
     // HeldItemSlot packet
     private int currentSlot = -1;
 
-    public PlayerData(UUID uniqueId, Player player) {
+    public PlayerData(UUID uniqueId, @NotNull Player player) {
         this.uniqueId = uniqueId;
         this.player = player;
 
@@ -227,8 +227,8 @@ public class PlayerData {
      * @param flying       Flying packet.
      * @param isPrimarySet If the primary location is being set.
      */
-    public static void updateFlyingLocations(@NonNull PlayerData data,
-                                             @NonNull WrappedPacketInFlying flying,
+    public static void updateFlyingLocations(PlayerData data,
+                                             @NotNull WrappedPacketInFlying flying,
                                              boolean isPrimarySet) {
         if (flying.isMoving()) {
             if (isPrimarySet) {

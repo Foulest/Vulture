@@ -2,7 +2,6 @@ package net.foulest.vulture.check.type.speed;
 
 import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
-import lombok.NonNull;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
@@ -13,6 +12,7 @@ import net.foulest.vulture.util.MovementUtil;
 import org.bukkit.GameMode;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 @CheckInfo(name = "Speed (D)", type = CheckType.SPEED,
         description = "Checks for invalid movement when sprinting.")
@@ -20,12 +20,12 @@ public class SpeedD extends Check {
 
     private double buffer;
 
-    public SpeedD(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public SpeedD(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull MovementEvent event, long timestamp) {
+    public void handle(@NotNull MovementEvent event, long timestamp) {
         WrappedPacketInFlying to = event.getTo();
         WrappedPacketInFlying from = event.getFrom();
 
@@ -54,7 +54,7 @@ public class SpeedD extends Check {
 
         Vector direction = MathUtil.getEyeDirection(player);
 
-        double speedDelta = MathUtil.getVectorSpeed(fromPosition, toPosition).distanceSquared(direction);
+        double speedDelta = MathUtil.getVectorSpeed(toPosition, fromPosition).distanceSquared(direction);
         double maxDelta = 0.25; // was 0.221; changed to fix false flags with Controllable mod
         double speedLevel = MovementUtil.getPotionEffectLevel(player, PotionEffectType.SPEED);
 

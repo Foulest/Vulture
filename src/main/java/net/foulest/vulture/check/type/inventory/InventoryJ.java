@@ -21,13 +21,13 @@ public class InventoryJ extends Check {
     private Vector3i lastBlockPosition;
     private Float lastYaw;
 
-    public InventoryJ(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public InventoryJ(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
-                       @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+    public void handle(CancellableNMSPacketEvent event, byte packetId,
+                       NMSPacket nmsPacket, Object packet, long timestamp) {
         if (packetId == PacketType.Play.Client.BLOCK_PLACE) {
             WrappedPacketInBlockPlace blockPlace = new WrappedPacketInBlockPlace(nmsPacket);
 

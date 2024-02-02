@@ -22,13 +22,13 @@ public class KillAuraH extends Check {
     private double buffer;
     private double buffer2;
 
-    public KillAuraH(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public KillAuraH(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
-                       @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+    public void handle(CancellableNMSPacketEvent event, byte packetId,
+                       NMSPacket nmsPacket, Object packet, long timestamp) {
         // Checks the player for exemptions.
         if (playerData.getLastAttackTick() > 2) {
             return;

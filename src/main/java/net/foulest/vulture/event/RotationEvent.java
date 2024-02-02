@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import net.foulest.vulture.data.PlayerData;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
 @Setter
@@ -37,7 +38,7 @@ public class RotationEvent {
      *
      * @return Whether or not the player is teleporting.
      */
-    public boolean isTeleport(PlayerData playerData) {
+    public boolean isTeleport(@NotNull PlayerData playerData) {
         return playerData.isTeleporting(to.getPosition());
     }
 }

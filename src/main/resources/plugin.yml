@@ -1,5 +1,5 @@
 name: Vulture
-version: '1.4.5'
+version: ${project.version}
 main: net.foulest.vulture.Vulture
 author: Foulest
 load: POSTWORLD

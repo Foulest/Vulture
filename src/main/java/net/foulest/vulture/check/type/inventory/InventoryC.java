@@ -21,13 +21,13 @@ public class InventoryC extends Check {
     private long start;
     private int stage;
 
-    public InventoryC(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public InventoryC(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
-                       @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+    public void handle(CancellableNMSPacketEvent event, byte packetId,
+                       NMSPacket nmsPacket, Object packet, long timestamp) {
         if (packetId == PacketType.Play.Client.HELD_ITEM_SLOT) {
             if (stage == 0 || stage == 2) {
                 if (stage == 0) {

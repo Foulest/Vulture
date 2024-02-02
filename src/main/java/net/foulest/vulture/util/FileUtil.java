@@ -20,8 +20,7 @@ public class FileUtil {
             @Cleanup BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
             writer.write(data);
         } catch (IOException ex) {
-            MessageUtil.log(Level.WARNING, "Failed to print data to file: " + fileName);
-            ex.printStackTrace();
+            MessageUtil.printException(ex);
         }
     }
 }

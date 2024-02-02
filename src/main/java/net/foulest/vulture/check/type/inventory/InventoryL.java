@@ -16,13 +16,13 @@ public class InventoryL extends Check {
 
     private boolean inventoryOpen;
 
-    public InventoryL(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public InventoryL(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
-                       @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+    public void handle(CancellableNMSPacketEvent event, byte packetId,
+                       NMSPacket nmsPacket, Object packet, long timestamp) {
         String packetName = PacketProcessor.getPacketFromId(packetId).getSimpleName();
 
         // This is a very bare-bones way of checking if an inventory is open.

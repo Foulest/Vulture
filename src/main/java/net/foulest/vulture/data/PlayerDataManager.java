@@ -4,6 +4,7 @@ import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckManager;
 import net.foulest.vulture.util.MessageUtil;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -23,7 +24,7 @@ public class PlayerDataManager {
      * @param player The player to get.
      * @return The player's data.
      */
-    public static PlayerData getPlayerData(Player player) {
+    public static PlayerData getPlayerData(@NotNull Player player) {
         if (playerDataMap.containsKey(player.getUniqueId())) {
             return playerDataMap.get(player.getUniqueId());
         } else {
@@ -37,7 +38,7 @@ public class PlayerDataManager {
      *
      * @param player The player to add.
      */
-    public static void addPlayerData(Player player) {
+    public static void addPlayerData(@NotNull Player player) {
         if (!playerDataMap.containsKey(player.getUniqueId())) {
             PlayerData data = new PlayerData(player.getUniqueId(), player);
 
@@ -49,8 +50,7 @@ public class PlayerDataManager {
                     data.getChecks().add(checkInstance);
                 } catch (NoSuchMethodException | IllegalAccessException | InstantiationException
                          | InvocationTargetException ex) {
-                    MessageUtil.log(Level.WARNING, "Failed to initialize check: " + checkClass.getSimpleName());
-                    ex.printStackTrace();
+                    MessageUtil.printException(ex);
                 }
             }
 
@@ -64,7 +64,7 @@ public class PlayerDataManager {
      *
      * @param player The player to remove.
      */
-    public static void removePlayerData(Player player) {
+    public static void removePlayerData(@NotNull Player player) {
         playerDataMap.remove(player.getUniqueId());
     }
 }

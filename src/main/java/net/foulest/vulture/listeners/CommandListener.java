@@ -47,9 +47,9 @@ public class CommandListener implements Listener {
      * @param command The command.
      * @param sender  The sender.
      */
-    private void processCommand(@NonNull Cancellable event,
-                       @NonNull String command,
-                       @NonNull CommandSender sender) {
+    private void processCommand(Cancellable event,
+                                String command,
+                                CommandSender sender) {
         // Check if the command is blacklisted.
         for (String string : Settings.blacklistedCommands) {
             Pattern pattern = Pattern.compile(string);

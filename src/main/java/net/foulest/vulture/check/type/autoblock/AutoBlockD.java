@@ -18,13 +18,13 @@ public class AutoBlockD extends Check {
 
     private boolean sent;
 
-    public AutoBlockD(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public AutoBlockD(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
-                       @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+    public void handle(CancellableNMSPacketEvent event, byte packetId,
+                       NMSPacket nmsPacket, Object packet, long timestamp) {
         if (packetId == PacketType.Play.Client.BLOCK_PLACE) {
             WrappedPacketInBlockPlace blockPlace = new WrappedPacketInBlockPlace(nmsPacket);
             Direction direction = blockPlace.getDirection();

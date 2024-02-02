@@ -15,12 +15,12 @@ public class FlightD extends Check {
     private double buffer;
     private int ticksRising;
 
-    public FlightD(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public FlightD(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull MovementEvent event, long timestamp) {
+    public void handle(MovementEvent event, long timestamp) {
         // Checks the player for exemptions.
         if (player.isFlying()
                 || playerData.isNearClimbable()

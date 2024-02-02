@@ -9,9 +9,9 @@ import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.util.MessageUtil;
 import org.bukkit.Server;
 import org.bukkit.plugin.PluginManager;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.logging.Level;
 
 public class HamsterDecoderHandler extends ByteToMessageDecoder {
 
@@ -19,9 +19,9 @@ public class HamsterDecoderHandler extends ByteToMessageDecoder {
     private final PluginManager pluginManager;
     private final PlayerData playerData;
 
-    public HamsterDecoderHandler(PlayerData playerData) {
-        this.server = playerData.getPlayer().getServer();
-        this.pluginManager = server.getPluginManager();
+    public HamsterDecoderHandler(@NotNull PlayerData playerData) {
+        server = playerData.getPlayer().getServer();
+        pluginManager = server.getPluginManager();
         this.playerData = playerData;
     }
 
@@ -39,10 +39,9 @@ public class HamsterDecoderHandler extends ByteToMessageDecoder {
         PacketDecodeEvent event = new PacketDecodeEvent(channelHandlerContext, playerData, byteBufWrapper, async);
 
         try {
-            this.pluginManager.callEvent(event);
+            pluginManager.callEvent(event);
         } catch (Exception ex) {
-            MessageUtil.log(Level.WARNING, "Failed to call PacketDecodeEvent!");
-            ex.printStackTrace();
+            MessageUtil.printException(ex);
         }
 
         if (!event.isCancelled()) {

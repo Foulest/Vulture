@@ -1,5 +1,6 @@
 # Vulture
 # Version: ${project.version}
+#
 # Created by: Foulest (https://github.com/Foulest/Vulture)
 # License: GPLv3 (https://github.com/Foulest/Vulture/LICENSE)
 vulture:
@@ -7,20 +8,21 @@ vulture:
   prefix: '&e[Vulture]'
 
   # The ban message broadcast to the server when a player is banned.
-  # This message will appear for banCommands that are not 'vulture kick'.
-  # Set this to '[]' to disable the broadcast message.
+  # This message will appear for banCommands that are not 'vulture kick.'
+  # Set this to '[]' to turn off the broadcast message.
   # Placeholders: %player%, %check%
   banMessage:
     - '&c%player% has been removed from the network.'
 
-  # The amount of seconds in between a player's violations being reset.
-  # Set this to -1 to disable violations resetting over time.
+  # The number of seconds in between a player's violations being reset.
+  # Set this to -1 to turn off violations resetting over time.
   # Violations automatically reset when a player logs out.
   resetViolations: 600
 
 blacklisted:
   # The list of blacklisted payloads.
   # When a player sends a blacklisted payload, they will be automatically kicked.
+  #
   # For a list of payloads, visit the link below and look at the second column of each PayloadType.
   # https://github.com/Foulest/Vulture/blob/main/src/main/java/net/foulest/vulture/check/type/clientbrand/ClientBrand.java
   payloads:
@@ -45,9 +47,9 @@ blacklisted:
 # The list of checks to be enabled.
 # Each check has a list of options.
 #
-# The 'enabled' option is used to enable/disable the check.
-# The 'maxViolations' option is used to set the maximum amount of violations a player can have before being banned.
-# The 'banCommand' option is used to set the command that is executed when a player is banned.
+# The 'enabled' option turns the check on/off.
+# The 'maxViolations' option sets the maximum number of violations a player can have before being banned.
+# The 'banCommand' option sets the command executed when a player is banned.
 # Placeholders: %player%, %check%
 #
 # Some checks have additional and/or missing options.
@@ -311,10 +313,12 @@ checks:
       maxViolations: 10
       banCommand: vulture kick %player% %check%
 
-# The list of protections to be enabled.
-# Modifying these settings are NOT recommended and are for experienced server owners only.
+# The list of packet and exploit protections to be enabled.
+# Each protection has a list of options.
+#
+# Modifying these settings is NOT recommended and only for experienced server owners.
 # Disabling protections will allow players to use exploits and send invalid or modified packets.
-# If you are unsure of what a packet protection does, leave it at the default value.
+# Leave it at the default value if unsure what a specific protection does.
 protections:
   exploits:
     world:

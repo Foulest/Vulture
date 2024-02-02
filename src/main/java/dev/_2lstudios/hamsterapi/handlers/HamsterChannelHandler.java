@@ -10,8 +10,7 @@ import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.util.MessageUtil;
 import org.bukkit.Server;
 import org.bukkit.plugin.PluginManager;
-
-import java.util.logging.Level;
+import org.jetbrains.annotations.NotNull;
 
 public class HamsterChannelHandler extends ChannelDuplexHandler {
 
@@ -19,9 +18,9 @@ public class HamsterChannelHandler extends ChannelDuplexHandler {
     private final PluginManager pluginManager;
     private final PlayerData playerData;
 
-    public HamsterChannelHandler(PlayerData playerData) {
-        this.server = playerData.getPlayer().getServer();
-        this.pluginManager = server.getPluginManager();
+    public HamsterChannelHandler(@NotNull PlayerData playerData) {
+        server = playerData.getPlayer().getServer();
+        pluginManager = server.getPluginManager();
         this.playerData = playerData;
     }
 
@@ -41,10 +40,9 @@ public class HamsterChannelHandler extends ChannelDuplexHandler {
         PacketSendEvent event = new PacketSendEvent(channelHandlerContext, playerData, packetWrapper, async);
 
         try {
-            this.pluginManager.callEvent(event);
+            pluginManager.callEvent(event);
         } catch (Exception ex) {
-            MessageUtil.log(Level.WARNING, "Failed to call PacketSendEvent!");
-            ex.printStackTrace();
+            MessageUtil.printException(ex);
         }
 
         if (!event.isCancelled()) {
@@ -66,10 +64,9 @@ public class HamsterChannelHandler extends ChannelDuplexHandler {
         PacketReceiveEvent event = new PacketReceiveEvent(channelHandlerContext, playerData, packetWrapper, async);
 
         try {
-            this.pluginManager.callEvent(event);
+            pluginManager.callEvent(event);
         } catch (Exception ex) {
-            MessageUtil.log(Level.WARNING, "Failed to call PacketReceiveEvent!");
-            ex.printStackTrace();
+            MessageUtil.printException(ex);
         }
 
         if (!event.isCancelled()) {

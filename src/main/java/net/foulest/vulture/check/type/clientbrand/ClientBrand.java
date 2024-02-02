@@ -4,7 +4,6 @@ import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEve
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.play.in.custompayload.WrappedPacketInCustomPayload;
-import lombok.NonNull;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
@@ -15,6 +14,7 @@ import net.foulest.vulture.util.FileUtil;
 import net.foulest.vulture.util.KickUtil;
 import net.foulest.vulture.util.MessageUtil;
 import net.foulest.vulture.util.Settings;
+import org.jetbrains.annotations.NotNull;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -879,13 +879,13 @@ public class ClientBrand extends Check {
             new PayloadType("wigger", "Merge Client", DataType.CHANNEL, true)
     );
 
-    public ClientBrand(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public ClientBrand(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
-                       @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+    public void handle(CancellableNMSPacketEvent event, byte packetId,
+                       NMSPacket nmsPacket, Object packet, long timestamp) {
         if (packetId == PacketType.Play.Client.CUSTOM_PAYLOAD) {
             WrappedPacketInCustomPayload payload = new WrappedPacketInCustomPayload(nmsPacket);
             String data = new String(payload.getData(), StandardCharsets.UTF_8).replace(" (Velocity)", "");
@@ -911,7 +911,7 @@ public class ClientBrand extends Check {
      * @param data  The data sent by the player.
      * @param event The event to cancel.
      */
-    private void handleBrandData(String data, CancellableNMSPacketEvent event) {
+    private void handleBrandData(@NotNull String data, CancellableNMSPacketEvent event) {
         // Kicks players on Crystalware.
         if (data.contains("CRYSTAL|") || data.contains("Winterware")) {
             KickUtil.kickPlayer(player, event, "Blacklisted Brand: Crystalware");
@@ -948,7 +948,7 @@ public class ClientBrand extends Check {
      * @param data  The data sent by the player.
      * @param event The event to cancel.
      */
-    private void handleRegisterData(String data, CancellableNMSPacketEvent event) {
+    private void handleRegisterData(@NotNull String data, CancellableNMSPacketEvent event) {
         // Kicks players that register empty data.
         if (data.isEmpty()) {
             KickUtil.kickPlayer(player, event, "Empty Data");
@@ -992,10 +992,10 @@ public class ClientBrand extends Check {
      * @param event           The event to cancel.
      * @param data            The data to check.
      */
-    private void validateAndProcessPayload(@NonNull List<PayloadType> payloadTypeList,
-                                           @NonNull CancellableNMSPacketEvent event,
-                                           @NonNull String data,
-                                           @NonNull DataType dataType) {
+    private void validateAndProcessPayload(@NotNull List<PayloadType> payloadTypeList,
+                                           CancellableNMSPacketEvent event,
+                                           String data,
+                                           DataType dataType) {
         // Checks if the data is present in the payload type list.
         for (PayloadType payloadType : payloadTypeList) {
             if (payloadType.data.equals(data)) {

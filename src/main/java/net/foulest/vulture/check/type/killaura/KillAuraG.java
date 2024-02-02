@@ -17,13 +17,13 @@ public class KillAuraG extends Check {
     private long lastFlyingTime = -1;
     private double buffer;
 
-    public KillAuraG(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public KillAuraG(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
-                       @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+    public void handle(CancellableNMSPacketEvent event, byte packetId,
+                       NMSPacket nmsPacket, Object packet, long timestamp) {
         if (PacketType.Play.Client.Util.isInstanceOfFlying(packetId)) {
             lastFlyingTime = System.currentTimeMillis();
 

@@ -1,12 +1,11 @@
 package net.foulest.vulture.cmds;
 
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import net.foulest.vulture.Vulture;
 import net.foulest.vulture.check.type.clientbrand.type.PayloadType;
-import net.foulest.vulture.data.PlayerDataManager;
 import net.foulest.vulture.data.PlayerData;
+import net.foulest.vulture.data.PlayerDataManager;
 import net.foulest.vulture.util.KickUtil;
 import net.foulest.vulture.util.MessageUtil;
 import net.foulest.vulture.util.Settings;
@@ -15,6 +14,7 @@ import net.foulest.vulture.util.command.CommandArgs;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -31,7 +31,7 @@ public class VultureCmd {
 
     @Command(name = "vulture", description = "Main command for Vulture.",
             permission = "vulture.main", usage = "/vulture")
-    public void onCommand(@NonNull CommandArgs args) {
+    public void onCommand(@NotNull CommandArgs args) {
         CommandSender sender = args.getSender();
 
         // No additional arguments, display help menu.
@@ -172,7 +172,13 @@ public class VultureCmd {
         }
     }
 
-    private void handleHelp(@NonNull CommandSender sender, @NonNull CommandArgs args) {
+    /**
+     * Handles the help command.
+     *
+     * @param sender The command sender
+     * @param args   The command arguments
+     */
+    private void handleHelp(@NotNull CommandSender sender, CommandArgs args) {
         if (!sender.hasPermission("vulture.main")) {
             MessageUtil.messagePlayer(sender, "&cNo permission.");
             return;
@@ -194,7 +200,9 @@ public class VultureCmd {
         if (args.length() > 1) {
             try {
                 page = Integer.parseInt(args.getArgs(1));
-            } catch (NumberFormatException ignored) {
+            } catch (NumberFormatException ex) {
+                MessageUtil.messagePlayer(sender, "&cInvalid page number. Choose between 1 and " + maxPages + ".");
+                return;
             }
         }
 

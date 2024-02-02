@@ -1,8 +1,5 @@
 package net.foulest.vulture.util;
 
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
 import net.foulest.vulture.Vulture;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.data.PlayerDataManager;
@@ -10,6 +7,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -21,22 +20,10 @@ import java.util.logging.Logger;
  * @author Foulest
  * @project Vulture
  */
-@Getter
-@Setter
 @SuppressWarnings("unused")
 public final class MessageUtil {
 
-    public static Logger logger = Bukkit.getLogger();
-
-    /**
-     * Sends a message to the specified player.
-     *
-     * @param sender  The player to send the message to.
-     * @param message The message to send.
-     */
-    public static void messagePlayer(@NonNull CommandSender sender, @NonNull String message) {
-        sender.sendMessage(colorize(message));
-    }
+    private static final Logger logger = Bukkit.getLogger();
 
     /**
      * Logs a message to the console.
@@ -44,18 +31,29 @@ public final class MessageUtil {
      * @param level   The level to log the message at.
      * @param message The message to log.
      */
-    public static void log(@NonNull Level level, @NonNull String message) {
+    public static void log(Level level, String message) {
         logger.log(level, "[Vulture] " + message);
     }
 
     /**
-     * Logs a debug message to the console.
+     * Prints an exception's message as a warning to the console.
      *
-     * @param message The message to log.
+     * @param ex The exception to print.
      */
-    public static void debug(@NonNull String message) {
-        if (Vulture.instance.debug) {
-            log(Level.INFO, "[DEBUG] " + message);
+    public static void printException(Throwable ex) {
+        logger.log(Level.WARNING, "[Vulture] An error occurred: " + ex.getLocalizedMessage()
+                + " (Caused by: " + ex.getCause() + ")");
+    }
+
+    /**
+     * Sends a message to the specified player.
+     *
+     * @param sender  The player to send the message to.
+     * @param message The message to send.
+     */
+    public static void messagePlayer(CommandSender sender, String @NotNull ... message) {
+        for (String line : message) {
+            sender.sendMessage(colorize(line));
         }
     }
 
@@ -64,22 +62,78 @@ public final class MessageUtil {
      *
      * @param message The message to send.
      */
-    public static void broadcast(@NonNull String message) {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            messagePlayer(player, message);
-        }
+    public static void broadcast(String @NotNull ... message) {
+        for (String line : message) {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                messagePlayer(player, line);
+            }
 
-        messagePlayer(Bukkit.getConsoleSender(), message);
+            messagePlayer(Bukkit.getConsoleSender(), line);
+        }
     }
 
     /**
-     * Broadcasts a list of messages to all online players.
+     * Broadcasts a message to all online players.
      *
-     * @param message The list of messages to send.
+     * @param message The message to send.
      */
-    public static void broadcastList(@NonNull List<String> message) {
+    public static void broadcast(@NotNull List<String> message) {
         for (String line : message) {
-            broadcast(line);
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                messagePlayer(player, line);
+            }
+
+            messagePlayer(Bukkit.getConsoleSender(), line);
+        }
+    }
+
+    /**
+     * Sends an alert to all online players with a specified permission.
+     *
+     * @param message    The message to send.
+     * @param permission The permission to check.
+     */
+    public static void broadcastWithPerm(String permission, String @NotNull ... message) {
+        for (String line : message) {
+            for (Player online : Bukkit.getOnlinePlayers()) {
+                if (online.hasPermission(permission)) {
+                    messagePlayer(online, line);
+                }
+            }
+
+            messagePlayer(Bukkit.getConsoleSender(), line);
+        }
+    }
+
+    /**
+     * Colorizes the specified message.
+     *
+     * @param message The message to colorize.
+     */
+    @Contract("_ -> new")
+    public static @NotNull String colorize(String message) {
+        return ChatColor.translateAlternateColorCodes('&', message);
+    }
+
+    /**
+     * Strips the color from the specified message.
+     *
+     * @param message The message to strip the color from.
+     */
+    public static String stripColor(String message) {
+        return ChatColor.stripColor(message);
+    }
+
+    // Plugin specific methods
+
+    /**
+     * Logs a debug message to the console.
+     *
+     * @param message The message to log.
+     */
+    public static void debug(String message) {
+        if (Vulture.instance.debug) {
+            log(Level.INFO, "[DEBUG] " + message);
         }
     }
 
@@ -88,7 +142,7 @@ public final class MessageUtil {
      *
      * @param message The message to send.
      */
-    public static void sendAlert(@NonNull String message) {
+    public static void sendAlert(String message) {
         for (Player player : Bukkit.getOnlinePlayers()) {
             PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
@@ -98,39 +152,5 @@ public final class MessageUtil {
         }
 
         messagePlayer(Bukkit.getConsoleSender(), Settings.prefix + " " + message);
-    }
-
-    /**
-     * Sends an alert to all online players with a specified permission.
-     *
-     * @param message    The message to send.
-     * @param permission The permission to check.
-     */
-    public static void broadcastWithPerm(@NonNull String message, @NonNull String permission) {
-        for (Player online : Bukkit.getOnlinePlayers()) {
-            if (online.hasPermission(permission)) {
-                messagePlayer(online, message);
-            }
-        }
-
-        messagePlayer(Bukkit.getConsoleSender(), message);
-    }
-
-    /**
-     * Colorizes the specified message.
-     *
-     * @param message The message to colorize.
-     */
-    public static String colorize(@NonNull String message) {
-        return ChatColor.translateAlternateColorCodes('&', message);
-    }
-
-    /**
-     * Strips the color from the specified message.
-     *
-     * @param message The message to strip the color from.
-     */
-    public static String stripColor(@NonNull String message) {
-        return ChatColor.stripColor(message);
     }
 }

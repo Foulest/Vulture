@@ -1,12 +1,16 @@
 package net.foulest.vulture.check.type.clientbrand.type;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 public enum DataType {
     BRAND,
     REGISTER_DATA_MOD,
     REGISTER_DATA_OTHER,
     CHANNEL;
 
-    public String getName() {
+    @Contract(pure = true)
+    public @NotNull String getName() {
         switch (this) {
             case BRAND:
                 return "Brand";

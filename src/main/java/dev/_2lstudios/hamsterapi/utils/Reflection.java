@@ -1,10 +1,13 @@
 package dev._2lstudios.hamsterapi.utils;
 
 import lombok.AllArgsConstructor;
+import net.foulest.vulture.util.MessageUtil;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 
 @AllArgsConstructor
 public class Reflection {
@@ -14,23 +17,23 @@ public class Reflection {
     private final Map<Class<?>, Map<Class<?>, Map<Integer, Field>>> classFields = new HashMap<>();
 
     public Class<?> getClass(String className) {
-        if (this.classes.containsKey(className)) {
-            return this.classes.get(className);
+        if (classes.containsKey(className)) {
+            return classes.get(className);
         }
 
         Class<?> obtainedClass = null;
 
         try {
             obtainedClass = Class.forName(className);
-        } catch (ClassNotFoundException ignored) {
-            // Executed when class is not found
+        } catch (ClassNotFoundException ex) {
+            MessageUtil.printException(ex);
         } finally {
-            this.classes.put(className, obtainedClass);
+            classes.put(className, obtainedClass);
         }
         return obtainedClass;
     }
 
-    private Object getValue(Field field, Object object) throws IllegalArgumentException, IllegalAccessException {
+    private Object getValue(@NotNull Field field, Object object) throws IllegalArgumentException, IllegalAccessException {
         boolean accessible = field.isAccessible();
         field.setAccessible(true);
         Object value = field.get(object);
@@ -70,19 +73,19 @@ public class Reflection {
         return getField(object, fieldType, 0);
     }
 
-    private Class<?> getMinecraftClass(String key) {
+    private Class<?> getMinecraftClass(@NotNull String key) {
         int lastDot = key.lastIndexOf(".");
         String lastKey = key.substring(lastDot > 0 ? lastDot + 1 : 0);
-        Class<?> legacyClass = getClass("net.minecraft.server." + this.version + "." + lastKey);
+        Class<?> legacyClass = getClass("net.minecraft.server." + version + "." + lastKey);
         Class<?> newClass = getClass("net.minecraft." + key);
         return legacyClass != null ? legacyClass : newClass;
     }
 
-    private Class<?> getCraftBukkitClass(String key) {
+    private Class<?> getCraftBukkitClass(@NotNull String key) {
         int lastDot = key.lastIndexOf(".");
         String lastKey = key.substring(lastDot > 0 ? lastDot + 1 : 0);
-        Class<?> legacyClass = getClass("org.bukkit.craftbukkit." + this.version + "." + lastKey);
-        Class<?> newClass = getClass("org.bukkit.craftbukkit." + this.version + "." + key);
+        Class<?> legacyClass = getClass("org.bukkit.craftbukkit." + version + "." + lastKey);
+        Class<?> newClass = getClass("org.bukkit.craftbukkit." + version + "." + key);
         return legacyClass != null ? legacyClass : newClass;
     }
 

@@ -31,13 +31,13 @@ public class PingSpoofB extends Check {
     public static long maxAveragePing;
     public static long maxPingDeviation;
 
-    public PingSpoofB(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public PingSpoofB(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
-                       @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+    public void handle(CancellableNMSPacketEvent event, byte packetId,
+                       NMSPacket nmsPacket, Object packet, long timestamp) {
         long timeSinceRespawn = playerData.getTimeSince(ActionType.RESPAWN);
         long timeSinceTeleport = playerData.getTimeSince(ActionType.TELEPORT);
         long timeSinceLogin = playerData.getTimeSince(ActionType.LOGIN);

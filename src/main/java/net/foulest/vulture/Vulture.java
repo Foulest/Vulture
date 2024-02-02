@@ -4,12 +4,12 @@ import dev._2lstudios.hamsterapi.HamsterAPI;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.SneakyThrows;
 import net.foulest.vulture.cmds.VultureCmd;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.data.PlayerDataManager;
 import net.foulest.vulture.listeners.CommandListener;
+import net.foulest.vulture.listeners.ExploitListener;
 import net.foulest.vulture.listeners.PlayerDataListener;
 import net.foulest.vulture.processor.type.PacketProcessor;
 import net.foulest.vulture.util.MessageUtil;
@@ -20,6 +20,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.logging.Level;
 
@@ -32,14 +33,14 @@ import java.util.logging.Level;
 @Getter
 public class Vulture extends JavaPlugin {
 
+    @Getter
     public static Vulture instance;
     public CommandFramework framework;
     public PacketEvents packetEvents;
     public PacketProcessor packetProcessor;
     public Runnable packetTracker;
     public Runnable lagTracker;
-    public boolean loaded = false;
-    public boolean debug = false;
+    public boolean debug;
     public long lastTimestamp;
     public int ticksRunningSlow;
     public int ticksRunningFast;
@@ -133,19 +134,17 @@ public class Vulture extends JavaPlugin {
 
         // Creates the default settings config.
         MessageUtil.log(Level.INFO, "Loading Settings...");
-        Settings.setupSettings();
         Settings.loadSettings();
 
         // Loads the plugin's listeners.
         MessageUtil.log(Level.INFO, "Loading Listeners...");
-        loadListeners(new PlayerDataListener(), new CommandListener());
+        loadListeners(new CommandListener(), new ExploitListener(), new PlayerDataListener());
 
         // Loads the plugin's commands.
         MessageUtil.log(Level.INFO, "Loading Commands...");
         loadCommands(new VultureCmd());
 
         MessageUtil.log(Level.INFO, "Loaded successfully.");
-        loaded = true;
     }
 
     @Override
@@ -166,10 +165,6 @@ public class Vulture extends JavaPlugin {
             PlayerDataManager.removePlayerData(player);
         }
 
-        // Saves the settings.
-        MessageUtil.log(Level.INFO, "Saving Settings...");
-        Settings.saveSettings();
-
         MessageUtil.log(Level.INFO, "Shut down successfully.");
     }
 
@@ -178,7 +173,7 @@ public class Vulture extends JavaPlugin {
      *
      * @param listeners Listener to load.
      */
-    private void loadListeners(@NonNull Listener... listeners) {
+    private void loadListeners(Listener @NotNull ... listeners) {
         for (Listener listener : listeners) {
             Bukkit.getPluginManager().registerEvents(listener, this);
         }
@@ -189,7 +184,7 @@ public class Vulture extends JavaPlugin {
      *
      * @param commands Command to load.
      */
-    private void loadCommands(@NonNull Object... commands) {
+    private void loadCommands(Object @NotNull ... commands) {
         for (Object command : commands) {
             framework.registerCommands(command);
         }

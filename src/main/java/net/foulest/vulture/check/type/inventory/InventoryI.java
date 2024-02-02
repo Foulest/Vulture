@@ -18,13 +18,13 @@ public class InventoryI extends Check {
     private int stage;
     private int lastSlot;
 
-    public InventoryI(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public InventoryI(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
-                       @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+    public void handle(CancellableNMSPacketEvent event, byte packetId,
+                       NMSPacket nmsPacket, Object packet, long timestamp) {
         // Checks the player for exemptions.
         if (playerData.getVersion().isNewerThan(ClientVersion.v_1_8)) {
             return;

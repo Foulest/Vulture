@@ -1,23 +1,24 @@
 package net.foulest.vulture.util;
 
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import net.foulest.vulture.Vulture;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckManager;
 import net.foulest.vulture.check.type.pingspoof.PingSpoofB;
+import net.foulest.vulture.util.yaml.CustomYamlConfiguration;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
-import java.util.Arrays;
-import java.util.Collections;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -32,204 +33,176 @@ import java.util.logging.Level;
 @Setter
 public class Settings {
 
+    // File settings
     public static File file;
     public static FileConfiguration config;
+    public static String fileName = "config.yml";
 
     // General settings
-    public static String prefix = "&e[Vulture]";
-    public static List<String> banMessage = Collections.singletonList("&c%player% has been removed from the network.");
-    public static long resetViolations = 600;
+    public static String prefix;
+    public static List<String> banMessage;
+    public static long resetViolations;
 
     // Blacklisted payloads
-    public static List<String> blacklistedPayloads = Collections.singletonList("GalactiCraft");
+    public static List<String> blacklistedPayloads;
 
     // Blacklisted commands
-    public static List<String> blacklistedCommands = Arrays.asList(
-            // WorldEdit
-            "/calc", "/eval", "/solve",
+    public static List<String> blacklistedCommands;
 
-            // Holographic Displays
-            "/h.* readtext",
+    // Packet protections
+    public static int maxPacketsPerTick;
+    public static boolean abilitiesDuplicateFlying;
+    public static boolean abilitiesInvalidFlightAllowed;
+    public static boolean abilitiesInvalidFlySpeed;
+    public static boolean abilitiesInvalidFlying;
+    public static boolean abilitiesInvalidInstantBuild;
+    public static boolean abilitiesInvalidInvulnerable;
+    public static boolean abilitiesInvalidWalkSpeed;
+    public static boolean armAnimationInvalidConditions;
+    public static boolean attackEntityInvalidConditions;
+    public static boolean beaconInvalidConditions;
+    public static boolean beaconInvalidData;
+    public static boolean beaconInvalidEffect;
+    public static boolean beaconInvalidTier;
+    public static boolean blockDigInvalidDistance;
+    public static boolean blockPlaceInvalidConditions;
+    public static boolean blockPlaceInvalidCursorPosition;
+    public static boolean blockPlaceInvalidDistance;
+    public static boolean blockPlaceInvalidItem;
+    public static boolean blockPlaceInvalidOtherBlockPosition;
+    public static boolean blockPlaceInvalidOtherCursorPosition;
+    public static boolean blockPlaceInvalidUpBlockPosition;
+    public static boolean bookEditInvalidConditions;
+    public static boolean bookEditInvalidData;
+    public static boolean bookOpenInvalidConditions;
+    public static boolean bookSignInvalidConditions;
+    public static boolean bookSignInvalidData;
+    public static boolean chatInvalidConditions;
+    public static boolean chatInvalidMessage;
+    public static boolean closeWindowClosedInventory;
+    public static boolean closeWindowInvalidConditions;
+    public static boolean commandBlockInvalidConditions;
+    public static boolean customPayloadInvalidSize;
+    public static boolean enchantItemInvalidWindowId;
+    public static boolean entityActionInvalidJumpBoost;
+    public static boolean flyingInvalidPitch;
+    public static boolean flyingInvalidPositionData;
+    public static boolean flyingInvalidRotationData;
+    public static boolean flyingInvalidYData;
+    public static boolean heldItemSlotInvalidConditions;
+    public static boolean heldItemSlotInvalidSlot;
+    public static boolean heldItemSlotInvalidSlotChange;
+    public static boolean itemDropInvalidData;
+    public static boolean itemNameInvalidData;
+    public static boolean itemNameInvalidSize;
+    public static boolean releaseUseItemInvalidConditions;
+    public static boolean releaseUseItemInvalidData;
+    public static boolean respawnInvalidConditions;
+    public static boolean ridingJumpInvalidConditions;
+    public static boolean ridingJumpInvalidJumpBoost;
+    public static boolean setCreativeSlotInvalidConditions;
+    public static boolean setCreativeSlotInvalidSlot;
+    public static boolean settingsInvalidLocale;
+    public static boolean settingsInvalidViewDistance;
+    public static boolean spectateInvalidConditions;
+    public static boolean startSneakingInvalidConditions;
+    public static boolean startSprintingInvalidConditions;
+    public static boolean steerVehicleInvalidConditions;
+    public static boolean steerVehicleInvalidDismountValue;
+    public static boolean steerVehicleInvalidNonDismountValue;
+    public static boolean steerVehicleInvalidValue;
+    public static boolean stopSleepingInvalidConditions;
+    public static boolean stopSneakingInvalidConditions;
+    public static boolean tabCompleteInvalidMessage;
+    public static boolean tradeSelectInvalidData;
+    public static boolean transactionInvalidWindowId;
+    public static boolean transactionNotAccepted;
+    public static boolean updateSignInvalidData;
+    public static boolean useEntityInvalidConditions;
+    public static boolean useEntityInvalidDistance;
+    public static boolean windowClickInvalidCloneButton;
+    public static boolean windowClickInvalidConditions;
+    public static boolean windowClickInvalidPickupAllButton;
+    public static boolean windowClickInvalidPickupButton;
+    public static boolean windowClickInvalidQuickCraftButton;
+    public static boolean windowClickInvalidQuickMoveButton;
+    public static boolean windowClickInvalidSlot;
+    public static boolean windowClickInvalidSwapButton;
+    public static boolean windowClickInvalidThrowButton;
 
-            // PermissionsEx
-            "/pe.*x promote", "/pe.*x demote", "/promote", "/demote",
-
-            // Multiverse
-            "/m.*v.* \\^", "/m.*v.*help <", "/\\$"
-    );
-
-    // Packet protections; max packets per tick
-    public static int maxPacketsPerTick = 230;
-
-    // Packet protections; Abilities
-    public static boolean abilitiesDuplicateFlying = true;
-    public static boolean abilitiesInvalidFlightAllowed = true;
-    public static boolean abilitiesInvalidFlySpeed = true;
-    public static boolean abilitiesInvalidFlying = true;
-    public static boolean abilitiesInvalidInstantBuild = true;
-    public static boolean abilitiesInvalidInvulnerable = true;
-    public static boolean abilitiesInvalidWalkSpeed = true;
-
-    // Packet protections; ArmAnimation
-    public static boolean armAnimationInvalidConditions = true;
-
-    // Packet protections; AttackEntity
-    public static boolean attackEntityInvalidConditions = true;
-
-    // Packet protections; Beacon
-    public static boolean beaconInvalidConditions = true;
-    public static boolean beaconInvalidData = true;
-    public static boolean beaconInvalidEffect = true;
-    public static boolean beaconInvalidTier = true;
-
-    // Packet protections; BlockDig
-    public static boolean blockDigInvalidDistance = true;
-
-    // Packet protections; BlockPlace
-    public static boolean blockPlaceInvalidConditions = true;
-    public static boolean blockPlaceInvalidCursorPosition = true;
-    public static boolean blockPlaceInvalidDistance = true;
-    public static boolean blockPlaceInvalidItem = true;
-    public static boolean blockPlaceInvalidOtherBlockPosition = true;
-    public static boolean blockPlaceInvalidOtherCursorPosition = true;
-    public static boolean blockPlaceInvalidUpBlockPosition = true;
-
-    // Packet protections; BookEdit
-    public static boolean bookEditInvalidConditions = true;
-    public static boolean bookEditInvalidData = true;
-
-    // Packet protections; BookOpen
-    public static boolean bookOpenInvalidConditions = true;
-
-    // Packet protections; BookSign
-    public static boolean bookSignInvalidConditions = true;
-    public static boolean bookSignInvalidData = true;
-
-    // Packet protections; Chat
-    public static boolean chatInvalidConditions = true;
-    public static boolean chatInvalidMessage = true;
-
-    // Packet protections; CloseWindow
-    public static boolean closeWindowClosedInventory = true;
-    public static boolean closeWindowInvalidConditions = true;
-
-    // Packet protections; CommandBlock
-    public static boolean commandBlockInvalidConditions = true;
-
-    // Packet protections; CustomPayload
-    public static boolean customPayloadInvalidSize = true;
-
-    // Packet protections; EnchantItem
-    public static boolean enchantItemInvalidWindowId = true;
-
-    // Packet protections; EntityAction
-    public static boolean entityActionInvalidJumpBoost = true;
-
-    // Packet protections; Flying
-    public static boolean flyingInvalidPitch = true;
-    public static boolean flyingInvalidPositionData = true;
-    public static boolean flyingInvalidRotationData = true;
-    public static boolean flyingInvalidYData = true;
-
-    // Packet protections; HeldItemSlot
-    public static boolean heldItemSlotInvalidConditions = true;
-    public static boolean heldItemSlotInvalidSlot = true;
-    public static boolean heldItemSlotInvalidSlotChange = true;
-
-    // Packet protections; ItemDrop
-    public static boolean itemDropInvalidData = true;
-
-    // Packet protections; ItemName
-    public static boolean itemNameInvalidData = true;
-    public static boolean itemNameInvalidSize = true;
-
-    // Packet protections; ReleaseUseItem
-    public static boolean releaseUseItemInvalidConditions = true;
-    public static boolean releaseUseItemInvalidData = true;
-
-    // Packet protections; Respawn
-    public static boolean respawnInvalidConditions = true;
-
-    // Packet protections; RidingJump
-    public static boolean ridingJumpInvalidConditions = true;
-    public static boolean ridingJumpInvalidJumpBoost = true;
-
-    // Packet protections; SetCreativeSlot
-    public static boolean setCreativeSlotInvalidConditions = true;
-    public static boolean setCreativeSlotInvalidSlot = true;
-
-    // Packet protections; Settings
-    public static boolean settingsInvalidLocale = true;
-    public static boolean settingsInvalidViewDistance = true;
-
-    // Packet protections; Spectate
-    public static boolean spectateInvalidConditions = true;
-
-    // Packet protections; StartSneaking
-    public static boolean startSneakingInvalidConditions = true;
-
-    // Packet protections; StartSprinting
-    public static boolean startSprintingInvalidConditions = true;
-
-    // Packet protections; SteerVehicle
-    public static boolean steerVehicleInvalidConditions = true;
-    public static boolean steerVehicleInvalidDismountValue = true;
-    public static boolean steerVehicleInvalidNonDismountValue = true;
-    public static boolean steerVehicleInvalidValue = true;
-
-    // Packet protections; StopSleeping
-    public static boolean stopSleepingInvalidConditions = true;
-
-    // Packet protections; StopSneaking
-    public static boolean stopSneakingInvalidConditions = true;
-
-    // Packet protections; TabComplete
-    public static boolean tabCompleteInvalidMessage = true;
-
-    // Packet protections; TradeSelect
-    public static boolean tradeSelectInvalidData = true;
-
-    // Packet protections; Transaction
-    public static boolean transactionInvalidWindowId = true;
-    public static boolean transactionNotAccepted = true;
-
-    // Packet protections; UpdateSign
-    public static boolean updateSignInvalidData = true;
-
-    // Packet protections; UseEntity
-    public static boolean useEntityInvalidConditions = true;
-    public static boolean useEntityInvalidDistance = true;
-
-    // Packet protections; WindowClick
-    public static boolean windowClickInvalidCloneButton = true;
-    public static boolean windowClickInvalidConditions = true;
-    public static boolean windowClickInvalidPickupAllButton = true;
-    public static boolean windowClickInvalidPickupButton = true;
-    public static boolean windowClickInvalidQuickCraftButton = true;
-    public static boolean windowClickInvalidQuickMoveButton = true;
-    public static boolean windowClickInvalidSlot = true;
-    public static boolean windowClickInvalidSwapButton = true;
-    public static boolean windowClickInvalidThrowButton = true;
+    // Exploit protections
+    public static boolean worldInvalidBlockBreak;
+    public static boolean worldInvalidBlockPlace;
 
     /**
-     * Initialize and set up default configuration values.
+     * Loads the configuration file and values.
      */
-    public static void setupSettings() {
-        initConfig();
-        setDefaultConfigValues();
-        saveConfig();
+    public static void loadSettings() {
+        loadConfigFile();
+        loadConfigValues();
+    }
+
+    /**
+     * Initializes the configuration file and loads defaults.
+     */
+    private static void loadConfigFile() {
+        // First, attempt to load the default configuration as a stream to check if it exists in the plugin JAR
+        InputStream defConfigStream = Vulture.getInstance().getResource(fileName);
+
+        if (defConfigStream == null) {
+            // Log a warning if the default configuration cannot be found within the JAR
+            MessageUtil.log(Level.WARNING, "Could not find " + fileName + " in the plugin JAR.");
+            return;
+        } else {
+            try {
+                // Close the defConfigStream properly to avoid resource leaks
+                defConfigStream.close();
+            } catch (IOException ex) {
+                MessageUtil.printException(ex);
+            }
+        }
+
+        // Proceed to check if the config file exists in the plugin's data folder
+        // and save the default config from the JAR if not
+        File dataFolder = Vulture.getInstance().getDataFolder();
+        file = new File(dataFolder, fileName);
+        if (!file.exists()) {
+            Vulture.getInstance().saveResource(fileName, false);
+        }
+
+        // Now that we've ensured the file exists (either it already did, or we've just created it),
+        // we can safely load it into our CustomYamlConfiguration object
+        config = CustomYamlConfiguration.loadConfiguration(file);
+
+        // Load the default configuration for comparison and to set defaults
+        try (InputStream defConfigStreamForDefaults = Vulture.getInstance().getResource(fileName)) {
+            CustomYamlConfiguration defConfig = CustomYamlConfiguration
+                    .loadConfiguration(new InputStreamReader(defConfigStreamForDefaults, StandardCharsets.UTF_8));
+
+            // Ensure defaults are applied
+            config.setDefaults(defConfig);
+            config.options().copyDefaults(true);
+            saveConfig(); // Save the config with defaults applied
+        } catch (IOException ex) {
+            MessageUtil.printException(ex);
+        }
+    }
+
+    /**
+     * Saves the configuration file.
+     */
+    private static void saveConfig() {
+        try {
+            config.save(file);
+        } catch (IOException ex) {
+            MessageUtil.printException(ex);
+        }
     }
 
     /**
      * Loads configuration values into the relevant static fields.
      */
-    public static void loadSettings() {
-        if (!file.exists()) {
-            setupSettings();
-        }
-
-        config = YamlConfiguration.loadConfiguration(file);
-
+    public static void loadConfigValues() {
         // General settings
         prefix = config.getString("vulture.prefix");
         banMessage = config.getStringList("vulture.banMessage");
@@ -263,6 +236,10 @@ public class Settings {
                 changeAnnotationValue(checkInfo, "banCommand", config.get("checks." + name + ".banCommand"));
             }
         }
+
+        // Exploit protections; invalid block break/place
+        worldInvalidBlockBreak = config.getBoolean("protections.exploits.invalid-block-break");
+        worldInvalidBlockPlace = config.getBoolean("protections.exploits.invalid-block-place");
 
         // Packet protections; max packets per tick
         maxPacketsPerTick = config.getInt("protections.packets.max-packets-per-tick");
@@ -419,414 +396,12 @@ public class Settings {
     }
 
     /**
-     * Saves the current settings into the configuration file.
-     */
-    public static void saveSettings() {
-        // General settings
-        config.set("vulture.prefix", prefix);
-        config.set("vulture.banMessage", banMessage);
-        config.set("vulture.resetViolations", resetViolations);
-
-        // Blacklisted payloads
-        config.set("blacklisted.payloads", blacklistedPayloads);
-
-        // Blacklisted commands
-        config.set("blacklisted.commands", blacklistedCommands);
-
-        // PingSpoofB settings
-        config.set("checks.pingspoof.B.maxPing", PingSpoofB.maxPing);
-        config.set("checks.pingspoof.B.maxAveragePing", PingSpoofB.maxAveragePing);
-        config.set("checks.pingspoof.B.maxPingDeviation", PingSpoofB.maxPingDeviation);
-
-        // Packet protections; max packets per tick
-        config.set("protections.packets.max-packets-per-tick", maxPacketsPerTick);
-
-        // Packet protections; Abilities
-        config.set("protections.packets.abilities.duplicate-flying", abilitiesDuplicateFlying);
-        config.set("protections.packets.abilities.invalid-flight-allowed", abilitiesInvalidFlightAllowed);
-        config.set("protections.packets.abilities.invalid-fly-speed", abilitiesInvalidFlySpeed);
-        config.set("protections.packets.abilities.invalid-flying", abilitiesInvalidFlying);
-        config.set("protections.packets.abilities.invalid-instant-build", abilitiesInvalidInstantBuild);
-        config.set("protections.packets.abilities.invalid-invulnerable", abilitiesInvalidInvulnerable);
-        config.set("protections.packets.abilities.invalid-walk-speed", abilitiesInvalidWalkSpeed);
-
-        // Packet protections; ArmAnimation
-        config.set("protections.packets.arm-animation.invalid-conditions", armAnimationInvalidConditions);
-
-        // Packet protections; AttackEntity
-        config.set("protections.packets.attack-entity.invalid-conditions", attackEntityInvalidConditions);
-
-        // Packet protections; Beacon
-        config.set("protections.packets.beacon.invalid-conditions", beaconInvalidConditions);
-        config.set("protections.packets.beacon.invalid-data", beaconInvalidData);
-        config.set("protections.packets.beacon.invalid-effect", beaconInvalidEffect);
-        config.set("protections.packets.beacon.invalid-tier", beaconInvalidTier);
-
-        // Packet protections; BlockDig
-        config.set("protections.packets.block-dig.invalid-distance", blockDigInvalidDistance);
-
-        // Packet protections; BlockPlace
-        config.set("protections.packets.block-place.invalid-conditions", blockPlaceInvalidConditions);
-        config.set("protections.packets.block-place.invalid-cursor-position", blockPlaceInvalidCursorPosition);
-        config.set("protections.packets.block-place.invalid-distance", blockPlaceInvalidDistance);
-        config.set("protections.packets.block-place.invalid-item", blockPlaceInvalidItem);
-        config.set("protections.packets.block-place.invalid-other-block-position", blockPlaceInvalidOtherBlockPosition);
-        config.set("protections.packets.block-place.invalid-other-cursor-position", blockPlaceInvalidOtherCursorPosition);
-        config.set("protections.packets.block-place.invalid-up-block-position", blockPlaceInvalidUpBlockPosition);
-
-        // Packet protections; BookEdit
-        config.set("protections.packets.book-edit.invalid-conditions", bookEditInvalidConditions);
-        config.set("protections.packets.book-edit.invalid-data", bookEditInvalidData);
-
-        // Packet protections; BookOpen
-        config.set("protections.packets.book-open.invalid-conditions", bookOpenInvalidConditions);
-
-        // Packet protections; BookSign
-        config.set("protections.packets.book-sign.invalid-conditions", bookSignInvalidConditions);
-        config.set("protections.packets.book-sign.invalid-data", bookSignInvalidData);
-
-        // Packet protections; Chat
-        config.set("protections.packets.chat.invalid-conditions", chatInvalidConditions);
-        config.set("protections.packets.chat.invalid-message", chatInvalidMessage);
-
-        // Packet protections; CloseWindow
-        config.set("protections.packets.close-window.closed-inventory", closeWindowClosedInventory);
-        config.set("protections.packets.close-window.invalid-conditions", closeWindowInvalidConditions);
-
-        // Packet protections; CommandBlock
-        config.set("protections.packets.command-block.invalid-conditions", commandBlockInvalidConditions);
-
-        // Packet protections; CustomPayload
-        config.set("protections.packets.custom-payload.invalid-size", customPayloadInvalidSize);
-
-        // Packet protections; EnchantItem
-        config.set("protections.packets.enchant-item.invalid-window-id", enchantItemInvalidWindowId);
-
-        // Packet protections; EntityAction
-        config.set("protections.packets.entity-action.invalid-jump-boost", entityActionInvalidJumpBoost);
-
-        // Packet protections; Flying
-        config.set("protections.packets.flying.invalid-pitch", flyingInvalidPitch);
-        config.set("protections.packets.flying.invalid-position-data", flyingInvalidPositionData);
-        config.set("protections.packets.flying.invalid-rotation-data", flyingInvalidRotationData);
-        config.set("protections.packets.flying.invalid-y-data", flyingInvalidYData);
-
-        // Packet protections; HeldItemSlot
-        config.set("protections.packets.held-item-slot.invalid-conditions", heldItemSlotInvalidConditions);
-        config.set("protections.packets.held-item-slot.invalid-slot", heldItemSlotInvalidSlot);
-        config.set("protections.packets.held-item-slot.invalid-slot-change", heldItemSlotInvalidSlotChange);
-
-        // Packet protections; ItemDrop
-        config.set("protections.packets.item-drop.invalid-data", itemDropInvalidData);
-
-        // Packet protections; ItemName
-        config.set("protections.packets.item-name.invalid-data", itemNameInvalidData);
-        config.set("protections.packets.item-name.invalid-size", itemNameInvalidSize);
-
-        // Packet protections; ReleaseUseItem
-        config.set("protections.packets.release-use-item.invalid-conditions", releaseUseItemInvalidConditions);
-        config.set("protections.packets.release-use-item.invalid-data", releaseUseItemInvalidData);
-
-        // Packet protections; Respawn
-        config.set("protections.packets.respawn.invalid-conditions", respawnInvalidConditions);
-
-        // Packet protections; RidingJump
-        config.set("protections.packets.riding-jump.invalid-conditions", ridingJumpInvalidConditions);
-        config.set("protections.packets.riding-jump.invalid-jump-boost", ridingJumpInvalidJumpBoost);
-
-        // Packet protections; SetCreativeSlot
-        config.set("protections.packets.set-creative-slot.invalid-conditions", setCreativeSlotInvalidConditions);
-        config.set("protections.packets.set-creative-slot.invalid-slot", setCreativeSlotInvalidSlot);
-
-        // Packet protections; Settings
-        config.set("protections.packets.settings.invalid-locale", settingsInvalidLocale);
-        config.set("protections.packets.settings.invalid-view-distance", settingsInvalidViewDistance);
-
-        // Packet protections; Spectate
-        config.set("protections.packets.spectate.invalid-conditions", spectateInvalidConditions);
-
-        // Packet protections; StartSneaking
-        config.set("protections.packets.start-sneaking.invalid-conditions", startSneakingInvalidConditions);
-
-        // Packet protections; StartSprinting
-        config.set("protections.packets.start-sprinting.invalid-conditions", startSprintingInvalidConditions);
-
-        // Packet protections; SteerVehicle
-        config.set("protections.packets.steer-vehicle.invalid-conditions", steerVehicleInvalidConditions);
-        config.set("protections.packets.steer-vehicle.invalid-dismount-value", steerVehicleInvalidDismountValue);
-        config.set("protections.packets.steer-vehicle.invalid-non-dismount-value", steerVehicleInvalidNonDismountValue);
-        config.set("protections.packets.steer-vehicle.invalid-value", steerVehicleInvalidValue);
-
-        // Packet protections; StopSleeping
-        config.set("protections.packets.stop-sleeping.invalid-conditions", stopSleepingInvalidConditions);
-
-        // Packet protections; StopSneaking
-        config.set("protections.packets.stop-sneaking.invalid-conditions", stopSneakingInvalidConditions);
-
-        // Packet protections; TabComplete
-        config.set("protections.packets.tab-complete.invalid-message", tabCompleteInvalidMessage);
-
-        // Packet protections; TradeSelect
-        config.set("protections.packets.trade-select.invalid-data", tradeSelectInvalidData);
-
-        // Packet protections; Transaction
-        config.set("protections.packets.transaction.invalid-window-id", transactionInvalidWindowId);
-        config.set("protections.packets.transaction.not-accepted", transactionNotAccepted);
-
-        // Packet protections; UpdateSign
-        config.set("protections.packets.update-sign.invalid-data", updateSignInvalidData);
-
-        // Packet protections; UseEntity
-        config.set("protections.packets.use-entity.invalid-conditions", useEntityInvalidConditions);
-        config.set("protections.packets.use-entity.invalid-distance", useEntityInvalidDistance);
-
-        // Packet protections; WindowClick
-        config.set("protections.packets.window-click.invalid-clone-button", windowClickInvalidCloneButton);
-        config.set("protections.packets.window-click.invalid-conditions", windowClickInvalidConditions);
-        config.set("protections.packets.window-click.invalid-pickup-all-button", windowClickInvalidPickupAllButton);
-        config.set("protections.packets.window-click.invalid-pickup-button", windowClickInvalidPickupButton);
-        config.set("protections.packets.window-click.invalid-quick-craft-button", windowClickInvalidQuickCraftButton);
-        config.set("protections.packets.window-click.invalid-quick-move-button", windowClickInvalidQuickMoveButton);
-        config.set("protections.packets.window-click.invalid-slot", windowClickInvalidSlot);
-        config.set("protections.packets.window-click.invalid-swap-button", windowClickInvalidSwapButton);
-        config.set("protections.packets.window-click.invalid-throw-button", windowClickInvalidThrowButton);
-
-        saveConfig();
-    }
-
-    /**
-     * Initializes the configuration file.
-     */
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    private static void initConfig() {
-        file = new File(Vulture.instance.getDataFolder(), "settings.yml");
-
-        if (!file.exists()) {
-            try {
-                file.getParentFile().mkdirs();
-                file.createNewFile();
-            } catch (IOException ex) {
-                MessageUtil.log(Level.WARNING, "Failed to create settings file.");
-                ex.printStackTrace();
-            }
-        }
-
-        config = YamlConfiguration.loadConfiguration(file);
-    }
-
-    /**
-     * Sets the default values for the configuration file.
-     */
-    private static void setDefaultConfigValues() {
-        // General settings
-        config.addDefault("vulture.prefix", prefix);
-        config.addDefault("vulture.banMessage", banMessage);
-        config.addDefault("vulture.resetViolations", resetViolations);
-
-        // Blacklisted payloads
-        config.addDefault("blacklisted.payloads", blacklistedPayloads);
-
-        // Blacklisted commands
-        config.addDefault("blacklisted.commands", blacklistedCommands);
-
-        // Check settings
-        for (Class<? extends Check> check : CheckManager.CHECK_CLASSES) {
-            String name = getCheckName(check);
-            CheckInfo checkInfo = check.getAnnotation(CheckInfo.class);
-
-            boolean enabled = checkInfo.enabled();
-            int maxViolations = checkInfo.maxViolations();
-            String banCommand = checkInfo.banCommand();
-
-            config.addDefault("checks." + name + ".enabled", enabled);
-
-            if (checkInfo.punishable()) {
-                config.addDefault("checks." + name + ".maxViolations", maxViolations);
-                config.addDefault("checks." + name + ".banCommand", banCommand);
-            }
-
-            // PingSpoofB settings
-            if (name.equals("pingspoof.B")) {
-                config.addDefault("checks." + name + ".maxPing", 1000);
-                config.addDefault("checks." + name + ".maxAveragePing", 500);
-                config.addDefault("checks." + name + ".maxPingDeviation", 200);
-            }
-        }
-
-        // Packet protections; max packets per tick
-        config.addDefault("protections.packets.max-packets-per-tick", maxPacketsPerTick);
-
-        // Packet protections; Abilities
-        config.addDefault("protections.packets.abilities.duplicate-flying", abilitiesDuplicateFlying);
-        config.addDefault("protections.packets.abilities.invalid-flight-allowed", abilitiesInvalidFlightAllowed);
-        config.addDefault("protections.packets.abilities.invalid-fly-speed", abilitiesInvalidFlySpeed);
-        config.addDefault("protections.packets.abilities.invalid-flying", abilitiesInvalidFlying);
-        config.addDefault("protections.packets.abilities.invalid-instant-build", abilitiesInvalidInstantBuild);
-        config.addDefault("protections.packets.abilities.invalid-invulnerable", abilitiesInvalidInvulnerable);
-        config.addDefault("protections.packets.abilities.invalid-walk-speed", abilitiesInvalidWalkSpeed);
-
-        // Packet protections; ArmAnimation
-        config.addDefault("protections.packets.arm-animation.invalid-conditions", armAnimationInvalidConditions);
-
-        // Packet protections; AttackEntity
-        config.addDefault("protections.packets.attack-entity.invalid-conditions", attackEntityInvalidConditions);
-
-        // Packet protections; Beacon
-        config.addDefault("protections.packets.beacon.invalid-conditions", beaconInvalidConditions);
-        config.addDefault("protections.packets.beacon.invalid-data", beaconInvalidData);
-        config.addDefault("protections.packets.beacon.invalid-effect", beaconInvalidEffect);
-        config.addDefault("protections.packets.beacon.invalid-tier", beaconInvalidTier);
-
-        // Packet protections; BlockDig
-        config.addDefault("protections.packets.block-dig.invalid-distance", blockDigInvalidDistance);
-
-        // Packet protections; BlockPlace
-        config.addDefault("protections.packets.block-place.invalid-conditions", blockPlaceInvalidConditions);
-        config.addDefault("protections.packets.block-place.invalid-cursor-position", blockPlaceInvalidCursorPosition);
-        config.addDefault("protections.packets.block-place.invalid-distance", blockPlaceInvalidDistance);
-        config.addDefault("protections.packets.block-place.invalid-item", blockPlaceInvalidItem);
-        config.addDefault("protections.packets.block-place.invalid-other-block-position", blockPlaceInvalidOtherBlockPosition);
-        config.addDefault("protections.packets.block-place.invalid-other-cursor-position", blockPlaceInvalidOtherCursorPosition);
-        config.addDefault("protections.packets.block-place.invalid-up-block-position", blockPlaceInvalidUpBlockPosition);
-
-        // Packet protections; BookEdit
-        config.addDefault("protections.packets.book-edit.invalid-conditions", bookEditInvalidConditions);
-        config.addDefault("protections.packets.book-edit.invalid-data", bookEditInvalidData);
-
-        // Packet protections; BookOpen
-        config.addDefault("protections.packets.book-open.invalid-conditions", bookOpenInvalidConditions);
-
-        // Packet protections; BookSign
-        config.addDefault("protections.packets.book-sign.invalid-conditions", bookSignInvalidConditions);
-        config.addDefault("protections.packets.book-sign.invalid-data", bookSignInvalidData);
-
-        // Packet protections; Chat
-        config.addDefault("protections.packets.chat.invalid-conditions", chatInvalidConditions);
-        config.addDefault("protections.packets.chat.invalid-message", chatInvalidMessage);
-
-        // Packet protections; CloseWindow
-        config.addDefault("protections.packets.close-window.closed-inventory", closeWindowClosedInventory);
-        config.addDefault("protections.packets.close-window.invalid-conditions", closeWindowInvalidConditions);
-
-        // Packet protections; CommandBlock
-        config.addDefault("protections.packets.command-block.invalid-conditions", commandBlockInvalidConditions);
-
-        // Packet protections; CustomPayload
-        config.addDefault("protections.packets.custom-payload.invalid-size", customPayloadInvalidSize);
-
-        // Packet protections; EnchantItem
-        config.addDefault("protections.packets.enchant-item.invalid-window-id", enchantItemInvalidWindowId);
-
-        // Packet protections; EntityAction
-        config.addDefault("protections.packets.entity-action.invalid-jump-boost", entityActionInvalidJumpBoost);
-
-        // Packet protections; Flying
-        config.addDefault("protections.packets.flying.invalid-pitch", flyingInvalidPitch);
-        config.addDefault("protections.packets.flying.invalid-position-data", flyingInvalidPositionData);
-        config.addDefault("protections.packets.flying.invalid-rotation-data", flyingInvalidRotationData);
-        config.addDefault("protections.packets.flying.invalid-y-data", flyingInvalidYData);
-
-        // Packet protections; HeldItemSlot
-        config.addDefault("protections.packets.held-item-slot.invalid-conditions", heldItemSlotInvalidConditions);
-        config.addDefault("protections.packets.held-item-slot.invalid-slot", heldItemSlotInvalidSlot);
-        config.addDefault("protections.packets.held-item-slot.invalid-slot-change", heldItemSlotInvalidSlotChange);
-
-        // Packet protections; ItemDrop
-        config.addDefault("protections.packets.item-drop.invalid-data", itemDropInvalidData);
-
-        // Packet protections; ItemName
-        config.addDefault("protections.packets.item-name.invalid-data", itemNameInvalidData);
-        config.addDefault("protections.packets.item-name.invalid-size", itemNameInvalidSize);
-
-        // Packet protections; ReleaseUseItem
-        config.addDefault("protections.packets.release-use-item.invalid-conditions", releaseUseItemInvalidConditions);
-        config.addDefault("protections.packets.release-use-item.invalid-data", releaseUseItemInvalidData);
-
-        // Packet protections; Respawn
-        config.addDefault("protections.packets.respawn.invalid-conditions", respawnInvalidConditions);
-
-        // Packet protections; RidingJump
-        config.addDefault("protections.packets.riding-jump.invalid-conditions", ridingJumpInvalidConditions);
-        config.addDefault("protections.packets.riding-jump.invalid-jump-boost", ridingJumpInvalidJumpBoost);
-
-        // Packet protections; SetCreativeSlot
-        config.addDefault("protections.packets.set-creative-slot.invalid-conditions", setCreativeSlotInvalidConditions);
-        config.addDefault("protections.packets.set-creative-slot.invalid-slot", setCreativeSlotInvalidSlot);
-
-        // Packet protections; Settings
-        config.addDefault("protections.packets.settings.invalid-locale", settingsInvalidLocale);
-        config.addDefault("protections.packets.settings.invalid-view-distance", settingsInvalidViewDistance);
-
-        // Packet protections; Spectate
-        config.addDefault("protections.packets.spectate.invalid-conditions", spectateInvalidConditions);
-
-        // Packet protections; StartSneaking
-        config.addDefault("protections.packets.start-sneaking.invalid-conditions", startSneakingInvalidConditions);
-
-        // Packet protections; StartSprinting
-        config.addDefault("protections.packets.start-sprinting.invalid-conditions", startSprintingInvalidConditions);
-
-        // Packet protections; SteerVehicle
-        config.addDefault("protections.packets.steer-vehicle.invalid-conditions", steerVehicleInvalidConditions);
-        config.addDefault("protections.packets.steer-vehicle.invalid-dismount-value", steerVehicleInvalidDismountValue);
-        config.addDefault("protections.packets.steer-vehicle.invalid-non-dismount-value", steerVehicleInvalidNonDismountValue);
-        config.addDefault("protections.packets.steer-vehicle.invalid-value", steerVehicleInvalidValue);
-
-        // Packet protections; StopSleeping
-        config.addDefault("protections.packets.stop-sleeping.invalid-conditions", stopSleepingInvalidConditions);
-
-        // Packet protections; StopSneaking
-        config.addDefault("protections.packets.stop-sneaking.invalid-conditions", stopSneakingInvalidConditions);
-
-        // Packet protections; TabComplete
-        config.addDefault("protections.packets.tab-complete.invalid-message", tabCompleteInvalidMessage);
-
-        // Packet protections; TradeSelect
-        config.addDefault("protections.packets.trade-select.invalid-data", tradeSelectInvalidData);
-
-        // Packet protections; Transaction
-        config.addDefault("protections.packets.transaction.invalid-window-id", transactionInvalidWindowId);
-        config.addDefault("protections.packets.transaction.not-accepted", transactionNotAccepted);
-
-        // Packet protections; UpdateSign
-        config.addDefault("protections.packets.update-sign.invalid-data", updateSignInvalidData);
-
-        // Packet protections; UseEntity
-        config.addDefault("protections.packets.use-entity.invalid-conditions", useEntityInvalidConditions);
-        config.addDefault("protections.packets.use-entity.invalid-distance", useEntityInvalidDistance);
-
-        // Packet protections; WindowClick
-        config.addDefault("protections.packets.window-click.invalid-clone-button", windowClickInvalidCloneButton);
-        config.addDefault("protections.packets.window-click.invalid-conditions", windowClickInvalidConditions);
-        config.addDefault("protections.packets.window-click.invalid-pickup-all-button", windowClickInvalidPickupAllButton);
-        config.addDefault("protections.packets.window-click.invalid-pickup-button", windowClickInvalidPickupButton);
-        config.addDefault("protections.packets.window-click.invalid-quick-craft-button", windowClickInvalidQuickCraftButton);
-        config.addDefault("protections.packets.window-click.invalid-quick-move-button", windowClickInvalidQuickMoveButton);
-        config.addDefault("protections.packets.window-click.invalid-slot", windowClickInvalidSlot);
-        config.addDefault("protections.packets.window-click.invalid-swap-button", windowClickInvalidSwapButton);
-        config.addDefault("protections.packets.window-click.invalid-throw-button", windowClickInvalidThrowButton);
-
-        config.options().copyDefaults(true);
-    }
-
-    /**
-     * Saves the configuration file.
-     */
-    private static void saveConfig() {
-        try {
-            config.save(file);
-        } catch (IOException ex) {
-            MessageUtil.log(Level.WARNING, "Couldn't save the config file.");
-        }
-    }
-
-    /**
      * Gets the name of a check.
      *
      * @param check The check.
      * @return The name of the check.
      */
-    private static String getCheckName(Class<? extends Check> check) {
+    private static @NotNull String getCheckName(@NotNull Class<? extends Check> check) {
         CheckInfo checkInfo = check.getAnnotation(CheckInfo.class);
         String name = checkInfo.name().replace(" ", "")
                 .replace("(", ".")
@@ -849,8 +424,8 @@ public class Settings {
      * @param newValue   The new value.
      */
     @SuppressWarnings("unchecked")
-    public static void changeAnnotationValue(@NonNull Annotation annotation,
-                                             @NonNull String key, @NonNull Object newValue) {
+    public static void changeAnnotationValue(Annotation annotation,
+                                             String key, Object newValue) {
         Object handler = Proxy.getInvocationHandler(annotation);
         Field field;
 

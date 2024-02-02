@@ -23,12 +23,12 @@ public class ReachC extends Check {
     private double buffer;
     private Vector3d playerEyeLocation;
 
-    public ReachC(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public ReachC(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull MovementEvent event, long timestamp) {
+    public void handle(MovementEvent event, long timestamp) {
         // Checks the player for exemptions.
         if (player.getGameMode().equals(GameMode.CREATIVE)
                 || playerData.getLastAttackTick() > 1

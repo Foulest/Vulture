@@ -1,13 +1,13 @@
 package net.foulest.vulture.util;
 
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
 @Setter
@@ -30,7 +30,7 @@ public class MovementUtil {
      * @param player The player to get the base speed of.
      * @return The player's base speed.
      */
-    public static float getBaseSpeed(@NonNull Player player) {
+    public static float getBaseSpeed(Player player) {
         return 0.26f + (getPotionEffectLevel(player, PotionEffectType.SPEED) * 0.03001f)
                 + ((player.getWalkSpeed() - 0.2f) * 1.6f);
     }
@@ -42,7 +42,7 @@ public class MovementUtil {
      * @param effectType The effect type to get the potion effect level of.
      * @return The potion effect level of the specified effect type.
      */
-    public static int getPotionEffectLevel(@NonNull Player player, @NonNull PotionEffectType effectType) {
+    public static int getPotionEffectLevel(@NotNull Player player, PotionEffectType effectType) {
         for (PotionEffect effect : player.getActivePotionEffects()) {
             if (effect.getType().getName().equals(effectType.getName())) {
                 return effect.getAmplifier() + 1;
@@ -57,7 +57,7 @@ public class MovementUtil {
      * @param player The player to get the depth strider level of.
      * @return The player's depth strider level.
      */
-    public static int getDepthStriderLevel(@NonNull Player player) {
+    public static int getDepthStriderLevel(@NotNull Player player) {
         ItemStack boots = player.getInventory().getBoots();
 
         if (boots != null) {

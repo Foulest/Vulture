@@ -1,14 +1,15 @@
 package net.foulest.vulture.util;
 
+import dev._2lstudios.hamsterapi.HamsterAPI;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import net.foulest.vulture.Vulture;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.data.PlayerDataManager;
-import dev._2lstudios.hamsterapi.HamsterAPI;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -27,49 +28,68 @@ public final class KickUtil {
 
     private static final Set<UUID> currentlyKicking = Collections.synchronizedSet(new HashSet<>());
 
-    private KickUtil() {
-        throw new UnsupportedOperationException("KickUtil should not be instantiated.");
+    public static void kickPlayer(Player player, String debugMessage) {
+        kick(player, debugMessage, "Disconnected", true);
     }
 
-    public static void kickPlayer(@NonNull Player player, @NonNull String debugMessage) {
-        kick(player, null, debugMessage, "Disconnected", true);
+    public static void kickPlayer(Player player, String debugMessage, String reason) {
+        kick(player, debugMessage, reason, true);
     }
 
-    public static void kickPlayer(@NonNull Player player, @NonNull String debugMessage, @NonNull String reason) {
-        kick(player, null, debugMessage, reason, true);
+    public static void kickPlayer(Player player, @NotNull Cancellable event,
+                                  String debugMessage, String reason) {
+        event.setCancelled(true);
+        kick(player, debugMessage, reason, true);
     }
 
-    public static void kickPlayer(@NonNull Player player, @NonNull CancellableEvent event,
-                                  @NonNull String debugMessage, @NonNull String reason) {
-        kick(player, event, debugMessage, reason, true);
+    public static void kickPlayer(Player player, @NotNull Cancellable event,
+                                  String debugMessage) {
+        event.setCancelled(true);
+        kick(player, debugMessage, "Disconnected", true);
     }
 
-    public static void kickPlayer(@NonNull Player player, @NonNull CancellableEvent event,
-                                  @NonNull String debugMessage) {
-        kick(player, event, debugMessage, "Disconnected", true);
-    }
-
-    public static void kickPlayer(@NonNull Player player, @NonNull CancellableEvent event,
-                                  boolean valueToCheck, @NonNull String debugMessage) {
+    public static void kickPlayer(Player player, Cancellable event,
+                                  boolean valueToCheck, String debugMessage) {
         if (valueToCheck) {
-            kick(player, event, debugMessage, "Disconnected", true);
+            event.setCancelled(true);
+            kick(player, debugMessage, "Disconnected", true);
         }
     }
 
-    public static void kickPlayer(@NonNull Player player, @NonNull String debugMessage, boolean announceKick) {
-        kick(player, null, debugMessage, "Disconnected", announceKick);
+    public static void kickPlayer(Player player, @NotNull CancellableEvent event,
+                                  String debugMessage, String reason) {
+        event.setCancelled(true);
+        kick(player, debugMessage, reason, true);
     }
 
-    public static void kickPlayer(@NonNull Player player, @NonNull String debugMessage,
+    public static void kickPlayer(Player player, @NotNull CancellableEvent event,
+                                  String debugMessage) {
+        event.setCancelled(true);
+        kick(player, debugMessage, "Disconnected", true);
+    }
+
+    public static void kickPlayer(Player player, CancellableEvent event,
+                                  boolean valueToCheck, String debugMessage) {
+        if (valueToCheck) {
+            event.setCancelled(true);
+            kick(player, debugMessage, "Disconnected", true);
+        }
+    }
+
+    public static void kickPlayer(Player player, String debugMessage, boolean announceKick) {
+        kick(player, debugMessage, "Disconnected", announceKick);
+    }
+
+    public static void kickPlayer(Player player, String debugMessage,
                                   boolean valueToCheck, boolean announceKick) {
         if (valueToCheck) {
-            kick(player, null, debugMessage, "Disconnected", announceKick);
+            kick(player, debugMessage, "Disconnected", announceKick);
         }
     }
 
-    public static void kickPlayer(@NonNull Player player, @NonNull String debugMessage,
-                                  @NonNull String reason, boolean announceKick) {
-        kick(player, null, debugMessage, reason, announceKick);
+    public static void kickPlayer(Player player, String debugMessage,
+                                  String reason, boolean announceKick) {
+        kick(player, debugMessage, reason, announceKick);
     }
 
     /**
@@ -78,9 +98,9 @@ public final class KickUtil {
      * @param player The player to be kicked.
      * @param reason The reason for kicking the player.
      */
-    public static void kick(@NonNull Player player, CancellableEvent eventToCancel,
-                            @NonNull String debugMessage,
-                            @NonNull String reason, boolean announceKick) {
+    public static void kick(@NotNull Player player,
+                            String debugMessage,
+                            String reason, boolean announceKick) {
         synchronized (currentlyKicking) {
             if (currentlyKicking.contains(player.getUniqueId())) {
                 // Already in the process of kicking this player.
@@ -94,11 +114,8 @@ public final class KickUtil {
 
         if (announceKick) {
             MessageUtil.sendAlert("&f" + player.getName() + " &7has been kicked for cheating."
-                    + (debugMessage.isEmpty() ? "" : " &8(" + debugMessage + "&8)"));
-        }
-
-        if (eventToCancel != null) {
-            eventToCancel.setCancelled(true);
+                    + (debugMessage.isEmpty() ? "" : " &8(" + debugMessage + "&8)")
+            );
         }
 
         // Kicks the player with a message.
@@ -124,7 +141,7 @@ public final class KickUtil {
      * @param player The player to check.
      * @return If the player is being kicked.
      */
-    public static boolean isPlayerBeingKicked(@NonNull Player player) {
+    public static boolean isPlayerBeingKicked(Player player) {
         synchronized (currentlyKicking) {
             return currentlyKicking.contains(player.getUniqueId());
         }

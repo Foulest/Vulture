@@ -15,39 +15,39 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class TaskUtil {
 
-    public static void runTask(@NonNull Runnable runnable) {
+    public static void runTask(Runnable runnable) {
         Bukkit.getScheduler().runTask(Vulture.instance, runnable);
     }
 
-    public static void runTaskAsynchronously(@NonNull Runnable runnable) {
+    public static void runTaskAsynchronously(Runnable runnable) {
         Bukkit.getScheduler().runTaskAsynchronously(Vulture.instance, runnable);
     }
 
-    public static void runTaskLater(@NonNull Runnable runnable, long delay) {
+    public static void runTaskLater(Runnable runnable, long delay) {
         Bukkit.getScheduler().runTaskLater(Vulture.instance, runnable, delay);
     }
 
-    public static void runTaskLaterAsynchronously(@NonNull Runnable runnable, long delay) {
+    public static void runTaskLaterAsynchronously(Runnable runnable, long delay) {
         Bukkit.getScheduler().runTaskLaterAsynchronously(Vulture.instance, runnable, delay);
     }
 
-    public static void runTaskTimer(@NonNull Runnable runnable, long delay, long period) {
+    public static void runTaskTimer(Runnable runnable, long delay, long period) {
         Bukkit.getScheduler().runTaskTimer(Vulture.instance, runnable, delay, period);
     }
 
-    public static void runTaskTimerAsynchronously(@NonNull Runnable runnable, long delay, long period) {
+    public static void runTaskTimerAsynchronously(Runnable runnable, long delay, long period) {
         Bukkit.getScheduler().runTaskTimerAsynchronously(Vulture.instance, runnable, delay, period);
     }
 
-    public static void scheduleSyncDelayedTask(@NonNull Runnable runnable) {
+    public static void scheduleSyncDelayedTask(Runnable runnable) {
         Bukkit.getScheduler().scheduleSyncDelayedTask(Vulture.instance, runnable);
     }
 
-    public static void scheduleSyncDelayedTask(@NonNull Runnable runnable, long period) {
+    public static void scheduleSyncDelayedTask(Runnable runnable, long period) {
         Bukkit.getScheduler().scheduleSyncDelayedTask(Vulture.instance, runnable, period);
     }
 
-    public static void scheduleSyncRepeatingTask(@NonNull Runnable runnable, long delay, long period) {
+    public static void scheduleSyncRepeatingTask(Runnable runnable, long delay, long period) {
         Bukkit.getScheduler().scheduleSyncRepeatingTask(Vulture.instance, runnable, delay, period);
     }
 

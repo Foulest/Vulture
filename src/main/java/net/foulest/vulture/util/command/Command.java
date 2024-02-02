@@ -6,10 +6,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Annotation used to define commands for the CommandFramework.
+ * This annotation should be applied to methods that represent commands.
+ * This class is part of the CommandFramework.
+ *
  * @author minnymin3
- * @project Vulture
- * <p>
- * <a href="https://github.com/mcardy/CommandFramework">...</a>
+ * @see <a href="https://github.com/mcardy/CommandFramework">CommandFramework GitHub</a>
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
@@ -38,12 +40,12 @@ public @interface Command {
     String[] aliases() default {};
 
     /**
-     * The description that will appear in /help of the command.
+     * The description that will appear in the /help of the command.
      */
     String description();
 
     /**
-     * The usage that will appear in /help (command).
+     * The usage that will appear in the /help of the command.
      */
     String usage();
 

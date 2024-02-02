@@ -18,12 +18,12 @@ public class SpeedF extends Check {
 
     private double buffer;
 
-    public SpeedF(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public SpeedF(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull MovementEvent event, long timestamp) {
+    public void handle(MovementEvent event, long timestamp) {
         // Checks the player for exemptions.
         if (player.isFlying()) {
             return;

@@ -17,13 +17,13 @@ public class BadPacketsF extends Check {
     private boolean sentSignEditor;
     private boolean sentBlockChange;
 
-    public BadPacketsF(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public BadPacketsF(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
-                       @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+    public void handle(CancellableNMSPacketEvent event, byte packetId,
+                       NMSPacket nmsPacket, Object packet, long timestamp) {
         if (packetId == PacketType.Play.Server.OPEN_SIGN_EDITOR) {
             sentSignEditor = true;
             sentBlockChange = false;

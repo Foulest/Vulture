@@ -2,8 +2,9 @@ package net.foulest.vulture.util.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -24,7 +25,7 @@ public final class EvictingList<T> extends LinkedList<T> {
     private final int maxSize;
 
     @Override
-    public boolean add(@NonNull T t) {
+    public boolean add(T t) {
         if (size() >= getMaxSize()) {
             removeFirst();
         }
@@ -35,7 +36,8 @@ public final class EvictingList<T> extends LinkedList<T> {
         return size() >= getMaxSize();
     }
 
-    public List<T> toList() {
+    @Contract(" -> new")
+    public @NotNull List<T> toList() {
         return new LinkedList<>(this);
     }
 }

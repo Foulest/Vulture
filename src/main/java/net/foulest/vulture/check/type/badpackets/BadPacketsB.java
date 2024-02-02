@@ -18,13 +18,13 @@ public class BadPacketsB extends Check {
 
     private int ticksInBed;
 
-    public BadPacketsB(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public BadPacketsB(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
-                       @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+    public void handle(CancellableNMSPacketEvent event, byte packetId,
+                       NMSPacket nmsPacket, Object packet, long timestamp) {
         ticksInBed = !playerData.isInBed() ? 0 : ticksInBed + 1;
 
         // Checks the player for exemptions.

@@ -1,24 +1,24 @@
 package net.foulest.vulture.check.type.aimassist;
 
 import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
-import lombok.NonNull;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.event.RotationEvent;
+import org.jetbrains.annotations.NotNull;
 
 @CheckInfo(name = "AimAssist (B)", type = CheckType.AIMASSIST)
 public class AimAssistB extends Check {
 
     private int buffer;
 
-    public AimAssistB(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public AimAssistB(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull RotationEvent event, long timestamp) {
+    public void handle(@NotNull RotationEvent event, long timestamp) {
         WrappedPacketInFlying to = event.getTo();
         WrappedPacketInFlying from = event.getFrom();
 

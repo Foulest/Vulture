@@ -1,10 +1,9 @@
 package net.foulest.vulture.util;
 
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
-import net.foulest.vulture.data.PlayerDataManager;
 import net.foulest.vulture.data.PlayerData;
+import net.foulest.vulture.data.PlayerDataManager;
 import net.foulest.vulture.util.data.ConcurrentStream;
 import net.foulest.vulture.util.raytrace.BoundingBox;
 import org.bukkit.Effect;
@@ -13,6 +12,9 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -21,30 +23,30 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class BlockUtil {
 
-    public static boolean isPlayerInUnloadedChunk(@NonNull Player player) {
+    public static boolean isPlayerInUnloadedChunk(@NotNull Player player) {
         return !player.getLocation().getWorld().isChunkLoaded(player.getLocation().getBlockX() >> 4,
                 player.getLocation().getBlockZ() >> 4);
     }
 
-    public static boolean isLocationInUnloadedChunk(@NonNull Location location) {
+    public static boolean isLocationInUnloadedChunk(@NotNull Location location) {
         return !location.getWorld().isChunkLoaded(location.getBlockX() >> 4, location.getBlockZ() >> 4);
     }
 
-    public static BoundingBox getPlayerFeetBoundingBox(@NonNull Player player) {
+    public static BoundingBox getPlayerFeetBoundingBox(Player player) {
         return new BoundingBox(player)
                 .expand(0.0, 0.0, 0.0)
                 .expandMin(0.0, 1.3, 0.0)
                 .expandMax(0.0, -1.0, 0.0);
     }
 
-    public static BoundingBox getPlayerNearBoundingBox(@NonNull Player player) {
+    public static BoundingBox getPlayerNearBoundingBox(Player player) {
         return new BoundingBox(player)
                 .expand(1.0, 0.0, 1.0)
                 .expandMin(0.0, 1.2, 0.0)
                 .expandMax(0.0, 1.0, 0.0);
     }
 
-    public static BoundingBox getPlayerCustomBoundingBox(@NonNull Player player, double expandXZ,
+    public static BoundingBox getPlayerCustomBoundingBox(Player player, double expandXZ,
                                                          double expandMin, double expandMax) {
         return new BoundingBox(player)
                 .expand(expandXZ, 0.0, expandXZ)
@@ -52,11 +54,12 @@ public class BlockUtil {
                 .expandMax(0.0, expandMax, 0.0);
     }
 
-    public static ConcurrentStream<Block> getCollidingBlocks(@NonNull Player player, @NonNull BoundingBox boundingBox) {
+    @Contract("_, _ -> new")
+    public static @NotNull ConcurrentStream<Block> getCollidingBlocks(Player player, @NotNull BoundingBox boundingBox) {
         return new ConcurrentStream<>(boundingBox.getCollidingBlocks(player), false);
     }
 
-    public static Block getCollidingBlock(@NonNull Player player) {
+    public static @Nullable Block getCollidingBlock(Player player) {
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
         if (isPlayerInUnloadedChunk(player)) {
@@ -80,7 +83,7 @@ public class BlockUtil {
         return null;
     }
 
-    private static boolean collidesWithSolid(@NonNull Player player, BoundingBox boundingBox) {
+    private static boolean collidesWithSolid(Player player, BoundingBox boundingBox) {
         ConcurrentStream<Block> collidingBlocks = getCollidingBlocks(player, boundingBox);
 
         return collidingBlocks.any(block -> block.getType().isSolid()
@@ -91,7 +94,9 @@ public class BlockUtil {
                 || block.getType() == Material.SKULL);
     }
 
-    public static List<Block> getIntersectingBlocks(@NonNull Location from, @NonNull Location to, @NonNull Player player) {
+    public static @NotNull List<Block> getIntersectingBlocks(@NotNull Location from,
+                                                             @NotNull Location to,
+                                                             Player player) {
         // Create a bounding box representing the player's trajectory
         BoundingBox trajectoryBox = new BoundingBox(
                 Math.min(from.getX(), to.getX()),
@@ -109,7 +114,7 @@ public class BlockUtil {
         return blocks;
     }
 
-    public static boolean isOnGroundOffset(@NonNull Player player, double offset) {
+    public static boolean isOnGroundOffset(Player player, double offset) {
         if (isPlayerInUnloadedChunk(player)) {
             return true;
         }
@@ -120,7 +125,7 @@ public class BlockUtil {
         return collidesWithSolid(player, boundingBox);
     }
 
-    public static boolean isUnderBlock(@NonNull Player player) {
+    public static boolean isUnderBlock(Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;
         }
@@ -129,7 +134,7 @@ public class BlockUtil {
         return collidesWithSolid(player, boundingBox);
     }
 
-    public static boolean isAgainstBlock(@NonNull Player player) {
+    public static boolean isAgainstBlock(Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;
         }
@@ -138,7 +143,7 @@ public class BlockUtil {
         return collidesWithSolid(player, boundingBox);
     }
 
-    public static boolean isOnSlab(@NonNull Player player) {
+    public static boolean isOnSlab(Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;
         }
@@ -151,7 +156,7 @@ public class BlockUtil {
                 || block.getType() == Material.STONE_SLAB2);
     }
 
-    public static boolean isOnStairs(@NonNull Player player) {
+    public static boolean isOnStairs(Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;
         }
@@ -174,7 +179,7 @@ public class BlockUtil {
                 || block.getType() == Material.SPRUCE_WOOD_STAIRS);
     }
 
-    public static boolean isNearStairs(@NonNull Player player) {
+    public static boolean isNearStairs(Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;
         }
@@ -197,7 +202,7 @@ public class BlockUtil {
                 || block.getType() == Material.SPRUCE_WOOD_STAIRS);
     }
 
-    public static boolean isNearPiston(@NonNull Player player) {
+    public static boolean isNearPiston(Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;
         }
@@ -211,7 +216,7 @@ public class BlockUtil {
                 || block.getType() == Material.PISTON_MOVING_PIECE);
     }
 
-    public static boolean isNearCactus(@NonNull Player player) {
+    public static boolean isNearCactus(Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;
         }
@@ -221,7 +226,7 @@ public class BlockUtil {
         return collidingBlocks.any(block -> block.getType() == Material.CACTUS);
     }
 
-    public static boolean isInWeb(@NonNull Player player) {
+    public static boolean isInWeb(Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;
         }
@@ -231,7 +236,7 @@ public class BlockUtil {
         return collidingBlocks.any(block -> block.getType() == Material.WEB);
     }
 
-    public static boolean isInLiquid(@NonNull Player player) {
+    public static boolean isInLiquid(Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;
         }
@@ -245,7 +250,7 @@ public class BlockUtil {
                 || block.getType() == Material.STATIONARY_WATER);
     }
 
-    public static boolean isNearLiquid(@NonNull Player player) {
+    public static boolean isNearLiquid(Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;
         }
@@ -259,7 +264,7 @@ public class BlockUtil {
                 || block.getType() == Material.STATIONARY_WATER);
     }
 
-    public static boolean isNearChest(@NonNull Player player) {
+    public static boolean isNearChest(Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;
         }
@@ -272,7 +277,7 @@ public class BlockUtil {
                 || block.getType() == Material.TRAPPED_CHEST);
     }
 
-    public static boolean isOnChest(@NonNull Player player) {
+    public static boolean isOnChest(Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;
         }
@@ -285,7 +290,7 @@ public class BlockUtil {
                 || block.getType() == Material.TRAPPED_CHEST);
     }
 
-    public static boolean isOnClimbable(@NonNull Player player) {
+    public static boolean isOnClimbable(Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;
         }
@@ -297,7 +302,7 @@ public class BlockUtil {
                 || block.getType() == Material.VINE);
     }
 
-    public static boolean isNearPortal(@NonNull Player player) {
+    public static boolean isNearPortal(Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;
         }
@@ -308,7 +313,7 @@ public class BlockUtil {
         return collidingBlocks.any(block -> block.getType() == Material.PORTAL);
     }
 
-    public static boolean isNearClimbable(@NonNull Player player) {
+    public static boolean isNearClimbable(Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;
         }
@@ -320,7 +325,7 @@ public class BlockUtil {
                 || block.getType() == Material.VINE);
     }
 
-    public static boolean isOnSnowLayer(@NonNull Player player) {
+    public static boolean isOnSnowLayer(Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;
         }
@@ -330,7 +335,7 @@ public class BlockUtil {
         return collidingBlocks.any(block -> block.getType() == Material.SNOW);
     }
 
-    public static boolean isOnIce(@NonNull Player player) {
+    public static boolean isOnIce(Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;
         }
@@ -342,7 +347,7 @@ public class BlockUtil {
                 || block.getType() == Material.PACKED_ICE);
     }
 
-    public static boolean isOnSoulSand(@NonNull Player player) {
+    public static boolean isOnSoulSand(Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;
         }
@@ -352,7 +357,7 @@ public class BlockUtil {
         return collidingBlocks.any(block -> block.getType() == Material.SOUL_SAND);
     }
 
-    public static boolean isNearTrapdoor(@NonNull Player player) {
+    public static boolean isNearTrapdoor(Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;
         }
@@ -364,7 +369,7 @@ public class BlockUtil {
                 || block.getType() == Material.IRON_TRAPDOOR);
     }
 
-    public static boolean isNearFlowerPot(@NonNull Player player) {
+    public static boolean isNearFlowerPot(Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;
         }
@@ -374,7 +379,7 @@ public class BlockUtil {
         return collidingBlocks.any(block -> block.getType() == Material.FLOWER_POT);
     }
 
-    public static boolean isNearHopper(@NonNull Player player) {
+    public static boolean isNearHopper(Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;
         }
@@ -384,7 +389,7 @@ public class BlockUtil {
         return collidingBlocks.any(block -> block.getType() == Material.HOPPER);
     }
 
-    public static boolean isNearBrewingStand(@NonNull Player player) {
+    public static boolean isNearBrewingStand(Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;
         }
@@ -394,7 +399,7 @@ public class BlockUtil {
         return collidingBlocks.any(block -> block.getType() == Material.BREWING_STAND);
     }
 
-    public static boolean isNearFence(@NonNull Player player) {
+    public static boolean isNearFence(Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;
         }
@@ -411,7 +416,7 @@ public class BlockUtil {
                 || block.getType() == Material.COBBLE_WALL);
     }
 
-    public static boolean isNearFenceGate(@NonNull Player player) {
+    public static boolean isNearFenceGate(Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;
         }
@@ -426,7 +431,7 @@ public class BlockUtil {
                 || block.getType() == Material.SPRUCE_FENCE_GATE);
     }
 
-    public static boolean isOnLilyPad(@NonNull Player player) {
+    public static boolean isOnLilyPad(Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;
         }
@@ -436,7 +441,7 @@ public class BlockUtil {
         return collidingBlocks.any(block -> block.getType() == Material.WATER_LILY);
     }
 
-    public static boolean isNearLilyPad(@NonNull Player player) {
+    public static boolean isNearLilyPad(Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;
         }
@@ -446,7 +451,7 @@ public class BlockUtil {
         return collidingBlocks.any(block -> block.getType() == Material.WATER_LILY);
     }
 
-    public static boolean isNearSlab(@NonNull Player player) {
+    public static boolean isNearSlab(Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;
         }
@@ -459,7 +464,7 @@ public class BlockUtil {
                 || block.getType() == Material.STONE_SLAB2);
     }
 
-    public static boolean isNearSnowLayer(@NonNull Player player) {
+    public static boolean isNearSnowLayer(Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;
         }
@@ -469,7 +474,7 @@ public class BlockUtil {
         return collidingBlocks.any(block -> block.getType() == Material.SNOW);
     }
 
-    public static boolean isNearCarpet(@NonNull Player player) {
+    public static boolean isNearCarpet(Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;
         }
@@ -479,7 +484,7 @@ public class BlockUtil {
         return collidingBlocks.any(block -> block.getType() == Material.CARPET);
     }
 
-    public static boolean isNearAnvil(@NonNull Player player) {
+    public static boolean isNearAnvil(Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;
         }
@@ -489,7 +494,7 @@ public class BlockUtil {
         return collidingBlocks.any(block -> block.getType() == Material.ANVIL);
     }
 
-    public static boolean isNearSlimeBlock(@NonNull Player player) {
+    public static boolean isNearSlimeBlock(Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;
         }
@@ -499,7 +504,8 @@ public class BlockUtil {
         return collidingBlocks.any(block -> block.getType() == Material.SLIME_BLOCK);
     }
 
-    public static void visualizeBoundingBox(@NonNull Player player, @NonNull BoundingBox boundingBox) {
+    public static void visualizeBoundingBox(@NotNull Player player,
+                                            @NotNull BoundingBox boundingBox) {
         World world = player.getWorld();
         Effect effect = Effect.COLOURED_DUST;
 
@@ -516,7 +522,7 @@ public class BlockUtil {
         world.playEffect(new Location(world, boundingBox.max.getX(), boundingBox.max.getY(), boundingBox.max.getZ()), effect, 0);
     }
 
-    public static double getBlockFriction(@NonNull Player player) {
+    public static double getBlockFriction(Player player) {
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
         return playerData.isOnIce() ? 0.98 : 0.60;
     }

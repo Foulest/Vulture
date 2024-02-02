@@ -20,13 +20,13 @@ public class BadPacketsE extends Check {
     private int packetsSent;
     private int packetsReceived;
 
-    public BadPacketsE(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public BadPacketsE(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
-                       @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+    public void handle(CancellableNMSPacketEvent event, byte packetId,
+                       NMSPacket nmsPacket, Object packet, long timestamp) {
         if (packetId == PacketType.Play.Server.RESOURCE_PACK_SEND) {
             ++packetsSent;
 

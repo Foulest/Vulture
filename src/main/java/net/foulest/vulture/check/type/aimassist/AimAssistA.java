@@ -1,11 +1,11 @@
 package net.foulest.vulture.check.type.aimassist;
 
-import lombok.NonNull;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.event.RotationEvent;
+import org.jetbrains.annotations.NotNull;
 
 @CheckInfo(name = "AimAssist (A)", type = CheckType.AIMASSIST)
 public class AimAssistA extends Check {
@@ -15,12 +15,12 @@ public class AimAssistA extends Check {
     private double buffer;
     private double streak;
 
-    public AimAssistA(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public AimAssistA(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull RotationEvent event, long timestamp) {
+    public void handle(@NotNull RotationEvent event, long timestamp) {
         double deltaYaw = event.getDeltaYaw();
         double deltaPitch = event.getDeltaPitch();
 

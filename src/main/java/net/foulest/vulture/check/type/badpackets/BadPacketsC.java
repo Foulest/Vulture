@@ -18,13 +18,13 @@ public class BadPacketsC extends Check {
 
     private boolean swung;
 
-    public BadPacketsC(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public BadPacketsC(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
-                       @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+    public void handle(CancellableNMSPacketEvent event, byte packetId,
+                       NMSPacket nmsPacket, Object packet, long timestamp) {
         // Checks the player for exemptions.
         if (playerData.getVersion().isNewerThan(ClientVersion.v_1_8)) {
             return;

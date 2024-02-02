@@ -1,7 +1,7 @@
 package net.foulest.vulture.util.yaml;
 
 import com.google.common.base.Charsets;
-import org.bukkit.Bukkit;
+import net.foulest.vulture.util.MessageUtil;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
@@ -10,7 +10,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,61 +35,60 @@ public class CustomYamlConfiguration extends YamlConfiguration {
 
     @Override
     public String saveToString() {
+        // Strip all comments from the original data
         String dataWithoutComments = super.saveToString().trim();
+
+        // Use a pattern to match YAML comments and remove them
+        String dataStrippedOfComments = dataWithoutComments.replaceAll("(?m)^\\s*#.*?$", "").trim();
+
         StringBuilder dataWithComments = new StringBuilder();
 
-        // Process header comments if present
-        String headerKey = "__header__";
-        if (commentsMap.containsKey(headerKey)) {
-            String headerComment = commentsMap.get(headerKey);
-            StringBuilder headerBuilder = new StringBuilder();
-            String[] headerLines = headerComment.split("\n");
-
-            for (String line : headerLines) {
-                headerBuilder.append("#").append(line).append(System.lineSeparator());
-            }
-
-            String header = headerBuilder.toString().trim();
-
-            // Check if the actual data starts with any other YAML content before the header
-            if (!dataWithoutComments.startsWith(header)) {
-                // If the header is not at the beginning, prepend it
-                dataWithComments.append(headerBuilder).append(System.lineSeparator());
-            }
+        // Insert header comments
+        String headerComment = commentsMap.getOrDefault("__header__", "");
+        if (!headerComment.isEmpty()) {
+            appendComments(dataWithComments, headerComment, ""); // No indentation for header
         }
 
-        // Split the data into lines for processing
-        String[] lines = dataWithoutComments.split("\n");
+        // Iterate through each line of the stripped YAML data to reinsert comments
+        String[] lines = dataStrippedOfComments.split("\n");
 
-        // Temporary storage to build the current line's comment, if any
-        StringBuilder commentBuilder = new StringBuilder();
-
-        // Iterate through each line of the YAML data
         for (String line : lines) {
-            // Check if the line starts with a key that has a stored comment
+            // Attempt to extract a key from the current line
             String key = getKeyFromLine(line);
 
             if (key != null && commentsMap.containsKey(key)) {
-                // If there's a comment for this key, prepare it
+                // Insert comment for the key before the line
                 String comment = commentsMap.get(key);
-                String[] commentLines = comment.split("\n");
 
-                for (String commentLine : commentLines) {
-                    commentBuilder.append("# ").append(commentLine).append("\n");
+                if (!comment.isEmpty()) {
+                    String[] commentLines = comment.split("\n");
+
+                    // Determine the indentation of the current line
+                    int indent = line.indexOf(key);
+                    StringBuilder indentBuilder = new StringBuilder();
+
+                    for (int i = 0; i < indent; i++) {
+                        indentBuilder.append(" "); // Append space to match the indentation
+                    }
+
+                    String indentSpace = indentBuilder.toString(); // Create an indentation string
+
+                    for (String commentLine : commentLines) {
+                        dataWithComments.append(indentSpace).append("# ").append(commentLine).append(System.lineSeparator());
+                    }
                 }
             }
 
-            // Append the comment before the line it's associated with
-            if (commentBuilder.length() > 0) {
-                dataWithComments.append(commentBuilder);
-                commentBuilder.setLength(0); // Clear the comment builder for the next use
-            }
-
             // Append the current line of YAML data
-            dataWithComments.append(line).append("\n");
+            dataWithComments.append(line).append(System.lineSeparator());
         }
 
-        // Return the YAML data as a string, now including comments
+        // Add footer comments from commentsMap if present
+        String footerComment = commentsMap.getOrDefault("__footer__", "");
+        if (!footerComment.isEmpty()) {
+            appendComments(dataWithComments, footerComment, ""); // No indentation for footer
+        }
+
         return dataWithComments.toString();
     }
 
@@ -125,7 +123,7 @@ public class CustomYamlConfiguration extends YamlConfiguration {
             config.load(file);
         } catch (FileNotFoundException ignored) {
         } catch (IOException | InvalidConfigurationException ex) {
-            Bukkit.getLogger().log(Level.SEVERE, "Cannot load " + file, ex);
+            MessageUtil.printException(ex);
         }
         return config;
     }
@@ -136,30 +134,41 @@ public class CustomYamlConfiguration extends YamlConfiguration {
         try {
             config.load(reader);
         } catch (IOException | InvalidConfigurationException ex) {
-            Bukkit.getLogger().log(Level.SEVERE, "Cannot load configuration from stream", ex);
+            MessageUtil.printException(ex);
         }
         return config;
     }
 
     /**
-     * Extracts the key from a YAML line, if present.
-     * This is a simplistic approach and might need refining for complex YAML structures.
+     * Appends comments to the StringBuilder with given indentation.
+     *
+     * @param builder     The StringBuilder to append comments to.
+     * @param comments    The comment string to append.
+     * @param indentation The indentation to apply to each comment line.
+     */
+    private void appendComments(StringBuilder builder, String comments, String indentation) {
+        for (String line : comments.split("\n")) {
+            builder.append(indentation).append("# ").append(line).append("\n");
+        }
+    }
+
+    /**
+     * Extracts the key from a YAML line, if present. Adjust regex as necessary.
      *
      * @param line The line of YAML to extract the key from.
      * @return The key if the line contains a key-value pair, otherwise null.
      */
     private @Nullable String getKeyFromLine(String line) {
-        // Match lines that start with a YAML key (followed by a colon).
-        // This regex needs to be refined based on the actual YAML structure and indentation.
-        Pattern pattern = Pattern.compile("^\\s*([\\w\\-]+):");
-        Matcher matcher = pattern.matcher(line);
-
-        if (matcher.find()) {
-            return matcher.group(1);
-        }
-        return null;
+        Matcher matcher = Pattern.compile("^\\s*([\\w\\-]+):").matcher(line);
+        return matcher.find() ? matcher.group(1) : null;
     }
 
+    /**
+     * Parses the YAML data and stores the comments in the comments map.
+     * This method is called when loading YAML data to ensure comments are stored.
+     *
+     * @param contents The YAML data to parse and store comments for.
+     */
     private void parseAndStoreComments(@NotNull String contents) {
         String[] lines = contents.split("\n");
         StringBuilder commentBuilder = new StringBuilder();
@@ -173,13 +182,15 @@ public class CustomYamlConfiguration extends YamlConfiguration {
                 if (commentBuilder.length() > 0) {
                     commentBuilder.append("\n");
                 }
-
                 commentBuilder.append(line.trim().substring(1).trim()); // Remove '#' and trim
 
             } else {
-                if (!line.trim().isEmpty()) {
-                    // If we encounter a non-empty line that's not a comment, assume subsequent comments are not headers
-                    isHeader = false;
+                if (!line.trim().isEmpty() && isHeader) {
+                    // Store header comments and mark that we've found a non-comment line
+                    String lastComment = commentBuilder.toString();
+                    commentsMap.put("__header__", lastComment);
+                    commentBuilder.setLength(0);
+                    isHeader = false; // No longer reading header comments
                 }
 
                 Matcher matcher = keyPattern.matcher(line);
@@ -187,21 +198,18 @@ public class CustomYamlConfiguration extends YamlConfiguration {
                 if (matcher.find()) {
                     // Found a key, store the accumulated comments if any
                     String key = matcher.group(1);
-
                     if (commentBuilder.length() > 0) {
                         String lastComment = commentBuilder.toString();
                         commentsMap.put(key, lastComment);
                         commentBuilder.setLength(0); // Reset comment builder
                     }
-
-                } else if (isHeader && commentBuilder.length() > 0) {
-                    // Handle header comments specifically
-                    String lastComment = commentBuilder.toString();
-                    commentsMap.put("__header__", lastComment);
-                    System.out.println("Header: " + lastComment);
-                    commentBuilder.setLength(0); // Reset for the next header or key comment
                 }
             }
+        }
+
+        // In case the file ends with comments not associated with a key
+        if (commentBuilder.length() > 0 && !isHeader) {
+            commentsMap.put("__footer__", commentBuilder.toString());
         }
     }
 }

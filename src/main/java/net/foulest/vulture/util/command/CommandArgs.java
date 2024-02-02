@@ -1,16 +1,18 @@
 package net.foulest.vulture.util.command;
 
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 /**
+ * Represents the arguments provided to a command handler method.
+ * These arguments include the sender, the executed command, the command label, and the command arguments.
+ * This class is part of the CommandFramework.
+ *
  * @author minnymin3
- * @project Vulture
- * <p>
- * <a href="https://github.com/mcardy/CommandFramework">...</a>
+ * @see <a href="https://github.com/mcardy/CommandFramework">CommandFramework GitHub</a>
  */
 @Getter
 @Setter
@@ -21,8 +23,17 @@ public class CommandArgs {
     private final String label;
     private final String[] args;
 
-    protected CommandArgs(@NonNull CommandSender sender, @NonNull org.bukkit.command.Command command,
-                          @NonNull String label, @NonNull String[] args, int subCommand) {
+    /**
+     * Constructor for CommandArgs.
+     *
+     * @param sender     The CommandSender executing the command.
+     * @param command    The executed command.
+     * @param label      The label of the command.
+     * @param args       The arguments provided to the command.
+     * @param subCommand The number of sub-commands in the command.
+     */
+    protected CommandArgs(CommandSender sender, org.bukkit.command.Command command,
+                          String label, String @NotNull [] args, int subCommand) {
         String[] modArgs = new String[args.length - subCommand];
 
         if (args.length - subCommand >= 0) {
@@ -44,37 +55,47 @@ public class CommandArgs {
     }
 
     /**
-     * Gets the label including sub command labels of this command
+     * Get the command label with sub-commands replaced by spaces.
      *
-     * @return Something like 'test.subcommand'
+     * @return The formatted command label.
      */
     public String getLabel() {
         return label.replaceAll("\\.", " ");
     }
 
     /**
-     * Gets the argument at the specified index
+     * Get the argument at the specified index.
      *
-     * @param index The index to simpleGet
-     * @return The string at the specified index
+     * @param index The index of the argument.
+     * @return The argument at the specified index.
      */
     public String getArgs(int index) {
         return args[index];
     }
 
     /**
-     * Returns the length of the command arguments
+     * Get the number of arguments.
      *
-     * @return int length of args
+     * @return The number of arguments.
      */
     public int length() {
         return args.length;
     }
 
+    /**
+     * Check if the sender is a player.
+     *
+     * @return true if the sender is a player, false otherwise.
+     */
     public boolean isPlayer() {
         return sender instanceof Player;
     }
 
+    /**
+     * Get the sender as a Player if the sender is a player.
+     *
+     * @return The sender as a Player or null if the sender is not a player.
+     */
     public Player getPlayer() {
         return isPlayer() ? ((Player) sender) : null;
     }

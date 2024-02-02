@@ -4,6 +4,8 @@ import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 
@@ -11,7 +13,7 @@ public class MathUtil {
 
     private static final float[] SIN_TABLE = new float[65536];
     private static final float[] SIN_TABLE_FAST = new float[4096];
-    public static boolean fastMath = false;
+    public static boolean fastMath;
 
     public static float getDistanceBetweenAngles(float angle1, float angle2) {
         float distance = Math.abs(angle1 - angle2) % 360.0f;
@@ -22,11 +24,14 @@ public class MathUtil {
         return distance;
     }
 
-    public static Vector getVectorSpeed(Vector3d from, Vector3d to) {
+    @Contract("_, _ -> new")
+    public static @NotNull Vector getVectorSpeed(@NotNull Vector3d to,
+                                                 @NotNull Vector3d from) {
         return new Vector(to.getX() - from.getX(), 0, to.getZ() - from.getZ());
     }
 
-    public static Vector getEyeDirection(Player player) {
+    @Contract("_ -> new")
+    public static @NotNull Vector getEyeDirection(@NotNull Player player) {
         return new Vector(-Math.sin(player.getEyeLocation().getYaw() * Math.PI / 180.0) * 1.0 * 0.5, 0.0,
                 Math.cos(player.getEyeLocation().getYaw() * Math.PI / 180.0) * 1.0 * 0.5);
     }
@@ -39,7 +44,7 @@ public class MathUtil {
         return Math.sqrt(getVariance(data));
     }
 
-    public static double getVariance(Collection<? extends Number> data) {
+    public static double getVariance(@NotNull Collection<? extends Number> data) {
         int count = 0;
         double sum = 0.0;
         double variance = 0.0;
@@ -58,11 +63,13 @@ public class MathUtil {
         return variance;
     }
 
-    public static Vector3d getPositionEyes(double x, double y, double z, float eyeHeight) {
+    @Contract(value = "_, _, _, _ -> new", pure = true)
+    public static @NotNull Vector3d getPositionEyes(double x, double y, double z, float eyeHeight) {
         return new Vector3d(x, y + eyeHeight, z);
     }
 
-    public static Vector3d getVectorForRotation(float pitch, float yaw) {
+    @Contract("_, _ -> new")
+    public static @NotNull Vector3d getVectorForRotation(float pitch, float yaw) {
         float f = cos(-yaw * 0.017453292F - (float) Math.PI);
         float f1 = sin(-yaw * 0.017453292F - (float) Math.PI);
         float f2 = -cos(-pitch * 0.017453292F);

@@ -17,13 +17,13 @@ public class GroundSpoofB extends Check {
 
     private static final double ON_GROUND_VELOCITY = -0.0784000015258789;
 
-    public GroundSpoofB(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public GroundSpoofB(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
-                       @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+    public void handle(CancellableNMSPacketEvent event, byte packetId,
+                       NMSPacket nmsPacket, Object packet, long timestamp) {
         if (PacketType.Play.Client.Util.isInstanceOfFlying(packetId)) {
             WrappedPacketInFlying flying = new WrappedPacketInFlying(nmsPacket);
             double velocity = player.getVelocity().getY();

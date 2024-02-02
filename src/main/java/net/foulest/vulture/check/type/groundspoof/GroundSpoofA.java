@@ -18,12 +18,12 @@ public class GroundSpoofA extends Check {
     private int offGroundTicks;
     private int onGroundTicks;
 
-    public GroundSpoofA(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public GroundSpoofA(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull MovementEvent event, long timestamp) {
+    public void handle(MovementEvent event, long timestamp) {
         // Checks the player for exemptions.
         if (playerData.getTimeSince(ActionType.LOGIN) < 2000L
                 || playerData.isNearbyBoat(0.6, 0.6, 0.6)) {

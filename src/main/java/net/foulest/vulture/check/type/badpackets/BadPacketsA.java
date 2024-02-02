@@ -23,13 +23,13 @@ import java.util.Map;
         description = "Detects sending too many packets in the same tick.")
 public class BadPacketsA extends Check {
 
-    public BadPacketsA(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public BadPacketsA(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
-                       @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+    public void handle(CancellableNMSPacketEvent event, byte packetId,
+                       NMSPacket nmsPacket, Object packet, long timestamp) {
         if (Vulture.timeSinceLaggingFast() <= 500 || Vulture.timeSinceLaggingSlow() <= 500) {
             return;
         }

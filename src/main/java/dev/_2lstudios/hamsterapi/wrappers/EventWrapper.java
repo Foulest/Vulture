@@ -8,6 +8,8 @@ import lombok.Setter;
 import net.foulest.vulture.data.PlayerData;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
 public class EventWrapper implements Cancellable {
@@ -18,35 +20,41 @@ public class EventWrapper implements Cancellable {
     private final PlayerData playerData;
     private final Player player;
     @Setter
-    private boolean cancelled = false;
-    private boolean closed = false;
+    private boolean cancelled;
+    private boolean closed;
 
-    public EventWrapper(PlayerData playerData, ChannelHandlerContext channelHandlerContext, PacketWrapper packet) {
-        this.packet = packet;
-        this.channelHandlerContext = channelHandlerContext;
+    @Contract(pure = true)
+    public EventWrapper(@NotNull PlayerData playerData,
+                        ChannelHandlerContext channelHandlerContext,
+                        PacketWrapper packet) {
         this.playerData = playerData;
-        this.player = playerData.getPlayer();
-        this.byteBuf = null;
+        this.channelHandlerContext = channelHandlerContext;
+        this.packet = packet;
+        player = playerData.getPlayer();
+        byteBuf = null;
     }
 
-    public EventWrapper(PlayerData playerData, ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf) {
-        this.channelHandlerContext = channelHandlerContext;
+    @Contract(pure = true)
+    public EventWrapper(@NotNull PlayerData playerData,
+                        ChannelHandlerContext channelHandlerContext,
+                        ByteBuf byteBuf) {
         this.playerData = playerData;
-        this.player = playerData.getPlayer();
-        this.packet = null;
+        this.channelHandlerContext = channelHandlerContext;
         this.byteBuf = byteBuf;
+        player = playerData.getPlayer();
+        packet = null;
     }
 
     public ChannelPipeline getPipeline() {
-        return this.channelHandlerContext.pipeline();
+        return channelHandlerContext.pipeline();
     }
 
     public void close() {
-        this.channelHandlerContext.close();
-        this.closed = true;
+        channelHandlerContext.close();
+        closed = true;
     }
 
     public ByteBufWrapper getByteWrapper() {
-        return new ByteBufWrapper(this.byteBuf);
+        return new ByteBufWrapper(byteBuf);
     }
 }

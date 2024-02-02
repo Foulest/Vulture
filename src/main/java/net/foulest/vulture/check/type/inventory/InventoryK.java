@@ -17,13 +17,13 @@ import net.foulest.vulture.processor.type.PacketProcessor;
 @CheckInfo(name = "Inventory (K)", type = CheckType.INVENTORY)
 public class InventoryK extends Check {
 
-    public InventoryK(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public InventoryK(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
-                       @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+    public void handle(CancellableNMSPacketEvent event, byte packetId,
+                       NMSPacket nmsPacket, Object packet, long timestamp) {
         if (playerData.isInventoryOpen()) {
             switch (packetId) {
                 case PacketType.Play.Client.CLOSE_WINDOW:

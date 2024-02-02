@@ -21,16 +21,16 @@ import net.foulest.vulture.util.data.EvictingList;
 public class TimerA extends Check {
 
     private final EvictingList<Long> flyingDiffs = new EvictingList<>(40);
-    private long lastFlyingPacket = 0;
+    private long lastFlyingPacket;
     private double buffer;
 
-    public TimerA(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public TimerA(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
-                       @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+    public void handle(CancellableNMSPacketEvent event, byte packetId,
+                       NMSPacket nmsPacket, Object packet, long timestamp) {
         if (PacketType.Play.Client.Util.isInstanceOfFlying(packetId)) {
             long timeSinceLag = playerData.getTimeSince(ActionType.LAG);
             long transPing = playerData.getTransPing();

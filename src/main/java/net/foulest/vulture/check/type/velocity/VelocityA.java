@@ -17,13 +17,13 @@ public class VelocityA extends Check {
 
     private double lastY;
 
-    public VelocityA(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public VelocityA(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
-                       @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+    public void handle(CancellableNMSPacketEvent event, byte packetId,
+                       NMSPacket nmsPacket, Object packet, long timestamp) {
         if (PacketType.Play.Client.Util.isInstanceOfFlying(packetId)) {
             WrappedPacketInFlying flying = new WrappedPacketInFlying(nmsPacket);
             Vector3d flyingPosition = flying.getPosition();

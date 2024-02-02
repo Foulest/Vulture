@@ -1,17 +1,17 @@
 package net.foulest.vulture.check.type.speed;
 
 import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
-import lombok.NonNull;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.event.MovementEvent;
-import net.foulest.vulture.util.MovementUtil;
 import net.foulest.vulture.util.BlockUtil;
+import net.foulest.vulture.util.MovementUtil;
 import org.bukkit.GameMode;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.NotNull;
 
 @CheckInfo(name = "Speed (C)", type = CheckType.SPEED)
 public class SpeedC extends Check {
@@ -20,12 +20,12 @@ public class SpeedC extends Check {
     private double friction = 0.91;
     private double buffer;
 
-    public SpeedC(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public SpeedC(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull MovementEvent event, long timestamp) {
+    public void handle(@NotNull MovementEvent event, long timestamp) {
         WrappedPacketInFlying from = event.getFrom();
 
         double deltaY = event.getDeltaY();

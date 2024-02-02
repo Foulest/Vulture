@@ -25,13 +25,13 @@ public class PingSpoofA extends Check {
     private int transactionsInCount;
     private int transactionsOutCount;
 
-    public PingSpoofA(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public PingSpoofA(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
-                       @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+    public void handle(CancellableNMSPacketEvent event, byte packetId,
+                       NMSPacket nmsPacket, Object packet, long timestamp) {
         if (packetId == PacketType.Play.Server.TRANSACTION) {
             WrappedPacketOutTransaction transaction = new WrappedPacketOutTransaction(nmsPacket);
             transactionsOut.add(new Pair<>(transaction.getActionNumber(), timestamp));

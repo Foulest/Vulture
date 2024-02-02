@@ -2,8 +2,9 @@ package net.foulest.vulture.util.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
@@ -23,13 +24,14 @@ public final class Pair<X, Y> {
     private final X x;
     private final Y y;
 
-    public static <X, Y> Pair<X, Y> of(@NonNull X x, @NonNull Y y) {
+    @Contract("_, _ -> new")
+    public static <X, Y> @NotNull Pair<X, Y> of(X x, Y y) {
         return new Pair<>(x, y);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public boolean equals(@NonNull Object obj) {
+    public boolean equals(Object obj) {
         if (!(obj instanceof Pair)) {
             return false;
         }

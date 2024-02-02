@@ -1,17 +1,17 @@
 package net.foulest.vulture.check.type.flight;
 
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
-import lombok.NonNull;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.event.MovementEvent;
-import net.foulest.vulture.util.MovementUtil;
 import net.foulest.vulture.util.BlockUtil;
+import net.foulest.vulture.util.MovementUtil;
 import org.bukkit.GameMode;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.NotNull;
 
 @CheckInfo(name = "Flight (B)", type = CheckType.FLIGHT,
         description = "Checks for invalid y-axis movement when in water.")
@@ -23,12 +23,12 @@ public class FlightB extends Check {
     private int ticksInWater;
     private int ticksAboveCombined;
 
-    public FlightB(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public FlightB(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull MovementEvent event, long timestamp) {
+    public void handle(@NotNull MovementEvent event, long timestamp) {
         double deltaY = event.getDeltaY();
         double velocity = player.getVelocity().getY();
 
@@ -64,7 +64,7 @@ public class FlightB extends Check {
     /**
      * Checks for invalid y-axis movement when in water.
      *
-     * @param deltaY The change in y-axis.
+     * @param deltaY   The change in y-axis.
      * @param velocity The player's velocity.
      */
     public void checkForInvalidY(double deltaY, double velocity) {
@@ -81,7 +81,7 @@ public class FlightB extends Check {
     /**
      * Checks for invalid combined movement when in water.
      *
-     * @param deltaY The change in y-axis.
+     * @param deltaY   The change in y-axis.
      * @param velocity The player's velocity.
      */
     public void checkForCombined(double deltaY, double velocity) {

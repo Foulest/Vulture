@@ -1,7 +1,6 @@
 package net.foulest.vulture.check.type.speed;
 
 import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
-import lombok.NonNull;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
@@ -11,6 +10,7 @@ import net.foulest.vulture.event.MovementEvent;
 import net.foulest.vulture.util.MovementUtil;
 import org.bukkit.GameMode;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.NotNull;
 
 @CheckInfo(name = "Speed (A)", type = CheckType.SPEED)
 public class SpeedA extends Check {
@@ -18,12 +18,12 @@ public class SpeedA extends Check {
     private double buffer;
     private double terrainBuffer;
 
-    public SpeedA(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public SpeedA(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull MovementEvent event, long timestamp) {
+    public void handle(@NotNull MovementEvent event, long timestamp) {
         WrappedPacketInFlying to = event.getTo();
 
         // Checks the player for exemptions.

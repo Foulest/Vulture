@@ -17,13 +17,13 @@ public class KillAuraD extends Check {
     private boolean sentDig;
     private int buffer;
 
-    public KillAuraD(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public KillAuraD(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
-                       @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+    public void handle(CancellableNMSPacketEvent event, byte packetId,
+                       NMSPacket nmsPacket, Object packet, long timestamp) {
         if (packetId == PacketType.Play.Client.USE_ENTITY) {
             WrappedPacketInUseEntity useEntity = new WrappedPacketInUseEntity(nmsPacket);
             WrappedPacketInUseEntity.EntityUseAction action = useEntity.getAction();

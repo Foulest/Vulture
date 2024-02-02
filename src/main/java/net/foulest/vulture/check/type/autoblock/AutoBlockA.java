@@ -17,13 +17,13 @@ public class AutoBlockA extends Check {
 
     private int stage;
 
-    public AutoBlockA(@NonNull PlayerData playerData) throws ClassNotFoundException {
+    public AutoBlockA(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(@NonNull CancellableNMSPacketEvent event, byte packetId,
-                       @NonNull NMSPacket nmsPacket, @NonNull Object packet, long timestamp) {
+    public void handle(CancellableNMSPacketEvent event, byte packetId,
+                       NMSPacket nmsPacket, Object packet, long timestamp) {
         if (packetId == PacketType.Play.Client.BLOCK_DIG) {
             WrappedPacketInBlockDig blockDig = new WrappedPacketInBlockDig(nmsPacket);
             WrappedPacketInBlockDig.PlayerDigType digType = blockDig.getDigType();

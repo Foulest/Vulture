@@ -3,7 +3,6 @@ package net.foulest.vulture.util.raytrace;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import net.foulest.vulture.util.data.EnumFacing;
 import net.foulest.vulture.util.data.MovingObjectPosition;
@@ -17,6 +16,8 @@ import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +38,7 @@ public class BoundingBox {
     public Vector max;
 
     // Gets the min and max point of a block.
-    public BoundingBox(@NonNull Block block) {
+    public BoundingBox(@NotNull Block block) {
         IBlockData blockData = ((CraftWorld) block.getWorld()).getHandle().getType(new BlockPosition(block.getX(), block.getY(), block.getZ()));
         net.minecraft.server.v1_8_R3.Block blockNative = blockData.getBlock();
 
@@ -48,14 +49,14 @@ public class BoundingBox {
     }
 
     // Gets the min and max point of an entity.
-    public BoundingBox(@NonNull Entity entity) {
+    public BoundingBox(Entity entity) {
         AxisAlignedBB bb = ((CraftEntity) entity).getHandle().getBoundingBox();
         min = new Vector(bb.a, bb.b, bb.c);
         max = new Vector(bb.d, bb.e, bb.f);
     }
 
     // Gets the min and max point of an AxisAlignedBB.
-    public BoundingBox(@NonNull AxisAlignedBB bb) {
+    public BoundingBox(@NotNull AxisAlignedBB bb) {
         min = new Vector(bb.a, bb.b, bb.c);
         max = new Vector(bb.d, bb.e, bb.f);
     }
@@ -72,7 +73,7 @@ public class BoundingBox {
         return max.clone().add(min).multiply(0.5);
     }
 
-    public boolean collidesWith(@NonNull BoundingBox other) {
+    public boolean collidesWith(@NotNull BoundingBox other) {
         return (min.getX() <= other.max.getX() && max.getX() >= other.min.getX())
                 && (min.getY() <= other.max.getY() && max.getY() >= other.min.getY())
                 && (min.getZ() <= other.max.getZ() && max.getZ() >= other.min.getZ());
@@ -112,7 +113,7 @@ public class BoundingBox {
         return new BoundingBox(min, new Vector(maxX, maxY, maxZ));
     }
 
-    public List<Block> getCollidingBlocks(@NonNull Player player) {
+    public List<Block> getCollidingBlocks(Player player) {
         List<Block> blocks = new ArrayList<>();
 
         for (int x = min.getBlockX(); x <= max.getBlockX(); x++) {
@@ -133,21 +134,23 @@ public class BoundingBox {
         return blocks;
     }
 
-    public static BoundingBox getEntityBoundingBox(Location location) {
+    @Contract("_ -> new")
+    public static @NotNull BoundingBox getEntityBoundingBox(@NotNull Location location) {
         double f = 0.6 / 2.0;
         double f1 = 1.8;
         return (new BoundingBox(location.getX() - f, location.getY(), location.getZ() - f,
                 location.getX() + f, location.getY() + f1, location.getZ() + f));
     }
 
-    public static BoundingBox getEntityBoundingBox(double x, double y, double z) {
+    @Contract("_, _, _ -> new")
+    public static @NotNull BoundingBox getEntityBoundingBox(double x, double y, double z) {
         double f = 0.6 / 2.0;
         double f1 = 1.8;
         return (new BoundingBox(x - f, y, z - f, x + f, y + f1, z + f));
     }
 
-    public MovingObjectPosition calculateIntercept(@NonNull Vector3d vecA, @NonNull Vector3d vecB) {
-        Vector3d[] vectors = new Vector3d[]{
+    public MovingObjectPosition calculateIntercept(Vector3d vecA, Vector3d vecB) {
+        Vector3d[] vectors = {
                 getIntermediateWithXValue(vecA, vecB, min.getX()),
                 getIntermediateWithXValue(vecA, vecB, max.getX()),
                 getIntermediateWithYValue(vecA, vecB, min.getY()),
@@ -156,7 +159,7 @@ public class BoundingBox {
                 getIntermediateWithZValue(vecA, vecB, max.getZ())
         };
 
-        boolean[] validityChecks = new boolean[]{
+        boolean[] validityChecks = {
                 isVecInYZ(vectors[0]),
                 isVecInYZ(vectors[1]),
                 isVecInXZ(vectors[2]),
@@ -207,14 +210,14 @@ public class BoundingBox {
         return new MovingObjectPosition(closest, facing);
     }
 
-    public double squareDistanceTo(@NonNull Vector3d origin, @NonNull Vector3d vec) {
+    public double squareDistanceTo(@NotNull Vector3d origin, @NotNull Vector3d vec) {
         double d0 = vec.x - origin.x;
         double d1 = vec.y - origin.y;
         double d2 = vec.z - origin.z;
         return d0 * d0 + d1 * d1 + d2 * d2;
     }
 
-    public Vector3d getIntermediateWithXValue(@NonNull Vector3d origin, @NonNull Vector3d vec, double x) {
+    public Vector3d getIntermediateWithXValue(@NotNull Vector3d origin, @NotNull Vector3d vec, double x) {
         double d0 = vec.x - origin.x;
         double d1 = vec.y - origin.y;
         double d2 = vec.z - origin.z;
@@ -228,7 +231,7 @@ public class BoundingBox {
         }
     }
 
-    public Vector3d getIntermediateWithYValue(@NonNull Vector3d origin, @NonNull Vector3d vec, double y) {
+    public Vector3d getIntermediateWithYValue(@NotNull Vector3d origin, @NotNull Vector3d vec, double y) {
         double d0 = vec.x - origin.x;
         double d1 = vec.y - origin.y;
         double d2 = vec.z - origin.z;
@@ -241,7 +244,7 @@ public class BoundingBox {
         }
     }
 
-    public Vector3d getIntermediateWithZValue(@NonNull Vector3d origin, @NonNull Vector3d vec, double z) {
+    public Vector3d getIntermediateWithZValue(@NotNull Vector3d origin, @NotNull Vector3d vec, double z) {
         double d0 = vec.x - origin.x;
         double d1 = vec.y - origin.y;
         double d2 = vec.z - origin.z;
@@ -254,22 +257,22 @@ public class BoundingBox {
         }
     }
 
-    private boolean isVecInYZ(@NonNull Vector3d vec) {
+    private boolean isVecInYZ(@NotNull Vector3d vec) {
         return vec.y >= min.getY() && vec.y <= max.getY()
                 && vec.z >= min.getZ() && vec.z <= max.getZ();
     }
 
-    private boolean isVecInXZ(@NonNull Vector3d vec) {
+    private boolean isVecInXZ(@NotNull Vector3d vec) {
         return vec.x >= min.getX() && vec.x <= max.getX()
                 && vec.z >= min.getZ() && vec.z <= max.getZ();
     }
 
-    private boolean isVecInXY(@NonNull Vector3d vec) {
+    private boolean isVecInXY(@NotNull Vector3d vec) {
         return vec.x >= min.getX() && vec.x <= max.getX()
                 && vec.y >= min.getY() && vec.y <= max.getY();
     }
 
-    public boolean isVecInside(@NonNull Vector3d vec) {
+    public boolean isVecInside(@NotNull Vector3d vec) {
         return vec.x > min.getX() && vec.x < max.getX()
                 && (vec.y > min.getY() && vec.y < max.getX()
                 && vec.z > min.getZ() && vec.z < max.getZ());

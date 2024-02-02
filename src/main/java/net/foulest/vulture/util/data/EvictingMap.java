@@ -2,8 +2,8 @@ package net.foulest.vulture.util.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Deque;
 import java.util.HashMap;
@@ -28,13 +28,13 @@ public final class EvictingMap<K, V> extends HashMap<K, V> {
 
     @Override
     @SuppressWarnings("SuspiciousMethodCalls")
-    public boolean remove(@NonNull Object key, @NonNull Object value) {
+    public boolean remove(Object key, Object value) {
         storedKeys.remove(key);
         return super.remove(key, value);
     }
 
     @Override
-    public V putIfAbsent(@NonNull K key, @NonNull V value) {
+    public V putIfAbsent(K key, V value) {
         if (!storedKeys.contains(key) || !get(key).equals(value)) {
             checkAndRemove();
         }
@@ -42,14 +42,14 @@ public final class EvictingMap<K, V> extends HashMap<K, V> {
     }
 
     @Override
-    public V put(@NonNull K key, @NonNull V value) {
+    public V put(K key, V value) {
         checkAndRemove();
         storedKeys.addLast(key);
         return super.put(key, value);
     }
 
     @Override
-    public void putAll(@NonNull Map<? extends K, ? extends V> map) {
+    public void putAll(@NotNull Map<? extends K, ? extends V> map) {
         map.forEach(this::put);
     }
 
@@ -61,7 +61,7 @@ public final class EvictingMap<K, V> extends HashMap<K, V> {
 
     @Override
     @SuppressWarnings("SuspiciousMethodCalls")
-    public V remove(@NonNull Object key) {
+    public V remove(Object key) {
         storedKeys.remove(key);
         return super.remove(key);
     }
