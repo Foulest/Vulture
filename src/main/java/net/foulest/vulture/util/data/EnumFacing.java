@@ -77,7 +77,7 @@ public enum EnumFacing implements IStringSerializable {
      * returns this facing without rotating.
      */
     public EnumFacing rotateAround(@NotNull Axis axis) {
-        switch (EnumFacing$1.field_179515_a[axis.ordinal()]) {
+        switch (EnumFacing$1.AXIS_ORDINAL_MAP[axis.ordinal()]) {
             case 1:
                 if (this != WEST && this != EAST) {
                     return rotateX();
@@ -105,7 +105,7 @@ public enum EnumFacing implements IStringSerializable {
      * Rotate this Facing around the X axis (NORTH => DOWN => SOUTH => UP => NORTH)
      */
     private EnumFacing rotateX() {
-        switch (EnumFacing$1.field_179513_b[ordinal()]) {
+        switch (EnumFacing$1.FACING_ORDINAL_MAP[ordinal()]) {
             case 1:
                 return DOWN;
             case 3:
@@ -123,7 +123,7 @@ public enum EnumFacing implements IStringSerializable {
      * Rotate this Facing around the Y axis clockwise (NORTH => EAST => SOUTH => WEST => NORTH)
      */
     public EnumFacing rotateY() {
-        switch (EnumFacing$1.field_179513_b[ordinal()]) {
+        switch (EnumFacing$1.FACING_ORDINAL_MAP[ordinal()]) {
             case 1:
                 return EAST;
             case 2:
@@ -141,7 +141,7 @@ public enum EnumFacing implements IStringSerializable {
      * Rotate this Facing around the Z axis (EAST => DOWN => WEST => UP => EAST)
      */
     private EnumFacing rotateZ() {
-        switch (EnumFacing$1.field_179513_b[ordinal()]) {
+        switch (EnumFacing$1.FACING_ORDINAL_MAP[ordinal()]) {
             case 2:
                 return DOWN;
             case 4:
@@ -159,7 +159,7 @@ public enum EnumFacing implements IStringSerializable {
      * Rotate this Facing around the Y axis counter-clockwise (NORTH => WEST => SOUTH => EAST => NORTH)
      */
     public EnumFacing rotateYCCW() {
-        switch (EnumFacing$1.field_179513_b[ordinal()]) {
+        switch (EnumFacing$1.FACING_ORDINAL_MAP[ordinal()]) {
             case 1:
                 return WEST;
             case 2:
@@ -247,7 +247,7 @@ public enum EnumFacing implements IStringSerializable {
         return name;
     }
 
-    public static @NotNull EnumFacing func_181076_a(AxisDirection direction, Axis axis) {
+    public static @NotNull EnumFacing getFacingByDirectionAndAxis(AxisDirection direction, Axis axis) {
         for (EnumFacing facing : values()) {
             if (facing.getAxisDirection() == direction && facing.getAxis() == axis) {
                 return facing;
@@ -272,37 +272,37 @@ public enum EnumFacing implements IStringSerializable {
     @Setter
     static final class EnumFacing$1 {
 
-        static final int[] field_179515_a;
-        static final int[] field_179513_b;
-        static final int[] field_179514_c = new int[Plane.values().length];
+        static final int[] AXIS_ORDINAL_MAP;
+        static final int[] FACING_ORDINAL_MAP;
+        static final int[] PLANE_ORDINAL_MAP = new int[Plane.values().length];
 
         static {
             try {
-                field_179514_c[Plane.HORIZONTAL.ordinal()] = 1;
-                field_179514_c[Plane.VERTICAL.ordinal()] = 2;
+                PLANE_ORDINAL_MAP[Plane.HORIZONTAL.ordinal()] = 1;
+                PLANE_ORDINAL_MAP[Plane.VERTICAL.ordinal()] = 2;
             } catch (NoSuchFieldError ex) {
                 MessageUtil.printException(ex);
             }
 
-            field_179513_b = new int[values().length];
+            FACING_ORDINAL_MAP = new int[values().length];
 
             try {
-                field_179513_b[NORTH.ordinal()] = 1;
-                field_179513_b[EAST.ordinal()] = 2;
-                field_179513_b[SOUTH.ordinal()] = 3;
-                field_179513_b[WEST.ordinal()] = 4;
-                field_179513_b[UP.ordinal()] = 5;
-                field_179513_b[DOWN.ordinal()] = 6;
+                FACING_ORDINAL_MAP[NORTH.ordinal()] = 1;
+                FACING_ORDINAL_MAP[EAST.ordinal()] = 2;
+                FACING_ORDINAL_MAP[SOUTH.ordinal()] = 3;
+                FACING_ORDINAL_MAP[WEST.ordinal()] = 4;
+                FACING_ORDINAL_MAP[UP.ordinal()] = 5;
+                FACING_ORDINAL_MAP[DOWN.ordinal()] = 6;
             } catch (NoSuchFieldError ex) {
                 MessageUtil.printException(ex);
             }
 
-            field_179515_a = new int[Axis.values().length];
+            AXIS_ORDINAL_MAP = new int[Axis.values().length];
 
             try {
-                field_179515_a[Axis.X.ordinal()] = 1;
-                field_179515_a[Axis.Y.ordinal()] = 2;
-                field_179515_a[Axis.Z.ordinal()] = 3;
+                AXIS_ORDINAL_MAP[Axis.X.ordinal()] = 1;
+                AXIS_ORDINAL_MAP[Axis.Y.ordinal()] = 2;
+                AXIS_ORDINAL_MAP[Axis.Z.ordinal()] = 3;
             } catch (NoSuchFieldError ex) {
                 MessageUtil.printException(ex);
             }
@@ -382,7 +382,7 @@ public enum EnumFacing implements IStringSerializable {
 
         @Contract(" -> new")
         public EnumFacing @NotNull [] facings() {
-            switch (EnumFacing$1.field_179514_c[ordinal()]) {
+            switch (EnumFacing$1.PLANE_ORDINAL_MAP[ordinal()]) {
                 case 1:
                     return new EnumFacing[]{NORTH, EAST, SOUTH, WEST};
                 case 2:
