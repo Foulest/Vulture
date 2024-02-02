@@ -41,7 +41,7 @@ public final class MessageUtil {
      * @param ex The exception to print.
      */
     public static void printException(@NotNull Throwable ex) {
-        logger.log(Level.WARNING, "[Vulture] An error occurred: " + ex.getLocalizedMessage()
+        logger.log(Level.WARNING, "An error occurred: " + ex.getLocalizedMessage()
                 + " (Caused by: " + ex.getCause() + ")");
     }
 
