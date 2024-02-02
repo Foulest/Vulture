@@ -18,10 +18,6 @@ public class CustomYamlConfiguration extends YamlConfiguration {
     // Map to store the path of the YAML keys and their associated comments
     private final Map<String, String> commentsMap = new LinkedHashMap<>();
 
-    public CustomYamlConfiguration() {
-        super();
-    }
-
     @Override
     public void loadFromString(String contents) throws InvalidConfigurationException {
         super.loadFromString(contents); // Call the original method to load the data
