@@ -77,7 +77,7 @@ public enum EnumFacing implements IStringSerializable {
      * returns this facing without rotating.
      */
     public EnumFacing rotateAround(@NotNull Axis axis) {
-        switch (EnumFacingMappings.AXIS_ORDINAL_MAP[axis.ordinal()]) {
+        switch (EnumFacingUtils.AXIS_ORDINAL_MAP[axis.ordinal()]) {
             case 1:
                 if (this != WEST && this != EAST) {
                     return rotateX();
@@ -105,7 +105,7 @@ public enum EnumFacing implements IStringSerializable {
      * Rotate this Facing around the X axis (NORTH => DOWN => SOUTH => UP => NORTH)
      */
     private EnumFacing rotateX() {
-        switch (EnumFacingMappings.FACING_ORDINAL_MAP[ordinal()]) {
+        switch (EnumFacingUtils.FACING_ORDINAL_MAP[ordinal()]) {
             case 1:
                 return DOWN;
             case 3:
@@ -123,7 +123,7 @@ public enum EnumFacing implements IStringSerializable {
      * Rotate this Facing around the Y axis clockwise (NORTH => EAST => SOUTH => WEST => NORTH)
      */
     public EnumFacing rotateY() {
-        switch (EnumFacingMappings.FACING_ORDINAL_MAP[ordinal()]) {
+        switch (EnumFacingUtils.FACING_ORDINAL_MAP[ordinal()]) {
             case 1:
                 return EAST;
             case 2:
@@ -141,7 +141,7 @@ public enum EnumFacing implements IStringSerializable {
      * Rotate this Facing around the Z axis (EAST => DOWN => WEST => UP => EAST)
      */
     private EnumFacing rotateZ() {
-        switch (EnumFacingMappings.FACING_ORDINAL_MAP[ordinal()]) {
+        switch (EnumFacingUtils.FACING_ORDINAL_MAP[ordinal()]) {
             case 2:
                 return DOWN;
             case 4:
@@ -159,7 +159,7 @@ public enum EnumFacing implements IStringSerializable {
      * Rotate this Facing around the Y axis counter-clockwise (NORTH => WEST => SOUTH => EAST => NORTH)
      */
     public EnumFacing rotateYCCW() {
-        switch (EnumFacingMappings.FACING_ORDINAL_MAP[ordinal()]) {
+        switch (EnumFacingUtils.FACING_ORDINAL_MAP[ordinal()]) {
             case 1:
                 return WEST;
             case 2:
@@ -270,7 +270,7 @@ public enum EnumFacing implements IStringSerializable {
 
     @Getter
     @Setter
-    static final class EnumFacingMappings {
+    static final class EnumFacingUtils {
 
         static final int[] AXIS_ORDINAL_MAP;
         static final int[] FACING_ORDINAL_MAP;
@@ -382,7 +382,7 @@ public enum EnumFacing implements IStringSerializable {
 
         @Contract(" -> new")
         public EnumFacing @NotNull [] facings() {
-            switch (EnumFacingMappings.PLANE_ORDINAL_MAP[ordinal()]) {
+            switch (EnumFacingUtils.PLANE_ORDINAL_MAP[ordinal()]) {
                 case 1:
                     return new EnumFacing[]{NORTH, EAST, SOUTH, WEST};
                 case 2:
