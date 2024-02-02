@@ -1,6 +1,5 @@
 package net.foulest.vulture.check.type.speed;
 
-import lombok.NonNull;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;

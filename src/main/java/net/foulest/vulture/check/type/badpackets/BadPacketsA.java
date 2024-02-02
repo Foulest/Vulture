@@ -5,7 +5,6 @@ import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.play.in.setcreativeslot.WrappedPacketInSetCreativeSlot;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
-import lombok.NonNull;
 import net.foulest.vulture.Vulture;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;

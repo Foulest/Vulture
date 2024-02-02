@@ -1,6 +1,5 @@
 package net.foulest.vulture.check.type.flight;
 
-import lombok.NonNull;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;

@@ -12,7 +12,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.logging.Level;
 
 /**
  * Custom Bukkit TabCompleter class that implements the TabCompleter interface.

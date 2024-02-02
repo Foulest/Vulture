@@ -1,7 +1,6 @@
 package net.foulest.vulture.listeners;
 
 import lombok.AllArgsConstructor;
-import lombok.NonNull;
 import net.foulest.vulture.util.MessageUtil;
 import net.foulest.vulture.util.Settings;
 import org.bukkit.command.CommandSender;

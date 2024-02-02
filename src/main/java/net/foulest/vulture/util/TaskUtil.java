@@ -1,7 +1,6 @@
 package net.foulest.vulture.util;
 
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import net.foulest.vulture.Vulture;
 import org.bukkit.Bukkit;
