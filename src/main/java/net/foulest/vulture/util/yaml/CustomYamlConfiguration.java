@@ -46,7 +46,9 @@ public class CustomYamlConfiguration extends YamlConfiguration {
         // Insert header comments
         String headerComment = commentsMap.getOrDefault("__header__", "");
         if (!headerComment.isEmpty()) {
-            appendComments(dataWithComments, headerComment, ""); // No indentation for header
+            for (String line : headerComment.split("\n")) {
+                dataWithComments.append("# ").append(line).append("\n");
+            }
         }
 
         // Iterate through each line of the stripped YAML data to reinsert comments
@@ -86,9 +88,10 @@ public class CustomYamlConfiguration extends YamlConfiguration {
         // Add footer comments from commentsMap if present
         String footerComment = commentsMap.getOrDefault("__footer__", "");
         if (!footerComment.isEmpty()) {
-            appendComments(dataWithComments, footerComment, ""); // No indentation for footer
+            for (String line : footerComment.split("\n")) {
+                dataWithComments.append("# ").append(line).append("\n");
+            }
         }
-
         return dataWithComments.toString();
     }
 
@@ -137,19 +140,6 @@ public class CustomYamlConfiguration extends YamlConfiguration {
             MessageUtil.printException(ex);
         }
         return config;
-    }
-
-    /**
-     * Appends comments to the StringBuilder with given indentation.
-     *
-     * @param builder     The StringBuilder to append comments to.
-     * @param comments    The comment string to append.
-     * @param indentation The indentation to apply to each comment line.
-     */
-    private void appendComments(StringBuilder builder, String comments, String indentation) {
-        for (String line : comments.split("\n")) {
-            builder.append(indentation).append("# ").append(line).append("\n");
-        }
     }
 
     /**
