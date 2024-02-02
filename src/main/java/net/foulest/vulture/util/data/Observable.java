@@ -2,7 +2,6 @@ package net.foulest.vulture.util.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 
 import java.util.Collections;

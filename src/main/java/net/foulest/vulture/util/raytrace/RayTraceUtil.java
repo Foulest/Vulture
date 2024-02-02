@@ -12,6 +12,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,7 +22,7 @@ import java.util.Collection;
 @SuppressWarnings("unused")
 public class RayTraceUtil {
 
-    public static Block getBlockPlayerLookingAt(Player player, double distance) {
+    public static @Nullable Block getBlockPlayerLookingAt(@NotNull Player player, double distance) {
         RayTrace rayTrace = new RayTrace(player.getEyeLocation().toVector(), player.getEyeLocation().getDirection());
         ArrayList<Vector> positions = rayTrace.traverse(distance, 0.01);
 

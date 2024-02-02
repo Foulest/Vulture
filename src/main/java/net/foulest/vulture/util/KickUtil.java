@@ -141,7 +141,7 @@ public final class KickUtil {
      * @param player The player to check.
      * @return If the player is being kicked.
      */
-    public static boolean isPlayerBeingKicked(Player player) {
+    public static boolean isPlayerBeingKicked(@NotNull Player player) {
         synchronized (currentlyKicking) {
             return currentlyKicking.contains(player.getUniqueId());
         }

@@ -8,7 +8,6 @@ import io.github.retrooper.packetevents.packetwrappers.play.in.closewindow.Wrapp
 import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
 import io.github.retrooper.packetevents.packetwrappers.play.in.windowclick.WrappedPacketInWindowClick;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
-import lombok.NonNull;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
