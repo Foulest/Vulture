@@ -153,13 +153,6 @@ public class Settings {
             // Log a warning if the default configuration cannot be found within the JAR
             MessageUtil.log(Level.WARNING, "Could not find " + fileName + " in the plugin JAR.");
             return;
-        } else {
-            try {
-                // Close the defConfigStream properly to avoid resource leaks
-                defConfigStream.close();
-            } catch (IOException ex) {
-                MessageUtil.printException(ex);
-            }
         }
 
         // Proceed to check if the config file exists in the plugin's data folder
@@ -173,16 +166,17 @@ public class Settings {
         // Now that we've ensured the file exists (either it already did, or we've just created it),
         // we can safely load it into our CustomYamlConfiguration object
         config = CustomYamlConfiguration.loadConfiguration(file);
+        CustomYamlConfiguration defConfig = CustomYamlConfiguration
+                .loadConfiguration(new InputStreamReader(defConfigStream, StandardCharsets.UTF_8));
 
-        // Load the default configuration for comparison and to set defaults
-        try (InputStream defConfigStreamForDefaults = Vulture.getInstance().getResource(fileName)) {
-            CustomYamlConfiguration defConfig = CustomYamlConfiguration
-                    .loadConfiguration(new InputStreamReader(defConfigStreamForDefaults, StandardCharsets.UTF_8));
+        // Ensure defaults are applied
+        config.setDefaults(defConfig);
+        config.options().copyDefaults(true);
+        saveConfig(); // Save the config with defaults applied
 
-            // Ensure defaults are applied
-            config.setDefaults(defConfig);
-            config.options().copyDefaults(true);
-            saveConfig(); // Save the config with defaults applied
+        // Close the defConfigStream properly to avoid resource leaks
+        try {
+            defConfigStream.close();
         } catch (IOException ex) {
             MessageUtil.printException(ex);
         }
