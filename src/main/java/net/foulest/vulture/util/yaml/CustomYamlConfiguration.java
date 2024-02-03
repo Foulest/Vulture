@@ -13,6 +13,13 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * CustomYamlConfiguration is an extension of YamlConfiguration
+ * that allows for comments to be stored and loaded.
+ *
+ * @author Foulest
+ * @project Vulture
+ */
 public class CustomYamlConfiguration extends YamlConfiguration {
 
     // Map to store the path of the YAML keys and their associated comments
