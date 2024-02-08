@@ -46,8 +46,6 @@ Vulture is a robust, free, and open-source anticheat plugin designed specificall
 - [Contribution Guidelines](https://github.com/Foulest/Vulture/wiki/Contribution-Guidelines)
 - [Disclaimer](https://github.com/Foulest/Vulture/wiki/Disclaimer)
 - [Installation](https://github.com/Foulest/Vulture/wiki/Installation)
-- [Permissions](https://github.com/Foulest/Vulture/wiki/Permissions)
-- [Usage](https://github.com/Foulest/Vulture/wiki/Usage)
 
 ## Getting Help
 
