@@ -49,10 +49,9 @@ dependencies {
 tasks {
     shadowJar {
         archiveFileName.set("${project.name}-${project.version}.jar")
-
+        enableRelocation = true
+        relocationPrefix = "net.foulest.vulture.shaded"
         minimize()
-        relocate 'io.github', 'net.foulest.vulture.shaded.io.github'
-        relocate 'org.jetbrains', 'net.foulest.vulture.shaded.org.jetbrains'
     }
 
     compileJava {
