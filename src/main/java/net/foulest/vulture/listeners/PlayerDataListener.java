@@ -8,7 +8,6 @@ import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.data.PlayerDataManager;
 import net.foulest.vulture.util.KickUtil;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -69,16 +68,10 @@ public class PlayerDataListener implements Listener {
      *
      * @param event BlockBreakEvent
      */
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler
     public void onBlockBreak(@NotNull BlockBreakEvent event) {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
-        Block targetBlock = event.getBlock();
-
-        // Returns if the block is null.
-        if (targetBlock == null) {
-            return;
-        }
 
         // Sets digging to false.
         playerData.setDigging(false);
