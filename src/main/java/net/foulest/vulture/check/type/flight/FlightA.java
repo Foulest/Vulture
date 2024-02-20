@@ -304,6 +304,13 @@ public class FlightA extends Check {
                 return;
             }
 
+            // Ignores weird after teleport behavior.
+            if (deltaY == -0.07840000152587834 && diffYLastV < threshold && notOnGroundTicks == 1) {
+                MessageUtil.debug("FlightA: " + player.getName() + " failed (D2) (Y=" + deltaY + ")");
+                setLastValues(deltaY, velocity);
+                return;
+            }
+
             // Ignores players who were recently teleported.
             if (deltaY == 0.0 && velocity == 0.0) {
                 MessageUtil.debug("FlightA: " + player.getName() + " failed (E1) (Y=" + deltaY + ")");
@@ -322,7 +329,7 @@ public class FlightA extends Check {
             // Ignores players who are teleporting to unloaded chunks.
             if (deltaY == -0.09800000190735147
                     && (playerData.getTimeSince(ActionType.IN_UNLOADED_CHUNK) < 1500L
-                    || playerData.getTimeSince(ActionType.TELEPORT) < 250L)) {
+                    || playerData.getTimeSince(ActionType.TELEPORT) < 750L)) {
                 MessageUtil.debug("FlightA: " + player.getName() + " failed (G1) (Y=" + deltaY + ")"
                         + " (T=" + playerData.getTimeSince(ActionType.IN_UNLOADED_CHUNK) + ")");
                 setLastValues(deltaY, velocity);
