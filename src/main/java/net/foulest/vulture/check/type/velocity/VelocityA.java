@@ -45,10 +45,6 @@ public class VelocityA extends Check {
                 flag(true, "deltaY=" + deltaY
                         + " takenVelocity=" + takenVelocity
                 );
-            } else {
-                debug("deltaY=" + deltaY
-                        + " takenVelocity=" + takenVelocity
-                );
             }
 
             lastY = (flying.isMoving() ? flyingPosition.getY() : lastY);

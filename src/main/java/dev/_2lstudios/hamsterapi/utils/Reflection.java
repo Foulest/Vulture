@@ -1,7 +1,6 @@
 package dev._2lstudios.hamsterapi.utils;
 
 import lombok.AllArgsConstructor;
-import net.foulest.vulture.util.MessageUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
@@ -24,8 +23,7 @@ public class Reflection {
 
         try {
             obtainedClass = Class.forName(className);
-        } catch (ClassNotFoundException ex) {
-            MessageUtil.printException(ex);
+        } catch (ClassNotFoundException ignored) {
         } finally {
             classes.put(className, obtainedClass);
         }
