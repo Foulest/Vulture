@@ -12,10 +12,12 @@ import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.processor.type.PacketProcessor;
 import net.foulest.vulture.util.KickUtil;
+import net.foulest.vulture.util.MessageUtil;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 
 import java.util.Map;
+import java.util.logging.Level;
 
 @CheckInfo(name = "BadPackets (A)", type = CheckType.BADPACKETS, punishable = false,
         description = "Detects sending too many packets in the same tick.")
@@ -49,7 +51,7 @@ public class BadPacketsA extends Check {
                 case PacketType.Play.Client.HELD_ITEM_SLOT:
                     if (count >= (olderThan1_8 && inCreative ? 3 : 4)) {
                         if (timeSinceDelayed < 500L) {
-                            System.out.println("Cancelled packet " + packetName + " with count " + count);
+                            MessageUtil.log(Level.INFO, "Cancelled packet " + packetName + " with count " + count);
                             event.setCancelled(true);
                             break;
                         }
@@ -62,7 +64,7 @@ public class BadPacketsA extends Check {
                 case PacketType.Play.Client.ENTITY_ACTION:
                     if (count >= 3) {
                         if (timeSinceDelayed < 500L) {
-                            System.out.println("Cancelled packet " + packetName + " with count " + count);
+                            MessageUtil.log(Level.INFO, "Cancelled packet " + packetName + " with count " + count);
                             event.setCancelled(true);
                             break;
                         }
@@ -72,9 +74,9 @@ public class BadPacketsA extends Check {
                     break;
 
                 case PacketType.Play.Client.WINDOW_CLICK:
-                    if (count >= (olderThan1_8 ? 4 : 6)) {
+                    if (count >= (olderThan1_8 ? 52 : 6)) {
                         if (timeSinceDelayed < 500L) {
-                            System.out.println("Cancelled packet " + packetName + " with count " + count);
+                            MessageUtil.log(Level.INFO, "Cancelled packet " + packetName + " with count " + count);
                             event.setCancelled(true);
                             break;
                         }
@@ -87,7 +89,7 @@ public class BadPacketsA extends Check {
                 case PacketType.Play.Client.USE_ENTITY:
                     if (count >= 4) {
                         if (timeSinceDelayed < 500L) {
-                            System.out.println("Cancelled packet " + packetName + " with count " + count);
+                            MessageUtil.log(Level.INFO, "Cancelled packet " + packetName + " with count " + count);
                             event.setCancelled(true);
                             break;
                         }
@@ -99,7 +101,7 @@ public class BadPacketsA extends Check {
                 case PacketType.Play.Client.ARM_ANIMATION:
                     if (count >= 7) {
                         if (timeSinceDelayed < 500L) {
-                            System.out.println("Cancelled packet " + packetName + " with count " + count);
+                            MessageUtil.log(Level.INFO, "Cancelled packet " + packetName + " with count " + count);
                             event.setCancelled(true);
                             break;
                         }
@@ -114,7 +116,7 @@ public class BadPacketsA extends Check {
                     if (creativeSlot.getClickedItem().getType() == Material.AIR) {
                         if (count >= 230) {
                             if (timeSinceDelayed < 500L) {
-                                System.out.println("Cancelled packet " + packetName + " with count " + count);
+                                MessageUtil.log(Level.INFO, "Cancelled packet " + packetName + " with count " + count);
                                 event.setCancelled(true);
                                 break;
                             }
@@ -122,9 +124,9 @@ public class BadPacketsA extends Check {
                             KickUtil.kickPlayer(player, event, "packet=" + packetName + " count=" + count);
                         }
                     } else {
-                        if (count >= (olderThan1_8 ? 4 : 15)) {
+                        if (count >= (olderThan1_8 ? 9 : 15)) {
                             if (timeSinceDelayed < 500L) {
-                                System.out.println("Cancelled packet " + packetName + " with count " + count);
+                                MessageUtil.log(Level.INFO, "Cancelled packet " + packetName + " with count " + count);
                                 event.setCancelled(true);
                                 break;
                             }
@@ -139,7 +141,7 @@ public class BadPacketsA extends Check {
                 case PacketType.Play.Client.SETTINGS:
                     if (count >= (olderThan1_8 ? 2 : 41)) {
                         if (timeSinceDelayed < 500L) {
-                            System.out.println("Cancelled packet " + packetName + " with count " + count);
+                            MessageUtil.log(Level.INFO, "Cancelled packet " + packetName + " with count " + count);
                             event.setCancelled(true);
                             break;
                         }
@@ -151,7 +153,7 @@ public class BadPacketsA extends Check {
                 case PacketType.Play.Client.STEER_VEHICLE:
                     if (count >= (playerData.getTimeSince(ActionType.LOGIN) < 2000L ? 13 : (olderThan1_8 ? 2 : 5))) {
                         if (timeSinceDelayed < 500L) {
-                            System.out.println("Cancelled packet " + packetName + " with count " + count);
+                            MessageUtil.log(Level.INFO, "Cancelled packet " + packetName + " with count " + count);
                             event.setCancelled(true);
                             break;
                         }
@@ -171,7 +173,7 @@ public class BadPacketsA extends Check {
                 default:
                     if (count >= 2) {
                         if (timeSinceDelayed < 500L) {
-                            System.out.println("Cancelled packet " + packetName + " with count " + count);
+                            MessageUtil.log(Level.INFO, "Cancelled packet " + packetName + " with count " + count);
                             event.setCancelled(true);
                             break;
                         }
