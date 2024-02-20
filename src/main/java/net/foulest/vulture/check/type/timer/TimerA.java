@@ -4,7 +4,6 @@ import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEve
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
-import net.foulest.vulture.Vulture;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
@@ -37,8 +36,9 @@ public class TimerA extends Check {
             int totalTicks = playerData.getTotalTicks();
             int lastDroppedPackets = playerData.getLastDroppedPackets();
 
-            // Checks the player for exemptions.
-            if (Vulture.timeSinceLaggingFast() <= 500 || Vulture.timeSinceLaggingSlow() <= 500) {
+            // Ignores timer checks if the server is lagging.
+            // TODO: Test more thoroughly.
+            if (playerData.getTimeSince(ActionType.SERVER_PACKET_DELAYED) < 500L) {
                 return;
             }
 

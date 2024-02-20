@@ -41,11 +41,6 @@ public class Vulture extends JavaPlugin {
     public Runnable packetTracker;
     public Runnable lagTracker;
     public boolean debug;
-    public long lastTimestamp;
-    public int ticksRunningSlow;
-    public int ticksRunningFast;
-    public long lastLaggingSlow;
-    public long lastLaggingFast;
 
     @Override
     public void onLoad() {
@@ -63,42 +58,6 @@ public class Vulture extends JavaPlugin {
     public void onEnable() {
         // Kicks all online players.
         Bukkit.getOnlinePlayers().forEach(player -> player.kickPlayer("Disconnected"));
-
-        // Calculates server lag every tick.
-        MessageUtil.log(Level.INFO, "Initializing Lag Tracker...");
-        lagTracker = () -> {
-            // Timestamps the tick to calculate server lag.
-            long now = System.currentTimeMillis();
-            long diff = now - lastTimestamp;
-
-            // Calculates the server lag.
-            if (diff != now) {
-                if (diff > 52.0) {
-                    ticksRunningSlow++;
-                    ticksRunningFast = 0;
-
-                    if (ticksRunningSlow >= 3 || diff > 100.0) {
-                        lastLaggingSlow = now;
-                    }
-
-                } else if (diff < 48.0) {
-                    ticksRunningFast++;
-                    ticksRunningSlow = 0;
-
-                    if (ticksRunningFast >= 4 || diff > 100.0) {
-                        lastLaggingFast = now;
-                    }
-
-                } else {
-                    ticksRunningSlow = 0;
-                    ticksRunningFast = 0;
-                }
-            }
-
-            // Sets the last timestamp to the current time.
-            lastTimestamp = now;
-        };
-        TaskUtil.runTaskTimer(lagTracker, 0L, 1L);
 
         // Resets the packets sent in the tick for all players every tick.
         MessageUtil.log(Level.INFO, "Initializing Packet Tracker...");
@@ -188,23 +147,5 @@ public class Vulture extends JavaPlugin {
         for (Object command : commands) {
             framework.registerCommands(command);
         }
-    }
-
-    /**
-     * Gets the time since the server was lagging (fast).
-     *
-     * @return The time since the server was lagging (fast).
-     */
-    public static long timeSinceLaggingFast() {
-        return System.currentTimeMillis() - instance.lastLaggingFast;
-    }
-
-    /**
-     * Gets the time since the server was lagging (slow).
-     *
-     * @return The time since the server was lagging (slow).
-     */
-    public static long timeSinceLaggingSlow() {
-        return System.currentTimeMillis() - instance.lastLaggingSlow;
     }
 }

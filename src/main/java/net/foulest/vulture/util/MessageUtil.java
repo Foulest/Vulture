@@ -43,6 +43,7 @@ public final class MessageUtil {
     public static void printException(@NotNull Throwable ex) {
         logger.log(Level.WARNING, "An error occurred: " + ex.getLocalizedMessage()
                 + " (Caused by: " + ex.getCause() + ")");
+        ex.printStackTrace();
     }
 
     /**

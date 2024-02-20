@@ -5,7 +5,6 @@ import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.play.in.setcreativeslot.WrappedPacketInSetCreativeSlot;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
-import net.foulest.vulture.Vulture;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
@@ -29,10 +28,6 @@ public class BadPacketsA extends Check {
     @Override
     public void handle(CancellableNMSPacketEvent event, byte packetId,
                        NMSPacket nmsPacket, Object packet, long timestamp) {
-        if (Vulture.timeSinceLaggingFast() <= 500 || Vulture.timeSinceLaggingSlow() <= 500) {
-            return;
-        }
-
         synchronized (playerData.getPacketCounts()) {
             Map<Byte, Integer> packetCounts = playerData.getPacketCounts();
             packetCounts.compute(packetId, (key, count) -> (count == null) ? 1 : count + 1);
@@ -47,48 +42,69 @@ public class BadPacketsA extends Check {
             String packetName = PacketProcessor.getPacketFromId(packetId).getSimpleName();
             boolean olderThan1_8 = playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8);
             boolean inCreative = player.getGameMode() == GameMode.CREATIVE;
+            long timeSinceDelayed = playerData.getTimeSince(ActionType.SERVER_PACKET_DELAYED);
 
             switch (packetId) {
                 case PacketType.Play.Client.BLOCK_PLACE:
                 case PacketType.Play.Client.HELD_ITEM_SLOT:
                     if (count >= (olderThan1_8 && inCreative ? 3 : 4)) {
-                        KickUtil.kickPlayer(player, event, "packet=" + packetName + " count=" + count
-                                + " fast=" + (System.currentTimeMillis() - Vulture.instance.lastLaggingFast)
-                                + " slow=" + (System.currentTimeMillis() - Vulture.instance.lastLaggingSlow));
+                        if (timeSinceDelayed < 500L) {
+                            System.out.println("Cancelled packet " + packetName + " with count " + count);
+                            event.setCancelled(true);
+                            break;
+                        }
+
+                        KickUtil.kickPlayer(player, event, "packet=" + packetName + " count=" + count);
                     }
                     break;
 
                 case PacketType.Play.Client.CUSTOM_PAYLOAD:
                 case PacketType.Play.Client.ENTITY_ACTION:
                     if (count >= 3) {
-                        KickUtil.kickPlayer(player, event, "packet=" + packetName + " count=" + count
-                                + " fast=" + (System.currentTimeMillis() - Vulture.instance.lastLaggingFast)
-                                + " slow=" + (System.currentTimeMillis() - Vulture.instance.lastLaggingSlow));
+                        if (timeSinceDelayed < 500L) {
+                            System.out.println("Cancelled packet " + packetName + " with count " + count);
+                            event.setCancelled(true);
+                            break;
+                        }
+
+                        KickUtil.kickPlayer(player, event, "packet=" + packetName + " count=" + count);
                     }
                     break;
 
                 case PacketType.Play.Client.WINDOW_CLICK:
-                    if (count >= (olderThan1_8 ? 3 : 6)) {
-                        KickUtil.kickPlayer(player, event, "packet=" + packetName + " count=" + count
-                                + " fast=" + (System.currentTimeMillis() - Vulture.instance.lastLaggingFast)
-                                + " slow=" + (System.currentTimeMillis() - Vulture.instance.lastLaggingSlow));
+                    if (count >= (olderThan1_8 ? 4 : 6)) {
+                        if (timeSinceDelayed < 500L) {
+                            System.out.println("Cancelled packet " + packetName + " with count " + count);
+                            event.setCancelled(true);
+                            break;
+                        }
+
+                        KickUtil.kickPlayer(player, event, "packet=" + packetName + " count=" + count);
                     }
                     break;
 
                 case PacketType.Play.Client.BLOCK_DIG:
                 case PacketType.Play.Client.USE_ENTITY:
                     if (count >= 4) {
-                        KickUtil.kickPlayer(player, event, "packet=" + packetName + " count=" + count
-                                + " fast=" + (System.currentTimeMillis() - Vulture.instance.lastLaggingFast)
-                                + " slow=" + (System.currentTimeMillis() - Vulture.instance.lastLaggingSlow));
+                        if (timeSinceDelayed < 500L) {
+                            System.out.println("Cancelled packet " + packetName + " with count " + count);
+                            event.setCancelled(true);
+                            break;
+                        }
+
+                        KickUtil.kickPlayer(player, event, "packet=" + packetName + " count=" + count);
                     }
                     break;
 
                 case PacketType.Play.Client.ARM_ANIMATION:
                     if (count >= 7) {
-                        KickUtil.kickPlayer(player, event, "packet=" + packetName + " count=" + count
-                                + " fast=" + (System.currentTimeMillis() - Vulture.instance.lastLaggingFast)
-                                + " slow=" + (System.currentTimeMillis() - Vulture.instance.lastLaggingSlow));
+                        if (timeSinceDelayed < 500L) {
+                            System.out.println("Cancelled packet " + packetName + " with count " + count);
+                            event.setCancelled(true);
+                            break;
+                        }
+
+                        KickUtil.kickPlayer(player, event, "packet=" + packetName + " count=" + count);
                     }
                     break;
 
@@ -97,26 +113,50 @@ public class BadPacketsA extends Check {
 
                     if (creativeSlot.getClickedItem().getType() == Material.AIR) {
                         if (count >= 230) {
-                            KickUtil.kickPlayer(player, event, "packet=" + packetName + " count=" + count
-                                    + " fast=" + (System.currentTimeMillis() - Vulture.instance.lastLaggingFast)
-                                    + " slow=" + (System.currentTimeMillis() - Vulture.instance.lastLaggingSlow));
+                            if (timeSinceDelayed < 500L) {
+                                System.out.println("Cancelled packet " + packetName + " with count " + count);
+                                event.setCancelled(true);
+                                break;
+                            }
+
+                            KickUtil.kickPlayer(player, event, "packet=" + packetName + " count=" + count);
                         }
                     } else {
                         if (count >= (olderThan1_8 ? 4 : 15)) {
+                            if (timeSinceDelayed < 500L) {
+                                System.out.println("Cancelled packet " + packetName + " with count " + count);
+                                event.setCancelled(true);
+                                break;
+                            }
+
                             KickUtil.kickPlayer(player, event, "packet=" + packetName + " count=" + count
                                     + " slot=" + creativeSlot.getSlot()
-                                    + " item=" + creativeSlot.getClickedItem().getType().name()
-                                    + " fast=" + (System.currentTimeMillis() - Vulture.instance.lastLaggingFast)
-                                    + " slow=" + (System.currentTimeMillis() - Vulture.instance.lastLaggingSlow));
+                                    + " item=" + creativeSlot.getClickedItem().getType().name());
                         }
                     }
                     break;
 
                 case PacketType.Play.Client.SETTINGS:
                     if (count >= (olderThan1_8 ? 2 : 41)) {
-                        KickUtil.kickPlayer(player, event, "packet=" + packetName + " count=" + count
-                                + " fast=" + (System.currentTimeMillis() - Vulture.instance.lastLaggingFast)
-                                + " slow=" + (System.currentTimeMillis() - Vulture.instance.lastLaggingSlow));
+                        if (timeSinceDelayed < 500L) {
+                            System.out.println("Cancelled packet " + packetName + " with count " + count);
+                            event.setCancelled(true);
+                            break;
+                        }
+
+                        KickUtil.kickPlayer(player, event, "packet=" + packetName + " count=" + count);
+                    }
+                    break;
+
+                case PacketType.Play.Client.STEER_VEHICLE:
+                    if (count >= (playerData.getTimeSince(ActionType.LOGIN) < 2000L ? 13 : (olderThan1_8 ? 2 : 5))) {
+                        if (timeSinceDelayed < 500L) {
+                            System.out.println("Cancelled packet " + packetName + " with count " + count);
+                            event.setCancelled(true);
+                            break;
+                        }
+
+                        KickUtil.kickPlayer(player, event, "packet=" + packetName + " count=" + count);
                     }
                     break;
 
@@ -128,19 +168,15 @@ public class BadPacketsA extends Check {
                 case PacketType.Play.Client.TRANSACTION:
                     break;
 
-                case PacketType.Play.Client.STEER_VEHICLE:
-                    if (count >= (playerData.getTimeSince(ActionType.LOGIN) < 2000L ? 13 : (olderThan1_8 ? 2 : 5))) {
-                        KickUtil.kickPlayer(player, event, "packet=" + packetName + " count=" + count
-                                + " fast=" + (System.currentTimeMillis() - Vulture.instance.lastLaggingFast)
-                                + " slow=" + (System.currentTimeMillis() - Vulture.instance.lastLaggingSlow));
-                    }
-                    break;
-
                 default:
                     if (count >= 2) {
-                        KickUtil.kickPlayer(player, event, "packet=" + packetName + " count=" + count
-                                + " fast=" + (System.currentTimeMillis() - Vulture.instance.lastLaggingFast)
-                                + " slow=" + (System.currentTimeMillis() - Vulture.instance.lastLaggingSlow));
+                        if (timeSinceDelayed < 500L) {
+                            System.out.println("Cancelled packet " + packetName + " with count " + count);
+                            event.setCancelled(true);
+                            break;
+                        }
+
+                        KickUtil.kickPlayer(player, event, "packet=" + packetName + " count=" + count);
                     }
                     break;
             }
