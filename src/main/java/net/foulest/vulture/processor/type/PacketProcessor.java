@@ -292,6 +292,7 @@ public class PacketProcessor extends Processor {
 
                             // Checks for and ignores instantly breakable blocks.
                             switch (block.getType()) {
+                                case AIR:
                                 case BROWN_MUSHROOM:
                                 case CARROT:
                                 case CROPS:
@@ -889,14 +890,12 @@ public class PacketProcessor extends Processor {
                     case START_SPRINTING:
                         if ((playerData.isBlocking() && playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8))
                                 || playerData.isShootingBow()
-                                || playerData.isEating()
                                 || playerData.isDrinking()
                                 || player.hasPotionEffect(PotionEffectType.BLINDNESS)) {
                             KickUtil.kickPlayer(player, event, Settings.startSprintingInvalidConditions,
                                     "Sent StartSprinting packet with invalid conditions"
                                             + " (blocking=" + playerData.isBlocking()
                                             + " shootingBow=" + playerData.isShootingBow()
-                                            + " eating=" + playerData.isEating()
                                             + " drinking=" + playerData.isDrinking()
                                             + " blindness=" + player.hasPotionEffect(PotionEffectType.BLINDNESS) + ")"
                             );
@@ -1787,6 +1786,12 @@ public class PacketProcessor extends Processor {
     public void onPacketPlaySend(@NotNull PacketPlaySendEvent event) {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
+
+        // Sets the last server packet timestamps.
+        if (playerData.getTimeSince(ActionType.SERVER_PACKET_RECEIVED) >= 1000L) {
+            playerData.setTimestamp(ActionType.SERVER_PACKET_DELAYED);
+        }
+        playerData.setTimestamp(ActionType.SERVER_PACKET_RECEIVED);
 
         switch (event.getPacketId()) {
             case PacketType.Play.Server.ABILITIES:
