@@ -1,433 +1,441 @@
+# -----------------------------------------------
 # Vulture
 # Version: ${project.version}
 #
 # Created by: Foulest (https://github.com/Foulest/Vulture)
 # License: GPLv3 (https://github.com/Foulest/Vulture/LICENSE)
+# -----------------------------------------------
 vulture:
-  # The prefix used for all Vulture messages.
-  prefix: '&e[Vulture]'
-  # The ban message broadcast to the server when a player is banned.
-  # This message will appear for banCommands that are not 'vulture kick.'
-  # Set this to '[]' to turn off the broadcast message.
-  # Placeholders: %player%, %check%
-  banMessage:
-    - '&c%player% has been removed from the network.'
-  # The number of seconds in between a player's violations being reset.
-  # Set this to -1 to turn off violations resetting over time.
-  # Violations automatically reset when a player logs out.
-  resetViolations: 600
-blacklisted:
-  # The list of blacklisted payloads.
-  # When a player sends a blacklisted payload, they will be automatically kicked.
-  # For a list of payloads, visit the link below and look at the second column of each PayloadType.
+  # -----------------------------------------------
+  # General Settings
+  # -----------------------------------------------
+  general:
+    prefix: '&e[Vulture]'
+    banMessage:
+      - '&c%player% has been removed from the network.'
+    resetViolations: 600
+  # -----------------------------------------------
+  # Blocked Settings
+  #
+  # Both payloads and commands can be blocked below.
+  # The commands section supports RegEx.
+  #
+  # Players that send blocked payloads will be kicked.
+  # Players that send blocked commands will have their command blocked.
+  #
+  # For information about what payloads are, visit the links below:
+  # https://github.com/Foulest/Vulture/blob/main/src/main/java/net/foulest/vulture/check/type/clientbrand/type/PayloadType.java
   # https://github.com/Foulest/Vulture/blob/main/src/main/java/net/foulest/vulture/check/type/clientbrand/ClientBrand.java
-  payloads:
-    - GalactiCraft
-  # The list of blacklisted commands.
-  # When a player sends a blacklisted command, the command will be blocked.
-  # Regular expressions are supported for command blocking.
-  commands:
-    - /calc
-    - /eval
-    - /solve
-    - /h.* readtext
-    - /pe.*x promote
-    - /pe.*x demote
-    - /promote
-    - /demote
-    - /m.*v.* \^
-    - /m.*v.*help <
-    - /\$
-# The list of checks to be enabled.
-# Each check has a list of options.
-#
-# The 'enabled' option turns the check on/off.
-# The 'maxViolations' option sets the maximum number of violations a player can have before being banned.
-# The 'banCommand' option sets the command executed when a player is banned.
-# Placeholders: %player%, %check%
-#
-# Some checks have additional and/or missing options.
-# For example, some checks are missing the 'maxViolations' and 'banCommand' options.
-# These checks do not have a maximum amount of violations and do not ban players; they only kick players.
-checks:
-  aimassist:
-    A:
+  # -----------------------------------------------
+  blocked:
+    payloads:
+      - GalactiCraft
+    commands:
+      - /calc
+      - /eval
+      - /solve
+      - /h.* readtext
+      - /pe.*x promote
+      - /pe.*x demote
+      - /promote
+      - /demote
+      - /m.*v.* \^
+      - /m.*v.*help <
+      - /\$
+  # -----------------------------------------------
+  # Check Settings
+  #
+  # The 'enabled' option turns the check on/off.
+  # The 'maxViolations' option sets the maximum number of violations a player can have before being banned.
+  # The 'banCommand' option sets the command executed when a player is banned.
+  # Placeholders: %player%, %check%
+  #
+  # Some checks have additional and/or missing options.
+  # For example, some checks are missing the 'maxViolations' and 'banCommand' options.
+  # These checks do not have a maximum amount of violations and do not ban players; they only kick players.
+  # -----------------------------------------------
+  checks:
+    aimassist:
+      A:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      B:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      C:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      D:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      E:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      F:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      G:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      H:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      I:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+    autoblock:
+      A:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      B:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      C:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      D:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+    autoclicker:
+      A:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      B:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+    badpackets:
+      A:
+        enabled: true
+      B:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      C:
+        enabled: true
+      D:
+        enabled: true
+      E:
+        enabled: true
+      F:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      G:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+    clientbrand:
       enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    B:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    C:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    D:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    E:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    F:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    G:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    H:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    I:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-  autoblock:
-    A:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    B:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    C:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    D:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-  autoclicker:
-    A:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    B:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-  badpackets:
-    A:
-      enabled: true
-    B:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    C:
-      enabled: true
-    D:
-      enabled: true
-    E:
-      enabled: true
-    F:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    G:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-  clientbrand:
-    enabled: true
-  flight:
-    A:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    B:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    C:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    D:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-  groundspoof:
-    A:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    B:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-  inventory:
-    A:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    B:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    C:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    D:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    E:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    F:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    G:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    H:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    I:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    J:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    K:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    L:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-  killaura:
-    A:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    B:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    C:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    D:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    E:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    F:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    G:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    H:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    I:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    J:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-  pingspoof:
-    A:
-      enabled: true
-    B:
-      enabled: true
-      maxPing: 1000
-      maxAveragePing: 500
-      maxPingDeviation: 200
-  reach:
-    A:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    B:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    C:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-  speed:
-    A:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    B:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    C:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    D:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    E:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-    F:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-  timer:
-    A:
-      enabled: true
-  velocity:
-    A:
-      enabled: true
-      maxViolations: 10
-      banCommand: vulture kick %player% %check%
-# The list of packet and exploit protections to be enabled.
-# Note: Modifying these settings is NOT recommended and only for experienced server owners.
-# Disabling protections will allow players to use exploits and send invalid or modified packets.
-# Leave it at the default value if unsure what a specific protection does.
-protections:
-  exploits:
-    world:
-      invalid-block-break: true
-      invalid-block-place: true
-  packets:
-    max-packets-per-tick: 230
-    abilities:
-      duplicate-flying: true
-      invalid-flight-allowed: true
-      invalid-fly-speed: true
-      invalid-flying: true
-      invalid-instant-build: true
-      invalid-invulnerable: true
-      invalid-walk-speed: true
-    arm-animation:
-      invalid-conditions: true
-    attack-entity:
-      invalid-conditions: true
-    beacon:
-      invalid-conditions: true
-      invalid-data: true
-      invalid-effect: true
-      invalid-tier: true
-    block-dig:
-      invalid-distance: true
-    block-place:
-      invalid-conditions: true
-      invalid-cursor-position: true
-      invalid-distance: true
-      invalid-item: true
-      invalid-other-block-position: true
-      invalid-other-cursor-position: true
-      invalid-up-block-position: true
-    book-edit:
-      invalid-conditions: true
-      invalid-data: true
-    book-open:
-      invalid-conditions: true
-    book-sign:
-      invalid-conditions: true
-      invalid-data: true
-    chat:
-      invalid-conditions: true
-      invalid-message: true
-    close-window:
-      closed-inventory: true
-      invalid-conditions: true
-    command-block:
-      invalid-conditions: true
-    custom-payload:
-      invalid-size: true
-    enchant-item:
-      invalid-window-id: true
-    entity-action:
-      invalid-jump-boost: true
-    flying:
-      invalid-pitch: true
-      invalid-position-data: true
-      invalid-rotation-data: true
-      invalid-y-data: true
-    held-item-slot:
-      invalid-conditions: true
-      invalid-slot: true
-      invalid-slot-change: true
-    item-drop:
-      invalid-data: true
-    item-name:
-      invalid-data: true
-      invalid-size: true
-    release-use-item:
-      invalid-conditions: true
-      invalid-data: true
-    respawn:
-      invalid-conditions: true
-    riding-jump:
-      invalid-conditions: true
-      invalid-jump-boost: true
-    set-creative-slot:
-      invalid-conditions: true
-      invalid-slot: true
-    settings:
-      invalid-locale: true
-      invalid-view-distance: true
-    spectate:
-      invalid-conditions: true
-    start-sneaking:
-      invalid-conditions: true
-    start-sprinting:
-      invalid-conditions: true
-    steer-vehicle:
-      invalid-conditions: true
-      invalid-dismount-value: true
-      invalid-non-dismount-value: true
-      invalid-value: true
-    stop-sleeping:
-      invalid-conditions: true
-    stop-sneaking:
-      invalid-conditions: true
-    tab-complete:
-      invalid-message: true
-    trade-select:
-      invalid-data: true
-    transaction:
-      invalid-window-id: true
-      not-accepted: true
-    update-sign:
-      invalid-data: true
-    use-entity:
-      invalid-conditions: true
-      invalid-distance: true
-    window-click:
-      invalid-clone-button: true
-      invalid-conditions: true
-      invalid-pickup-all-button: true
-      invalid-pickup-button: true
-      invalid-quick-craft-button: true
-      invalid-quick-move-button: true
-      invalid-slot: true
-      invalid-swap-button: true
-      invalid-throw-button: true
+    flight:
+      A:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      B:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      C:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      D:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+    groundspoof:
+      A:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      B:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+    inventory:
+      A:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      B:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      C:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      D:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      E:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      F:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      G:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      H:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      I:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      J:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      K:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      L:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+    killaura:
+      A:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      B:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      C:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      D:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      E:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      F:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      G:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      H:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      I:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      J:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+    pingspoof:
+      A:
+        enabled: true
+      B:
+        enabled: true
+        maxPing: 1000
+        maxAveragePing: 500
+        maxPingDeviation: 200
+    reach:
+      A:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      B:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      C:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+    speed:
+      A:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      B:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      C:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      D:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      E:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      F:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+    timer:
+      A:
+        enabled: true
+    velocity:
+      A:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+  # -----------------------------------------------
+  # Protection Settings
+  #
+  # Note: Modifying these settings is NOT recommended and only for experienced server owners.
+  # Disabling protections will allow players to use exploits and send invalid or modified packets.
+  # Leave it at the default value if unsure what a specific protection does.
+  # -----------------------------------------------
+  protections:
+    exploits:
+      world:
+        invalid-block-break: true
+        invalid-block-place: true
+    packets:
+      max-packets-per-tick: 230
+      abilities:
+        duplicate-flying: true
+        invalid-flight-allowed: true
+        invalid-fly-speed: true
+        invalid-flying: true
+        invalid-instant-build: true
+        invalid-invulnerable: true
+        invalid-walk-speed: true
+      arm-animation:
+        invalid-conditions: true
+      attack-entity:
+        invalid-conditions: true
+      beacon:
+        invalid-conditions: true
+        invalid-data: true
+        invalid-effect: true
+        invalid-tier: true
+      block-dig:
+        invalid-distance: true
+      block-place:
+        invalid-conditions: true
+        invalid-cursor-position: true
+        invalid-distance: true
+        invalid-item: true
+        invalid-other-block-position: true
+        invalid-other-cursor-position: true
+        invalid-up-block-position: true
+      book-edit:
+        invalid-conditions: true
+        invalid-data: true
+      book-open:
+        invalid-conditions: true
+      book-sign:
+        invalid-conditions: true
+        invalid-data: true
+      chat:
+        invalid-conditions: true
+        invalid-message: true
+      close-window:
+        closed-inventory: true
+        invalid-conditions: true
+      command-block:
+        invalid-conditions: true
+      custom-payload:
+        invalid-size: true
+      enchant-item:
+        invalid-window-id: true
+      entity-action:
+        invalid-jump-boost: true
+      flying:
+        invalid-pitch: true
+        invalid-position-data: true
+        invalid-rotation-data: true
+        invalid-y-data: true
+      held-item-slot:
+        invalid-conditions: true
+        invalid-slot: true
+        invalid-slot-change: true
+      item-drop:
+        invalid-data: true
+      item-name:
+        invalid-data: true
+        invalid-size: true
+      release-use-item:
+        invalid-conditions: true
+        invalid-data: true
+      respawn:
+        invalid-conditions: true
+      riding-jump:
+        invalid-conditions: true
+        invalid-jump-boost: true
+      set-creative-slot:
+        invalid-conditions: true
+        invalid-slot: true
+      settings:
+        invalid-locale: true
+        invalid-view-distance: true
+      spectate:
+        invalid-conditions: true
+      start-sneaking:
+        invalid-conditions: true
+      start-sprinting:
+        invalid-conditions: true
+      steer-vehicle:
+        invalid-conditions: true
+        invalid-dismount-value: true
+        invalid-non-dismount-value: true
+        invalid-value: true
+      stop-sleeping:
+        invalid-conditions: true
+      stop-sneaking:
+        invalid-conditions: true
+      tab-complete:
+        invalid-message: true
+      trade-select:
+        invalid-data: true
+      transaction:
+        invalid-window-id: true
+        not-accepted: true
+      update-sign:
+        invalid-data: true
+      use-entity:
+        invalid-conditions: true
+        invalid-distance: true
+      window-click:
+        invalid-clone-button: true
+        invalid-conditions: true
+        invalid-pickup-all-button: true
+        invalid-pickup-button: true
+        invalid-quick-craft-button: true
+        invalid-quick-move-button: true
+        invalid-slot: true
+        invalid-swap-button: true
+        invalid-throw-button: true

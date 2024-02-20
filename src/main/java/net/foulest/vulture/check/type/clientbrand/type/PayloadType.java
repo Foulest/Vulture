@@ -12,5 +12,5 @@ public class PayloadType {
     public String data;
     public String name;
     public DataType dataType;
-    public boolean blacklisted;
+    public boolean blocked;
 }

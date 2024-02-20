@@ -40,7 +40,7 @@ public class CommandListener implements Listener {
     }
 
     /**
-     * Processes a command and cancels it if it is blacklisted.
+     * Processes a command and cancels it if it is blocked.
      *
      * @param event   The event.
      * @param command The command.
@@ -49,8 +49,8 @@ public class CommandListener implements Listener {
     private void processCommand(Cancellable event,
                                 String command,
                                 CommandSender sender) {
-        // Check if the command is blacklisted.
-        for (String string : Settings.blacklistedCommands) {
+        // Check if the command is blocked.
+        for (String string : Settings.blockedCommands) {
             Pattern pattern = Pattern.compile(string);
 
             // If the command matches the pattern, cancel it.

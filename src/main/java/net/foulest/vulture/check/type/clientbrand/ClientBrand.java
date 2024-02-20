@@ -900,8 +900,8 @@ public class ClientBrand extends Check {
                 validateAndProcessPayload(CHANNELS, event, channelName, DataType.CHANNEL);
             }
 
-            // Checks for blacklisted mods registered by the player.
-            checkForBlacklistedMods(event);
+            // Checks for blocked mods registered by the player.
+            checkForBlockedMods(event);
         }
     }
 
@@ -914,7 +914,7 @@ public class ClientBrand extends Check {
     private void handleBrandData(@NotNull String data, CancellableNMSPacketEvent event) {
         // Kicks players on Crystalware.
         if (data.contains("CRYSTAL|") || data.contains("Winterware")) {
-            KickUtil.kickPlayer(player, event, "Blacklisted Brand: Crystalware");
+            KickUtil.kickPlayer(player, event, "Blocked Brand: Crystalware");
             return;
         }
 
@@ -968,17 +968,15 @@ public class ClientBrand extends Check {
     }
 
     /**
-     * Checks for blacklisted mods registered by the player.
+     * Checks for blocked mods registered by the player.
      *
      * @param event The event to cancel.
      */
-    private void checkForBlacklistedMods(CancellableNMSPacketEvent event) {
+    private void checkForBlockedMods(CancellableNMSPacketEvent event) {
+        // If the payload is blocked, kick the player.
         for (PayloadType payloadType : playerData.getPayloads()) {
-            List<String> blacklistedPayload = Settings.blacklistedPayloads;
-
-            // If the payload is blacklisted, kick the player.
-            if (blacklistedPayload.contains(payloadType.name)) {
-                KickUtil.kickPlayer(player, event, "Blacklisted Mod: " + payloadType.name,
+            if (Settings.blockedPayloads.contains(payloadType.name)) {
+                KickUtil.kickPlayer(player, event, "Blocked Mod: " + payloadType.name,
                         "&c" + payloadType.name + " is not allowed on this server.");
                 return;
             }
@@ -999,9 +997,9 @@ public class ClientBrand extends Check {
         // Checks if the data is present in the payload type list.
         for (PayloadType payloadType : payloadTypeList) {
             if (payloadType.data.equals(data)) {
-                // If the payload is blacklisted, kick the player.
-                if (payloadType.blacklisted) {
-                    KickUtil.kickPlayer(player, event, "Blacklisted "
+                // If the payload is blocked, kick the player.
+                if (payloadType.isBlocked()) {
+                    KickUtil.kickPlayer(player, event, "Blocked "
                             + dataType.getName() + ": " + payloadType.data);
                     return;
                 }
