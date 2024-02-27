@@ -34,7 +34,7 @@ dependencies {
 
     // PacketEvents v1.8.4 - for listening to packets
     // https://github.com/retrooper/packetevents
-    implementation group: 'io.github.retrooper', name: 'packetevents', version: 'v1.8.4'
+    implementation group: 'io.github.retrooper', name: 'packetevents', version: 'v2.2.0'
 
     // JetBrains Annotations - for code inspection and documentation
     // https://mvnrepository.com/artifact/org.jetbrains/annotations
