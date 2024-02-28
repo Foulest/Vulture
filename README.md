@@ -1,8 +1,8 @@
 # Vulture
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![CodeQL Badge](https://github.com/Foulest/RepairKit/actions/workflows/codeql.yml/badge.svg)](https://github.com/Foulest/RepairKit/actions/workflows/codeql.yml)
 [![JitPack Badge](https://jitpack.io/v/Foulest/Vulture.svg)](https://jitpack.io/#Foulest/Vulture)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/238ed4bb02fe4c2192f199953705c3da)](https://app.codacy.com/gh/Foulest/Vulture/dashboard)
 
 **Vulture** is a robust, free, and open-source anticheat plugin designed specifically for Minecraft 1.8.9 servers.
 
