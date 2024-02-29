@@ -7,6 +7,7 @@ import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import net.foulest.vulture.util.MathUtil;
 import net.foulest.vulture.util.MessageUtil;
 import org.jetbrains.annotations.Contract;
@@ -18,6 +19,7 @@ import java.util.Random;
 
 @Getter
 @AllArgsConstructor
+@ToString(onlyExplicitlyIncluded = true)
 @SuppressWarnings("unused")
 public enum EnumFacing implements IStringSerializable {
     DOWN("DOWN", 0, 1, -1, "down", AxisDirection.NEGATIVE, Axis.Y, new Vector3i(0, -1, 0)),
@@ -44,6 +46,7 @@ public enum EnumFacing implements IStringSerializable {
      */
     private final int horizontalIndex;
 
+    @ToString.Include
     private final String name;
     private final AxisDirection axisDirection;
     private final Axis axis;
@@ -243,10 +246,6 @@ public enum EnumFacing implements IStringSerializable {
         return north;
     }
 
-    public String toString() {
-        return name;
-    }
-
     public static @NotNull EnumFacing getFacingByDirectionAndAxis(AxisDirection direction, Axis axis) {
         for (EnumFacing facing : values()) {
             if (facing.getAxisDirection() == direction && facing.getAxis() == axis) {
@@ -311,6 +310,7 @@ public enum EnumFacing implements IStringSerializable {
 
     @Getter
     @AllArgsConstructor
+    @ToString(onlyExplicitlyIncluded = true)
     public enum Axis implements Predicate<Object>, IStringSerializable {
         X("X", 0, "x", Plane.HORIZONTAL),
         Y("Y", 1, "y", Plane.VERTICAL),
@@ -318,6 +318,7 @@ public enum EnumFacing implements IStringSerializable {
 
         private final String axisName;
         private final int index;
+        @ToString.Include
         private final String name;
         private final Plane plane;
 
@@ -333,10 +334,6 @@ public enum EnumFacing implements IStringSerializable {
 
         public boolean isHorizontal() {
             return plane == Plane.HORIZONTAL;
-        }
-
-        public String toString() {
-            return name;
         }
 
         @Contract(pure = true)
@@ -357,6 +354,7 @@ public enum EnumFacing implements IStringSerializable {
 
     @Getter
     @AllArgsConstructor
+    @ToString(onlyExplicitlyIncluded = true)
     public enum AxisDirection {
         POSITIVE("POSITIVE", 0, 1, "Towards positive"),
         NEGATIVE("NEGATIVE", 1, -1, "Towards negative");
@@ -364,11 +362,8 @@ public enum EnumFacing implements IStringSerializable {
         private final String name;
         private final int index;
         private final int offset;
+        @ToString.Include
         private final String description;
-
-        public String toString() {
-            return description;
-        }
     }
 
     @Getter

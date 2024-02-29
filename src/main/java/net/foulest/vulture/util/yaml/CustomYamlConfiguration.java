@@ -1,6 +1,7 @@
 package net.foulest.vulture.util.yaml;
 
 import com.google.common.base.Charsets;
+import lombok.Cleanup;
 import net.foulest.vulture.util.MessageUtil;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -100,23 +101,20 @@ public class CustomYamlConfiguration extends YamlConfiguration {
 
     @Override
     public void load(File file) throws IOException, InvalidConfigurationException {
-        FileInputStream stream = new FileInputStream(file);
-        load(new InputStreamReader(stream, Charsets.UTF_8));
+        @Cleanup FileInputStream stream = new FileInputStream(file);
+        @Cleanup InputStreamReader reader = new InputStreamReader(stream, Charsets.UTF_8);
+        load(reader);
     }
 
     @Override
     public void load(Reader reader) throws IOException, InvalidConfigurationException {
-        BufferedReader input = reader instanceof BufferedReader ? (BufferedReader) reader : new BufferedReader(reader);
+        @Cleanup BufferedReader input = (reader instanceof BufferedReader) ? (BufferedReader) reader : new BufferedReader(reader);
         StringBuilder builder = new StringBuilder();
         String line;
 
-        try {
-            while ((line = input.readLine()) != null) {
-                builder.append(line);
-                builder.append('\n');
-            }
-        } finally {
-            input.close();
+        while ((line = input.readLine()) != null) {
+            builder.append(line);
+            builder.append('\n');
         }
 
         loadFromString(builder.toString());

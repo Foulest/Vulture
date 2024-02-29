@@ -4,6 +4,7 @@ import dev._2lstudios.hamsterapi.HamsterAPI;
 import dev._2lstudios.hamsterapi.enums.PacketType;
 import dev._2lstudios.hamsterapi.utils.Reflection;
 import lombok.Getter;
+import lombok.ToString;
 import net.foulest.vulture.util.MessageUtil;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -14,8 +15,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Getter
+@ToString(onlyExplicitlyIncluded = true)
 public class PacketWrapper {
 
+    @ToString.Include
     private final Object packet;
     private final String name;
     private final Class<?> craftItemStackClass;
@@ -146,9 +149,5 @@ public class PacketWrapper {
 
     public Map<String, Double> getDouble() {
         return doubles;
-    }
-
-    public String toString() {
-        return packet.toString();
     }
 }

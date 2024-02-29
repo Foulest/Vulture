@@ -13,6 +13,7 @@ import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 
+@SuppressWarnings("deprecation")
 @CheckInfo(name = "Inventory (D)", type = CheckType.INVENTORY,
         description = "Detects this Inventory pattern: OpenInventory, WindowClick (Quick Move/Throw), CloseWindow")
 public class InventoryD extends Check {

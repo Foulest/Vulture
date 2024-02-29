@@ -72,7 +72,7 @@ public class HamsterAPI {
      * @param playerData The player's data.
      */
     public static void setup(@NotNull PlayerData playerData) throws IllegalAccessException,
-            InvocationTargetException, NoSuchMethodException, NoSuchFieldException {
+            InvocationTargetException, NoSuchMethodException {
         Player player = playerData.getPlayer();
 
         if (!playerData.isSetup()) {
