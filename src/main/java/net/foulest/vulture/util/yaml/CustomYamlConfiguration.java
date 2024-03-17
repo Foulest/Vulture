@@ -127,7 +127,7 @@ public class CustomYamlConfiguration extends YamlConfiguration {
             config.load(file);
         } catch (FileNotFoundException ignored) {
         } catch (IOException | InvalidConfigurationException ex) {
-            MessageUtil.printException(ex);
+            ex.printStackTrace();
         }
         return config;
     }
@@ -138,7 +138,7 @@ public class CustomYamlConfiguration extends YamlConfiguration {
         try {
             config.load(reader);
         } catch (IOException | InvalidConfigurationException ex) {
-            MessageUtil.printException(ex);
+            ex.printStackTrace();
         }
         return config;
     }

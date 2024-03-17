@@ -149,7 +149,7 @@ public class HamsterAPI {
             inject(playerData);
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException
                  | NoSuchFieldException | ClosedChannelException ex) {
-            MessageUtil.printException(ex);
+            ex.printStackTrace();
             return false;
         }
         return true;

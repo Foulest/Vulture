@@ -19,7 +19,7 @@ public class FileUtil {
             @Cleanup BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
             writer.write(data);
         } catch (IOException ex) {
-            MessageUtil.printException(ex);
+            ex.printStackTrace();
         }
     }
 }

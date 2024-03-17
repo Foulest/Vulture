@@ -170,7 +170,7 @@ public class Check {
                 }
             }
         } catch (ConcurrentModificationException ex) {
-            MessageUtil.printException(ex);
+            ex.printStackTrace();
         }
 
         // Increments the violations.

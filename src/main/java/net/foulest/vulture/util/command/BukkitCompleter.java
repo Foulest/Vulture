@@ -71,7 +71,7 @@ public class BukkitCompleter implements TabCompleter {
                     return (List<String>) entry.getKey().invoke(entry.getValue(),
                             new CommandArgs(sender, command, label, args, cmdLabel.split("\\.").length - 1));
                 } catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException ex) {
-                    MessageUtil.printException(ex);
+                    ex.printStackTrace();
                 }
             }
         }

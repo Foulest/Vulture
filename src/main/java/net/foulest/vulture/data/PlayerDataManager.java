@@ -49,7 +49,7 @@ public class PlayerDataManager {
                     data.getChecks().add(checkInstance);
                 } catch (NoSuchMethodException | IllegalAccessException | InstantiationException
                          | InvocationTargetException ex) {
-                    MessageUtil.printException(ex);
+                    ex.printStackTrace();
                 }
             }
 

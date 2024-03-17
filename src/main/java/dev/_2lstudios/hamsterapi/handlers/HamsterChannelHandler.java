@@ -7,7 +7,6 @@ import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import net.foulest.vulture.data.PlayerData;
-import net.foulest.vulture.util.MessageUtil;
 import org.bukkit.Server;
 import org.bukkit.plugin.PluginManager;
 import org.jetbrains.annotations.NotNull;
@@ -42,7 +41,7 @@ public class HamsterChannelHandler extends ChannelDuplexHandler {
         try {
             pluginManager.callEvent(event);
         } catch (Exception ex) {
-            MessageUtil.printException(ex);
+            ex.printStackTrace();
         }
 
         if (!event.isCancelled()) {
@@ -66,7 +65,7 @@ public class HamsterChannelHandler extends ChannelDuplexHandler {
         try {
             pluginManager.callEvent(event);
         } catch (Exception ex) {
-            MessageUtil.printException(ex);
+            ex.printStackTrace();
         }
 
         if (!event.isCancelled()) {

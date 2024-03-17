@@ -41,7 +41,7 @@ public class HamsterDecoderHandler extends ByteToMessageDecoder {
         try {
             pluginManager.callEvent(event);
         } catch (Exception ex) {
-            MessageUtil.printException(ex);
+            ex.printStackTrace();
         }
 
         if (!event.isCancelled()) {

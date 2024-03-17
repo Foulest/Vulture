@@ -280,7 +280,7 @@ public enum EnumFacing implements IStringSerializable {
                 PLANE_ORDINAL_MAP[Plane.HORIZONTAL.ordinal()] = 1;
                 PLANE_ORDINAL_MAP[Plane.VERTICAL.ordinal()] = 2;
             } catch (NoSuchFieldError ex) {
-                MessageUtil.printException(ex);
+                ex.printStackTrace();
             }
 
             FACING_ORDINAL_MAP = new int[values().length];
@@ -293,7 +293,7 @@ public enum EnumFacing implements IStringSerializable {
                 FACING_ORDINAL_MAP[UP.ordinal()] = 5;
                 FACING_ORDINAL_MAP[DOWN.ordinal()] = 6;
             } catch (NoSuchFieldError ex) {
-                MessageUtil.printException(ex);
+                ex.printStackTrace();
             }
 
             AXIS_ORDINAL_MAP = new int[Axis.values().length];
@@ -303,7 +303,7 @@ public enum EnumFacing implements IStringSerializable {
                 AXIS_ORDINAL_MAP[Axis.Y.ordinal()] = 2;
                 AXIS_ORDINAL_MAP[Axis.Z.ordinal()] = 3;
             } catch (NoSuchFieldError ex) {
-                MessageUtil.printException(ex);
+                ex.printStackTrace();
             }
         }
     }

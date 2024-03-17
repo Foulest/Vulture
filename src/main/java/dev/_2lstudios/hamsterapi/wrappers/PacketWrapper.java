@@ -76,7 +76,7 @@ public class PacketWrapper {
 
                 field.setAccessible(false);
             } catch (Exception ex) {
-                MessageUtil.printException(ex);
+                ex.printStackTrace();
             }
         }
     }
@@ -105,7 +105,7 @@ public class PacketWrapper {
             field.set(packet, value);
             field.setAccessible(false);
         } catch (Exception ex) {
-            MessageUtil.printException(ex);
+            ex.printStackTrace();
         }
     }
 
@@ -119,7 +119,7 @@ public class PacketWrapper {
             field.set(packet, nmsItemStack);
             field.setAccessible(false);
         } catch (Exception ex) {
-            MessageUtil.printException(ex);
+            ex.printStackTrace();
         }
     }
 
