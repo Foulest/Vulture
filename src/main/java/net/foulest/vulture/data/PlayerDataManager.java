@@ -2,7 +2,6 @@ package net.foulest.vulture.data;
 
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckManager;
-import net.foulest.vulture.util.MessageUtil;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 

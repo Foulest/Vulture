@@ -9,7 +9,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import net.foulest.vulture.util.MathUtil;
-import net.foulest.vulture.util.MessageUtil;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 

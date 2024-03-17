@@ -9,7 +9,6 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import lombok.Getter;
 import net.foulest.vulture.data.PlayerData;
-import net.foulest.vulture.util.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;

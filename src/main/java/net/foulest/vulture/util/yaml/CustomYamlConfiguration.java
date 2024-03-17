@@ -2,7 +2,6 @@ package net.foulest.vulture.util.yaml;
 
 import com.google.common.base.Charsets;
 import lombok.Cleanup;
-import net.foulest.vulture.util.MessageUtil;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;

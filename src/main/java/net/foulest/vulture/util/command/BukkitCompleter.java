@@ -2,7 +2,6 @@ package net.foulest.vulture.util.command;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.foulest.vulture.util.MessageUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;

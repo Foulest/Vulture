@@ -6,7 +6,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import net.foulest.vulture.data.PlayerData;
-import net.foulest.vulture.util.MessageUtil;
 import org.bukkit.Server;
 import org.bukkit.plugin.PluginManager;
 import org.jetbrains.annotations.NotNull;

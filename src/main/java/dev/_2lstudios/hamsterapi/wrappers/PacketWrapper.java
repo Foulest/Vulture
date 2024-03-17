@@ -5,7 +5,6 @@ import dev._2lstudios.hamsterapi.enums.PacketType;
 import dev._2lstudios.hamsterapi.utils.Reflection;
 import lombok.Getter;
 import lombok.ToString;
-import net.foulest.vulture.util.MessageUtil;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
