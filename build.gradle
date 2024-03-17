@@ -47,6 +47,10 @@ dependencies {
 }
 
 tasks {
+    jar {
+        archiveFileName.set("${project.name}-${project.version}-default.jar")
+    }
+
     shadowJar {
         archiveFileName.set("${project.name}-${project.version}.jar")
         enableRelocation = true
@@ -72,14 +76,6 @@ tasks {
 
     tasks.register('sourceJar', Jar) {
         from sourceSets.main.allJava
-    }
-
-    jar.configure {
-        archiveClassifier = 'default'
-    }
-
-    shadowJar.configure {
-        archiveClassifier = null
     }
 }
 
