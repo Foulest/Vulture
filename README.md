@@ -4,7 +4,7 @@
 [![CodeQL Badge](https://github.com/Foulest/Vulture/actions/workflows/codeql.yml/badge.svg)](https://github.com/Foulest/Vulture/actions/workflows/codeql.yml)
 [![JitPack Badge](https://jitpack.io/v/Foulest/Vulture.svg)](https://jitpack.io/#Foulest/Vulture)
 
-**Vulture** is a robust, free, and open-source anti-cheat plugin designed specifically for Minecraft 1.8.9 servers.
+**Vulture** is an advanced anti-cheat plugin designed specifically for Minecraft 1.8.9 servers.
 
 ## Features
 
