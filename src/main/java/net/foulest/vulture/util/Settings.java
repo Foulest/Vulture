@@ -9,6 +9,7 @@ import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckManager;
 import net.foulest.vulture.check.type.pingspoof.PingSpoofB;
 import net.foulest.vulture.util.yaml.CustomYamlConfiguration;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,8 +21,10 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Level;
 
 /**
@@ -49,6 +52,20 @@ public class Settings {
 
     // Blocked commands
     public static List<String> blockedCommands;
+
+    // IP Whitelist settings
+    public static boolean ipWhitelistEnabled;
+    public static Map<UUID, List<String>> ipWhitelist;
+
+    // Exploit protections
+    public static boolean worldInvalidBlockBreak;
+    public static boolean worldInvalidBlockPlace;
+    public static boolean worldBlockNetherCeiling;
+    public static boolean worldBlockCommandsWhileSleeping;
+    public static boolean worldFixPearlPhasing;
+    public static boolean portalsBlockAffectedMobs;
+    public static boolean pistonsBlockMovingEntities;
+    public static boolean itemsInvalidStackSize;
 
     // Packet protections
     public static int maxPacketsPerTick;
@@ -131,10 +148,6 @@ public class Settings {
     public static boolean windowClickInvalidSwapButton;
     public static boolean windowClickInvalidThrowButton;
 
-    // Exploit protections
-    public static boolean worldInvalidBlockBreak;
-    public static boolean worldInvalidBlockPlace;
-
     /**
      * Loads the configuration file and values.
      */
@@ -183,7 +196,7 @@ public class Settings {
     /**
      * Saves the configuration file.
      */
-    private static void saveConfig() {
+    public static void saveConfig() {
         try {
             config.save(file);
         } catch (IOException ex) {
@@ -232,9 +245,29 @@ public class Settings {
             }
         }
 
-        // Exploit protections; invalid block break/place
-        worldInvalidBlockBreak = config.getBoolean("vulture.protections.exploits.invalid-block-break");
-        worldInvalidBlockPlace = config.getBoolean("vulture.protections.exploits.invalid-block-place");
+        // IP Whitelist settings
+        ipWhitelistEnabled = config.getBoolean("vulture.ip-whitelist.enabled");
+
+        // Load IP whitelist
+        ipWhitelist = new HashMap<>();
+        ConfigurationSection whitelistSection = config.getConfigurationSection("vulture.ip-whitelist.whitelist");
+        if (whitelistSection != null) {
+            for (String uuidString : whitelistSection.getKeys(false)) {
+                UUID uuid = UUID.fromString(uuidString);
+                List<String> ips = whitelistSection.getStringList(uuidString + ".ips");
+                ipWhitelist.put(uuid, ips);
+            }
+        }
+
+        // Exploit protections
+        worldInvalidBlockBreak = config.getBoolean("vulture.protections.exploits.world.invalid-block-break");
+        worldInvalidBlockPlace = config.getBoolean("vulture.protections.exploits.world.invalid-block-place");
+        worldBlockNetherCeiling = config.getBoolean("vulture.protections.exploits.world.block-nether-ceiling");
+        worldBlockCommandsWhileSleeping = config.getBoolean("vulture.protections.exploits.world.block-commands-while-sleeping");
+        worldFixPearlPhasing = config.getBoolean("vulture.protections.exploits.world.fix-pearl-phasing");
+        portalsBlockAffectedMobs = config.getBoolean("vulture.protections.exploits.portals.block-affected-mobs");
+        pistonsBlockMovingEntities = config.getBoolean("vulture.protections.exploits.pistons.block-moving-entities");
+        itemsInvalidStackSize = config.getBoolean("vulture.protections.exploits.items.invalid-stack-size");
 
         // Packet protections; max packets per tick
         maxPacketsPerTick = config.getInt("vulture.protections.packets.max-packets-per-tick");

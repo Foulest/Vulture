@@ -87,7 +87,6 @@ public class CheckManager {
 
             // Speed
             SpeedA.class, SpeedB.class, SpeedC.class, SpeedD.class, SpeedE.class,
-            SpeedF.class,
 
             // Timer
             TimerA.class,

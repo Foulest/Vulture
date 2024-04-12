@@ -27,6 +27,8 @@ public class FlightA extends Check {
     private double lastDeltaY;
     private double lastVelocity;
 
+    private double buffer;
+
     private int nearGroundTicks;
     private int notNearGroundTicks;
     private int onGroundTicks;
@@ -75,14 +77,12 @@ public class FlightA extends Check {
         double thresholdJump = threshold + (0.1 * MovementUtil.getPotionEffectLevel(player, PotionEffectType.JUMP));
 
         // Predictions
-        double predVelocityY = (lastDeltaY - GRAVITY_DECAY) * GRAVITY_MULTIPLIER;
-        double predVelocityVel = (lastVelocity - GRAVITY_DECAY) * GRAVITY_MULTIPLIER;
+        double predVelocity = (lastVelocity - GRAVITY_DECAY) * GRAVITY_MULTIPLIER;
         double predDeltaY = (lastDeltaY - GRAVITY_DECAY) * GRAVITY_MULTIPLIER;
 
         // Y Differences
         double diffYPredY = Math.abs(deltaY - predDeltaY);
-        double diffYPredVY = Math.abs(deltaY - predVelocityY);
-        double diffYPredVV = Math.abs(deltaY - predVelocityVel);
+        double diffYPredV = Math.abs(deltaY - predVelocity);
         double diffYLastY = Math.abs(deltaY - lastDeltaY);
         double diffYLastV = Math.abs(deltaY - lastVelocity);
         double diffYTakenV = Math.abs(deltaY - takenVelocity);
@@ -260,7 +260,7 @@ public class FlightA extends Check {
                     return;
                 }
 
-                if (diffYPredVV < threshold) {
+                if (diffYPredV < threshold) {
                     MessageUtil.debug("FlightA: " + player.getName() + " failed (C3) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
@@ -332,6 +332,18 @@ public class FlightA extends Check {
                     || playerData.getTimeSince(ActionType.TELEPORT) < 750L)) {
                 MessageUtil.debug("FlightA: " + player.getName() + " failed (G1) (Y=" + deltaY + ")"
                         + " (T=" + playerData.getTimeSince(ActionType.IN_UNLOADED_CHUNK) + ")");
+                setLastValues(deltaY, velocity);
+                return;
+            }
+
+            if (BlockUtil.isNearBed(player) && Math.abs(deltaY) < 0.1) {
+                MessageUtil.debug("FlightA: " + player.getName() + " failed (G2) (Y=" + deltaY + ")");
+                setLastValues(deltaY, velocity);
+                return;
+            }
+
+            if (BlockUtil.isNearBed(player) && onGroundTicks == 1 && Math.abs(deltaY) <= 0.5625) {
+                MessageUtil.debug("FlightA: " + player.getName() + " failed (G3) (Y=" + deltaY + ")");
                 setLastValues(deltaY, velocity);
                 return;
             }
@@ -410,6 +422,12 @@ public class FlightA extends Check {
                     setLastValues(deltaY, velocity);
                     return;
                 }
+
+                if (BlockUtil.isNearLilyPad(player) && Math.abs(deltaY) < 0.1) {
+                    MessageUtil.debug("FlightA: " + player.getName() + " failed (I5) (Y=" + deltaY + ")");
+                    setLastValues(deltaY, velocity);
+                    return;
+                }
             }
 
             // Handles players who should be on the ground.
@@ -457,7 +475,7 @@ public class FlightA extends Check {
                         return;
                     }
 
-                    if (Math.abs(deltaY) == 0.015625 && BlockUtil.isNearLilyPad(player)) {
+                    if ((Math.abs(deltaY) == 0.015625 || Math.abs(deltaY) == 0.09375) && BlockUtil.isNearLilyPad(player)) {
                         MessageUtil.debug("FlightA: " + player.getName() + " failed (J7) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
@@ -502,12 +520,18 @@ public class FlightA extends Check {
                         setLastValues(deltaY, velocity);
                         return;
                     }
+
+                    if (Math.abs(deltaY) == 0.5625 && BlockUtil.isNearBed(player)) {
+                        MessageUtil.debug("FlightA: " + player.getName() + " failed (J14) (Y=" + deltaY + ")");
+                        setLastValues(deltaY, velocity);
+                        return;
+                    }
                 }
             }
 
             // Handles players who are in the air.
             if (!MovementUtil.isYLevel(toY) && !MovementUtil.isYLevel(fromY)) {
-                if (againstBlock && diffYPredY < 0.016 && diffYPredVY < 0.016 && diffVLastY < 0.016) {
+                if (againstBlock && diffYPredY < 0.016 && diffYPredV < 0.016 && diffVLastY < 0.016) {
                     MessageUtil.debug("FlightA: " + player.getName() + " failed (K1) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
@@ -519,7 +543,7 @@ public class FlightA extends Check {
                     return;
                 }
 
-                if (diffYPredVV < threshold && playerData.getTimeSince(ActionType.TELEPORT) <= 500L) {
+                if (diffYPredV < threshold && playerData.getTimeSince(ActionType.TELEPORT) <= 500L) {
                     MessageUtil.debug("FlightA: " + player.getName() + " failed (K3) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
@@ -576,65 +600,71 @@ public class FlightA extends Check {
                 return;
             }
 
-            flag(true, "deltaY=" + deltaY
-                    + " lastDeltaY=" + lastDeltaY
-                    + " predDeltaY=" + predDeltaY
-                    + " |"
-                    + " velocity=" + velocity
-                    + " lastVelocity=" + lastVelocity
-                    + " predVelocityY=" + predVelocityY
-                    + " predVelocityVel=" + predVelocityVel
-                    + " |"
-                    + " takenVelocity=" + takenVelocity
-                    + " lastTakenVelocity=" + lastTakenVelocity
-                    + " |"
-                    + " YPredY=" + diffYPredY
-                    + " YLastY=" + diffYLastY
-                    + " YLastV=" + diffYLastV
-                    + " YPredVY=" + diffYPredVY
-                    + " YPredVV=" + diffYPredVV
-                    + " YTakenV=" + diffYTakenV
-                    + " YGravity=" + diffYGravity
-                    + " YGroundV=" + diffYGroundV
-                    + " |"
-                    + " VPredY=" + diffVPredY
-                    + " VLastY=" + diffVLastY
-                    + " VLastV=" + diffVLastV
-                    + " VTakenV=" + diffVTakenV
-                    + " VLastTakenV=" + diffVLastTakenV
-                    + " VRaw=" + diffVRaw
-                    + " |"
-                    + " 0.3=" + BlockUtil.isOnGroundOffset(player, 0.3)
-                    + " 0.4=" + BlockUtil.isOnGroundOffset(player, 0.4)
-                    + " 0.5=" + BlockUtil.isOnGroundOffset(player, 0.5)
-                    + " 0.Y=" + BlockUtil.isOnGroundOffset(player, Math.abs(deltaY) + 0.001)
-                    + " |"
-                    + " nearGround=" + nearGroundTicks
-                    + " notNearGround=" + notNearGroundTicks
-                    + " onGround=" + onGroundTicks
-                    + " notOnGround=" + notOnGroundTicks
-                    + " flatDeltaY=" + flatDeltaYTicks
-                    + " |"
-                    + " enterVehicle=" + playerData.getTimeSince(ActionType.ENTER_VEHICLE)
-                    + " steerVehicle=" + playerData.getTimeSince(ActionType.STEER_VEHICLE)
-                    + " leaveVehicle=" + playerData.getTimeSince(ActionType.LEAVE_VEHICLE)
-                    + " damage=" + playerData.getTimeSince(ActionType.DAMAGE)
-                    + " teleport=" + playerData.getTimeSince(ActionType.TELEPORT)
-                    + " liquid=" + playerData.getTimeSince(ActionType.IN_LIQUID)
-                    + " stopFlying=" + playerData.getTimeSince(ActionType.STOP_FLYING)
-                    + " inUnloadedChunk=" + playerData.getTimeSince(ActionType.IN_UNLOADED_CHUNK)
-                    + " |"
-                    + " underBlock=" + underBlock
-                    + " againstBlock=" + againstBlock
-                    + " insideBlock=" + insideBlock
-                    + " nearClimbable=" + playerData.isNearClimbable()
-                    + " onClimbable=" + playerData.isOnClimbable()
-                    + " nearStairs=" + nearStairs
-                    + " |"
-                    + " toY=" + toY
-                    + " fromY=" + fromY
-                    + " threshold=" + threshold
-            );
+            if ((buffer += deltaY + 0.5) >= 1.0) {
+                flag(true, "deltaY=" + deltaY
+                        + " lastDeltaY=" + lastDeltaY
+                        + " predDeltaY=" + predDeltaY
+                        + " |"
+                        + " velocity=" + velocity
+                        + " lastVelocity=" + lastVelocity
+                        + " predVelocity=" + predVelocity
+                        + " |"
+                        + " takenVelocity=" + takenVelocity
+                        + " lastTakenVelocity=" + lastTakenVelocity
+                        + " |"
+                        + " YPredY=" + diffYPredY
+                        + " YLastY=" + diffYLastY
+                        + " YLastV=" + diffYLastV
+                        + " YPredVV=" + diffYPredV
+                        + " YTakenV=" + diffYTakenV
+                        + " YGravity=" + diffYGravity
+                        + " YGroundV=" + diffYGroundV
+                        + " |"
+                        + " VPredY=" + diffVPredY
+                        + " VLastY=" + diffVLastY
+                        + " VLastV=" + diffVLastV
+                        + " VTakenV=" + diffVTakenV
+                        + " VLastTakenV=" + diffVLastTakenV
+                        + " VRaw=" + diffVRaw
+                        + " |"
+                        + " 0.01=" + BlockUtil.isOnGroundOffset(player, 0.01)
+                        + " 0.05=" + BlockUtil.isOnGroundOffset(player, 0.05)
+                        + " 0.1=" + BlockUtil.isOnGroundOffset(player, 0.1)
+                        + " 0.2=" + BlockUtil.isOnGroundOffset(player, 0.2)
+                        + " 0.3=" + BlockUtil.isOnGroundOffset(player, 0.3)
+                        + " 0.4=" + BlockUtil.isOnGroundOffset(player, 0.4)
+                        + " 0.5=" + BlockUtil.isOnGroundOffset(player, 0.5)
+                        + " |"
+                        + " nearGround=" + nearGroundTicks
+                        + " notNearGround=" + notNearGroundTicks
+                        + " onGround=" + onGroundTicks
+                        + " notOnGround=" + notOnGroundTicks
+                        + " flatDeltaY=" + flatDeltaYTicks
+                        + " |"
+                        + " enterVehicle=" + playerData.getTimeSince(ActionType.ENTER_VEHICLE)
+                        + " steerVehicle=" + playerData.getTimeSince(ActionType.STEER_VEHICLE)
+                        + " leaveVehicle=" + playerData.getTimeSince(ActionType.LEAVE_VEHICLE)
+                        + " damage=" + playerData.getTimeSince(ActionType.DAMAGE)
+                        + " teleport=" + playerData.getTimeSince(ActionType.TELEPORT)
+                        + " liquid=" + playerData.getTimeSince(ActionType.IN_LIQUID)
+                        + " stopFlying=" + playerData.getTimeSince(ActionType.STOP_FLYING)
+                        + " inUnloadedChunk=" + playerData.getTimeSince(ActionType.IN_UNLOADED_CHUNK)
+                        + " |"
+                        + " underBlock=" + underBlock
+                        + " againstBlock=" + againstBlock
+                        + " insideBlock=" + insideBlock
+                        + " nearClimbable=" + playerData.isNearClimbable()
+                        + " onClimbable=" + playerData.isOnClimbable()
+                        + " nearStairs=" + nearStairs
+                        + " |"
+                        + " toY=" + toY
+                        + " fromY=" + fromY
+                        + " threshold=" + threshold
+                        + " buffer=" + buffer
+                );
+            }
+        } else {
+            buffer = Math.max(0, buffer - 0.05);
         }
 
         setLastValues(deltaY, velocity);

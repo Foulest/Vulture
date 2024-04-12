@@ -1,6 +1,5 @@
 package net.foulest.vulture.check;
 
-import dev._2lstudios.hamsterapi.HamsterAPI;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
@@ -8,6 +7,7 @@ import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import lombok.Getter;
 import lombok.Setter;
+import net.foulest.vulture.Vulture;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.event.MovementEvent;
 import net.foulest.vulture.event.RotationEvent;
@@ -198,7 +198,8 @@ public class Check {
      */
     private void handleAlert(String verbose) {
         MessageUtil.sendAlert("&f" + player.getName() + " &7failed &f"
-                + checkInfo.name() + " &c(x" + violations + ")" + verbose);
+                + checkInfo.name() + " &c(x" + violations + ")"
+                + (Vulture.instance.debug ? verbose : ""));
     }
 
     /**
@@ -231,9 +232,6 @@ public class Check {
             TaskUtil.runTask(() -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), checkInfo.banCommand()
                     .replace("%player%", player.getName())
                     .replace("%check%", checkInfo.name())));
-
-            // Closes the player's channel to ensure they are disconnected.
-            HamsterAPI.closeChannel(playerData);
         }
     }
 }

@@ -3,6 +3,10 @@ package net.foulest.vulture.util;
 import net.foulest.vulture.Vulture;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.data.PlayerDataManager;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -45,6 +49,67 @@ public final class MessageUtil {
         for (String line : message) {
             sender.sendMessage(colorize(line));
         }
+    }
+
+    /**
+     * Sends a message to the specified player.
+     *
+     * @param sender  The player to send the message to.
+     * @param message The message to send.
+     */
+    public static void messagePlayerHoverable(CommandSender sender, List<String> hoverableText,
+                                              String @NotNull ... message) {
+        messagePlayerClickable(sender, hoverableText, "", message);
+    }
+
+    /**
+     * Sends a hoverable message to the specified player
+     * with a command to run when clicked.
+     *
+     * @param sender        The player to send the message to.
+     * @param hoverableText The text to display when hovering over the message.
+     * @param command       The command to run when the message is clicked.
+     * @param message       The message to send.
+     */
+    public static void messagePlayerClickable(CommandSender sender, List<String> hoverableText,
+                                              String command, String @NotNull ... message) {
+        // Sends a normal message if the sender is not a player.
+        if (!(sender instanceof Player)) {
+            for (String line : message) {
+                sender.sendMessage(colorize(line));
+            }
+            return;
+        }
+
+        Player player = (Player) sender;
+        TextComponent textComponent = new TextComponent();
+
+        for (int i = 0; i < message.length; i++) {
+            TextComponent part = new TextComponent(TextComponent.fromLegacyText(colorize(message[i])));
+
+            if (i < message.length - 1) {
+                part.addExtra(" ");
+            }
+
+            textComponent.addExtra(part);
+        }
+
+        // Sets the click event.
+        if (!command.isEmpty()) {
+            textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command));
+        }
+
+        BaseComponent[] hoverText = new BaseComponent[hoverableText.size()];
+
+        for (int i = 0; i < hoverableText.size(); i++) {
+            hoverText[i] = new TextComponent(colorize(hoverableText.get(i)));
+        }
+
+        // Sets the hover event.
+        textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverText));
+
+        // Sends the message to the player.
+        player.spigot().sendMessage(textComponent);
     }
 
     /**
@@ -93,6 +158,17 @@ public final class MessageUtil {
 
             messagePlayer(Bukkit.getConsoleSender(), line);
         }
+    }
+
+    /**
+     * Translates the & symbol into Minecraft's native color code symbol (§).
+     *
+     * @param message The message to translate.
+     * @return The translated message with § symbols.
+     */
+    @Contract("_ -> new")
+    public static @NotNull String nativeColorCode(@NotNull String message) {
+        return message.replace("&", "§");
     }
 
     /**

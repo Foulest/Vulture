@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'net.foulest'
-version = '1.4.6'
+version = '1.4.7'
 description = project.name
 
 compileJava.options.encoding = 'UTF-8'
@@ -25,6 +25,11 @@ repositories {
         url 'https://jitpack.io'
         name 'JitPack'
     }
+
+    maven {
+        url 'https://repo.viaversion.com'
+        name 'ViaVersion'
+    }
 }
 
 dependencies {
@@ -32,13 +37,13 @@ dependencies {
     // https://hub.spigotmc.org/nexus/content/repositories/snapshots
     compileOnly group: 'org.spigotmc', name: 'spigot', version: '1.8.8-R0.1-SNAPSHOT'
 
-    // PacketEvents v1.8.4 - for listening to packets
-    // https://github.com/retrooper/packetevents
-    implementation group: 'io.github.retrooper', name: 'packetevents', version: 'v1.8.4'
-
     // JetBrains Annotations - for code inspection and documentation
     // https://mvnrepository.com/artifact/org.jetbrains/annotations
     compileOnly group: 'org.jetbrains', name: 'annotations', version: '24.1.0'
+
+    // ViaVersion - for version checking in PacketEvents
+    // https://github.com/ViaVersion/ViaVersion
+    compileOnly group: 'com.viaversion', name: 'viaversion-api', version: '4.9.3'
 
     // Lombok - for reducing boilerplate code
     // https://projectlombok.org

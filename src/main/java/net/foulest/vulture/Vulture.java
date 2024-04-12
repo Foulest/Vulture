@@ -1,6 +1,5 @@
 package net.foulest.vulture;
 
-import dev._2lstudios.hamsterapi.HamsterAPI;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import lombok.Getter;
@@ -22,6 +21,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 /**
@@ -35,10 +36,11 @@ public class Vulture extends JavaPlugin {
 
     @Getter
     public static Vulture instance;
+    public static Map<Player, Integer> packetsSentPerTick = new ConcurrentHashMap<>();
     public CommandFramework framework;
     public PacketEvents packetEvents;
     public PacketProcessor packetProcessor;
-    public Runnable packetTracker;
+    public Runnable tickReset;
     public Runnable lagTracker;
     public boolean debug;
 
@@ -60,18 +62,19 @@ public class Vulture extends JavaPlugin {
         Bukkit.getOnlinePlayers().forEach(player -> player.kickPlayer("Disconnected"));
 
         // Resets the packets sent in the tick for all players every tick.
-        MessageUtil.log(Level.INFO, "Initializing Packet Tracker...");
-        packetTracker = () -> {
+        tickReset = () -> {
+            if (!Vulture.packetsSentPerTick.isEmpty()) {
+                Vulture.packetsSentPerTick = new ConcurrentHashMap<>();
+            }
+
             // Clears the packet counts for all players.
             for (PlayerData playerData : PlayerDataManager.playerDataMap.values()) {
                 synchronized (playerData.getPacketCounts()) {
                     playerData.getPacketCounts().clear();
                 }
-
-                playerData.setPacketsSentPerTick(0);
             }
         };
-        TaskUtil.runTaskTimer(packetTracker, 0L, 1L);
+        TaskUtil.runTaskTimer(tickReset, 0L, 1L);
 
         // Initializes the Command Framework.
         MessageUtil.log(Level.INFO, "Initializing Command Framework...");
@@ -79,13 +82,7 @@ public class Vulture extends JavaPlugin {
 
         // Initializes PacketEvents.
         MessageUtil.log(Level.INFO, "Initializing PacketEvents...");
-        packetEvents.init(new PacketEventsSettings()
-                .checkForUpdates(false)
-                .bStats(false));
-
-        // Initializes HamsterAPI.
-        MessageUtil.log(Level.INFO, "Initializing HamsterAPI...");
-        HamsterAPI.initialize();
+        packetEvents.init(new PacketEventsSettings());
 
         // Loads the plugin's commands.
         MessageUtil.log(Level.INFO, "Loading Packet Processors...");
@@ -115,12 +112,6 @@ public class Vulture extends JavaPlugin {
         // Saves all online players' player data.
         MessageUtil.log(Level.INFO, "Saving Player Data...");
         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-            PlayerData playerData = PlayerDataManager.getPlayerData(player);
-
-            if (playerData != null) {
-                HamsterAPI.uninject(playerData);
-            }
-
             PlayerDataManager.removePlayerData(player);
         }
 

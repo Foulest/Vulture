@@ -4,7 +4,6 @@ import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPac
 import io.github.retrooper.packetevents.packetwrappers.play.out.position.WrappedPacketOutPosition;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
-import io.netty.channel.Channel;
 import lombok.Getter;
 import lombok.Setter;
 import net.foulest.vulture.action.ActionType;
@@ -23,7 +22,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Method;
 import java.util.*;
 
 @Getter
@@ -37,22 +35,8 @@ public class PlayerData {
     @Getter
     private final List<Check> checks = new ArrayList<>();
 
-    // HamsterAPI
-    @Getter
-    private Object playerConnection;
-    @Getter
-    private Object networkManager;
-    @Getter
-    private Channel channel;
-    private Class<?> iChatBaseComponentClass;
-    private Method toChatBaseComponent;
-    private Method sendPacketMethod;
-    private boolean setup;
-    private boolean injected;
-
     // Packet Counts
     private final Map<Byte, Integer> packetCounts = new HashMap<>();
-    private int packetsSentPerTick;
 
     // Timestamps
     private Map<ActionType, Long> actionTimestamps = new HashMap<>();

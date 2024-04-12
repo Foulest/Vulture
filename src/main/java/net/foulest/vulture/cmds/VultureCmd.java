@@ -13,11 +13,11 @@ import net.foulest.vulture.util.command.Command;
 import net.foulest.vulture.util.command.CommandArgs;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Main command for Vulture.
@@ -105,7 +105,7 @@ public class VultureCmd {
 
                 MessageUtil.messagePlayer(sender, "");
                 MessageUtil.messagePlayer(sender, "&e" + infoTarget.getName() + "'s Info");
-                MessageUtil.messagePlayer(sender, "&7* &fVersion: &e" + targetData.getVersion().name());
+                MessageUtil.messagePlayer(sender, "&7* &fVersion: &e" + targetData.getVersion().getDisplayName());
                 MessageUtil.messagePlayer(sender, "&7* &fPing: &e" + Vulture.instance.getPacketEvents().getPlayerUtils().getPing(infoTarget) + "ms");
                 MessageUtil.messagePlayer(sender, "&7* &fViolations: &e" + targetData.getViolations().size());
 
@@ -147,8 +147,139 @@ public class VultureCmd {
                 }
 
                 String reason = reasonBuilder.toString().trim();
-
                 KickUtil.kickPlayer(kickTarget, reason);
+                break;
+
+            case "whitelist":
+                if (!sender.hasPermission("vulture.whitelist")) {
+                    MessageUtil.messagePlayer(sender, "&cNo permission.");
+                    return;
+                }
+
+                if (!Settings.ipWhitelistEnabled) {
+                    MessageUtil.messagePlayer(sender, "&cIP whitelist is disabled in the config.");
+                    return;
+                }
+
+                if (args.length() != 3 && args.length() != 4) {
+                    MessageUtil.messagePlayer(sender, "&cUsage: /vulture whitelist add/remove <player> [IP]");
+                    return;
+                }
+
+                String playerName = args.getArgs(2);
+                Player target = Bukkit.getPlayer(playerName);
+                UUID targetUUID = null;
+
+                if (target != null && target.isOnline()) {
+                    targetUUID = target.getUniqueId();
+                } else {
+                    // Try to get the player's UUID from the saved whitelist
+                    for (UUID uuid : Settings.ipWhitelist.keySet()) {
+                        if (Bukkit.getOfflinePlayer(uuid).getName().equalsIgnoreCase(playerName)) {
+                            targetUUID = uuid;
+                            break;
+                        }
+                    }
+                }
+
+                if (targetUUID == null) {
+                    MessageUtil.messagePlayer(sender, "&cPlayer not found.");
+                    break;
+                }
+
+                String ipAddress = null;
+
+                if (args.length() == 4) {
+                    // Validate the IP address.
+                    if (!args.getArgs(3).matches("^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.?\\b){4}$")) {
+                        MessageUtil.messagePlayer(sender, "&cInvalid IP address.");
+                        return;
+                    }
+
+                    ipAddress = args.getArgs(3);
+                } else if (target != null && target.isOnline()) {
+                    ipAddress = target.getAddress().getAddress().getHostAddress();
+                }
+
+                switch (args.getArgs(1)) {
+                    case "add":
+                        if (ipAddress == null) {
+                            MessageUtil.messagePlayer(sender, "&cIP address is required when adding a whitelist entry.");
+                            return;
+                        }
+
+                        // Check if the player's IP is already whitelisted.
+                        List<String> playerIpsAdd = Settings.ipWhitelist.getOrDefault(targetUUID, new ArrayList<>());
+                        if (playerIpsAdd.contains(ipAddress)) {
+                            MessageUtil.messagePlayer(sender, "&cThe player's IP is already whitelisted.");
+                            return;
+                        }
+
+                        // Adds the IP address to the whitelist.
+                        playerIpsAdd.add(ipAddress);
+                        Settings.ipWhitelist.put(targetUUID, playerIpsAdd);
+
+                        // Saves the new whitelist.
+                        ConfigurationSection whitelistSectionAdd = Settings.config.createSection("vulture.ip-whitelist.whitelist");
+                        for (Map.Entry<UUID, List<String>> entry : Settings.ipWhitelist.entrySet()) {
+                            String uuidString = entry.getKey().toString();
+                            whitelistSectionAdd.set(uuidString + ".ips", entry.getValue());
+                        }
+                        Settings.saveConfig();
+
+                        // Reloads the settings file.
+                        Settings.loadSettings();
+
+                        MessageUtil.messagePlayer(sender, "&aAdded " + playerName + "'s IP address to the whitelist.");
+                        break;
+
+                    case "remove":
+                        // Check if the player has any whitelisted IPs.
+                        List<String> playerIpsRemove = Settings.ipWhitelist.getOrDefault(targetUUID, new ArrayList<>());
+                        if (playerIpsRemove.isEmpty()) {
+                            MessageUtil.messagePlayer(sender, "&cThe player has no whitelisted IP addresses.");
+                            return;
+                        }
+
+                        if (ipAddress != null) {
+                            // Remove the specific IP address from the whitelist.
+                            if (!playerIpsRemove.contains(ipAddress)) {
+                                MessageUtil.messagePlayer(sender, "&cThe specified IP address is not whitelisted for the player.");
+                                return;
+                            }
+
+                            playerIpsRemove.remove(ipAddress);
+                            if (playerIpsRemove.isEmpty()) {
+                                Settings.ipWhitelist.remove(targetUUID);
+                            } else {
+                                Settings.ipWhitelist.put(targetUUID, playerIpsRemove);
+                            }
+
+                            MessageUtil.messagePlayer(sender, "&aRemoved " + playerName + "'s specific IP address from the whitelist.");
+                        } else {
+                            // Remove all whitelisted IP addresses for the player.
+                            Settings.ipWhitelist.remove(targetUUID);
+
+                            MessageUtil.messagePlayer(sender, "&aRemoved all whitelisted IP addresses for " + playerName + ".");
+                        }
+
+                        // Saves the new whitelist.
+                        ConfigurationSection whitelistSectionRemove = Settings.config.createSection("vulture.ip-whitelist.whitelist");
+                        for (Map.Entry<UUID, List<String>> entry : Settings.ipWhitelist.entrySet()) {
+                            String uuidString = entry.getKey().toString();
+                            whitelistSectionRemove.set(uuidString + ".ips", entry.getValue());
+                        }
+                        Settings.saveConfig();
+
+                        // Reloads the settings file.
+                        Settings.loadSettings();
+
+                        break;
+
+                    default:
+                        MessageUtil.messagePlayer(sender, "&cUsage: /vulture whitelist add/remove <player> [IP]");
+                        break;
+                }
                 break;
 
             case "reload":
@@ -190,6 +321,7 @@ public class VultureCmd {
                 "&f/vulture reload &7- Reloads the config.",
                 "&f/vulture info <player> &7- View player info.",
                 "&f/vulture kick <player> <reason> &7- Kicks a player.",
+                "&f/vulture whitelist add/remove <player> [IP] &7- Manages the IP whitelist.",
                 "&f/vulture debug &7- Toggles debug mode."
         );
 

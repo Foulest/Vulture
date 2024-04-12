@@ -666,6 +666,7 @@ public class ClientBrand extends Check {
             new PayloadType("MC|Beacon", "Minecraft", DataType.CHANNEL, false),
             new PayloadType("MC|ItemName", "Minecraft", DataType.CHANNEL, false),
             new PayloadType("MC|TrSel", "Minecraft", DataType.CHANNEL, false),
+            new PayloadType("MC|PickItem", "Minecraft", DataType.CHANNEL, false),
             new PayloadType("MEK", "Mekanism", DataType.CHANNEL, false),
             new PayloadType("MorePlayerModels", "MorePlayerModels", DataType.CHANNEL, false),
             new PayloadType("Morph", "Morph", DataType.CHANNEL, false),
@@ -1017,6 +1018,7 @@ public class ClientBrand extends Check {
                 + " &8(Type: " + dataType.getName() + ") (Data: " + data + ")");
 
         // Prints the unknown data to a randomly generated text file.
+        // TODO: Remove this in production.
         FileUtil.printDataToFile(data, "unknown-data-" + System.currentTimeMillis() + ".txt");
 
         // Cancels the packets to prevent the server from registering the channels.

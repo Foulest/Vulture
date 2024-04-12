@@ -1,8 +1,7 @@
 package net.foulest.vulture.processor.type;
 
-import dev._2lstudios.hamsterapi.HamsterAPI;
-import dev._2lstudios.hamsterapi.events.PacketDecodeEvent;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
+import io.github.retrooper.packetevents.event.impl.PacketDecodeEvent;
 import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
 import io.github.retrooper.packetevents.event.impl.PacketPlaySendEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
@@ -38,6 +37,7 @@ import io.github.retrooper.packetevents.utils.player.Direction;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import io.github.retrooper.packetevents.utils.vector.Vector3f;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
+import net.foulest.vulture.Vulture;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.data.PlayerData;
@@ -58,7 +58,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
@@ -85,39 +84,30 @@ public class PacketProcessor extends Processor {
      *
      * @param event PacketDecodeEvent
      */
-    @EventHandler
+    @Override
     public void onPacketDecode(@NotNull PacketDecodeEvent event) {
-        PlayerData playerData = event.getPlayerData();
-        Player player = playerData.getPlayer();
+        Player player = event.getPlayer();
 
         // Ignores if the packet limit is disabled.
         if (Settings.maxPacketsPerTick <= 0) {
             return;
         }
 
-        // Cancels incoming packets for offline players.
-        if (!player.isOnline()) {
-            event.setCancelled(true);
-            return;
-        }
-
-        // Cancels incoming packets for players being kicked.
-        if (KickUtil.isPlayerBeingKicked(player)) {
-            event.setCancelled(true);
+        // Ignores incoming packets for invalid/offline players.
+        if (player == null || !player.isOnline()) {
             return;
         }
 
         // Iterate packets sent per tick.
-        int packetsSentInTick = playerData.getPacketsSentPerTick();
-        playerData.setPacketsSentPerTick(packetsSentInTick + 1);
-        packetsSentInTick++;
+        int packetCount = Vulture.packetsSentPerTick.computeIfAbsent(player, p -> 0) + 1;
+        Vulture.packetsSentPerTick.put(player, packetCount);
 
         // If the player has sent too many packets in one tick, kick them.
-        if (packetsSentInTick >= Settings.maxPacketsPerTick) {
+        if (packetCount >= Settings.maxPacketsPerTick) {
+            System.out.println("Player sent too many packets in one tick");
             event.setCancelled(true);
-            HamsterAPI.closeChannel(playerData);
             KickUtil.kickPlayer(player, "Sent too many packets in one tick"
-                    + " (count=" + packetsSentInTick + ")", true);
+                    + " (count=" + packetCount + ")", true);
         }
     }
 
@@ -127,7 +117,6 @@ public class PacketProcessor extends Processor {
      * @param event PacketPlayReceiveEvent
      */
     @Override
-    @SuppressWarnings("deprecation")
     public void onPacketPlayReceive(@NotNull PacketPlayReceiveEvent event) {
         // Cancels incoming packets for invalid players.
         if (Bukkit.getPlayer(event.getPlayer().getUniqueId()) == null) {
@@ -624,9 +613,6 @@ public class PacketProcessor extends Processor {
                         playerData.setTimestamp(ActionType.RESPAWN);
                         break;
 
-                    case REQUEST_STATS: // Ignored
-                        break;
-
                     default:
                         break;
                 }
@@ -709,6 +695,7 @@ public class PacketProcessor extends Processor {
                                         + " (data=" + data + ")"
                         );
 
+                        // TODO: Remove this in production.
                         FileUtil.printDataToFile(data, "item-name-data.txt");
                         return;
                     }
@@ -724,6 +711,14 @@ public class PacketProcessor extends Processor {
                                     + " (data=" + data + ")"
                     );
                     return;
+                }
+
+                // Checks for invalid pick item payloads.
+                if (channelName.equals("MC|PickItem")) {
+                    if (!data.equals("\t")) {
+                        // TODO: Remove this in production.
+                        FileUtil.printDataToFile(data, "pick-item-data.txt");
+                    }
                 }
 
                 // Checks for invalid beacon payloads.
@@ -1207,8 +1202,8 @@ public class PacketProcessor extends Processor {
                     playerData.setLastOnGroundPacket(playerData.isOnGroundPacket());
                     playerData.setOnGroundPacket(flying.isOnGround());
                     playerData.setLastOnGround(playerData.isNearGround());
-                    playerData.setOnGround(BlockUtil.isOnGroundOffset(player, 0.001));
-                    playerData.setNearGround(BlockUtil.isOnGroundOffset(player, 0.25)); // Normally 0.21, or 0.105
+                    playerData.setOnGround(BlockUtil.isOnGroundOffset(player, 0.1));
+                    playerData.setNearGround(BlockUtil.isOnGroundOffset(player, 0.25));
 
                     // Sets non-strict ground data.
                     if (playerData.isNearGround()) {
@@ -1509,7 +1504,6 @@ public class PacketProcessor extends Processor {
                     if (line.length() > 45) {
                         KickUtil.kickPlayer(player, event, Settings.updateSignInvalidData,
                                 "Sent UpdateSign packet with invalid data"
-                                        + " (line=" + line + ")"
                                         + " (length=" + line.length() + ")"
                         );
                         return;
@@ -1560,27 +1554,29 @@ public class PacketProcessor extends Processor {
                     return;
                 }
 
-                switch (useEntityAction) {
-                    case ATTACK:
-                        if (playerData.isBlocking()) {
-                            KickUtil.kickPlayer(player, event, Settings.attackEntityInvalidConditions,
-                                    "Sent AttackEntity packet with invalid conditions"
-                                            + " (blocking=" + true + ")"
-                            );
-                            return;
-                        }
+                if (useEntityAction != null) {
+                    switch (useEntityAction) {
+                        case ATTACK:
+                            if (playerData.isBlocking()) {
+                                KickUtil.kickPlayer(player, event, Settings.attackEntityInvalidConditions,
+                                        "Sent AttackEntity packet with invalid conditions"
+                                                + " (blocking=" + true + ")"
+                                );
+                                return;
+                            }
 
-                        playerData.setLastAttackTick(0);
-                        playerData.setTimestamp(ActionType.ATTACKING);
-                        break;
+                            playerData.setLastAttackTick(0);
+                            playerData.setTimestamp(ActionType.ATTACKING);
+                            break;
 
-                    case INTERACT:
-                    case INTERACT_AT:
-                        playerData.setTimestamp(ActionType.ENTITY_INTERACT);
-                        break;
+                        case INTERACT:
+                        case INTERACT_AT:
+                            playerData.setTimestamp(ActionType.ENTITY_INTERACT);
+                            break;
 
-                    default:
-                        break;
+                        default:
+                            break;
+                    }
                 }
 
                 if (entity instanceof Player) {

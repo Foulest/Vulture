@@ -14,11 +14,11 @@ import org.jetbrains.annotations.NotNull;
 public class MovementUtil {
 
     /**
-     * Checks if the player's Y level is a whole number.
+     * Checks if the player's Y level is divisible by 0.015625.
      * This is used to check if the player is on the ground.
      *
      * @param y The player's Y level.
-     * @return Whether or not the player's Y level is a whole number.
+     * @return Whether the player's Y level is divisible by 0.015625
      */
     public static boolean isYLevel(double y) {
         return y % 0.015625 == 0.0;

@@ -484,6 +484,18 @@ public class BlockUtil {
         return collidingBlocks.any(block -> block.getType() == Material.CARPET);
     }
 
+    public static boolean isNearBed(Player player) {
+        if (isPlayerInUnloadedChunk(player)) {
+            return false;
+        }
+
+        BoundingBox boundingBox = getPlayerCustomBoundingBox(player, 0.25, 1.2, -1.0);
+        ConcurrentStream<Block> collidingBlocks = getCollidingBlocks(player, boundingBox);
+        return collidingBlocks.any(block -> block.getType() == Material.BED_BLOCK
+                || block.getType() == Material.BED
+        );
+    }
+
     public static boolean isNearAnvil(Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;

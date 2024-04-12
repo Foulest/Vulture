@@ -38,7 +38,7 @@ public class TimerA extends Check {
 
             // Ignores timer checks if the server is lagging.
             // TODO: Test more thoroughly.
-            if (playerData.getTimeSince(ActionType.SERVER_PACKET_DELAYED) < 500L) {
+            if (playerData.getTimeSince(ActionType.SERVER_PACKET_DELAYED) < 1000L) {
                 return;
             }
 

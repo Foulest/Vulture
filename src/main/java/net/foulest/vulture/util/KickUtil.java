@@ -1,12 +1,9 @@
 package net.foulest.vulture.util;
 
-import dev._2lstudios.hamsterapi.HamsterAPI;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import lombok.Getter;
 import lombok.Setter;
 import net.foulest.vulture.Vulture;
-import net.foulest.vulture.data.PlayerData;
-import net.foulest.vulture.data.PlayerDataManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.jetbrains.annotations.NotNull;
@@ -110,10 +107,8 @@ public final class KickUtil {
             currentlyKicking.add(player.getUniqueId());
         }
 
-        PlayerData playerData = PlayerDataManager.getPlayerData(player);
-
         if (announceKick) {
-            MessageUtil.sendAlert("&f" + player.getName() + " &7has been kicked for cheating."
+            MessageUtil.sendAlert("&f" + player.getName() + " &7has been kicked by Vulture."
                     + (debugMessage.isEmpty() ? "" : " &8(" + debugMessage + "&8)")
             );
         }
@@ -123,14 +118,11 @@ public final class KickUtil {
             TaskUtil.runTask(() -> {
                 if (player.isOnline()) {
                     player.kickPlayer(MessageUtil.colorize(reason));
-                } else {
-                    HamsterAPI.closeChannel(playerData);
                 }
 
                 currentlyKicking.remove(player.getUniqueId());
             });
         } else {
-            HamsterAPI.closeChannel(playerData);
             currentlyKicking.remove(player.getUniqueId());
         }
     }

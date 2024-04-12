@@ -1,6 +1,5 @@
 package net.foulest.vulture.listeners;
 
-import dev._2lstudios.hamsterapi.HamsterAPI;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import lombok.AllArgsConstructor;
@@ -8,6 +7,8 @@ import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.data.PlayerDataManager;
 import net.foulest.vulture.util.KickUtil;
+import net.foulest.vulture.util.MessageUtil;
+import net.foulest.vulture.util.Settings;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -17,8 +18,32 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.*;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @AllArgsConstructor
 public class PlayerDataListener implements Listener {
+
+    /**
+     * Handles player login events.
+     */
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onLogin(@NotNull PlayerLoginEvent event) {
+        Player player = event.getPlayer();
+
+        // Checks if the player's IP matches the whitelist.
+        if (Settings.ipWhitelistEnabled) {
+            String playerIp = event.getAddress().getHostAddress();
+            List<String> whitelistedIps = Settings.ipWhitelist.getOrDefault(player.getUniqueId(), new ArrayList<>());
+
+            // Kicks players with non-whitelisted IPs.
+            if (!whitelistedIps.isEmpty() && !whitelistedIps.contains(playerIp)) {
+                event.disallow(PlayerLoginEvent.Result.KICK_FULL,
+                        MessageUtil.nativeColorCode("&cYour IP address does not match the whitelist."
+                        + "\n\n&cContact an administrator for more information."));
+            }
+        }
+    }
 
     /**
      * Handles player join events.
@@ -43,11 +68,6 @@ public class PlayerDataListener implements Listener {
         } else {
             playerData.setVersion(clientVersion);
         }
-
-        // Injects the player into HamsterAPI.
-        if (!HamsterAPI.tryInject(playerData)) {
-            KickUtil.kickPlayer(player, "Failed to inject player", true);
-        }
     }
 
     /**
@@ -58,8 +78,6 @@ public class PlayerDataListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onQuit(@NotNull PlayerQuitEvent event) {
         Player player = event.getPlayer();
-
-        // Removes the player's data from the map.
         PlayerDataManager.removePlayerData(player);
     }
 

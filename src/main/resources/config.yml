@@ -144,28 +144,32 @@ vulture:
     flight:
       A:
         enabled: true
-        maxViolations: 10
+        maxViolations: 50
         banCommand: vulture kick %player% %check%
       B:
         enabled: true
-        maxViolations: 10
+        maxViolations: 50
         banCommand: vulture kick %player% %check%
       C:
         enabled: true
-        maxViolations: 10
+        maxViolations: 50
         banCommand: vulture kick %player% %check%
       D:
         enabled: true
-        maxViolations: 10
+        maxViolations: 50
+        banCommand: vulture kick %player% %check%
+      E:
+        enabled: true
+        maxViolations: 50
         banCommand: vulture kick %player% %check%
     groundspoof:
       A:
         enabled: true
-        maxViolations: 10
+        maxViolations: 20
         banCommand: vulture kick %player% %check%
       B:
         enabled: true
-        maxViolations: 10
+        maxViolations: 20
         banCommand: vulture kick %player% %check%
     inventory:
       A:
@@ -281,27 +285,27 @@ vulture:
     speed:
       A:
         enabled: true
-        maxViolations: 10
+        maxViolations: 50
         banCommand: vulture kick %player% %check%
       B:
         enabled: true
-        maxViolations: 10
+        maxViolations: 50
         banCommand: vulture kick %player% %check%
       C:
         enabled: true
-        maxViolations: 10
+        maxViolations: 50
         banCommand: vulture kick %player% %check%
       D:
         enabled: true
-        maxViolations: 10
+        maxViolations: 50
         banCommand: vulture kick %player% %check%
       E:
         enabled: true
-        maxViolations: 10
+        maxViolations: 50
         banCommand: vulture kick %player% %check%
       F:
         enabled: true
-        maxViolations: 10
+        maxViolations: 50
         banCommand: vulture kick %player% %check%
     timer:
       A:
@@ -311,6 +315,15 @@ vulture:
         enabled: true
         maxViolations: 10
         banCommand: vulture kick %player% %check%
+  # -----------------------------------------------
+  # IP Whitelist Settings
+  #
+  # This ensures that specified players need to log in with the specified IP address.
+  # This completely prevents players (staff) accounts from being hijacked.
+  # -----------------------------------------------
+  ip-whitelist:
+    enabled: false
+    whitelist: []
   # -----------------------------------------------
   # Protection Settings
   #
@@ -323,8 +336,15 @@ vulture:
       world:
         invalid-block-break: true
         invalid-block-place: true
+        block-nether-ceiling: true
+        block-commands-while-sleeping: true
+        fix-pearl-phasing: true
+      pistons:
+        block-moving-entities: true
+      portals:
+        block-affected-mobs: true
     packets:
-      max-packets-per-tick: 230
+      max-packets-per-tick: 50
       abilities:
         duplicate-flying: true
         invalid-flight-allowed: true
