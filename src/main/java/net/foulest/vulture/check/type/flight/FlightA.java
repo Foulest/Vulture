@@ -47,8 +47,7 @@ public class FlightA extends Check {
         double lastTakenVelocity = playerData.getLastVelocityY();
 
         // Checks the player for exemptions.
-        if (playerData.isInLiquid()
-                || playerData.isFlying()
+        if (playerData.isFlying()
                 || playerData.getTimeSince(ActionType.LEAVE_VEHICLE) <= 15L
                 || playerData.getTimeSince(ActionType.STOP_FLYING) <= 200L
                 || event.isTeleport(playerData)) {
@@ -98,6 +97,12 @@ public class FlightA extends Check {
         double diffVLastTakenV = Math.abs(velocity - lastTakenVelocity);
         double diffVRaw = Math.abs(velocity - deltaY);
 
+        // Ignores players who are in liquid.
+        if (playerData.isInLiquid() && deltaY <= jumpY) {
+            setLastValues(deltaY, velocity);
+            return;
+        }
+
         // Ignores players who are under the effects of slime blocks.
         // Note: The effects of slime blocks are entirely done client-side.
         if (playerData.isUnderEffectOfSlime()
@@ -108,63 +113,63 @@ public class FlightA extends Check {
             if ((diffYPredY > 0.1 || diffYLastY < threshold) && diffVRaw >= 0.1 && diffYLastV >= 0.1) {
                 if (nearGroundSlime && deltaY != 0.0 && lastDeltaY <= 0.0) {
                     if (Math.abs(Math.abs(deltaY) - Math.abs(lastDeltaY)) <= 0.1) {
-                        MessageUtil.debug("FlightA: " + player.getName() + " failed (Slime #1) (Y=" + deltaY + ")");
+                        MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (Slime #1) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
                     }
 
                     if (velocity > 0.0 && lastVelocity < 0.0) {
-                        MessageUtil.debug("FlightA: " + player.getName() + " failed (Slime #2) (Y=" + deltaY + ")");
+                        MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (Slime #2) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
                     }
 
                     if (deltaY < 0.0 && velocity < 0.0 && lastVelocity < 0.0) {
-                        MessageUtil.debug("FlightA: " + player.getName() + " failed (Slime #3) (Y=" + deltaY + ")");
+                        MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (Slime #3) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
                     }
 
                     if (onGround && Math.abs(deltaY - jumpY) < threshold) {
-                        MessageUtil.debug("FlightA: " + player.getName() + " failed (Slime #4) (Y=" + deltaY + ")");
+                        MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (Slime #4) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
                     }
 
                     if (deltaY > 0.0 && velocity > deltaY && lastVelocity > 0.0) {
-                        MessageUtil.debug("FlightA: " + player.getName() + " failed (Slime #5) (Y=" + deltaY + ")");
+                        MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (Slime #5) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
                     }
 
                     if (velocity == ON_GROUND_VELOCITY) {
-                        MessageUtil.debug("FlightA: " + player.getName() + " failed (Slime #6) (Y=" + deltaY + ")");
+                        MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (Slime #6) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
                     }
                 }
 
                 if (deltaY < 0.0 && lastDeltaY > 0.0 && velocity < 0.0 && lastVelocity < 0.0) {
-                    MessageUtil.debug("FlightA: " + player.getName() + " failed (Slime #7) (Y=" + deltaY + ")");
+                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (Slime #7) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
                 }
 
                 if (velocity < 0.0 && lastVelocity > 0.0 && deltaY < 0.0 && lastDeltaY > 0.0) {
-                    MessageUtil.debug("FlightA: " + player.getName() + " failed (Slime #8) (Y=" + deltaY + ")");
+                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (Slime #8) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
                 }
 
                 if (velocity < 0.0 && Math.abs(velocity) > 1.0 && lastVelocity < 0.0
                         && deltaY < 0.0 && Math.abs(deltaY) < 1.0 && lastDeltaY < 0.0) {
-                    MessageUtil.debug("FlightA: " + player.getName() + " failed (Slime #9) (Y=" + deltaY + ")");
+                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (Slime #9) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
                 }
 
                 if (deltaY == 0.0 && onGround) {
-                    MessageUtil.debug("FlightA: " + player.getName() + " failed (Slime #10) (Y=" + deltaY + ")");
+                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (Slime #10) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
                 }
@@ -204,7 +209,7 @@ public class FlightA extends Check {
                     && ((deltaY == 0.0 && lastDeltaY == 0.0) || deltaY == 0.5625
                     || Math.abs(deltaY - jumpY) < threshold
                     || Math.abs(lastDeltaY - jumpY) < threshold)) {
-                MessageUtil.debug("FlightA: " + player.getName() + " failed (Boat) (Y=" + deltaY + ")");
+                MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (Boat) (Y=" + deltaY + ")");
                 setLastValues(deltaY, velocity);
                 return;
             }
@@ -212,14 +217,14 @@ public class FlightA extends Check {
             // Ignores weird falling behavior in clients above 1.8.
             if (predDeltaY - threshold < 0.001 && diffYGroundV - 0.006 < threshold && lastDeltaY > 0.0
                     && playerData.getVersion().isNewerThan(ClientVersion.v_1_8)) {
-                MessageUtil.debug("FlightA: " + player.getName() + " failed (A0) (Y=" + deltaY + ")");
+                MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (A0) (Y=" + deltaY + ")");
                 setLastValues(deltaY, velocity);
                 return;
             }
 
             // Ignores players who are on stairs.
             if (nearStairs && deltaY == 0.5) {
-                MessageUtil.debug("FlightA: " + player.getName() + " failed (Stairs) (Y=" + deltaY + ")");
+                MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (Stairs) (Y=" + deltaY + ")");
                 setLastValues(deltaY, velocity);
                 return;
             }
@@ -227,13 +232,13 @@ public class FlightA extends Check {
             // Ignores players who are near a climbable.
             if (nearClimbable) {
                 if (deltaY >= -0.15000000596046448 && deltaY <= 0.11760000228882461) {
-                    MessageUtil.debug("FlightA: " + player.getName() + " failed (A1) (Y=" + deltaY + ")");
+                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (A1) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
                 }
 
                 if (diffVPredY < threshold && nearGroundTicks == 1) {
-                    MessageUtil.debug("FlightA: " + player.getName() + " failed (A2) (Y=" + deltaY + ")");
+                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (A2) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
                 }
@@ -241,7 +246,7 @@ public class FlightA extends Check {
 
             // Ignores players jumping under blocks.
             if (underBlock && (deltaY + (fromY - (int) fromY)) - 0.20000004768 < 0.001) {
-                MessageUtil.debug("FlightA: " + player.getName() + " failed (B1) (Y=" + deltaY + ")");
+                MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (B1) (Y=" + deltaY + ")");
                 setLastValues(deltaY, velocity);
                 return;
             }
@@ -249,49 +254,49 @@ public class FlightA extends Check {
             // Ignores quirks of the movement system.
             if (diffYGroundV < threshold) {
                 if (diffYLastV < threshold && playerData.getTimeSince(ActionType.DAMAGE) < 100L) {
-                    MessageUtil.debug("FlightA: " + player.getName() + " failed (C1) (Y=" + deltaY + ")");
+                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (C1) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
                 }
 
                 if (diffVPredY < threshold) {
-                    MessageUtil.debug("FlightA: " + player.getName() + " failed (C2) (Y=" + deltaY + ")");
+                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (C2) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
                 }
 
                 if (diffYPredV < threshold) {
-                    MessageUtil.debug("FlightA: " + player.getName() + " failed (C3) (Y=" + deltaY + ")");
+                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (C3) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
                 }
 
                 if (playerData.getTimeSince(ActionType.LEAVE_VEHICLE) <= 72L) {
-                    MessageUtil.debug("FlightA: " + player.getName() + " failed (C4) (Y=" + deltaY + ")");
+                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (C4) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
                 }
 
                 if (diffVRaw < threshold) {
-                    MessageUtil.debug("FlightA: " + player.getName() + " failed (C5) (Y=" + deltaY + ")");
+                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (C5) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
                 }
 
                 if (lastDeltaY - 0.20000004768 < 0.001 && notOnGroundTicks == 1) {
-                    MessageUtil.debug("FlightA: " + player.getName() + " failed (C6) (Y=" + deltaY + ")");
+                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (C6) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
                 }
 
                 if (playerData.getTimeSince(ActionType.TELEPORT) <= 100L) {
-                    MessageUtil.debug("FlightA: " + player.getName() + " failed (C7) (Y=" + deltaY + ")");
+                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (C7) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
                 }
 
                 if (playerData.getVersion().isNewerThan(ClientVersion.v_1_8) && notNearGroundTicks == 1) {
-                    MessageUtil.debug("FlightA: " + player.getName() + " failed (C8) (Y=" + deltaY + ")");
+                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (C8) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
                 }
@@ -299,21 +304,21 @@ public class FlightA extends Check {
 
             // Ignores players stuck falling inside a block.
             if (insideBlock && deltaY <= 0.0 && Math.abs(deltaY) <= 0.07840000152587834) {
-                MessageUtil.debug("FlightA: " + player.getName() + " failed (D1) (Y=" + deltaY + ")");
+                MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (D1) (Y=" + deltaY + ")");
                 setLastValues(deltaY, velocity);
                 return;
             }
 
             // Ignores weird after teleport behavior.
             if (deltaY == -0.07840000152587834 && diffYLastV < threshold && notOnGroundTicks == 1) {
-                MessageUtil.debug("FlightA: " + player.getName() + " failed (D2) (Y=" + deltaY + ")");
+                MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (D2) (Y=" + deltaY + ")");
                 setLastValues(deltaY, velocity);
                 return;
             }
 
             // Ignores players who were recently teleported.
             if (deltaY == 0.0 && velocity == 0.0) {
-                MessageUtil.debug("FlightA: " + player.getName() + " failed (E1) (Y=" + deltaY + ")");
+                MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (E1) (Y=" + deltaY + ")");
                 setLastValues(deltaY, velocity);
                 return;
             }
@@ -321,7 +326,7 @@ public class FlightA extends Check {
             // Ignores players taking the correct velocity given to them.
             if ((takenVelocity != 0.0 || lastTakenVelocity != 0.0) && deltaY != 0.0
                     && (diffYTakenV < threshold || diffYLastTakenV < threshold)) {
-                MessageUtil.debug("FlightA: " + player.getName() + " failed (F1) (Y=" + deltaY + ")");
+                MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (F1) (Y=" + deltaY + ")");
                 setLastValues(deltaY, velocity);
                 return;
             }
@@ -330,20 +335,20 @@ public class FlightA extends Check {
             if (deltaY == -0.09800000190735147
                     && (playerData.getTimeSince(ActionType.IN_UNLOADED_CHUNK) < 1500L
                     || playerData.getTimeSince(ActionType.TELEPORT) < 750L)) {
-                MessageUtil.debug("FlightA: " + player.getName() + " failed (G1) (Y=" + deltaY + ")"
+                MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (G1) (Y=" + deltaY + ")"
                         + " (T=" + playerData.getTimeSince(ActionType.IN_UNLOADED_CHUNK) + ")");
                 setLastValues(deltaY, velocity);
                 return;
             }
 
             if (BlockUtil.isNearBed(player) && Math.abs(deltaY) < 0.1) {
-                MessageUtil.debug("FlightA: " + player.getName() + " failed (G2) (Y=" + deltaY + ")");
+                MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (G2) (Y=" + deltaY + ")");
                 setLastValues(deltaY, velocity);
                 return;
             }
 
             if (BlockUtil.isNearBed(player) && onGroundTicks == 1 && Math.abs(deltaY) <= 0.5625) {
-                MessageUtil.debug("FlightA: " + player.getName() + " failed (G3) (Y=" + deltaY + ")");
+                MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (G3) (Y=" + deltaY + ")");
                 setLastValues(deltaY, velocity);
                 return;
             }
@@ -353,31 +358,31 @@ public class FlightA extends Check {
                 // Ignores players jumping in the air.
                 if (Math.abs(deltaY - jumpY) < 0.00000001) {
                     if (nearGround) {
-                        MessageUtil.debug("FlightA: " + player.getName() + " failed (H1) (Y=" + deltaY + ")");
+                        MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (H1) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
                     }
 
                     if (diffVLastV < threshold) {
-                        MessageUtil.debug("FlightA: " + player.getName() + " failed (H2) (Y=" + deltaY + ")");
+                        MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (H2) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
                     }
 
                     if (notNearGroundTicks == 1) {
-                        MessageUtil.debug("FlightA: " + player.getName() + " failed (H3) (Y=" + deltaY + ")");
+                        MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (H3) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
                     }
 
                     if (diffVTakenV < threshold) {
-                        MessageUtil.debug("FlightA: " + player.getName() + " failed (H4) (Y=" + deltaY + ")");
+                        MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (H4) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
                     }
 
                     if (velocity == ON_GROUND_VELOCITY) {
-                        MessageUtil.debug("FlightA: " + player.getName() + " failed (H5) (Y=" + deltaY + ")");
+                        MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (H5) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
                     }
@@ -385,7 +390,7 @@ public class FlightA extends Check {
 
                 // Ignores players jumping under blocks.
                 if ((deltaY + (toY - (int) toY)) - 0.20000004768 < 0.001) {
-                    MessageUtil.debug("FlightA: " + player.getName() + " failed (B2) (Y=" + deltaY + ")");
+                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (B2) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
                 }
@@ -397,34 +402,34 @@ public class FlightA extends Check {
                 if (deltaY > 0.0 && lastDeltaY < 0.0 && toY % 1.0 == 0.0
                         && !MovementUtil.isYLevel(deltaY)
                         && !MovementUtil.isYLevel(lastDeltaY)) {
-                    MessageUtil.debug("FlightA: " + player.getName() + " failed (I1) (Y=" + deltaY + ")");
+                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (I1) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
                 }
 
                 // Ignores players landing on the ground.
                 if (deltaY < 0.0 && !MovementUtil.isYLevel(deltaY)) {
-                    MessageUtil.debug("FlightA: " + player.getName() + " failed (I2) (Y=" + deltaY + ")");
+                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (I2) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
                 }
 
                 // Ignores players landing on the ground.
                 if (!MovementUtil.isYLevel(deltaY) && onGround && !againstBlock) {
-                    MessageUtil.debug("FlightA: " + player.getName() + " failed (I3) (Y=" + deltaY + ")");
+                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (I3) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
                 }
 
                 // Ignores rising right after falling onto a block.
                 if (deltaY > 0.0 && lastDeltaY < 0.0 && !MovementUtil.isYLevel(deltaY) && diffVLastY < threshold) {
-                    MessageUtil.debug("FlightA: " + player.getName() + " failed (I4) (Y=" + deltaY + ")");
+                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (I4) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
                 }
 
                 if (BlockUtil.isNearLilyPad(player) && Math.abs(deltaY) < 0.1) {
-                    MessageUtil.debug("FlightA: " + player.getName() + " failed (I5) (Y=" + deltaY + ")");
+                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (I5) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
                 }
@@ -435,25 +440,25 @@ public class FlightA extends Check {
                 // Ignores players on the ground.
                 if (deltaY == 0.0) {
                     if (onGround) {
-                        MessageUtil.debug("FlightA: " + player.getName() + " failed (J1) (Y=" + deltaY + ")");
+                        MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (J1) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
                     }
 
                     if (diffVLastV == 0.0) {
-                        MessageUtil.debug("FlightA: " + player.getName() + " failed (J2) (Y=" + deltaY + ")");
+                        MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (J2) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
                     }
 
                     if (lastDeltaY != 0.0) {
-                        MessageUtil.debug("FlightA: " + player.getName() + " failed (J3) (Y=" + deltaY + ")");
+                        MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (J3) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
                     }
 
                     if (BlockUtil.isNearFence(player) || BlockUtil.isNearFenceGate(player)) {
-                        MessageUtil.debug("FlightA: " + player.getName() + " failed (J4) (Y=" + deltaY + ")");
+                        MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (J4) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
                     }
@@ -464,45 +469,45 @@ public class FlightA extends Check {
                     if (deltaY == 0.125 && (BlockUtil.isNearChest(player) || BlockUtil.isNearBrewingStand(player))
                             || (BlockUtil.isNearTrapdoor(player) && BlockUtil.isNearCarpet(player))
                             || (BlockUtil.isNearSlab(player) && BlockUtil.isNearFlowerPot(player))) {
-                        MessageUtil.debug("FlightA: " + player.getName() + " failed (J5) (Y=" + deltaY + ")");
+                        MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (J5) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
                     }
 
                     if (deltaY % 0.125 == 0 && deltaY <= 0.5 && BlockUtil.isNearSnowLayer(player)) {
-                        MessageUtil.debug("FlightA: " + player.getName() + " failed (J6) (Y=" + deltaY + ")");
+                        MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (J6) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
                     }
 
                     if ((Math.abs(deltaY) == 0.015625 || Math.abs(deltaY) == 0.09375) && BlockUtil.isNearLilyPad(player)) {
-                        MessageUtil.debug("FlightA: " + player.getName() + " failed (J7) (Y=" + deltaY + ")");
+                        MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (J7) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
                     }
 
                     if (Math.abs(deltaY) == 0.0625 && BlockUtil.isNearCarpet(player)) {
-                        MessageUtil.debug("FlightA: " + player.getName() + " failed (J8) (Y=" + deltaY + ")");
+                        MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (J8) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
                     }
 
                     if (Math.abs(deltaY) == 0.5 && (BlockUtil.isNearSlab(player)
                             || BlockUtil.isNearFenceGate(player) || BlockUtil.isNearFence(player))) {
-                        MessageUtil.debug("FlightA: " + player.getName() + " failed (J9) (Y=" + deltaY + ")");
+                        MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (J9) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
                     }
 
                     if (Math.abs(deltaY) == 0.1875 && BlockUtil.isNearTrapdoor(player)) {
-                        MessageUtil.debug("FlightA: " + player.getName() + " failed (J10) (Y=" + deltaY + ")");
+                        MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (J10) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
                     }
 
                     if (Math.abs(deltaY) == 0.3125 && ((BlockUtil.isNearTrapdoor(player) && BlockUtil.isNearSlab(player))
                             || (BlockUtil.isNearCarpet(player) && BlockUtil.isNearFlowerPot(player)))) {
-                        MessageUtil.debug("FlightA: " + player.getName() + " failed (J11) (Y=" + deltaY + ")");
+                        MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (J11) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
                     }
@@ -510,19 +515,19 @@ public class FlightA extends Check {
                     if (Math.abs(deltaY) == 0.375
                             && ((BlockUtil.isNearBrewingStand(player) && BlockUtil.isNearSlab(player))
                             || BlockUtil.isNearHopper(player) || BlockUtil.isNearFlowerPot(player))) {
-                        MessageUtil.debug("FlightA: " + player.getName() + " failed (J12) (Y=" + deltaY + ")");
+                        MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (J12) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
                     }
 
                     if (Math.abs(deltaY) == 0.4375 && BlockUtil.isNearCarpet(player) && BlockUtil.isNearSlab(player)) {
-                        MessageUtil.debug("FlightA: " + player.getName() + " failed (J13) (Y=" + deltaY + ")");
+                        MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (J13) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
                     }
 
                     if (Math.abs(deltaY) == 0.5625 && BlockUtil.isNearBed(player)) {
-                        MessageUtil.debug("FlightA: " + player.getName() + " failed (J14) (Y=" + deltaY + ")");
+                        MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (J14) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
                     }
@@ -532,70 +537,70 @@ public class FlightA extends Check {
             // Handles players who are in the air.
             if (!MovementUtil.isYLevel(toY) && !MovementUtil.isYLevel(fromY)) {
                 if (againstBlock && diffYPredY < 0.016 && diffYPredV < 0.016 && diffVLastY < 0.016) {
-                    MessageUtil.debug("FlightA: " + player.getName() + " failed (K1) (Y=" + deltaY + ")");
+                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (K1) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
                 }
 
                 if (againstBlock && notNearGroundTicks == 1) {
-                    MessageUtil.debug("FlightA: " + player.getName() + " failed (K2) (Y=" + deltaY + ")");
+                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (K2) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
                 }
 
                 if (diffYPredV < threshold && playerData.getTimeSince(ActionType.TELEPORT) <= 500L) {
-                    MessageUtil.debug("FlightA: " + player.getName() + " failed (K3) (Y=" + deltaY + ")");
+                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (K3) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
                 }
 
                 if (diffVLastY < threshold && underBlock) {
-                    MessageUtil.debug("FlightA: " + player.getName() + " failed (K4) (Y=" + deltaY + ")");
+                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (K4) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
                 }
 
                 if (diffVLastY < threshold && deltaY == 0.0 && nearGround) {
-                    MessageUtil.debug("FlightA: " + player.getName() + " failed (K5) (Y=" + deltaY + ")");
+                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (K5) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
                 }
 
                 if (againstBlock && onGround && velocity - threshold < 0.0001) {
-                    MessageUtil.debug("FlightA: " + player.getName() + " failed (K6) (Y=" + deltaY + ")");
+                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (K6) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
                 }
 
                 if (diffVPredY < threshold) {
-                    MessageUtil.debug("FlightA: " + player.getName() + " failed (K7) (Y=" + deltaY + ")");
+                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (K7) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
                 }
 
                 if ((toY - (int) toY) - jumpY < threshold && deltaY > 0.0 && lastDeltaY < 0.0
                         && velocity == ON_GROUND_VELOCITY && diffVLastV == 0.0) {
-                    MessageUtil.debug("FlightA: " + player.getName() + " failed (K8) (Y=" + deltaY + ")");
+                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (K8) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
                 }
 
                 if (deltaY == 0.0 && lastDeltaY < 0.0 && velocity == lastVelocity && onGround
                         && Math.abs(lastDeltaY) - Math.abs(velocity) < threshold) {
-                    MessageUtil.debug("FlightA: " + player.getName() + " failed (K9) (Y=" + deltaY + ")");
+                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (K9) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
                 }
             }
 
             if (nearGround && playerData.getTimeSince(ActionType.IN_LIQUID) < 100L && diffYPredY < 0.02) {
-                MessageUtil.debug("FlightA: " + player.getName() + " failed (L1) (Y=" + deltaY + ")");
+                MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (L1) (Y=" + deltaY + ")");
                 setLastValues(deltaY, velocity);
                 return;
             }
 
             if (!nearGround && lastVelocity == 0.0 && deltaY > 0.0 && deltaY < 0.1 && diffYPredY < 0.1) {
-                MessageUtil.debug("FlightA: " + player.getName() + " failed (M1) (Y=" + deltaY + ")");
+                MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (M1) (Y=" + deltaY + ")");
                 setLastValues(deltaY, velocity);
                 return;
             }

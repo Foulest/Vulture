@@ -1,5 +1,8 @@
 package io.github.retrooper.packetevents.utils.player;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 /**
  * The {@code Direction} enum contains constants for the different valid faces in the minecraft protocol.
  *
@@ -7,6 +10,8 @@ package io.github.retrooper.packetevents.utils.player;
  * @see <a href="https://wiki.vg/Protocol#Player_Digging">https://wiki.vg/Protocol#Player_Digging</a>
  * @since 1.7.8
  */
+@Getter
+@AllArgsConstructor
 public enum Direction {
     /**
      * -Y offset
@@ -48,14 +53,10 @@ public enum Direction {
      */
     INVALID;
 
-    final short face;
-
-    Direction(short face) {
-        this.face = face;
-    }
+    final short faceValue;
 
     Direction() {
-        this.face = (short) ordinal();
+        this.faceValue = (short) ordinal();
     }
 
     public static Direction getDirection(int face) {
@@ -65,9 +66,5 @@ public enum Direction {
             return INVALID;
         }
         return values()[face];
-    }
-
-    public short getFaceValue() {
-        return face;
     }
 }

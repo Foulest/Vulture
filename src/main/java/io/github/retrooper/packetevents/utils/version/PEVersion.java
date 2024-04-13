@@ -131,8 +131,8 @@ public class PEVersion {
     public PEVersion clone() {
         try {
             return (PEVersion) super.clone();
-        } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
+        } catch (CloneNotSupportedException ex) {
+            ex.printStackTrace();
         }
         return null;
     }

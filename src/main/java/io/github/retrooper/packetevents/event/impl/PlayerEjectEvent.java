@@ -40,7 +40,6 @@ public final class PlayerEjectEvent extends PacketEvent implements CancellableEv
      *
      * @return Ejected player.
      */
-    @NotNull
     @Override
     public Player getPlayer() {
         return player;

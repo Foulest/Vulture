@@ -39,13 +39,12 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                 Object value = field.get(connection);
 
                 if (value instanceof List) {
-                    // Inject the list
                     synchronized (value) {
-                        for (Object o : (List) value) {
-                            if (o instanceof ChannelFuture) {
+                        for (Object object : (List) value) {
+                            if (object instanceof ChannelFuture) {
                                 return true;
                             } else {
-                                break; // not the right list.
+                                break;
                             }
                         }
                     }
@@ -68,18 +67,17 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
                 try {
                     value = field.get(serverConnection);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
+                } catch (IllegalAccessException ex) {
+                    ex.printStackTrace();
                 }
 
                 if (value instanceof List) {
-                    // Get the list.
                     List listWrapper = new ListWrapper((List) value) {
                         @Override
-                        public void processAdd(Object o) {
-                            if (o instanceof ChannelFuture) {
+                        public void processAdd(Object object) {
+                            if (object instanceof ChannelFuture) {
                                 try {
-                                    injectChannelFuture((ChannelFuture) o);
+                                    injectChannelFuture((ChannelFuture) object);
                                 } catch (Exception ex) {
                                     ex.printStackTrace();
                                 }
@@ -95,12 +93,10 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
                     synchronized (listWrapper) {
                         for (Object serverChannel : (List) value) {
-                            // Is this the server channel future list?
                             if (serverChannel instanceof ChannelFuture) {
-                                // Yes it is...
                                 injectChannelFuture((ChannelFuture) serverChannel);
                             } else {
-                                break; // Wrong list
+                                break;
                             }
                         }
                     }
@@ -126,23 +122,23 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
                 ChannelPipeline pipeline = channel.pipeline();
 
+                // Remove the old handlers if they exist.
                 if (pipeline.get(PacketEvents.get().getHandlerName()) != null) {
                     pipeline.remove(PacketEvents.get().getHandlerName());
                 }
-
                 if (pipeline.get(PacketEvents.get().getHandlerName() + "-decoder") != null) {
                     pipeline.remove(PacketEvents.get().getHandlerName() + "-decoder");
                 }
 
                 ByteToMessageDecoder decodeHandler = new PlayerDecodeHandlerModern();
-                ChannelDuplexHandler playerChannelHandler = new PlayerChannelHandlerModern();
+                ChannelDuplexHandler channelHandler = new PlayerChannelHandlerModern();
 
+                // Add the new handlers.
                 if (pipeline.get("splitter") != null) {
                     pipeline.addAfter("splitter", PacketEvents.get().getHandlerName() + "-decoder", decodeHandler);
                 }
-
                 if (pipeline.get("packet_handler") != null) {
-                    pipeline.addBefore("packet_handler", PacketEvents.get().getHandlerName(), playerChannelHandler);
+                    pipeline.addBefore("packet_handler", PacketEvents.get().getHandlerName(), channelHandler);
                 }
             }
         }
@@ -179,7 +175,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
             bootstrapAcceptorField.setAccessible(true);
             bootstrapAcceptorField.set(bootstrapAcceptor, channelInitializer);
             injectedFutures.add(channelFuture);
-        } catch (IllegalAccessException e) {
+        } catch (IllegalAccessException ex) {
             ClassLoader cl = bootstrapAcceptor.getClass().getClassLoader();
 
             if (cl.getClass().getName().equals("org.bukkit.plugin.java.PluginClassLoader")) {
@@ -260,14 +256,15 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
             try {
                 for (Field key : map.keySet()) {
                     key.setAccessible(true);
-                    Object o = map.get(key);
+                    Object object = map.get(key);
 
-                    if (o instanceof ListWrapper) {
-                        key.set(o, ((ListWrapper) o).getOriginalList());
+                    if (object instanceof ListWrapper) {
+                        key.set(object, ((ListWrapper) object).getOriginalList());
                     }
                 }
-            } catch (IllegalAccessException e) {
-                PacketEvents.get().getPlugin().getLogger().severe("PacketEvents failed to eject the injection handler! Please reboot!");
+            } catch (IllegalAccessException ex) {
+                PacketEvents.get().getPlugin().getLogger().severe("PacketEvents failed to eject the"
+                        + " injection handler! Please reboot!");
             }
         }
 
@@ -276,56 +273,56 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
     @Override
     public void injectPlayer(Player player) {
-        Object channel = PacketEvents.get().getPlayerUtils().getChannel(player);
+        Object rawChannel = PacketEvents.get().getPlayerUtils().getChannel(player);
 
-        if (channel != null) {
-            updatePlayerObject(player, channel);
+        if (rawChannel != null) {
+            updatePlayerObject(player, rawChannel);
         }
     }
 
     @Override
     public void ejectPlayer(Player player) {
-        Object channel = PacketEvents.get().getPlayerUtils().getChannel(player);
+        Object rawChannel = PacketEvents.get().getPlayerUtils().getChannel(player);
 
-        if (channel != null) {
-            Channel chnl = (Channel) channel;
+        if (rawChannel != null) {
+            Channel channel = (Channel) rawChannel;
 
             try {
-                chnl.pipeline().remove(PacketEvents.get().getHandlerName());
-            } catch (Exception ex) {
-                ex.printStackTrace();
+                channel.pipeline().remove(PacketEvents.get().getHandlerName() + "-decoder");
+                channel.pipeline().remove(PacketEvents.get().getHandlerName());
+            } catch (Exception ignored) {
             }
         }
     }
 
     @Override
     public boolean hasInjected(Player player) {
-        Object channel = PacketEvents.get().getPlayerUtils().getChannel(player);
+        Object rawChannel = PacketEvents.get().getPlayerUtils().getChannel(player);
 
-        if (channel == null) {
+        if (rawChannel == null) {
             return false;
         }
 
-        PlayerChannelHandlerModern handler = getHandler(channel);
-        PlayerDecodeHandlerModern decodeHandler = getDecoderHandler(channel);
+        PlayerChannelHandlerModern handler = getHandler(rawChannel);
+        PlayerDecodeHandlerModern decodeHandler = getDecoderHandler(rawChannel);
         return handler != null && handler.player != null && decodeHandler != null && decodeHandler.player != null;
     }
 
     @Override
-    public void writePacket(Object ch, Object rawNMSPacket) {
-        Channel channel = (Channel) ch;
+    public void writePacket(Object rawChannel, Object rawNMSPacket) {
+        Channel channel = (Channel) rawChannel;
         channel.write(rawNMSPacket);
     }
 
     @Override
-    public void flushPackets(Object ch) {
-        Channel channel = (Channel) ch;
+    public void flushPackets(Object rawChannel) {
+        Channel channel = (Channel) rawChannel;
         channel.flush();
     }
 
     @Override
-    public void sendPacket(Object ch, Object rawNMSPacket) {
-        Channel channel = (Channel) ch;
+    public void sendPacket(Object rawChannel, Object rawNMSPacket) {
+        Channel channel = (Channel) rawChannel;
         channel.writeAndFlush(rawNMSPacket);
     }
 
@@ -354,17 +351,17 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
     @Override
     public void updatePlayerObject(Player player, Object rawChannel) {
         Channel channel = (Channel) rawChannel;
-
         ChannelHandler decodeHandler = channel.pipeline().get(PacketEvents.get().getHandlerName() + "-decoder");
+        ChannelHandler channelHandler = channel.pipeline().get(PacketEvents.get().getHandlerName());
 
+        // Update the player object in the player decode handler.
         if (decodeHandler instanceof PlayerDecodeHandlerModern) {
             ((PlayerDecodeHandlerModern) decodeHandler).player = player;
         }
 
-        ChannelHandler handler = channel.pipeline().get(PacketEvents.get().getHandlerName());
-
-        if (handler instanceof PlayerChannelHandlerModern) {
-            ((PlayerChannelHandlerModern) handler).player = player;
+        // Update the player object in the player channel handler.
+        if (channelHandler instanceof PlayerChannelHandlerModern) {
+            ((PlayerChannelHandlerModern) channelHandler).player = player;
         }
     }
 }

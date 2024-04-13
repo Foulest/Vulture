@@ -128,7 +128,6 @@ public final class PlayerUtils {
      * @return Client Version.
      * @see #clientVersionsMap
      */
-    @NotNull
     public ClientVersion getClientVersion(@NotNull Player player) {
         if (player.getAddress() == null) {
             return ClientVersion.UNKNOWN;
@@ -155,8 +154,7 @@ public final class PlayerUtils {
 
                 if (version == null) {
                     // We couldn't snatch that version from the packet.
-                    int protocolVersion = PacketEvents.get().getServerUtils().getVersion().getProtocolVersion();
-                    version = ClientVersion.getClientVersion(protocolVersion);
+                    version = ClientVersion.getClientVersion(47);
                 }
 
                 clientVersionsMap.put(player.getAddress(), version);

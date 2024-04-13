@@ -1,7 +1,6 @@
 package net.foulest.vulture;
 
 import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import net.foulest.vulture.cmds.VultureCmd;
@@ -42,7 +41,8 @@ public class Vulture extends JavaPlugin {
     public PacketProcessor packetProcessor;
     public Runnable tickReset;
     public Runnable lagTracker;
-    public boolean debug;
+    public boolean debugMode;
+    public boolean verboseMode;
 
     @Override
     public void onLoad() {
@@ -82,7 +82,7 @@ public class Vulture extends JavaPlugin {
 
         // Initializes PacketEvents.
         MessageUtil.log(Level.INFO, "Initializing PacketEvents...");
-        packetEvents.init(new PacketEventsSettings());
+        packetEvents.init();
 
         // Loads the plugin's commands.
         MessageUtil.log(Level.INFO, "Loading Packet Processors...");

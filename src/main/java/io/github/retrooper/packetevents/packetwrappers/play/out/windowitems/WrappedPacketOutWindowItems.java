@@ -5,24 +5,18 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import lombok.AllArgsConstructor;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-// TODO: Test wrapper
+@AllArgsConstructor
 public class WrappedPacketOutWindowItems extends WrappedPacket implements SendableWrapper {
 
-    private static boolean v_1_17;
-    private static boolean v_1_17_1;
-    private static Object nonNullListInstance;
-    private static Class<?> nonNullListClass;
     private static Constructor<?> packetConstructor;
-
     private int windowID;
     private int stateID;
     private List<ItemStack> slotData;
@@ -32,39 +26,12 @@ public class WrappedPacketOutWindowItems extends WrappedPacket implements Sendab
         super(packet);
     }
 
-    public WrappedPacketOutWindowItems(int windowID, int stateID, List<ItemStack> slots, ItemStack heldItem) {
-        this.windowID = windowID;
-        this.stateID = stateID;
-        this.slotData = slots;
-        this.heldItem = heldItem;
-    }
-
     @Override
     protected void load() {
-        v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
-        v_1_17_1 = version.isNewerThanOrEquals(ServerVersion.v_1_17_1);
-
         try {
-            if (v_1_17) {
-                nonNullListClass = NMSUtils.getNMClassWithoutException("core.NonNullList");
-
-                if (v_1_17_1) {
-                    Constructor<?> nonNullListConstructor = nonNullListClass.getDeclaredConstructors()[0];
-                    nonNullListConstructor.setAccessible(true);
-                    nonNullListInstance = nonNullListConstructor.newInstance(new ArrayList<>(), null);
-                    packetConstructor = PacketTypeClasses.Play.Server.WINDOW_ITEMS.getConstructor(int.class, int.class, nonNullListClass, NMSUtils.nmsItemStackClass);
-                } else {
-                    Constructor<?> nonNullListConstructor = nonNullListClass.getDeclaredConstructor();
-                    nonNullListConstructor.setAccessible(true);
-                    nonNullListInstance = nonNullListConstructor.newInstance();
-                    packetConstructor = PacketTypeClasses.Play.Server.WINDOW_ITEMS.getConstructor(int.class, nonNullListClass);
-                }
-            } else {
-                packetConstructor = PacketTypeClasses.Play.Server.WINDOW_ITEMS.getConstructor();
-            }
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException |
-                 InstantiationException e) {
-            e.printStackTrace();
+            packetConstructor = PacketTypeClasses.Play.Server.WINDOW_ITEMS.getConstructor();
+        } catch (NoSuchMethodException ex) {
+            ex.printStackTrace();
         }
     }
 
@@ -103,19 +70,10 @@ public class WrappedPacketOutWindowItems extends WrappedPacket implements Sendab
     public List<ItemStack> getSlots() {
         if (packet != null) {
             List<ItemStack> slots = new ArrayList<>();
+            Object[] nmsItemStacks = (Object[]) readAnyObject(1);
 
-            if (version.isNewerThan(ServerVersion.v_1_10_2)) {
-                List<Object> nmsItemStacks = readList(0);
-
-                for (Object nmsItemStack : nmsItemStacks) {
-                    slots.add(NMSUtils.toBukkitItemStack(nmsItemStack));
-                }
-            } else {
-                Object[] nmsItemStacks = (Object[]) readAnyObject(1);
-
-                for (Object nmsItemStack : nmsItemStacks) {
-                    slots.add(NMSUtils.toBukkitItemStack(nmsItemStack));
-                }
+            for (Object nmsItemStack : nmsItemStacks) {
+                slots.add(NMSUtils.toBukkitItemStack(nmsItemStack));
             }
             return slots;
         } else {
@@ -125,37 +83,20 @@ public class WrappedPacketOutWindowItems extends WrappedPacket implements Sendab
 
     public void setSlots(List<ItemStack> slots) {
         if (packet != null) {
-            if (version.isNewerThan(ServerVersion.v_1_10_2)) {
-                List<Object> nmsItemStacks = new ArrayList<>();
+            Object[] nmsItemStacks = new Object[slots.size()];
 
-                for (ItemStack itemStack : slots) {
-                    nmsItemStacks.add(NMSUtils.toNMSItemStack(itemStack));
-                }
-
-                writeList(0, nmsItemStacks);
-
-            } else {
-                Object[] nmsItemStacks = new Object[slots.size()];
-
-                for (int i = 0; i < slots.size(); i++) {
-                    nmsItemStacks[i] = NMSUtils.toNMSItemStack(slots.get(i));
-                }
-
-                writeAnyObject(1, nmsItemStacks);
+            for (int i = 0; i < slots.size(); i++) {
+                nmsItemStacks[i] = NMSUtils.toNMSItemStack(slots.get(i));
             }
+
+            writeAnyObject(1, nmsItemStacks);
         } else {
             this.slotData = slots;
         }
     }
 
     public Optional<ItemStack> getHeldItem() {
-        if (!v_1_17_1) return Optional.empty();
-
-        if (packet != null) {
-            return Optional.ofNullable(NMSUtils.toBukkitItemStack(readObject(0, NMSUtils.nmsItemStackClass)));
-        } else {
-            return Optional.of(heldItem);
-        }
+        return Optional.empty();
     }
 
     public void setHeldItem(ItemStack heldItem) {
@@ -176,24 +117,10 @@ public class WrappedPacketOutWindowItems extends WrappedPacket implements Sendab
 
     @Override
     public Object asNMSPacket() throws Exception {
-        Object packetInstance;
-
-        if (v_1_17_1) {
-            packetInstance = packetConstructor.newInstance(getWindowId(), stateID, nonNullListInstance, getNMSItemHeld());
-            WrappedPacketOutWindowItems wrappedPacketOutWindowItems = new WrappedPacketOutWindowItems(new NMSPacket(packetInstance));
-            wrappedPacketOutWindowItems.setSlots(getSlots());
-
-        } else if (v_1_17) {
-            packetInstance = packetConstructor.newInstance(getWindowId(), nonNullListInstance);
-            WrappedPacketOutWindowItems wrappedPacketOutWindowItems = new WrappedPacketOutWindowItems(new NMSPacket(packetInstance));
-            wrappedPacketOutWindowItems.setSlots(getSlots());
-
-        } else {
-            packetInstance = packetConstructor.newInstance();
-            WrappedPacketOutWindowItems wrappedPacketOutWindowItems = new WrappedPacketOutWindowItems(new NMSPacket(packetInstance));
-            wrappedPacketOutWindowItems.setWindowId(getWindowId());
-            wrappedPacketOutWindowItems.setSlots(getSlots());
-        }
+        Object packetInstance = packetConstructor.newInstance();
+        WrappedPacketOutWindowItems wrappedPacketOutWindowItems = new WrappedPacketOutWindowItems(new NMSPacket(packetInstance));
+        wrappedPacketOutWindowItems.setWindowId(getWindowId());
+        wrappedPacketOutWindowItems.setSlots(getSlots());
         return packetInstance;
     }
 }

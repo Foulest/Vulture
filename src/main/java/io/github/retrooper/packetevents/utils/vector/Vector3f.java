@@ -1,7 +1,9 @@
 package io.github.retrooper.packetevents.utils.vector;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,8 +15,10 @@ import org.jetbrains.annotations.NotNull;
  * @author retrooper
  * @since 1.8
  */
-@Setter
 @Getter
+@Setter
+@ToString
+@AllArgsConstructor
 public class Vector3f {
 
     /**
@@ -23,14 +27,17 @@ public class Vector3f {
      * to -1 to avoid null pointer exceptions.
      */
     public static final Vector3f INVALID = new Vector3f(-1, -1, -1);
+
     /**
      * X (coordinate/angle/whatever you wish)
      */
     public float x;
+
     /**
      * Y (coordinate/angle/whatever you wish)
      */
     public float y;
+
     /**
      * Z (coordinate/angle/whatever you wish)
      */
@@ -43,19 +50,6 @@ public class Vector3f {
         this.x = 0.0f;
         this.y = 0.0f;
         this.z = 0.0f;
-    }
-
-    /**
-     * Constructor allowing you to set the values.
-     *
-     * @param x X
-     * @param y Y
-     * @param z Z
-     */
-    public Vector3f(float x, float y, float z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
     }
 
     /**
@@ -122,10 +116,5 @@ public class Vector3f {
     @Override
     public Vector3f clone() {
         return new Vector3f(getX(), getY(), getZ());
-    }
-
-    @Override
-    public String toString() {
-        return "X: " + x + ", Y: " + y + ", Z: " + z;
     }
 }

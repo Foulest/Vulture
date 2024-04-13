@@ -2,14 +2,12 @@ package io.github.retrooper.packetevents.packetwrappers;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.exceptions.WrapperFieldNotFoundException;
-import io.github.retrooper.packetevents.exceptions.WrapperUnsupportedUsageException;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.api.WrapperPacketReader;
 import io.github.retrooper.packetevents.packetwrappers.api.WrapperPacketWriter;
 import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
-import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import org.bukkit.Difficulty;
@@ -19,14 +17,11 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
@@ -35,7 +30,6 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     private static final Map<Class<? extends WrappedPacket>, Boolean> LOADED_WRAPPERS = new ConcurrentHashMap<>();
     private static final Map<Class<?>, Map<Class<?>, Field[]>> FIELD_CACHE = new ConcurrentHashMap<>();
     private static final Field[] EMPTY_FIELD_ARRAY = new Field[0];
-    private static byte isVersion_1_17 = -1;
     public static ServerVersion version;
     protected final NMSPacket packet;
     private final Class<?> packetClass;
@@ -66,10 +60,6 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         Class<? extends WrappedPacket> clazz = getClass();
 
         if (!LOADED_WRAPPERS.containsKey(clazz)) {
-            if (!isSupported()) {
-                throw new WrapperUnsupportedUsageException(getClass());
-            }
-
             try {
                 load();
             } catch (Exception ex) {
@@ -89,100 +79,6 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     protected boolean hasLoaded() {
         return LOADED_WRAPPERS.getOrDefault(getClass(), false);
-    }
-
-    protected void throwUnsupportedOperation(@NotNull Enum<?> enumConst) throws UnsupportedOperationException {
-        Class<?> enumConstClass = enumConst.getClass();
-        Field field = null;
-
-        try {
-            field = enumConstClass.getField(enumConst.name());
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        }
-
-        if (Objects.requireNonNull(field).isAnnotationPresent(SupportedVersions.class)) {
-            SupportedVersions supportedVersions = field.getAnnotation(SupportedVersions.class);
-            List<ServerVersion> versionList = parseSupportedVersionsAnnotation(supportedVersions);
-            String supportedVersionsMsg = Arrays.toString(versionList.toArray(new ServerVersion[0]));
-
-            throw new UnsupportedOperationException("PacketEvents failed to use the " + enumConst.name()
-                    + " enum constant in the " + enumConstClass.getSimpleName() + " enum."
-                    + " This enum constant is not supported on your server version. ("
-                    + PacketEvents.get().getServerUtils().getVersion() + ")\n "
-                    + "This enum constant is only supported on these server versions: " + supportedVersionsMsg);
-        } else {
-            throw new UnsupportedOperationException("PacketEvents failed to use the " + enumConst.name()
-                    + " enum constant in the " + enumConstClass.getSimpleName() + " enum."
-                    + " This enum constant is not supported on your server version. ("
-                    + PacketEvents.get().getServerUtils().getVersion() + ")\n"
-                    + " Failed to find out what server versions this enum constant is supported on.");
-        }
-    }
-
-    protected void throwUnsupportedOperation() throws UnsupportedOperationException {
-        final String currentMethodName = "throwUnsupportedOperation";
-        StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-        int stackTraceElementIndex = 2;
-
-        for (int i = 0; i < stackTraceElements.length; i++) {
-            StackTraceElement element = stackTraceElements[i];
-
-            if (element.getMethodName().equals(currentMethodName)) {
-                stackTraceElementIndex = i + 1; //It is the next method
-                break;
-            }
-        }
-
-        StackTraceElement stackTraceElement = stackTraceElements[stackTraceElementIndex];
-        String methodName = stackTraceElement.getMethodName();
-        List<Method> possibleMethods = Reflection.getMethods(getClass(), methodName, (Class<?>) null);
-        Method method = null;
-
-        for (Method m : possibleMethods) {
-            if (m.isAnnotationPresent(SupportedVersions.class)) {
-                method = m;
-                break;
-            }
-        }
-
-        if (method == null) {
-            throw new UnsupportedOperationException("PacketEvents failed to access your requested field."
-                    + " This field is not supported on your server version. Failed to lookup the server"
-                    + " versions this field supports...");
-        } else {
-            SupportedVersions supportedVersions = method.getAnnotation(SupportedVersions.class);
-            List<ServerVersion> versionList = parseSupportedVersionsAnnotation(supportedVersions);
-            String supportedVersionsMsg = Arrays.toString(versionList.toArray(new ServerVersion[0]));
-
-            throw new UnsupportedOperationException("PacketEvents failed to access your requested field."
-                    + " This field is not supported on your server version. ("
-                    + PacketEvents.get().getServerUtils().getVersion() + ")\n"
-                    + " This field is only supported on these server versions: " + supportedVersionsMsg);
-        }
-    }
-
-    private @NotNull List<ServerVersion> parseSupportedVersionsAnnotation(@NotNull SupportedVersions supportedVersions) {
-        List<ServerVersion> versionList = new ArrayList<>();
-
-        for (int i = 0; i < supportedVersions.ranges().length; i += 2) {
-            ServerVersion first = supportedVersions.ranges()[i];
-            ServerVersion last = supportedVersions.ranges()[i + 1];
-
-            if (first == last) {
-                versionList.add(first);
-                continue;
-            } else if (first == ServerVersion.ERROR) {
-                first = ServerVersion.getOldest();
-            } else if (last == ServerVersion.ERROR) {
-                last = ServerVersion.getLatest();
-            }
-
-            versionList.addAll(Arrays.asList(ServerVersion.values()).subList(first.ordinal(), last.ordinal() + 1));
-        }
-
-        versionList.remove(ServerVersion.ERROR);
-        return versionList;
     }
 
     @Override
@@ -257,8 +153,6 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     @Override
     public String[] readStringArray(int index) {
-        // JavaImpact: Can we be sure that returning the original array is okay?
-        // retrooper: Yes
         return read(index, String[].class);
     }
 
@@ -442,8 +336,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         return getVector3i(blockPosObj);
     }
 
-    @Nullable
-    private Vector3i getVector3i(Object blockPosObj) {
+    private @Nullable Vector3i getVector3i(Object blockPosObj) {
         try {
             int x = (Integer) NMSUtils.getBlockPosX.invoke(blockPosObj);
             int y = (Integer) NMSUtils.getBlockPosY.invoke(blockPosObj);
@@ -470,7 +363,6 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         write(NMSUtils.nmsItemStackClass, index, nmsItemStack);
     }
 
-    @Nullable
     public GameMode readGameMode(int index) {
         Enum<?> enumConst = readEnumConstant(index, NMSUtils.enumGameModeClass);
         int targetIndex = enumConst.ordinal() - 1;
@@ -487,16 +379,8 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         writeEnumConstant(index, enumConst);
     }
 
-    public World.Environment readDimension(int index, int dimensionIDLegacyIndex) {
-        int dimensionID;
-
-        if (version.isOlderThan(ServerVersion.v_1_13_2)) {
-            dimensionID = readInt(dimensionIDLegacyIndex);
-        } else {
-            Object dimensionManagerObject = readObject(index, NMSUtils.dimensionManagerClass);
-            WrappedPacket dimensionManagerWrapper = new WrappedPacket(new NMSPacket(dimensionManagerObject));
-            dimensionID = dimensionManagerWrapper.readInt(0) - 1;
-        }
+    public World.Environment readDimension(int dimensionIDLegacyIndex) {
+        int dimensionID = readInt(dimensionIDLegacyIndex);
 
         switch (dimensionID) {
             case -1:
@@ -510,14 +394,8 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         }
     }
 
-    public void writeDimension(int index, int dimensionIDLegacyIndex, World.Environment dimension) {
-        if (version.isOlderThan(ServerVersion.v_1_13_2)) {
-            writeInt(dimensionIDLegacyIndex, dimension.getId());
-        } else {
-            Object dimensionManagerObject = readObject(index, NMSUtils.dimensionManagerClass);
-            WrappedPacket dimensionManagerWrapper = new WrappedPacket(new NMSPacket(dimensionManagerObject));
-            dimensionManagerWrapper.writeInt(0, dimension.getId() + 1);
-        }
+    public void writeDimension(int index, int dimensionIDLegacyIndex, World.@NotNull Environment dimension) {
+        writeInt(dimensionIDLegacyIndex, dimension.getId());
     }
 
     public Difficulty readDifficulty(int index) {
@@ -541,12 +419,8 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     }
 
     public String readMinecraftKey(int index) {
-        if (isVersion_1_17 == -1) {
-            isVersion_1_17 = (byte) (version.isNewerThanOrEquals(ServerVersion.v_1_17) ? 1 : 0);
-        }
-
-        int namespaceIndex = isVersion_1_17 == 1 ? 2 : 0;
-        int keyIndex = isVersion_1_17 == 1 ? 3 : 1;
+        int namespaceIndex = 0;
+        int keyIndex = 1;
         Object minecraftKey = readObject(index, NMSUtils.minecraftKeyClass);
         WrappedPacket minecraftKeyWrapper = new WrappedPacket(new NMSPacket(minecraftKey));
         return minecraftKeyWrapper.readString(namespaceIndex) + ":" + minecraftKeyWrapper.readString(keyIndex);
@@ -607,20 +481,5 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
      */
     public boolean isSupported() {
         return true;
-    }
-
-    /**
-     * If a method in a wrapper is annotated with this, it means it isn't supported on all server versions.
-     * It not being supported by all server versions can lead to exceptions. Make sure you always decompile a wrapper getter before using it.
-     * This annotation will specify what versions are supported.
-     *
-     * @author retrooper
-     * @since 1.8
-     */
-    @Target({ElementType.METHOD, ElementType.FIELD, ElementType.CONSTRUCTOR})
-    @Retention(RetentionPolicy.RUNTIME)
-    public @interface SupportedVersions {
-
-        ServerVersion[] ranges() default {};
     }
 }

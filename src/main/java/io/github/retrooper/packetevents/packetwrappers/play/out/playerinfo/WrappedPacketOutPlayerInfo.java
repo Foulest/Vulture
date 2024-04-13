@@ -1,6 +1,5 @@
 package io.github.retrooper.packetevents.packetwrappers.play.out.playerinfo;
 
-import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
@@ -10,7 +9,7 @@ import io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil;
 import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.GameMode;
@@ -22,7 +21,6 @@ import java.util.List;
 
 public class WrappedPacketOutPlayerInfo extends WrappedPacket implements SendableWrapper {
 
-    private static boolean v_1_17;
     private static Class<? extends Enum<?>> enumPlayerInfoActionClass;
     private static Constructor<?> packetConstructor;
     private static Constructor<?> playerInfoDataConstructor;
@@ -41,17 +39,12 @@ public class WrappedPacketOutPlayerInfo extends WrappedPacket implements Sendabl
 
     @Override
     protected void load() {
-        v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
         enumPlayerInfoActionClass = SubclassUtil.getEnumSubClass(PacketTypeClasses.Play.Server.PLAYER_INFO, "EnumPlayerInfoAction");
 
         try {
-            if (v_1_17) {
-                packetConstructor = PacketTypeClasses.Play.Server.PLAYER_INFO.getConstructor(NMSUtils.packetDataSerializerClass);
-            } else {
-                packetConstructor = PacketTypeClasses.Play.Server.PLAYER_INFO.getConstructor();
-            }
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            packetConstructor = PacketTypeClasses.Play.Server.PLAYER_INFO.getConstructor();
+        } catch (NoSuchMethodException ex) {
+            ex.printStackTrace();
         }
 
         Class<?> playerInfoDataClass = SubclassUtil.getSubClass(PacketTypeClasses.Play.Server.PLAYER_INFO, "PlayerInfoData");
@@ -141,16 +134,7 @@ public class WrappedPacketOutPlayerInfo extends WrappedPacket implements Sendabl
 
     @Override
     public Object asNMSPacket() throws Exception {
-        Object packetInstance;
-
-        if (v_1_17) {
-            Object byteBuf = PacketEvents.get().getByteBufUtil().newByteBuf(new byte[]{0, 0, 0, 0, 0, 0, 0, 0});
-            Object packetDataSerializer = NMSUtils.generatePacketDataSerializer(byteBuf);
-            packetInstance = packetConstructor.newInstance(packetDataSerializer);
-        } else {
-            packetInstance = packetConstructor.newInstance();
-        }
-
+        Object packetInstance = packetConstructor.newInstance();
         WrappedPacketOutPlayerInfo playerInfoWrapper = new WrappedPacketOutPlayerInfo(new NMSPacket(packetInstance));
         PlayerInfo[] playerInfos = getPlayerInfo();
 
@@ -172,18 +156,12 @@ public class WrappedPacketOutPlayerInfo extends WrappedPacket implements Sendabl
 
     @Getter
     @Setter
+    @AllArgsConstructor
     public static class PlayerInfo {
 
         private String username;
         private WrappedGameProfile gameProfile;
         private GameMode gameMode;
         private int ping;
-
-        public PlayerInfo(String username, WrappedGameProfile gameProfile, GameMode gameMode, int ping) {
-            this.username = username;
-            this.gameProfile = gameProfile;
-            this.gameMode = gameMode;
-            this.ping = ping;
-        }
     }
 }

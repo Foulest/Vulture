@@ -1,7 +1,9 @@
 package io.github.retrooper.packetevents.utils.vector;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.bukkit.Location;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -15,8 +17,10 @@ import org.jetbrains.annotations.NotNull;
  * @author retrooper
  * @since 1.7
  */
-@Setter
 @Getter
+@Setter
+@ToString
+@AllArgsConstructor
 public class Vector3i {
 
     /**
@@ -25,14 +29,17 @@ public class Vector3i {
      * to -1 to avoid null pointer exceptions.
      */
     public static final Vector3i INVALID = new Vector3i(-1, -1, -1);
+
     /**
      * X (coordinate/angle/whatever you wish)
      */
     public int x;
+
     /**
      * Y (coordinate/angle/whatever you wish)
      */
     public int y;
+
     /**
      * Z (coordinate/angle/whatever you wish)
      */
@@ -51,19 +58,6 @@ public class Vector3i {
         this.x = location.getBlockX();
         this.y = location.getBlockY();
         this.z = location.getBlockZ();
-    }
-
-    /**
-     * Constructor allowing you to set the values.
-     *
-     * @param x X
-     * @param y Y
-     * @param z Z
-     */
-    public Vector3i(int x, int y, int z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
     }
 
     /**
@@ -130,10 +124,5 @@ public class Vector3i {
     @Override
     public Vector3i clone() {
         return new Vector3i(getX(), getY(), getZ());
-    }
-
-    @Override
-    public String toString() {
-        return "X: " + x + ", Y: " + y + ", Z: " + z;
     }
 }

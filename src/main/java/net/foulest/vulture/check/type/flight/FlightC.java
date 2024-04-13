@@ -5,6 +5,7 @@ import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
+import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
@@ -33,7 +34,10 @@ public class FlightC extends Check {
             double velocity = player.getVelocity().getY();
 
             if (playerData.isNearbyBoat(0.6, 0.6, 0.6)
-                    || playerData.isNearSlimeBlock()) {
+                    || playerData.isNearSlimeBlock()
+                    || playerData.isFlying()
+                    || playerData.getTimeSince(ActionType.STOP_FLYING) <= 200L
+                    || playerData.isInLiquid()) {
                 lastY = flyingPosition.getY();
                 lastVelocity = velocity;
                 return;

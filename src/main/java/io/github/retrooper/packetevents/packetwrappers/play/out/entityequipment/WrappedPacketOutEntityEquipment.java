@@ -1,18 +1,15 @@
 package io.github.retrooper.packetevents.packetwrappers.play.out.entityequipment;
 
-import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
-import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.github.retrooper.packetevents.utils.pair.MojangPairUtils;
 import io.github.retrooper.packetevents.utils.pair.Pair;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import lombok.Getter;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,7 +19,6 @@ import java.util.List;
 
 public class WrappedPacketOutEntityEquipment extends WrappedPacketEntityAbstraction implements SendableWrapper {
 
-    private static boolean v_1_17;
     private static Class<? extends Enum<?>> enumItemSlotClass;
     private static Constructor<?> packetConstructor;
     private List<Pair<EquipmentSlot, ItemStack>> equipment;
@@ -67,14 +63,8 @@ public class WrappedPacketOutEntityEquipment extends WrappedPacketEntityAbstract
 
     @Override
     protected void load() {
-        v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
-
         try {
-            if (v_1_17) {
-                packetConstructor = PacketTypeClasses.Play.Server.ENTITY_EQUIPMENT.getConstructor(NMSUtils.packetDataSerializerClass);
-            } else {
-                packetConstructor = PacketTypeClasses.Play.Server.ENTITY_EQUIPMENT.getConstructor();
-            }
+            packetConstructor = PacketTypeClasses.Play.Server.ENTITY_EQUIPMENT.getConstructor();
         } catch (NoSuchMethodException ex) {
             ex.printStackTrace();
         }
@@ -90,14 +80,7 @@ public class WrappedPacketOutEntityEquipment extends WrappedPacketEntityAbstract
 
     private EquipmentSlot getSingleSlot() {
         if (packet != null) {
-            byte id;
-
-            if (version.isOlderThan(ServerVersion.v_1_9)) {
-                id = (byte) readInt(1);
-            } else {
-                Enum<?> nmsEnumItemSlot = readEnumConstant(0, enumItemSlotClass);
-                id = (byte) nmsEnumItemSlot.ordinal();
-            }
+            byte id = (byte) readInt(1);
             return EquipmentSlot.getById(id);
         } else {
             return legacySlot;
@@ -106,12 +89,7 @@ public class WrappedPacketOutEntityEquipment extends WrappedPacketEntityAbstract
 
     private void setSingleSlot(EquipmentSlot slot) {
         if (packet != null) {
-            if (version.isOlderThan(ServerVersion.v_1_9)) {
-                writeInt(1, slot.getId());
-            } else {
-                Enum<?> nmsEnumConstant = EnumUtil.valueByIndex(enumItemSlotClass, slot.getId());
-                writeEnumConstant(0, nmsEnumConstant);
-            }
+            writeInt(1, slot.getId());
         } else {
             this.legacySlot = slot;
         }
@@ -133,70 +111,27 @@ public class WrappedPacketOutEntityEquipment extends WrappedPacketEntityAbstract
         }
     }
 
-    // 1.16+ only methods
-
-    private @NotNull List<Pair<EquipmentSlot, ItemStack>> getListPair() {
-        List<Object> listMojangPairObject = readList(0);
-        List<Pair<EquipmentSlot, ItemStack>> pairList = new ArrayList<>();
-
-        for (Object mojangPair : listMojangPairObject) {
-            Pair<Object, Object> abstractedPair = MojangPairUtils.extractPair(mojangPair);
-            Enum<?> nmsItemSlot = (Enum<?>) abstractedPair.getFirst();
-            Object nmsItemStack = abstractedPair.getSecond();
-            Pair<EquipmentSlot, ItemStack> pair = new Pair<>(EquipmentSlot.getById((byte) nmsItemSlot.ordinal()), NMSUtils.toBukkitItemStack(nmsItemStack));
-            pairList.add(pair);
-        }
-        return pairList;
-    }
-
-    private void setListPair(@NotNull List<Pair<EquipmentSlot, ItemStack>> pairList) {
-        List<Object> mojangPairList = new ArrayList<>(pairList.size());
-
-        for (Pair<EquipmentSlot, ItemStack> pair : pairList) {
-            EquipmentSlot slot = pair.getFirst();
-            ItemStack itemStack = pair.getSecond();
-            Enum<?> nmsItemSlotEnumConstant = EnumUtil.valueByIndex(enumItemSlotClass, slot.getId());
-            Object nmsItemStack = NMSUtils.toNMSItemStack(itemStack);
-            Object mojangPair = MojangPairUtils.getMojangPair(nmsItemSlotEnumConstant, nmsItemStack);
-            mojangPairList.add(mojangPair);
-        }
-
-        writeList(0, mojangPairList);
-    }
-
-    // UNIVERSAL METHOD
-
     public List<Pair<EquipmentSlot, ItemStack>> getEquipment() {
         if (packet != null) {
-            if (version.isOlderThan(ServerVersion.v_1_16)) {
-                List<Pair<EquipmentSlot, ItemStack>> pair = new ArrayList<>(1);
-                pair.add(new Pair<>(getSingleSlot(), getSingleItemStack()));
-                return pair;
-            } else {
-                return getListPair();
-            }
+            List<Pair<EquipmentSlot, ItemStack>> pair = new ArrayList<>(1);
+            pair.add(new Pair<>(getSingleSlot(), getSingleItemStack()));
+            return pair;
         } else {
             return equipment;
         }
     }
 
-    public void setEquipment(List<Pair<EquipmentSlot, ItemStack>> equipment) throws UnsupportedOperationException {
-        boolean olderThan_v_1_16 = version.isOlderThan(ServerVersion.v_1_16);
-
-        if (olderThan_v_1_16 && equipment.size() > 1) {
+    public void setEquipment(@NotNull List<Pair<EquipmentSlot, ItemStack>> equipment) throws UnsupportedOperationException {
+        if (equipment.size() > 1) {
             throw new UnsupportedOperationException("The equipment pair list size cannot be greater than one on"
                     + " server versions older than 1.16!");
         }
 
         if (packet != null) {
-            if (olderThan_v_1_16) {
-                EquipmentSlot equipmentSlot = equipment.get(0).getFirst();
-                ItemStack itemStack = equipment.get(0).getSecond();
-                setSingleSlot(equipmentSlot);
-                setSingleItemStack(itemStack);
-            } else {
-                setListPair(equipment);
-            }
+            EquipmentSlot equipmentSlot = equipment.get(0).getFirst();
+            ItemStack itemStack = equipment.get(0).getSecond();
+            setSingleSlot(equipmentSlot);
+            setSingleItemStack(itemStack);
         } else {
             this.equipment = equipment;
         }
@@ -204,15 +139,7 @@ public class WrappedPacketOutEntityEquipment extends WrappedPacketEntityAbstract
 
     @Override
     public Object asNMSPacket() throws Exception {
-        Object packetInstance;
-
-        if (v_1_17) {
-            Object packetDataSerializer = NMSUtils.generatePacketDataSerializer(PacketEvents.get().getByteBufUtil().newByteBuf(new byte[]{0, 0, 0, 0}));
-            packetInstance = packetConstructor.newInstance(packetDataSerializer);
-        } else {
-            packetInstance = packetConstructor.newInstance();
-        }
-
+        Object packetInstance = packetConstructor.newInstance();
         WrappedPacketOutEntityEquipment wrappedPacketOutEntityEquipment = new WrappedPacketOutEntityEquipment(new NMSPacket(packetInstance));
         wrappedPacketOutEntityEquipment.setEntityId(getEntityId());
         wrappedPacketOutEntityEquipment.setEquipment(getEquipment());
@@ -222,7 +149,6 @@ public class WrappedPacketOutEntityEquipment extends WrappedPacketEntityAbstract
     @Getter
     public enum EquipmentSlot {
         MAINHAND,
-        OFFHAND,
         BOOTS,
         LEGGINGS,
         CHESTPLATE,
@@ -230,8 +156,8 @@ public class WrappedPacketOutEntityEquipment extends WrappedPacketEntityAbstract
 
         public byte id;
 
-        @Nullable
-        public static EquipmentSlot getById(byte id) {
+        @Contract(pure = true)
+        public static @Nullable EquipmentSlot getById(byte id) {
             for (EquipmentSlot slot : EquipmentSlot.values()) {
                 if (slot.id == id) {
                     return slot;

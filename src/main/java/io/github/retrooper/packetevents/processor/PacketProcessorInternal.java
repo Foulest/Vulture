@@ -12,7 +12,6 @@ import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -325,7 +324,6 @@ public class PacketProcessorInternal {
         }
     }
 
-    @Nullable
     private PacketState getPacketState(Player player, Object packet) {
         if (packet == null) {
             return null;

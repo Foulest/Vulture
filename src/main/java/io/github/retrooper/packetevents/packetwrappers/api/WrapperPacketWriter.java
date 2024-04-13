@@ -18,8 +18,6 @@ public interface WrapperPacketWriter {
 
     void writeString(int index, String value);
 
-    // ARRAYS
-
     void writeBooleanArray(int index, boolean[] array);
 
     void writeByteArray(int index, byte[] value);

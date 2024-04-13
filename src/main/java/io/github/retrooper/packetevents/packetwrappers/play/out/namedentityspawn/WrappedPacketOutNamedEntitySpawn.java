@@ -1,13 +1,11 @@
 package io.github.retrooper.packetevents.packetwrappers.play.out.namedentityspawn;
 
-import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -18,11 +16,11 @@ import java.util.UUID;
 
 public class WrappedPacketOutNamedEntitySpawn extends WrappedPacketEntityAbstraction implements SendableWrapper {
 
-    private static boolean v_1_17;
     private static final float rotationDividend = 256.0F / 360.0F;
     private static boolean doublesPresent;
     private static boolean dataWatcherPresent;
     private static Constructor<?> packetConstructor;
+
     private UUID uuid;
     private Vector3d position;
     private float yaw;
@@ -85,21 +83,15 @@ public class WrappedPacketOutNamedEntitySpawn extends WrappedPacketEntityAbstrac
         this.pitch = pitch;
     }
 
-
     @Override
     protected void load() {
-        v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
         doublesPresent = Reflection.getField(PacketTypeClasses.Play.Server.NAMED_ENTITY_SPAWN, double.class, 1) != null;
         dataWatcherPresent = Reflection.getField(PacketTypeClasses.Play.Server.NAMED_ENTITY_SPAWN, NMSUtils.dataWatcherClass, 0) != null;
 
         try {
-            if (v_1_17) {
-                packetConstructor = PacketTypeClasses.Play.Server.NAMED_ENTITY_SPAWN.getConstructor(NMSUtils.packetDataSerializerClass);
-            } else {
-                packetConstructor = PacketTypeClasses.Play.Server.NAMED_ENTITY_SPAWN.getConstructor();
-            }
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            packetConstructor = PacketTypeClasses.Play.Server.NAMED_ENTITY_SPAWN.getConstructor();
+        } catch (NoSuchMethodException ex) {
+            ex.printStackTrace();
         }
     }
 
@@ -193,18 +185,7 @@ public class WrappedPacketOutNamedEntitySpawn extends WrappedPacketEntityAbstrac
 
     @Override
     public Object asNMSPacket() throws Exception {
-        Object packetInstance;
-
-        if (v_1_17) {
-            // we were at 40
-            byte[] bytes = new byte[60];
-            Object byteBuf = PacketEvents.get().getByteBufUtil().newByteBuf(bytes);
-            Object packetDataSerializer = NMSUtils.generatePacketDataSerializer(byteBuf);
-            packetInstance = packetConstructor.newInstance(packetDataSerializer);
-        } else {
-            packetInstance = packetConstructor.newInstance();
-        }
-
+        Object packetInstance = packetConstructor.newInstance();
         WrappedPacketOutNamedEntitySpawn wrappedPacketOutNamedEntitySpawn = new WrappedPacketOutNamedEntitySpawn(new NMSPacket(packetInstance));
         wrappedPacketOutNamedEntitySpawn.setEntityId(getEntityId());
         wrappedPacketOutNamedEntitySpawn.setUUID(getUUID());

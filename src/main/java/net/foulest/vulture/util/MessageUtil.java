@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -57,8 +58,7 @@ public final class MessageUtil {
      * @param sender  The player to send the message to.
      * @param message The message to send.
      */
-    public static void messagePlayerHoverable(CommandSender sender, List<String> hoverableText,
-                                              String @NotNull ... message) {
+    public static void messagePlayerHoverable(CommandSender sender, List<String> hoverableText, String message) {
         messagePlayerClickable(sender, hoverableText, "", message);
     }
 
@@ -72,41 +72,23 @@ public final class MessageUtil {
      * @param message       The message to send.
      */
     public static void messagePlayerClickable(CommandSender sender, List<String> hoverableText,
-                                              String command, String @NotNull ... message) {
+                                              String command, String message) {
         // Sends a normal message if the sender is not a player.
         if (!(sender instanceof Player)) {
-            for (String line : message) {
-                sender.sendMessage(colorize(line));
-            }
+            sender.sendMessage(colorize(message));
             return;
         }
 
         Player player = (Player) sender;
-        TextComponent textComponent = new TextComponent();
+        TextComponent textComponent = new TextComponent(MessageUtil.colorize(message));
 
-        for (int i = 0; i < message.length; i++) {
-            TextComponent part = new TextComponent(TextComponent.fromLegacyText(colorize(message[i])));
+        // Adds the hoverable text to the message.
+        textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new BaseComponent[]{
+                new TextComponent(MessageUtil.colorize(String.join("\n", hoverableText)))
+        }));
 
-            if (i < message.length - 1) {
-                part.addExtra(" ");
-            }
-
-            textComponent.addExtra(part);
-        }
-
-        // Sets the click event.
-        if (!command.isEmpty()) {
-            textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command));
-        }
-
-        BaseComponent[] hoverText = new BaseComponent[hoverableText.size()];
-
-        for (int i = 0; i < hoverableText.size(); i++) {
-            hoverText[i] = new TextComponent(colorize(hoverableText.get(i)));
-        }
-
-        // Sets the hover event.
-        textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverText));
+        // Adds the command to run when the message is clicked.
+        textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command));
 
         // Sends the message to the player.
         player.spigot().sendMessage(textComponent);
@@ -198,7 +180,7 @@ public final class MessageUtil {
      * @param message The message to log.
      */
     public static void debug(String message) {
-        if (Vulture.instance.debug) {
+        if (Vulture.instance.debugMode) {
             log(Level.INFO, "[DEBUG] " + message);
         }
     }
@@ -213,7 +195,8 @@ public final class MessageUtil {
             PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
             if (playerData.isAlertsEnabled()) {
-                messagePlayer(player, Settings.prefix + " " + message);
+                messagePlayerClickable(player, Collections.singletonList("&aClick to teleport to the player."),
+                        "/tp " + player.getName(), Settings.prefix + " " + message);
             }
         }
 

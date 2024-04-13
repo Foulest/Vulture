@@ -1,7 +1,6 @@
 package io.github.retrooper.packetevents.utils.npc;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Map;
@@ -11,7 +10,6 @@ public class NPCManager {
 
     private final Map<Integer, NPC> npcMap = new ConcurrentHashMap<>();
 
-    @Nullable
     public NPC getNPCById(int entityID) {
         return npcMap.get(entityID);
     }

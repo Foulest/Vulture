@@ -2,18 +2,13 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.respawn;
 
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.World;
-import org.bukkit.WorldType;
 
-// TODO: finish and test
 class WrappedPacketOutRespawn extends WrappedPacket {
 
     private World.Environment dimension;
-    private Difficulty difficulty;
     private GameMode gameMode;
-    private WorldType levelType;
 
     public WrappedPacketOutRespawn(NMSPacket packet) {
         super(packet);
@@ -21,7 +16,7 @@ class WrappedPacketOutRespawn extends WrappedPacket {
 
     public World.Environment getDimension() {
         if (packet != null) {
-            return readDimension(0, 0);
+            return readDimension(0);
         } else {
             return dimension;
         }

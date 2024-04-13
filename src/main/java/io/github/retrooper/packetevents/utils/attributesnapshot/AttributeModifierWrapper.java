@@ -49,8 +49,8 @@ public class AttributeModifierWrapper extends WrappedPacket {
                 Enum<?> enumConst = EnumUtil.valueByIndex(operationEnumClass, operationIndex);
                 attributeModifierObj = attributeModifierConstructor.newInstance(id, name, amount, enumConst);
             }
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException ex) {
+            ex.printStackTrace();
         }
         return new AttributeModifierWrapper(new NMSPacket(attributeModifierObj));
     }

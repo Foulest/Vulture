@@ -5,9 +5,11 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import lombok.AllArgsConstructor;
 
 import java.lang.reflect.Constructor;
 
+@AllArgsConstructor
 public class WrappedPacketLoginOutDisconnect extends WrappedPacket implements SendableWrapper {
 
     private static Constructor<?> packetConstructor;
@@ -15,10 +17,6 @@ public class WrappedPacketLoginOutDisconnect extends WrappedPacket implements Se
 
     public WrappedPacketLoginOutDisconnect(NMSPacket packet) {
         super(packet);
-    }
-
-    public WrappedPacketLoginOutDisconnect(String reason) {
-        this.reason = reason;
     }
 
     @Override
@@ -49,10 +47,5 @@ public class WrappedPacketLoginOutDisconnect extends WrappedPacket implements Se
     @Override
     public Object asNMSPacket() throws Exception {
         return packetConstructor.newInstance(NMSUtils.generateIChatBaseComponent(getReason()));
-    }
-
-    @Override
-    public boolean isSupported() {
-        return PacketTypeClasses.Login.Server.DISCONNECT != null;
     }
 }

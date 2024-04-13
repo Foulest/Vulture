@@ -31,8 +31,6 @@ public final class NMSUtils {
 
     private static final ThreadLocal<Random> randomThreadLocal = ThreadLocal.withInitial(Random::new);
 
-    public static ServerVersion version;
-
     public static Constructor<?> blockPosConstructor;
     public static Constructor<?> minecraftKeyConstructor;
     public static Constructor<?> vec3DConstructor;
@@ -116,7 +114,8 @@ public final class NMSUtils {
     private static Object minecraftServerConnection;
 
     public static void load() {
-        if (version.isNewerThan(ServerVersion.v_1_7_10)) {
+        // 1.8.8 is the only version supported.
+        if (Bukkit.getVersion().contains("(MC: 1.8.8)")) {
             nettyPrefix = "io.netty.";
         } else {
             Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_RED + "[packetevents] Your server version is not supported by PacketEvents. Shutting down server...");
@@ -140,8 +139,8 @@ public final class NMSUtils {
             craftServerClass = getOBCClass("CraftServer");
             craftEntityClass = getOBCClass("entity.CraftEntity");
             craftItemStackClass = getOBCClass("inventory.CraftItemStack");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+        } catch (ClassNotFoundException ex) {
+            ex.printStackTrace();
         }
 
         nmsEntityClass = getNMSClassWithoutException("Entity");
@@ -264,8 +263,8 @@ public final class NMSUtils {
         if (packetDataSerializerClass != null) {
             try {
                 packetDataSerializerConstructor = packetDataSerializerClass.getConstructor(NMSUtils.byteBufClass);
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
+            } catch (NoSuchMethodException ex) {
+                ex.printStackTrace();
             }
         }
 
@@ -279,8 +278,8 @@ public final class NMSUtils {
         } catch (ClassNotFoundException e) {
             try {
                 gameProfileClass = Class.forName("com.mojang.authlib.GameProfile");
-            } catch (ClassNotFoundException e2) {
-                e2.printStackTrace();
+            } catch (ClassNotFoundException ex) {
+                ex.printStackTrace();
             }
         }
 
@@ -311,14 +310,6 @@ public final class NMSUtils {
             sectionPositionClass = getNMClassWithoutException("core.SectionPosition");
         }
 
-        if (version.isNewerThanOrEquals(ServerVersion.v_1_14)) {
-            movingObjectPositionBlockClass = NMSUtils.getNMSClassWithoutException("MovingObjectPositionBlock");
-
-            if (movingObjectPositionBlockClass == null) {
-                movingObjectPositionBlockClass = getNMClassWithoutException("world.phys.MovingObjectPositionBlock");
-            }
-        }
-
         try {
             // If null, it is 1.7.10
             if (blockPosClass != null) {
@@ -337,8 +328,8 @@ public final class NMSUtils {
             if (nmsItemStackClass != null && iMaterialClass != null) {
                 itemStackConstructor = nmsItemStackClass.getDeclaredConstructor(iMaterialClass);
             }
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+        } catch (NoSuchMethodException ex) {
+            ex.printStackTrace();
         }
 
         try {
@@ -387,8 +378,8 @@ public final class NMSUtils {
             if (minecraftKeyClass != null) {
                 minecraftKeyConstructor = minecraftKeyClass.getConstructor(String.class);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
 
         try {
@@ -452,8 +443,8 @@ public final class NMSUtils {
         if (minecraftServer == null) {
             try {
                 minecraftServer = Reflection.getField(craftServerClass, minecraftServerClass, 0).get(server);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
+            } catch (IllegalAccessException ex) {
+                ex.printStackTrace();
             }
         }
         return minecraftServer;
@@ -463,8 +454,8 @@ public final class NMSUtils {
         if (minecraftServerConnection == null) {
             try {
                 minecraftServerConnection = Reflection.getField(minecraftServerClass, serverConnectionClass, 0).get(getMinecraftServerInstance(Bukkit.getServer()));
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
+            } catch (IllegalAccessException ex) {
+                ex.printStackTrace();
             }
         }
         return minecraftServerConnection;
@@ -508,7 +499,7 @@ public final class NMSUtils {
     public static @Nullable Class<? extends Enum<?>> getNMSEnumClassWithoutException(String name) {
         try {
             return (Class<? extends Enum<?>>) getNMSClass(name);
-        } catch (Exception e) {
+        } catch (Exception ex) {
             return null;
         }
     }
@@ -516,7 +507,7 @@ public final class NMSUtils {
     public static @Nullable Class<?> getNMSClassWithoutException(String name) {
         try {
             return getNMSClass(name);
-        } catch (Exception e) {
+        } catch (Exception ex) {
             return null;
         }
     }
@@ -534,8 +525,8 @@ public final class NMSUtils {
 
         try {
             craftEntity = getBukkitEntity.invoke(nmsEntity);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException | InvocationTargetException ex) {
+            ex.printStackTrace();
         }
         return (Entity) craftEntity;
     }
@@ -545,8 +536,8 @@ public final class NMSUtils {
 
         try {
             return getCraftEntityHandle.invoke(craftEntity);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException | InvocationTargetException ex) {
+            ex.printStackTrace();
         }
         return null;
     }
@@ -554,8 +545,8 @@ public final class NMSUtils {
     public static @Nullable Object getNMSAxisAlignedBoundingBox(Object nmsEntity) {
         try {
             return entityBoundingBoxField.get(nmsEntityClass.cast(nmsEntity));
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException ex) {
+            ex.printStackTrace();
         }
         return null;
     }
@@ -569,8 +560,8 @@ public final class NMSUtils {
 
         try {
             return getCraftPlayerHandle.invoke(craftPlayer);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException | InvocationTargetException ex) {
+            ex.printStackTrace();
         }
         return null;
     }
@@ -637,8 +628,8 @@ public final class NMSUtils {
 
         try {
             return entityPlayerPingField.getInt(entityPlayer);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException ex) {
+            ex.printStackTrace();
         }
         return -1;
     }
@@ -665,8 +656,8 @@ public final class NMSUtils {
     public static @Nullable ItemStack toBukkitItemStack(Object nmsItemStack) {
         try {
             return (ItemStack) asBukkitCopy.invoke(null, nmsItemStack);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException | InvocationTargetException ex) {
+            ex.printStackTrace();
         }
         return null;
     }
@@ -674,8 +665,8 @@ public final class NMSUtils {
     public static @Nullable Object toNMSItemStack(ItemStack stack) {
         try {
             return asNMSCopy.invoke(null, stack);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException | InvocationTargetException ex) {
+            ex.printStackTrace();
         }
         return null;
     }
@@ -697,13 +688,12 @@ public final class NMSUtils {
 
         try {
             return getCraftWorldHandle.invoke(craftWorld);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException | InvocationTargetException ex) {
+            ex.printStackTrace();
         }
         return null;
     }
 
-    @Nullable
     public static Object generateIChatBaseComponent(String text) {
         if (text == null) {
             return null;
@@ -711,8 +701,8 @@ public final class NMSUtils {
 
         try {
             return chatFromStringMethod.invoke(null, text);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException | InvocationTargetException ex) {
+            ex.printStackTrace();
         }
         return null;
     }
@@ -726,7 +716,6 @@ public final class NMSUtils {
         return components;
     }
 
-    @Nullable
     public static String readIChatBaseComponent(Object iChatBaseComponent) {
         if (iChatBaseComponent == null) {
             return null;
@@ -734,8 +723,8 @@ public final class NMSUtils {
 
         try {
             return getMessageMethod.invoke(iChatBaseComponent).toString();
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException | InvocationTargetException ex) {
+            ex.printStackTrace();
         }
         return null;
     }
@@ -759,8 +748,8 @@ public final class NMSUtils {
     public static @Nullable Object generateNMSBlockPos(@NotNull Vector3i blockPosition) {
         try {
             return blockPosConstructor.newInstance(blockPosition.x, blockPosition.y, blockPosition.z);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException ex) {
+            ex.printStackTrace();
         }
         return null;
     }
@@ -787,8 +776,8 @@ public final class NMSUtils {
     public static @Nullable Object generateMinecraftKeyNew(String text) {
         try {
             return minecraftKeyConstructor.newInstance(text);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException ex) {
+            ex.printStackTrace();
         }
         return null;
     }
@@ -804,8 +793,8 @@ public final class NMSUtils {
     public static @Nullable Object generateVec3D(double x, double y, double z) {
         try {
             return vec3DConstructor.newInstance(x, y, z);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException ex) {
+            ex.printStackTrace();
         }
         return null;
     }
@@ -813,8 +802,8 @@ public final class NMSUtils {
     public static @Nullable Material getMaterialFromNMSBlock(Object nmsBlock) {
         try {
             return (Material) getMaterialFromNMSBlock.invoke(null, nmsBlock);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException | InvocationTargetException ex) {
+            ex.printStackTrace();
         }
         return null;
     }
@@ -822,8 +811,8 @@ public final class NMSUtils {
     public static @Nullable Object getNMSBlockFromMaterial(Material material) {
         try {
             return getNMSBlockFromMaterial.invoke(null, material);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException | InvocationTargetException ex) {
+            ex.printStackTrace();
         }
         return null;
     }
@@ -831,8 +820,8 @@ public final class NMSUtils {
     public static @Nullable Object generateDataWatcher(Object nmsEntity) {
         try {
             return dataWatcherConstructor.newInstance(nmsEntity);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException ex) {
+            ex.printStackTrace();
         }
         return null;
     }
@@ -869,8 +858,8 @@ public final class NMSUtils {
     public static int getEffectId(Object nmsMobEffectList) {
         try {
             return (int) getMobEffectListId.invoke(null, nmsMobEffectList);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException | InvocationTargetException ex) {
+            ex.printStackTrace();
         }
         return -1;
     }
@@ -878,8 +867,8 @@ public final class NMSUtils {
     public static @Nullable Object getMobEffectListById(int effectID) {
         try {
             return getMobEffectListById.invoke(null, effectID);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException | InvocationTargetException ex) {
+            ex.printStackTrace();
         }
         return null;
     }
@@ -887,8 +876,8 @@ public final class NMSUtils {
     public static int getNMSItemId(Object nmsItem) {
         try {
             return (int) getItemId.invoke(null, nmsItem);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException | InvocationTargetException ex) {
+            ex.printStackTrace();
         }
         return -1;
     }
@@ -896,8 +885,8 @@ public final class NMSUtils {
     public static @Nullable Object getNMSItemById(int id) {
         try {
             return getItemById.invoke(null, id);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException | InvocationTargetException ex) {
+            ex.printStackTrace();
         }
         return null;
     }
@@ -905,8 +894,8 @@ public final class NMSUtils {
     public static @Nullable Object generatePacketDataSerializer(Object byteBuf) {
         try {
             return packetDataSerializerConstructor.newInstance(byteBuf);
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
-            e.printStackTrace();
+        } catch (InstantiationException | InvocationTargetException | IllegalAccessException ex) {
+            ex.printStackTrace();
         }
         return null;
     }

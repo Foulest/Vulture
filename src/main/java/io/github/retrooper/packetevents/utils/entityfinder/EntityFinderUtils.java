@@ -21,12 +21,11 @@ import java.util.Objects;
 public final class EntityFinderUtils {
 
     public static ServerVersion version;
-    private static Class<?> worldServerClass;
     private static Method getEntityByIdMethod;
     private static Method craftWorldGetHandle;
 
     public static void load() {
-        worldServerClass = NMSUtils.getNMSClassWithoutException("WorldServer");
+        Class<?> worldServerClass = NMSUtils.getNMSClassWithoutException("WorldServer");
 
         if (worldServerClass == null) {
             worldServerClass = NMSUtils.getNMClassWithoutException("server.level.WorldServer");
@@ -50,8 +49,7 @@ public final class EntityFinderUtils {
      * @param id Entity ID
      * @return Bukkit Entity.
      */
-    @Nullable
-    public static Entity getEntityByIdUnsafe(World origin, int id) {
+    public static @Nullable Entity getEntityByIdUnsafe(World origin, int id) {
         Entity e = getEntityByIdWithWorldUnsafe(origin, id);
 
         if (e != null) {
@@ -106,8 +104,8 @@ public final class EntityFinderUtils {
                 return null;
             }
             return NMSUtils.getBukkitEntity(nmsEntity);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException | InvocationTargetException ex) {
+            ex.printStackTrace();
         }
         return null;
     }

@@ -6,11 +6,10 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import org.jetbrains.annotations.NotNull;
 
 public final class WrappedPacketInClientCommand extends WrappedPacket {
 
-    private static boolean v_1_16;
     private static Class<? extends Enum<?>> enumClientCommandClass;
 
     public WrappedPacketInClientCommand(NMSPacket packet) {
@@ -19,11 +18,10 @@ public final class WrappedPacketInClientCommand extends WrappedPacket {
 
     @Override
     protected void load() {
-        v_1_16 = version.isNewerThanOrEquals(ServerVersion.v_1_16);
         enumClientCommandClass = NMSUtils.getNMSEnumClassWithoutException("EnumClientCommand");
 
         if (enumClientCommandClass == null) {
-            //Probably a subclass
+            // Probably a subclass
             enumClientCommandClass = SubclassUtil.getEnumSubClass(PacketTypeClasses.Play.Client.CLIENT_COMMAND, "EnumClientCommand");
         }
     }
@@ -33,11 +31,7 @@ public final class WrappedPacketInClientCommand extends WrappedPacket {
         return ClientCommand.values()[enumConst.ordinal()];
     }
 
-    public void setClientCommand(ClientCommand command) throws UnsupportedOperationException {
-        if (command == ClientCommand.OPEN_INVENTORY_ACHIEVEMENT && v_1_16) {
-            throwUnsupportedOperation(command);
-        }
-
+    public void setClientCommand(@NotNull ClientCommand command) throws UnsupportedOperationException {
         Enum<?> enumConst = EnumUtil.valueByIndex(enumClientCommandClass, command.ordinal());
         writeEnumConstant(0, enumConst);
     }
@@ -45,8 +39,6 @@ public final class WrappedPacketInClientCommand extends WrappedPacket {
     public enum ClientCommand {
         PERFORM_RESPAWN,
         REQUEST_STATS,
-
-        @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_15_2})
         OPEN_INVENTORY_ACHIEVEMENT
     }
 }

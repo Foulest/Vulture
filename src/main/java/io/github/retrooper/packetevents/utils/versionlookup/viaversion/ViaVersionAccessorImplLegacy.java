@@ -19,16 +19,16 @@ public class ViaVersionAccessorImplLegacy implements ViaVersionAccessor {
                 Class<?> viaAPIClass = Class.forName("us.myles.ViaVersion.api.ViaAPI");
                 apiAccessor = viaClass.getMethod("getAPI");
                 getPlayerVersionMethod = viaAPIClass.getMethod("getPlayerVersion", Object.class);
-            } catch (ClassNotFoundException | NoSuchMethodException e) {
-                e.printStackTrace();
+            } catch (ClassNotFoundException | NoSuchMethodException ex) {
+                ex.printStackTrace();
             }
         }
 
         try {
             Object viaAPI = apiAccessor.invoke(null);
             return (int) getPlayerVersionMethod.invoke(viaAPI, player);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException | InvocationTargetException ex) {
+            ex.printStackTrace();
         }
         return -1;
     }

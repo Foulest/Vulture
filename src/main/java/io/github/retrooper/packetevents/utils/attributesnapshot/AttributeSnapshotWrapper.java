@@ -111,8 +111,8 @@ public class AttributeSnapshotWrapper extends WrappedPacket {
                 default:
                     return null;
             }
-        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException | InstantiationException | InvocationTargetException ex) {
+            ex.printStackTrace();
         }
         return new AttributeSnapshotWrapper(new NMSPacket(nmsAttributeSnapshot));
     }
@@ -180,16 +180,16 @@ public class AttributeSnapshotWrapper extends WrappedPacket {
 
             try {
                 attributeObj = iRegistryAttributeBaseField.get(null);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
+            } catch (IllegalAccessException ex) {
+                ex.printStackTrace();
             }
 
             Object nmsAttributeBase = null;
 
             try {
                 nmsAttributeBase = getiRegistryByMinecraftKeyMethod.invoke(attributeObj, minecraftKey);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
+            } catch (IllegalAccessException | InvocationTargetException ex) {
+                ex.printStackTrace();
             }
 
             write(attributeBaseClass, 0, nmsAttributeBase);

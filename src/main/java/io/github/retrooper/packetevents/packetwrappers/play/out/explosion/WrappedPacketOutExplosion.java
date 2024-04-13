@@ -5,21 +5,17 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import io.github.retrooper.packetevents.utils.vector.Vector3f;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class WrappedPacketOutExplosion extends WrappedPacket implements SendableWrapper {
 
-    private static boolean v_1_8;
-    private static Constructor<?> chunkPosConstructor;
     private static Constructor<?> packetConstructor;
     private double x;
     private double y;
@@ -60,17 +56,10 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
 
     @Override
     protected void load() {
-        v_1_8 = version.isNewerThanOrEquals(ServerVersion.v_1_8);
-
         try {
-            Class<?> chunkPosClass = NMSUtils.getNMSClassWithoutException("ChunkPosition");
             packetConstructor = PacketTypeClasses.Play.Server.EXPLOSION.getConstructor(double.class, double.class, double.class, float.class, List.class, NMSUtils.vec3DClass);
-
-            if (chunkPosClass != null) {
-                chunkPosConstructor = chunkPosClass.getConstructor(int.class, int.class, int.class);
-            }
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+        } catch (NoSuchMethodException ex) {
+            ex.printStackTrace();
         }
     }
 
@@ -137,16 +126,10 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
             List<Object> nmsRecordsList = new ArrayList<>();
 
             for (Vector3i record : records) {
-                Object position = null; // construct position
-
-                try {
-                    position = v_1_8 ? NMSUtils.generateNMSBlockPos(record) : chunkPosConstructor.newInstance(record.x, record.y, record.z);
-                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
-                }
-
+                Object position = NMSUtils.generateNMSBlockPos(record);
                 nmsRecordsList.add(position);
             }
+
             write(List.class, 0, nmsRecordsList);
         } else {
             this.records = records;
@@ -178,8 +161,7 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
         List<Object> positions = new ArrayList<>();
 
         for (Vector3i record : getRecords()) {
-            Object position = v_1_8 ? NMSUtils.generateNMSBlockPos(record)
-                    : chunkPosConstructor.newInstance(record.x, record.y, record.z);
+            Object position = NMSUtils.generateNMSBlockPos(record);
             positions.add(position);
         }
 

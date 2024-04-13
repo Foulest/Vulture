@@ -83,32 +83,14 @@ public class Check {
     }
 
     /**
-     * This method is used to flag the player without debugging and cancel an event.
+     * This method is used to flag the player and cancel an event.
      *
      * @param event   the event to cancel
      * @param verbose the optional data to include in the flag
      */
     protected final void flag(boolean setback, @NotNull CancellableEvent event, String... verbose) {
         event.setCancelled(true);
-        flag(setback, false, verbose);
-    }
-
-    /**
-     * This method is used to flag the player without debugging.
-     *
-     * @param verbose the optional data to include in the flag
-     */
-    protected final void flag(boolean setback, String... verbose) {
-        flag(setback, false, verbose);
-    }
-
-    /**
-     * This method is used to flag the player with debugging.
-     *
-     * @param verbose the optional data to include in the flag
-     */
-    protected final void debug(String... verbose) {
-        flag(false, true, verbose);
+        flag(setback, verbose);
     }
 
     /**
@@ -118,7 +100,7 @@ public class Check {
      *
      * @param verbose the optional data to include in the flag
      */
-    protected final void flag(boolean setback, boolean debug, String... verbose) {
+    protected final void flag(boolean setback, String... verbose) {
         // Checks the player for exemptions.
         if (playerData.isNewViolationsPaused()
                 || KickUtil.isPlayerBeingKicked(player)
@@ -133,13 +115,6 @@ public class Check {
         }
 
         String verboseString = verbose.length == 0 ? "" : " &7[" + String.join(", ", verbose) + "]";
-
-        // If debug is enabled, send the debug message and return.
-        if (debug) {
-            MessageUtil.sendAlert("&f" + player.getName() + " &7failed &f" + checkInfo.name()
-                    + " &c(Debug)" + verboseString);
-            return;
-        }
 
         // Handles adding a violation.
         handleNewViolation(verbose);
@@ -199,7 +174,7 @@ public class Check {
     private void handleAlert(String verbose) {
         MessageUtil.sendAlert("&f" + player.getName() + " &7failed &f"
                 + checkInfo.name() + " &c(x" + violations + ")"
-                + (Vulture.instance.debug ? verbose : ""));
+                + (Vulture.instance.verboseMode ? verbose : ""));
     }
 
     /**

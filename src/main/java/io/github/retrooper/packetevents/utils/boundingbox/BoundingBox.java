@@ -1,6 +1,7 @@
 package io.github.retrooper.packetevents.utils.boundingbox;
 
 import lombok.Getter;
+import lombok.ToString;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -9,14 +10,15 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
 @Getter
+@ToString
 @SerializableAs("BoundingBox")
 public class BoundingBox implements Cloneable, ConfigurationSerializable {
 
@@ -27,23 +29,23 @@ public class BoundingBox implements Cloneable, ConfigurationSerializable {
     private double maxY;
     private double maxZ;
 
-    @NotNull
-    public static BoundingBox of(@NotNull Vector corner1, @NotNull Vector corner2) {
+    @Contract("_, _ -> new")
+    public static @NotNull BoundingBox of(@NotNull Vector corner1, @NotNull Vector corner2) {
         Validate.notNull(corner1, "Corner1 is null!");
         Validate.notNull(corner2, "Corner2 is null!");
         return new BoundingBox(corner1.getX(), corner1.getY(), corner1.getZ(), corner2.getX(), corner2.getY(), corner2.getZ());
     }
 
-    @NotNull
-    public static BoundingBox of(@NotNull Location corner1, @NotNull Location corner2) {
+    @Contract("_, _ -> new")
+    public static @NotNull BoundingBox of(@NotNull Location corner1, @NotNull Location corner2) {
         Validate.notNull(corner1, "Corner1 is null!");
         Validate.notNull(corner2, "Corner2 is null!");
         Validate.isTrue(Objects.equals(corner1.getWorld(), corner2.getWorld()), "Locations from different worlds!");
         return new BoundingBox(corner1.getX(), corner1.getY(), corner1.getZ(), corner2.getX(), corner2.getY(), corner2.getZ());
     }
 
-    @NotNull
-    public static BoundingBox of(@NotNull Block corner1, @NotNull Block corner2) {
+    @Contract("_, _ -> new")
+    public static @NotNull BoundingBox of(@NotNull Block corner1, @NotNull Block corner2) {
         Validate.notNull(corner1, "Corner1 is null!");
         Validate.notNull(corner2, "Corner2 is null!");
         Validate.isTrue(Objects.equals(corner1.getWorld(), corner2.getWorld()), "Blocks from different worlds!");
@@ -62,20 +64,20 @@ public class BoundingBox implements Cloneable, ConfigurationSerializable {
         return new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
-    @NotNull
-    public static BoundingBox of(@NotNull Block block) {
+    @Contract("_ -> new")
+    public static @NotNull BoundingBox of(@NotNull Block block) {
         Validate.notNull(block, "Block is null!");
         return new BoundingBox(block.getX(), block.getY(), block.getZ(), (block.getX() + 1), (block.getY() + 1), (block.getZ() + 1));
     }
 
-    @NotNull
-    public static BoundingBox of(@NotNull Vector center, double x, double y, double z) {
+    @Contract("_, _, _, _ -> new")
+    public static @NotNull BoundingBox of(@NotNull Vector center, double x, double y, double z) {
         Validate.notNull(center, "Center is null!");
         return new BoundingBox(center.getX() - x, center.getY() - y, center.getZ() - z, center.getX() + x, center.getY() + y, center.getZ() + z);
     }
 
-    @NotNull
-    public static BoundingBox of(@NotNull Location center, double x, double y, double z) {
+    @Contract("_, _, _, _ -> new")
+    public static @NotNull BoundingBox of(@NotNull Location center, double x, double y, double z) {
         Validate.notNull(center, "Center is null!");
         return new BoundingBox(center.getX() - x, center.getY() - y, center.getZ() - z, center.getX() + x, center.getY() + y, center.getZ() + z);
     }
@@ -88,7 +90,6 @@ public class BoundingBox implements Cloneable, ConfigurationSerializable {
         this.resize(x1, y1, z1, x2, y2, z2);
     }
 
-    @NotNull
     public BoundingBox resize(double x1, double y1, double z1, double x2, double y2, double z2) {
         NumberConversions.checkFinite(x1, "x1 not finite");
         NumberConversions.checkFinite(y1, "y1 not finite");
@@ -105,12 +106,10 @@ public class BoundingBox implements Cloneable, ConfigurationSerializable {
         return this;
     }
 
-    @NotNull
     public Vector getMin() {
         return new Vector(this.minX, this.minY, this.minZ);
     }
 
-    @NotNull
     public Vector getMax() {
         return new Vector(this.maxX, this.maxY, this.maxZ);
     }
@@ -143,18 +142,15 @@ public class BoundingBox implements Cloneable, ConfigurationSerializable {
         return this.minZ + this.getWidthZ() * 0.5D;
     }
 
-    @NotNull
     public Vector getCenter() {
         return new Vector(this.getCenterX(), this.getCenterY(), this.getCenterZ());
     }
 
-    @NotNull
     public BoundingBox copy(@NotNull BoundingBox other) {
         Validate.notNull(other, "Other bounding box is null!");
         return this.resize(other.getMinX(), other.getMinY(), other.getMinZ(), other.getMaxX(), other.getMaxY(), other.getMaxZ());
     }
 
-    @NotNull
     public BoundingBox expand(double negativeX, double negativeY, double negativeZ, double positiveX, double positiveY, double positiveZ) {
         if (negativeX == 0.0D && negativeY == 0.0D && negativeZ == 0.0D && positiveX == 0.0D && positiveY == 0.0D && positiveZ == 0.0D) {
             return this;
@@ -209,12 +205,10 @@ public class BoundingBox implements Cloneable, ConfigurationSerializable {
         }
     }
 
-    @NotNull
     public BoundingBox expand(double x, double y, double z) {
         return this.expand(x, y, z, x, y, z);
     }
 
-    @NotNull
     public BoundingBox expand(@NotNull Vector expansion) {
         Validate.notNull(expansion, "Expansion is null!");
         double x = expansion.getX();
@@ -223,12 +217,10 @@ public class BoundingBox implements Cloneable, ConfigurationSerializable {
         return this.expand(x, y, z, x, y, z);
     }
 
-    @NotNull
     public BoundingBox expand(double expansion) {
         return this.expand(expansion, expansion, expansion, expansion, expansion, expansion);
     }
 
-    @NotNull
     public BoundingBox expand(double dirX, double dirY, double dirZ, double expansion) {
         if (expansion == 0.0D) {
             return this;
@@ -245,28 +237,23 @@ public class BoundingBox implements Cloneable, ConfigurationSerializable {
         }
     }
 
-    @NotNull
     public BoundingBox expand(@NotNull Vector direction, double expansion) {
         return this.expand(direction.getX(), direction.getY(), direction.getZ(), expansion);
     }
 
-    @NotNull
     public BoundingBox expand(@NotNull BlockFace blockFace, double expansion) {
         return blockFace == BlockFace.SELF ? this : this.expand(
                 new Vector(blockFace.getModX(), blockFace.getModY(), blockFace.getModZ()), expansion);
     }
 
-    @NotNull
     public BoundingBox expandDirectional(double dirX, double dirY, double dirZ) {
         return this.expand(dirX, dirY, dirZ, 1.0D);
     }
 
-    @NotNull
     public BoundingBox expandDirectional(@NotNull Vector direction) {
         return this.expand(direction.getX(), direction.getY(), direction.getZ(), 1.0D);
     }
 
-    @NotNull
     public BoundingBox union(double posX, double posY, double posZ) {
         double newMinX = Math.min(this.minX, posX);
         double newMinY = Math.min(this.minY, posY);
@@ -279,17 +266,14 @@ public class BoundingBox implements Cloneable, ConfigurationSerializable {
                 ? this : this.resize(newMinX, newMinY, newMinZ, newMaxX, newMaxY, newMaxZ);
     }
 
-    @NotNull
     public BoundingBox union(@NotNull Vector position) {
         return this.union(position.getX(), position.getY(), position.getZ());
     }
 
-    @NotNull
     public BoundingBox union(@NotNull Location position) {
         return this.union(position.getX(), position.getY(), position.getZ());
     }
 
-    @NotNull
     public BoundingBox union(@NotNull BoundingBox other) {
         if (this.contains(other)) {
             return this;
@@ -304,7 +288,6 @@ public class BoundingBox implements Cloneable, ConfigurationSerializable {
         }
     }
 
-    @NotNull
     public BoundingBox intersection(@NotNull BoundingBox other) {
         Validate.isTrue(this.overlaps(other), "The bounding boxes do not overlap!");
         double newMinX = Math.max(this.minX, other.minX);
@@ -316,19 +299,16 @@ public class BoundingBox implements Cloneable, ConfigurationSerializable {
         return this.resize(newMinX, newMinY, newMinZ, newMaxX, newMaxY, newMaxZ);
     }
 
-    @NotNull
     public BoundingBox shift(double shiftX, double shiftY, double shiftZ) {
         return shiftX == 0.0D && shiftY == 0.0D && shiftZ == 0.0D ? this
                 : this.resize(this.minX + shiftX, this.minY + shiftY, this.minZ + shiftZ,
                 this.maxX + shiftX, this.maxY + shiftY, this.maxZ + shiftZ);
     }
 
-    @NotNull
     public BoundingBox shift(@NotNull Vector shift) {
         return this.shift(shift.getX(), shift.getY(), shift.getZ());
     }
 
-    @NotNull
     public BoundingBox shift(@NotNull Location shift) {
         return this.shift(shift.getX(), shift.getY(), shift.getZ());
     }
@@ -385,7 +365,6 @@ public class BoundingBox implements Cloneable, ConfigurationSerializable {
                 Math.max(x1, x2), Math.max(y1, y2), Math.max(z1, z2));
     }
 
-    @Nullable
     public RayTraceResult rayTrace(@NotNull Vector start, @NotNull Vector direction, double maxDistance) {
         NumberConversions.checkFinite(start.getX(), "Start X is not finite");
         NumberConversions.checkFinite(start.getY(), "Start Y is not finite");
@@ -557,23 +536,6 @@ public class BoundingBox implements Cloneable, ConfigurationSerializable {
         }
     }
 
-    public String toString() {
-        return "BoundingBox [minX=" +
-                this.minX +
-                ", minY=" +
-                this.minY +
-                ", minZ=" +
-                this.minZ +
-                ", maxX=" +
-                this.maxX +
-                ", maxY=" +
-                this.maxY +
-                ", maxZ=" +
-                this.maxZ +
-                "]";
-    }
-
-    @NotNull
     public BoundingBox clone() {
         try {
             return (BoundingBox) super.clone();
@@ -582,7 +544,6 @@ public class BoundingBox implements Cloneable, ConfigurationSerializable {
         }
     }
 
-    @NotNull
     public Map<String, Object> serialize() {
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("minX", this.minX);
@@ -594,8 +555,8 @@ public class BoundingBox implements Cloneable, ConfigurationSerializable {
         return result;
     }
 
-    @NotNull
-    public static BoundingBox deserialize(@NotNull Map<String, Object> args) {
+    @Contract("_ -> new")
+    public static @NotNull BoundingBox deserialize(@NotNull Map<String, Object> args) {
         double minX = 0.0D;
         double minY = 0.0D;
         double minZ = 0.0D;

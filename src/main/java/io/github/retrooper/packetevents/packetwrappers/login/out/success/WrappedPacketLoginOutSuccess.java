@@ -7,9 +7,11 @@ import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil;
 import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import lombok.AllArgsConstructor;
 
 import java.lang.reflect.Constructor;
 
+@AllArgsConstructor
 public class WrappedPacketLoginOutSuccess extends WrappedPacket implements SendableWrapper {
 
     private static Constructor<?> packetConstructor;
@@ -17,10 +19,6 @@ public class WrappedPacketLoginOutSuccess extends WrappedPacket implements Senda
 
     public WrappedPacketLoginOutSuccess(NMSPacket packet) {
         super(packet);
-    }
-
-    public WrappedPacketLoginOutSuccess(WrappedGameProfile wrappedGameProfile) {
-        this.wrappedGameProfile = wrappedGameProfile;
     }
 
     @Override
@@ -56,10 +54,5 @@ public class WrappedPacketLoginOutSuccess extends WrappedPacket implements Senda
         WrappedGameProfile gp = getGameProfile();
         // TODO: Support writing property in wrapped game profile
         return packetConstructor.newInstance(GameProfileUtil.getGameProfile(gp.getId(), gp.getName()));
-    }
-
-    @Override
-    public boolean isSupported() {
-        return PacketTypeClasses.Login.Server.SUCCESS != null;
     }
 }

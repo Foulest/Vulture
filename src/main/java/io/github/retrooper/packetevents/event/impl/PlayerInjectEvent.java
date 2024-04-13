@@ -8,7 +8,6 @@ import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.net.InetSocketAddress;
 
@@ -48,7 +47,6 @@ public final class PlayerInjectEvent extends PacketEvent implements CancellableE
      *
      * @return Injected Player.
      */
-    @Nullable
     @Override
     public Player getPlayer() {
         return player;
@@ -59,7 +57,6 @@ public final class PlayerInjectEvent extends PacketEvent implements CancellableE
      *
      * @return Socket address of the injecting player.
      */
-    @Nullable
     public InetSocketAddress getSocketAddress() {
         return address;
     }

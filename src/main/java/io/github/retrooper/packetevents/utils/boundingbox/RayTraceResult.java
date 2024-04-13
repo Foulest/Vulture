@@ -1,25 +1,7 @@
-/*
- *
- * This file is part of Bukkit - https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/browse
- * Copyright (C) 2011 Bukkit author and contributors
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- */
-
 package io.github.retrooper.packetevents.utils.boundingbox;
 
+import lombok.Getter;
+import lombok.ToString;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
@@ -29,6 +11,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
+@Getter
+@ToString
 public class RayTraceResult {
 
     private final Vector hitPosition;
@@ -64,24 +48,8 @@ public class RayTraceResult {
         this(hitPosition, null, hitBlockFace, hitEntity);
     }
 
-    @NotNull
     public Vector getHitPosition() {
         return this.hitPosition.clone();
-    }
-
-    @Nullable
-    public Block getHitBlock() {
-        return this.hitBlock;
-    }
-
-    @Nullable
-    public BlockFace getHitBlockFace() {
-        return this.hitBlockFace;
-    }
-
-    @Nullable
-    public Entity getHitEntity() {
-        return this.hitEntity;
     }
 
     public int hashCode() {
@@ -110,17 +78,5 @@ public class RayTraceResult {
                 return Objects.equals(this.hitEntity, other.hitEntity);
             }
         }
-    }
-
-    public String toString() {
-        return "RayTraceResult [hitPosition=" +
-                this.hitPosition +
-                ", hitBlock=" +
-                this.hitBlock +
-                ", hitBlockFace=" +
-                this.hitBlockFace +
-                ", hitEntity=" +
-                this.hitEntity +
-                "]";
     }
 }

@@ -4,41 +4,27 @@ import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import lombok.AllArgsConstructor;
 
 import java.lang.reflect.Constructor;
-import java.util.Optional;
 
+@AllArgsConstructor
 public class WrappedPacketOutCollect extends WrappedPacket implements SendableWrapper {
 
-    private static boolean v_1_11;
     private static Constructor<?> packetConstructor;
     private int collectedEntityId;
     private int collectorEntityId;
-    private int itemCount;
 
     public WrappedPacketOutCollect(NMSPacket packet) {
         super(packet);
     }
 
-    public WrappedPacketOutCollect(int collectedEntityId, int collectorEntityId, int itemCount) {
-        this.collectedEntityId = collectedEntityId;
-        this.collectorEntityId = collectorEntityId;
-        this.itemCount = itemCount;
-    }
-
     @Override
     protected void load() {
-        v_1_11 = version.isNewerThanOrEquals(ServerVersion.v_1_11);
-
         try {
-            if (v_1_11) {
-                packetConstructor = PacketTypeClasses.Play.Server.COLLECT.getConstructor(int.class, int.class, int.class);
-            } else {
-                packetConstructor = PacketTypeClasses.Play.Server.COLLECT.getConstructor(int.class, int.class);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+            packetConstructor = PacketTypeClasses.Play.Server.COLLECT.getConstructor(int.class, int.class);
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 
@@ -74,35 +60,8 @@ public class WrappedPacketOutCollect extends WrappedPacket implements SendableWr
         }
     }
 
-    public Optional<Integer> getItemCount() {
-        if (!v_1_11) {
-            return Optional.empty();
-        }
-
-        if (packet != null) {
-            return Optional.of(readInt(2));
-        } else {
-            return Optional.of(this.itemCount);
-        }
-    }
-
-    public void setItemCount(int count) {
-        if (v_1_11) {
-            if (packet != null) {
-                writeInt(2, count);
-            } else {
-                this.itemCount = count;
-            }
-        }
-    }
-
     @Override
     public Object asNMSPacket() throws Exception {
-        /*
-         * On newer versions the packet has an extra field which is the picked up item count.
-         */
-        return v_1_11
-                ? packetConstructor.newInstance(getCollectedEntityId(), getCollectorEntityId(), getItemCount().get())
-                : packetConstructor.newInstance(getCollectedEntityId(), getCollectorEntityId());
+        return packetConstructor.newInstance(getCollectedEntityId(), getCollectorEntityId());
     }
 }

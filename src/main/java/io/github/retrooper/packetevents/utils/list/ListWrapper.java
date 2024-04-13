@@ -1,5 +1,6 @@
 package io.github.retrooper.packetevents.utils.list;
 
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -7,13 +8,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+@AllArgsConstructor
 public abstract class ListWrapper implements List {
 
     private final List list;
-
-    public ListWrapper(List inputList) {
-        this.list = inputList;
-    }
 
     public abstract void processAdd(Object o);
 
@@ -51,7 +49,7 @@ public abstract class ListWrapper implements List {
     }
 
     @Override
-    public Object[] toArray() {
+    public Object @NotNull [] toArray() {
         synchronized (this) {
             return this.list.toArray();
         }
@@ -74,7 +72,7 @@ public abstract class ListWrapper implements List {
     }
 
     @Override
-    public boolean addAll(Collection c) {
+    public boolean addAll(@NotNull Collection c) {
         for (Object o : c) {
             processAdd(o);
         }
@@ -187,7 +185,7 @@ public abstract class ListWrapper implements List {
     }
 
     @Override
-    public Object[] toArray(Object[] a) {
+    public Object @NotNull [] toArray(Object @NotNull [] a) {
         synchronized (this) {
             return this.list.toArray(a);
         }

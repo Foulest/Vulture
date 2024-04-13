@@ -1,10 +1,10 @@
 package io.github.retrooper.packetevents.utils.geyser;
 
-
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Objects;
 import java.util.UUID;
 
 public class GeyserUtils {
@@ -38,9 +38,9 @@ public class GeyserUtils {
         Object apiInstance = null;
 
         try {
-            apiInstance = GEYSER_API_METHOD.invoke(null);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+            apiInstance = Objects.requireNonNull(GEYSER_API_METHOD).invoke(null);
+        } catch (IllegalAccessException | InvocationTargetException ex) {
+            ex.printStackTrace();
         }
 
         Object connection = null;
@@ -49,8 +49,8 @@ public class GeyserUtils {
             if (apiInstance != null) {
                 connection = CONNECTION_BY_UUID_METHOD.invoke(apiInstance, uuid);
             }
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException | InvocationTargetException ex) {
+            ex.printStackTrace();
         }
         return connection != null;
     }

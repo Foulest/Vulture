@@ -241,7 +241,7 @@ public class BlockUtil {
             return false;
         }
 
-        BoundingBox boundingBox = getPlayerCustomBoundingBox(player, 0.0, -0.001, 0.0);
+        BoundingBox boundingBox = getPlayerCustomBoundingBox(player, 0.05, 0.05, 0.05);
         ConcurrentStream<Block> collidingBlocks = getCollidingBlocks(player, boundingBox);
 
         return collidingBlocks.any(block -> block.getType() == Material.LAVA

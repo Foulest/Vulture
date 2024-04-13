@@ -50,7 +50,6 @@ public abstract class WrappedPacketEntityAbstraction extends WrappedPacket {
         this.entity = null;
     }
 
-    @Nullable
     public Entity getEntity(@Nullable World world) {
         if (entity != null) {
             return entity;
@@ -58,7 +57,6 @@ public abstract class WrappedPacketEntityAbstraction extends WrappedPacket {
         return PacketEvents.get().getServerUtils().getEntityById(world, getEntityId());
     }
 
-    @Nullable
     public Entity getEntity() {
         if (entity != null) {
             return entity;

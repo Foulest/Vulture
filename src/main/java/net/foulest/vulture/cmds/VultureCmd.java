@@ -78,9 +78,25 @@ public class VultureCmd {
                     return;
                 }
 
-                Vulture.instance.debug = !Vulture.instance.debug;
+                Vulture.instance.debugMode = !Vulture.instance.debugMode;
                 MessageUtil.messagePlayer(sender, Settings.prefix + " &7Debug mode has been &f"
-                        + (Vulture.instance.debug ? "enabled" : "disabled") + "&7.");
+                        + (Vulture.instance.debugMode ? "enabled" : "disabled") + "&7.");
+                break;
+
+            case "verbose":
+                if (!sender.hasPermission("vulture.verbose")) {
+                    MessageUtil.messagePlayer(sender, "&cNo permission.");
+                    return;
+                }
+
+                if (args.length() != 1) {
+                    MessageUtil.messagePlayer(sender, "&cUsage: /vulture verbose");
+                    return;
+                }
+
+                Vulture.instance.verboseMode = !Vulture.instance.verboseMode;
+                MessageUtil.messagePlayer(sender, Settings.prefix + " &7Verbose mode has been &f"
+                        + (Vulture.instance.verboseMode ? "enabled" : "disabled") + "&7.");
                 break;
 
             case "info":
@@ -322,6 +338,7 @@ public class VultureCmd {
                 "&f/vulture info <player> &7- View player info.",
                 "&f/vulture kick <player> <reason> &7- Kicks a player.",
                 "&f/vulture whitelist add/remove <player> [IP] &7- Manages the IP whitelist.",
+                "&f/vulture verbose &7- Toggles verbose mode.",
                 "&f/vulture debug &7- Toggles debug mode."
         );
 

@@ -1,12 +1,9 @@
 package io.github.retrooper.packetevents.packetwrappers.play.out.entityteleport;
 
-import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
-import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import net.foulest.vulture.util.MathUtil;
 import org.bukkit.Location;
@@ -18,10 +15,8 @@ import java.lang.reflect.Constructor;
 public class WrappedPacketOutEntityTeleport extends WrappedPacketEntityAbstraction implements SendableWrapper {
 
     private static final float rotationMultiplier = 256.0F / 360.0F;
-    private static boolean v_1_17;
-    private static boolean legacyVersionMode;
-    private static boolean ultraLegacyVersionMode;
     private static Constructor<?> constructor;
+
     private Vector3d position;
     private float yaw;
     private float pitch;
@@ -82,50 +77,21 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacketEntityAbstracti
 
     @Override
     protected void load() {
-        v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
         Class<?> packetClass = PacketTypeClasses.Play.Server.ENTITY_TELEPORT;
 
         try {
-            constructor = packetClass.getConstructor(int.class, int.class, int.class, int.class, byte.class, byte.class, boolean.class, boolean.class);
-            ultraLegacyVersionMode = true;
-            legacyVersionMode = true;
-        } catch (NoSuchMethodException e) {
-            try {
-                constructor = packetClass.getConstructor(int.class, int.class, int.class, int.class, byte.class, byte.class, boolean.class);
-                ultraLegacyVersionMode = false;
-                legacyVersionMode = true;
-            } catch (NoSuchMethodException e2) {
-                try {
-                    if (v_1_17) {
-                        constructor = packetClass.getConstructor(NMSUtils.packetDataSerializerClass);
-                    } else {
-                        constructor = packetClass.getConstructor();
-                    }
-
-                    ultraLegacyVersionMode = false;
-                    legacyVersionMode = false;
-                } catch (NoSuchMethodException e3) {
-                    e3.printStackTrace();
-                }
-            }
+            constructor = packetClass.getConstructor(int.class, int.class, int.class, int.class, byte.class, byte.class, boolean.class);
+        } catch (NoSuchMethodException ex) {
+            ex.printStackTrace();
         }
     }
 
+
     public Vector3d getPosition() {
         if (packet != null) {
-            double x;
-            double y;
-            double z;
-
-            if (legacyVersionMode) {
-                x = readInt(1) / 32.0D;
-                y = readInt(2) / 32.0D;
-                z = readInt(3) / 32.0D;
-            } else {
-                x = readDouble(0);
-                y = readDouble(1);
-                z = readDouble(2);
-            }
+            double x = readInt(1) / 32.0D;
+            double y = readInt(2) / 32.0D;
+            double z = readInt(3) / 32.0D;
             return new Vector3d(x, y, z);
         } else {
             return position;
@@ -134,15 +100,9 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacketEntityAbstracti
 
     public void setPosition(Vector3d position) {
         if (packet != null) {
-            if (legacyVersionMode) {
-                writeInt(1, floor(position.x * 32.0D));
-                writeInt(2, floor(position.y * 32.0D));
-                writeInt(3, floor(position.z * 32.0D));
-            } else {
-                writeDouble(0, position.x);
-                writeDouble(1, position.y);
-                writeDouble(2, position.z);
-            }
+            writeInt(1, floor(position.x * 32.0D));
+            writeInt(2, floor(position.y * 32.0D));
+            writeInt(3, floor(position.z * 32.0D));
         } else {
             this.position = position;
         }
@@ -199,46 +159,7 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacketEntityAbstracti
     @Override
     public Object asNMSPacket() throws Exception {
         Vector3d pos = getPosition();
-        if (ultraLegacyVersionMode) {
-            // 1.7.10
-            return constructor.newInstance(entityID, floor(pos.x * 32.0D), floor(pos.y * 32.0D), floor(pos.z * 32.0D),
-                    (byte) ((int) getYaw() * rotationMultiplier), (byte) (int) (getPitch() * rotationMultiplier), false, false);
-        } else if (legacyVersionMode) {
-            // 1.8.x
-            return constructor.newInstance(entityID, floor(pos.x * 32.0D), floor(pos.y * 32.0D), floor(pos.z * 32.0D),
-                    (byte) ((int) getYaw() * rotationMultiplier), (byte) (int) (getPitch() * rotationMultiplier), false);
-        } else {
-            // newer versions
-            Object instance;
-
-            if (v_1_17) {
-                Object byteBuf = PacketEvents.get().getByteBufUtil().newByteBuf(new byte[]{
-                        0, 0, 0, 0,
-                        0, 0, 0, 0,
-                        0, 0, 0, 0,
-                        0, 0, 0, 0,
-                        0, 0, 0, 0,
-                        0, 0, 0, 0,
-                        0, 0, 0, 0});
-
-                // 4 bytes per bytebuf field
-                Object packetDataSerializer = NMSUtils.generatePacketDataSerializer(byteBuf);
-                instance = constructor.newInstance(packetDataSerializer);
-            } else {
-                instance = constructor.newInstance();
-            }
-
-            WrappedPacketOutEntityTeleport instanceWrapper = new WrappedPacketOutEntityTeleport(new NMSPacket(instance));
-            instanceWrapper.setEntityId(getEntityId());
-            instanceWrapper.setPosition(pos);
-            instanceWrapper.setPitch(getPitch());
-            instanceWrapper.setYaw(getYaw());
-
-            if (isOnGround()) {
-                // default value is false, so we can save a reflection call
-                instanceWrapper.setOnGround(true);
-            }
-            return instance;
-        }
+        return constructor.newInstance(entityID, floor(pos.x * 32.0D), floor(pos.y * 32.0D), floor(pos.z * 32.0D),
+                (byte) ((int) getYaw() * rotationMultiplier), (byte) (int) (getPitch() * rotationMultiplier), false);
     }
 }

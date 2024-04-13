@@ -7,41 +7,23 @@ import io.github.retrooper.packetevents.utils.boundingbox.BoundingBox;
 import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.npc.NPCManager;
-import io.github.retrooper.packetevents.utils.reflection.Reflection;
-import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spigotmc.SpigotConfig;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public final class ServerUtils {
 
-    private static Method getLevelEntityGetterIterable;
-    private static Class<?> persistentEntitySectionManagerClass;
-    private static Class<?> levelEntityGetterClass;
-    private static byte v_1_17 = -1;
     private static Class<?> geyserClass;
     private boolean geyserClassChecked;
     private final NPCManager npcManager = new NPCManager();
 
     // Initialized in PacketEvents#load
     public Map<Integer, Entity> entityCache;
-
-    /**
-     * Get the server version.
-     *
-     * @return Get Server Version
-     */
-    public ServerVersion getVersion() {
-        return ServerVersion.getVersion();
-    }
 
     /**
      * Get recent TPS array from NMS.
@@ -96,8 +78,7 @@ public final class ServerUtils {
         return new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
-    @Nullable
-    private Entity getEntityByIdIterateWorld(@NotNull World world, int entityID) {
+    private @Nullable Entity getEntityByIdIterateWorld(@NotNull World world, int entityID) {
         for (Entity entity : PacketEvents.get().getServerUtils().getEntityList(world)) {
             if (entity.getEntityId() == entityID) {
                 entityCache.putIfAbsent(entity.getEntityId(), entity);
@@ -107,97 +88,21 @@ public final class ServerUtils {
         return null;
     }
 
-    @Nullable
-    public Entity getEntityById(@Nullable World world, int entityID) {
-        Entity e = entityCache.get(entityID);
+    public @Nullable Entity getEntityById(@Nullable World world, int entityID) {
+        Entity entity = entityCache.get(entityID);
 
-        if (e != null) {
-            return e;
+        if (entity != null) {
+            return entity;
         }
-
-        if (v_1_17 == -1) {
-            v_1_17 = (byte) (getVersion().isNewerThanOrEquals(ServerVersion.v_1_17) ? 1 : 0);
-        }
-
-        if (v_1_17 == 1) {
-            try {
-                if (world != null) {
-                    Entity newEntity = getEntityByIdIterateWorld(world, entityID);
-
-                    if (newEntity != null) {
-                        return newEntity;
-                    }
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-
-            try {
-                for (World w : Bukkit.getWorlds()) {
-                    Entity newEntity = getEntityByIdIterateWorld(w, entityID);
-
-                    if (newEntity != null) {
-                        return newEntity;
-                    }
-                }
-            } catch (Exception ex) {
-                // No entity found
-                return null;
-            }
-        } else {
-            return EntityFinderUtils.getEntityByIdUnsafe(world, entityID);
-        }
-        return null;
+        return EntityFinderUtils.getEntityByIdUnsafe(world, entityID);
     }
 
-    @Nullable
     public Entity getEntityById(int entityID) {
         return getEntityById(null, entityID);
     }
 
-    public List<Entity> getEntityList(World world) {
-        if (v_1_17 == -1) {
-            v_1_17 = (byte) (getVersion().isNewerThanOrEquals(ServerVersion.v_1_17) ? 1 : 0);
-        }
-
-        if (v_1_17 == 1) {
-            if (persistentEntitySectionManagerClass == null) {
-                persistentEntitySectionManagerClass = NMSUtils.getNMClassWithoutException("world.level.entity.PersistentEntitySectionManager");
-            }
-
-            if (levelEntityGetterClass == null) {
-                levelEntityGetterClass = NMSUtils.getNMClassWithoutException("world.level.entity.LevelEntityGetter");
-            }
-
-            if (getLevelEntityGetterIterable == null) {
-                getLevelEntityGetterIterable = Reflection.getMethod(levelEntityGetterClass, Iterable.class, 0);
-            }
-
-            Object worldServer = NMSUtils.convertBukkitWorldToWorldServer(world);
-            WrappedPacket wrappedWorldServer = new WrappedPacket(new NMSPacket(worldServer));
-            Object persistentEntitySectionManager = wrappedWorldServer.readObject(0, persistentEntitySectionManagerClass);
-            WrappedPacket wrappedPersistentEntitySectionManager = new WrappedPacket(new NMSPacket(persistentEntitySectionManager));
-            Object levelEntityGetter = wrappedPersistentEntitySectionManager.readObject(0, levelEntityGetterClass);
-            Iterable<Object> nmsEntitiesIterable = null;
-
-            try {
-                nmsEntitiesIterable = (Iterable<Object>) getLevelEntityGetterIterable.invoke(levelEntityGetter);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
-
-            List<Entity> entityList = new ArrayList<>();
-
-            if (nmsEntitiesIterable != null) {
-                for (Object nmsEntity : nmsEntitiesIterable) {
-                    Entity bukkitEntity = NMSUtils.getBukkitEntity(nmsEntity);
-                    entityList.add(bukkitEntity);
-                }
-            }
-            return entityList;
-        } else {
-            return world.getEntities();
-        }
+    public List<Entity> getEntityList(@NotNull World world) {
+        return world.getEntities();
     }
 
     public boolean isGeyserAvailable() {
@@ -207,7 +112,7 @@ public final class ServerUtils {
             try {
                 geyserClass = Class.forName("org.geysermc.connector.GeyserConnector");
                 return true;
-            } catch (ClassNotFoundException e) {
+            } catch (ClassNotFoundException ex) {
                 return false;
             }
         }

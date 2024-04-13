@@ -1,5 +1,6 @@
 package io.github.retrooper.packetevents.utils.gameprofile;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.UUID;
@@ -11,15 +12,11 @@ import java.util.UUID;
  * @since 1.7
  */
 @Getter
+@AllArgsConstructor
 public class WrappedGameProfile {
 
     private final UUID id;
     private final String name;
-
-    public WrappedGameProfile(UUID id, String name) {
-        this.id = id;
-        this.name = name;
-    }
 
     public boolean isComplete() {
         return id != null && !isBlank(name);

@@ -1,6 +1,5 @@
 package io.github.retrooper.packetevents.utils.reflection;
 
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -230,8 +229,7 @@ public final class Reflection {
         return null;
     }
 
-    @Nullable
-    public static Class<?> getClassByNameWithoutException(String name) {
+    public static @Nullable Class<?> getClassByNameWithoutException(String name) {
         try {
             return Class.forName(name);
         } catch (ClassNotFoundException e) {

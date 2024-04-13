@@ -1,6 +1,5 @@
 package io.github.retrooper.packetevents.packetwrappers.login.in.start;
 
-import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil;
@@ -23,10 +22,5 @@ public class WrappedPacketLoginInStart extends WrappedPacket {
     public void setGameProfile(@NotNull WrappedGameProfile wrappedGameProfile) {
         Object gameProfile = GameProfileUtil.getGameProfile(wrappedGameProfile.getId(), wrappedGameProfile.getName());
         write(NMSUtils.gameProfileClass, 0, gameProfile);
-    }
-
-    @Override
-    public boolean isSupported() {
-        return PacketTypeClasses.Login.Client.START != null;
     }
 }

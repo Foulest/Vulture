@@ -1,6 +1,5 @@
 package io.github.retrooper.packetevents.packettype;
 
-import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
@@ -32,14 +31,7 @@ public class PacketTypeClasses {
             public static Class<?> PING;
 
             public static void load() {
-                String prefix;
-
-                if (PacketEvents.get().getServerUtils().getVersion().isNewerThanOrEquals(ServerVersion.v_1_17)) {
-                    prefix = "net.minecraft.network.protocol.status.";
-                } else {
-                    prefix = ServerVersion.getNMSDirectory() + ".";
-                }
-
+                String prefix = ServerVersion.getNMSDirectory() + ".";
                 Client.START = Reflection.getClassByNameWithoutException(prefix + "PacketStatusInStart");
                 Client.PING = Reflection.getClassByNameWithoutException(prefix + "PacketStatusInPing");
             }
@@ -51,14 +43,7 @@ public class PacketTypeClasses {
             public static Class<?> SERVER_INFO;
 
             public static void load() {
-                String prefix;
-
-                if (PacketEvents.get().getServerUtils().getVersion().isNewerThanOrEquals(ServerVersion.v_1_17)) {
-                    prefix = "net.minecraft.network.protocol.status.";
-                } else {
-                    prefix = ServerVersion.getNMSDirectory() + ".";
-                }
-
+                String prefix = ServerVersion.getNMSDirectory() + ".";
                 Server.PONG = Reflection.getClassByNameWithoutException(prefix + "PacketStatusOutPong");
                 Server.SERVER_INFO = Reflection.getClassByNameWithoutException(prefix + "PacketStatusOutServerInfo");
             }
@@ -72,14 +57,7 @@ public class PacketTypeClasses {
             public static Class<?> SET_PROTOCOL;
 
             public static void load() {
-                String prefix;
-
-                if (PacketEvents.get().getServerUtils().getVersion().isNewerThanOrEquals(ServerVersion.v_1_17)) {
-                    prefix = "net.minecraft.network.protocol.handshake.";
-                } else {
-                    prefix = ServerVersion.getNMSDirectory() + ".";
-                }
-
+                String prefix = ServerVersion.getNMSDirectory() + ".";
                 Handshaking.Client.SET_PROTOCOL = Reflection.getClassByNameWithoutException(prefix + "PacketHandshakingInSetProtocol");
             }
         }
@@ -89,23 +67,11 @@ public class PacketTypeClasses {
 
         public static class Client {
 
-            public static Class<?> CUSTOM_PAYLOAD;
             public static Class<?> START;
             public static Class<?> ENCRYPTION_BEGIN;
 
             public static void load() {
-                String prefix;
-
-                if (PacketEvents.get().getServerUtils().getVersion().isNewerThanOrEquals(ServerVersion.v_1_17)) {
-                    prefix = "net.minecraft.network.protocol.login.";
-                } else {
-                    prefix = ServerVersion.getNMSDirectory() + ".";
-                }
-
-                // In and Out custom payload login packets have been here since 1.13
-                if (PacketEvents.get().getServerUtils().getVersion().isNewerThanOrEquals(ServerVersion.v_1_13)) {
-                    Client.CUSTOM_PAYLOAD = Reflection.getClassByNameWithoutException(prefix + "PacketLoginInCustomPayload");
-                }
+                String prefix = ServerVersion.getNMSDirectory() + ".";
 
                 Client.START = Reflection.getClassByNameWithoutException(prefix + "PacketLoginInStart");
                 Client.ENCRYPTION_BEGIN = Reflection.getClassByNameWithoutException(prefix + "PacketLoginInEncryptionBegin");
@@ -114,25 +80,13 @@ public class PacketTypeClasses {
 
         public static class Server {
 
-            public static Class<?> CUSTOM_PAYLOAD;
             public static Class<?> DISCONNECT;
             public static Class<?> ENCRYPTION_BEGIN;
             public static Class<?> SUCCESS;
             public static Class<?> SET_COMPRESSION;
 
             public static void load() {
-                String prefix;
-
-                if (PacketEvents.get().getServerUtils().getVersion().isNewerThanOrEquals(ServerVersion.v_1_17)) {
-                    prefix = "net.minecraft.network.protocol.login.";
-                } else {
-                    prefix = ServerVersion.getNMSDirectory() + ".";
-                }
-
-                // In and Out custom payload login packets have been here since 1.13
-                if (PacketEvents.get().getServerUtils().getVersion().isNewerThanOrEquals(ServerVersion.v_1_13)) {
-                    Server.CUSTOM_PAYLOAD = Reflection.getClassByNameWithoutException(prefix + "PacketLoginOutCustomPayload");
-                }
+                String prefix = ServerVersion.getNMSDirectory() + ".";
 
                 Server.DISCONNECT = Reflection.getClassByNameWithoutException(prefix + "PacketLoginOutDisconnect");
                 Server.ENCRYPTION_BEGIN = Reflection.getClassByNameWithoutException(prefix + "PacketLoginOutEncryptionBegin");
@@ -194,20 +148,12 @@ public class PacketTypeClasses {
             public static Class<?> STRUCT;
             public static Class<?> UPDATE_SIGN;
             public static Class<?> SPECTATE;
-            public static Class<?> PONG;
 
             /**
              * Initiate all server-bound play packet classes.
              */
             public static void load() {
-                String prefix;
-
-                if (PacketEvents.get().getServerUtils().getVersion().isNewerThanOrEquals(ServerVersion.v_1_17)) {
-                    prefix = "net.minecraft.network.protocol.game.";
-                } else {
-                    prefix = ServerVersion.getNMSDirectory() + ".";
-                }
-
+                String prefix = ServerVersion.getNMSDirectory() + ".";
                 String commonPrefix = prefix + "PacketPlayIn";
 
                 FLYING = Reflection.getClassByNameWithoutException(commonPrefix + "Flying");
@@ -222,17 +168,8 @@ public class PacketTypeClasses {
                     LOOK = SubclassUtil.getSubClass(FLYING, "PacketPlayInLook");
                 }
 
-                if (PacketEvents.get().getServerUtils().getVersion().isNewerThanOrEquals(ServerVersion.v_1_17)) {
-                    GROUND = SubclassUtil.getSubClass(FLYING, "d");
-                } else {
-                    GROUND = FLYING;
-                }
-
-                // This packet does not exist in the 1.17+ protocol
+                GROUND = FLYING;
                 TRANSACTION = Reflection.getClassByNameWithoutException(commonPrefix + "Transaction");
-
-                // This packet was added in 1.17 protocol
-                PONG = Reflection.getClassByNameWithoutException(prefix + "ServerboundPongPacket");
 
                 try {
                     SETTINGS = Class.forName(commonPrefix + "Settings");
@@ -390,35 +327,12 @@ public class PacketTypeClasses {
             public static Class<?> TAGS;
             public static Class<?> MAP_CHUNK_BULK;
             public static Class<?> NAMED_ENTITY_SPAWN;
-            public static Class<?> PING;
-            public static Class<?> ADD_VIBRATION_SIGNAL;
-            public static Class<?> CLEAR_TITLES;
-            public static Class<?> INITIALIZE_BORDER;
-            public static Class<?> PLAYER_COMBAT_END;
-            public static Class<?> PLAYER_COMBAT_ENTER;
-            public static Class<?> PLAYER_COMBAT_KILL;
-            public static Class<?> SET_ACTIONBAR_TEXT;
-            public static Class<?> SET_BORDER_CENTER;
-            public static Class<?> SET_BORDER_LERP_SIZE;
-            public static Class<?> SET_BORDER_SIZE;
-            public static Class<?> SET_BORDER_WARNING_DELAY;
-            public static Class<?> SET_BORDER_WARNING_DISTANCE;
-            public static Class<?> SET_SUBTITLE_TEXT;
-            public static Class<?> SET_TITLES_ANIMATION;
-            public static Class<?> SET_TITLE_TEXT;
 
             /**
              * Initiate all client-bound packet classes.
              */
             public static void load() {
-                String prefix;
-
-                if (PacketEvents.get().getServerUtils().getVersion().isNewerThanOrEquals(ServerVersion.v_1_17)) {
-                    prefix = "net.minecraft.network.protocol.game.";
-                } else {
-                    prefix = ServerVersion.getNMSDirectory() + ".";
-                }
-
+                String prefix = ServerVersion.getNMSDirectory() + ".";
                 String commonPrefix = prefix + "PacketPlayOut";
 
                 SPAWN_ENTITY = Reflection.getClassByNameWithoutException(commonPrefix + "SpawnEntity");
@@ -524,29 +438,6 @@ public class PacketTypeClasses {
                 TAGS = Reflection.getClassByNameWithoutException(commonPrefix + "Tags");
                 MAP_CHUNK_BULK = Reflection.getClassByNameWithoutException(commonPrefix + "MapChunkBulk");
                 NAMED_ENTITY_SPAWN = Reflection.getClassByNameWithoutException(commonPrefix + "NamedEntitySpawn");
-
-                // These packets were added in 1.17
-                PING = Reflection.getClassByNameWithoutException(prefix + "ClientboundPingPacket");
-                ADD_VIBRATION_SIGNAL = Reflection.getClassByNameWithoutException(prefix + "ClientboundAddVibrationSignalPacket");
-                CLEAR_TITLES = Reflection.getClassByNameWithoutException(prefix + "ClientboundClearTitlesPacket");
-                INITIALIZE_BORDER = Reflection.getClassByNameWithoutException(prefix + "ClientboundInitializeBorderPacket");
-                PLAYER_COMBAT_END = Reflection.getClassByNameWithoutException(prefix + "ClientboundPlayerCombatEndPacket");
-                PLAYER_COMBAT_ENTER = Reflection.getClassByNameWithoutException(prefix + "ClientboundPlayerCombatEnterPacket");
-                PLAYER_COMBAT_KILL = Reflection.getClassByNameWithoutException(prefix + "ClientboundPlayerCombatKillPacket");
-                SET_ACTIONBAR_TEXT = Reflection.getClassByNameWithoutException(prefix + "ClientboundSetActionBarTextPacket");
-                SET_BORDER_CENTER = Reflection.getClassByNameWithoutException(prefix + "ClientboundSetBorderCenterPacket");
-                SET_BORDER_LERP_SIZE = Reflection.getClassByNameWithoutException(prefix + "ClientboundSetBorderLerpSizePacket");
-                SET_BORDER_SIZE = Reflection.getClassByNameWithoutException(prefix + "ClientboundSetBorderSizePacket");
-                SET_BORDER_WARNING_DELAY = Reflection.getClassByNameWithoutException(prefix + "ClientboundSetBorderWarningDelayPacket");
-                SET_BORDER_WARNING_DISTANCE = Reflection.getClassByNameWithoutException(prefix + "ClientboundSetBorderWarningDistancePacket");
-                SET_SUBTITLE_TEXT = Reflection.getClassByNameWithoutException(prefix + "ClientboundSetSubtitleTextPacket");
-                SET_TITLES_ANIMATION = Reflection.getClassByNameWithoutException(prefix + "ClientboundSetTitlesAnimationPacket");
-                SET_TITLE_TEXT = Reflection.getClassByNameWithoutException(prefix + "ClientboundSetTitleTextPacket");
-
-                // 1.18+ only, doesn't follow the naming convention
-                if (MAP_CHUNK == null) {
-                    MAP_CHUNK = Reflection.getClassByNameWithoutException("net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket");
-                }
             }
         }
     }

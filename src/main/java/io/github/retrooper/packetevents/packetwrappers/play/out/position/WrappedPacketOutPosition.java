@@ -6,28 +6,22 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 public final class WrappedPacketOutPosition extends WrappedPacket implements SendableWrapper {
 
-    private static boolean v_1_8;
-    private static boolean v_1_17;
     private static Constructor<?> packetConstructor;
-    private static byte constructorMode = 0;
     private static Class<? extends Enum<?>> enumPlayerTeleportFlagsClass;
+
     private Vector3d position;
     private float yaw;
     private float pitch;
     private Set<PlayerTeleportFlags> relativeFlags;
-    private int teleportID;
-    private boolean onGround;
 
     public WrappedPacketOutPosition(NMSPacket packet) {
         super(packet);
@@ -35,109 +29,41 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
     }
 
     public WrappedPacketOutPosition(double x, double y, double z, float yaw, float pitch,
-                                    Set<PlayerTeleportFlags> relativeFlags, int teleportID) {
+                                    Set<PlayerTeleportFlags> relativeFlags) {
         this.position = new Vector3d(x, y, z);
         this.yaw = yaw;
         this.pitch = pitch;
         this.relativeFlags = relativeFlags;
-        this.teleportID = teleportID;
     }
 
     public WrappedPacketOutPosition(Vector3d position, float yaw, float pitch,
-                                    Set<PlayerTeleportFlags> relativeFlags, int teleportID) {
+                                    Set<PlayerTeleportFlags> relativeFlags) {
         this.position = position;
         this.yaw = yaw;
         this.pitch = pitch;
         this.relativeFlags = relativeFlags;
-        this.teleportID = teleportID;
-    }
-
-    public WrappedPacketOutPosition(Vector3d position, float yaw, float pitch,
-                                    Set<PlayerTeleportFlags> relativeFlags, int teleportID, boolean onGround) {
-        this.position = position;
-        this.yaw = yaw;
-        this.pitch = pitch;
-        this.relativeFlags = relativeFlags;
-        this.teleportID = teleportID;
-        this.onGround = onGround;
     }
 
     @Override
     protected void load() {
-        v_1_8 = version.isNewerThanOrEquals(ServerVersion.v_1_8);
-        v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
         enumPlayerTeleportFlagsClass = SubclassUtil.getEnumSubClass(PacketTypeClasses.Play.Server.POSITION, "EnumPlayerTeleportFlags");
 
         try {
-            // 1.7.10
-            packetConstructor = PacketTypeClasses.Play.Server.POSITION.getConstructor(double.class, double.class, double.class, float.class, float.class, boolean.class, byte.class);
-        } catch (NoSuchMethodException e) {
-            constructorMode = 1;
-
-            try {
-                // 1.8 -> 1.8.8
-                packetConstructor = PacketTypeClasses.Play.Server.POSITION.getConstructor(double.class, double.class, double.class, float.class, float.class, Set.class);
-            } catch (NoSuchMethodException e2) {
-                constructorMode = 2;
-
-                // 1.9 -> 1.16.5
-                try {
-                    packetConstructor = PacketTypeClasses.Play.Server.POSITION.getConstructor(double.class, double.class, double.class, float.class, float.class, Set.class, int.class);
-                } catch (NoSuchMethodException e3) {
-                    constructorMode = 3;
-
-                    // 1.17
-                    try {
-                        packetConstructor = PacketTypeClasses.Play.Server.POSITION.getConstructor(double.class, double.class, double.class, float.class, float.class, Set.class, int.class, boolean.class);
-                    } catch (NoSuchMethodException e4) {
-                        throw new IllegalStateException("Failed to locate a supported constructor of the PacketPlayOutPosition packet class.");
-                    }
-                }
-            }
-        }
-    }
-
-    public Optional<Boolean> isOnGround() {
-        // 1.7.10 and 1.17+ support this field
-        if (v_1_8 && !v_1_17) {
-            return Optional.empty();
-        }
-
-        if (packet != null) {
-            return Optional.of(readBoolean(0));
-        } else {
-            return Optional.of(onGround);
-        }
-    }
-
-    public void setOnGround(boolean onGround) {
-        if (v_1_8 && !v_1_17) {
-            return;
-        }
-
-        if (packet != null) {
-            writeBoolean(0, onGround);
-        } else {
-            this.onGround = onGround;
+            packetConstructor = PacketTypeClasses.Play.Server.POSITION.getConstructor(double.class, double.class, double.class, float.class, float.class, Set.class);
+        } catch (NoSuchMethodException ex) {
+            throw new IllegalStateException("Failed to locate a supported constructor of the PacketPlayOutPosition packet class.");
         }
     }
 
     public byte getRelativeFlagsMask() {
         byte relativeMask = 0;
+        Set<PlayerTeleportFlags> flags = getRelativeFlags();
 
         if (packet != null) {
-            if (version.isOlderThan(ServerVersion.v_1_8)) {
-                relativeMask = readByte(0);
-            } else {
-                Set<PlayerTeleportFlags> flags = getRelativeFlags();
-
-                for (PlayerTeleportFlags flag : flags) {
-                    relativeMask |= flag.maskFlag;
-                }
+            for (PlayerTeleportFlags flag : flags) {
+                relativeMask |= flag.maskFlag;
             }
         } else {
-            Set<PlayerTeleportFlags> flags = getRelativeFlags();
-
             for (PlayerTeleportFlags flag : flags) {
                 relativeMask |= flag.maskFlag;
             }
@@ -147,19 +73,15 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
 
     public void setRelativeFlagsMask(byte mask) {
         if (packet != null) {
-            if (version.isOlderThan(ServerVersion.v_1_8)) {
-                writeByte(0, mask);
-            } else {
-                Set<Enum<?>> nmsRelativeFlags = new HashSet<>();
+            Set<Enum<?>> nmsRelativeFlags = new HashSet<>();
 
-                for (PlayerTeleportFlags flag : PlayerTeleportFlags.values()) {
-                    if ((mask & flag.maskFlag) == flag.maskFlag) {
-                        nmsRelativeFlags.add(EnumUtil.valueOf(enumPlayerTeleportFlagsClass, flag.name()));
-                    }
+            for (PlayerTeleportFlags flag : PlayerTeleportFlags.values()) {
+                if ((mask & flag.maskFlag) == flag.maskFlag) {
+                    nmsRelativeFlags.add(EnumUtil.valueOf(enumPlayerTeleportFlagsClass, flag.name()));
                 }
-
-                write(Set.class, 0, nmsRelativeFlags);
             }
+
+            write(Set.class, 0, nmsRelativeFlags);
         } else {
             relativeFlags.clear();
 
@@ -174,21 +96,10 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
     public Set<PlayerTeleportFlags> getRelativeFlags() {
         if (packet != null) {
             Set<PlayerTeleportFlags> relativeFlags = new HashSet<>();
+            Set<Enum<?>> set = readObject(0, Set.class);
 
-            if (version.isOlderThan(ServerVersion.v_1_8)) {
-                byte relativeBitMask = readByte(0);
-
-                for (PlayerTeleportFlags flag : PlayerTeleportFlags.values()) {
-                    if ((relativeBitMask & flag.maskFlag) == flag.maskFlag) {
-                        relativeFlags.add(flag);
-                    }
-                }
-            } else {
-                Set<Enum<?>> set = readObject(0, Set.class);
-
-                for (Enum<?> e : set) {
-                    relativeFlags.add(PlayerTeleportFlags.valueOf(e.name()));
-                }
+            for (Enum<?> e : set) {
+                relativeFlags.add(PlayerTeleportFlags.valueOf(e.name()));
             }
             return relativeFlags;
         } else {
@@ -198,23 +109,13 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
 
     public void setRelativeFlags(Set<PlayerTeleportFlags> flags) {
         if (packet != null) {
-            if (version.isOlderThan(ServerVersion.v_1_8)) {
-                byte relativeBitMask = 0;
+            Set<Enum<?>> nmsRelativeFlags = new HashSet<>();
 
-                for (PlayerTeleportFlags flag : flags) {
-                    relativeBitMask |= flag.maskFlag;
-                }
-
-                writeByte(0, relativeBitMask);
-            } else {
-                Set<Enum<?>> nmsRelativeFlags = new HashSet<>();
-
-                for (PlayerTeleportFlags flag : flags) {
-                    nmsRelativeFlags.add(EnumUtil.valueOf(enumPlayerTeleportFlagsClass, flag.name()));
-                }
-
-                write(Set.class, 0, nmsRelativeFlags);
+            for (PlayerTeleportFlags flag : flags) {
+                nmsRelativeFlags.add(EnumUtil.valueOf(enumPlayerTeleportFlagsClass, flag.name()));
             }
+
+            write(Set.class, 0, nmsRelativeFlags);
         } else {
             this.relativeFlags = flags;
         }
@@ -273,66 +174,16 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
         }
     }
 
-    public Optional<Integer> getTeleportId() {
-        if (version.isOlderThan(ServerVersion.v_1_9)) {
-            return Optional.empty();
-        }
-
-        if (packet != null) {
-            return Optional.of(readInt(0));
-        } else {
-            return Optional.of(teleportID);
-        }
-    }
-
-    public void setTeleportId(int teleportID) {
-        if (version.isOlderThan(ServerVersion.v_1_9)) {
-            return;
-        }
-
-        if (packet != null) {
-            writeInt(0, teleportID);
-        } else {
-            this.teleportID = teleportID;
-        }
-    }
-
     @Override
-    public @Nullable Object asNMSPacket() throws Exception {
+    public @NotNull Object asNMSPacket() throws Exception {
         Set<Object> nmsRelativeFlags = new HashSet<>();
 
-        if (constructorMode != 0) {
-            for (PlayerTeleportFlags flag : getRelativeFlags()) {
-                nmsRelativeFlags.add(EnumUtil.valueOf(enumPlayerTeleportFlagsClass, flag.name()));
-            }
+        for (PlayerTeleportFlags flag : getRelativeFlags()) {
+            nmsRelativeFlags.add(EnumUtil.valueOf(enumPlayerTeleportFlagsClass, flag.name()));
         }
 
         Vector3d position = getPosition();
-
-        switch (constructorMode) {
-            case 0:
-                // 1.7.10
-                return packetConstructor.newInstance(position.x, position.y, position.z,
-                        getYaw(), getPitch(), isOnGround(), getRelativeFlagsMask());
-
-            case 1:
-                // 1.8 -> 1.8.8
-                return packetConstructor.newInstance(position.x, position.y, position.z,
-                        getYaw(), getPitch(), nmsRelativeFlags);
-
-            case 2:
-                // 1.9 -> 1.16.5
-                return packetConstructor.newInstance(position.x, position.y, position.z,
-                        getYaw(), getPitch(), nmsRelativeFlags, getTeleportId().get());
-
-            case 3:
-                // 1.17
-                return packetConstructor.newInstance(position.x, position.y, position.z,
-                        getYaw(), getPitch(), nmsRelativeFlags, getTeleportId(), isOnGround().get());
-
-            default:
-                return null;
-        }
+        return packetConstructor.newInstance(position.x, position.y, position.z, getYaw(), getPitch(), nmsRelativeFlags);
     }
 
     public enum PlayerTeleportFlags {

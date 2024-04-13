@@ -6,7 +6,6 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -18,7 +17,6 @@ import java.lang.reflect.Method;
 
 public class WrappedPacketOutBlockChange extends WrappedPacket implements SendableWrapper {
 
-    private static boolean v_1_17;
     private static Constructor<?> packetConstructor;
     private static Method getNMSBlockMethodCache = null;
     private static Method getNMSWorldTypeMethodCache = null;
@@ -67,20 +65,10 @@ public class WrappedPacketOutBlockChange extends WrappedPacket implements Sendab
                     "getBlockStateIfLoaded", 0);
         }
 
-        v_1_17 = version.isNewerThanOrEquals(ServerVersion.v_1_17);
-
-        if (v_1_17) {
-            try {
-                packetConstructor = PacketTypeClasses.Play.Server.BLOCK_CHANGE.getConstructor(NMSUtils.blockPosClass, NMSUtils.iBlockDataClass);
-            } catch (NoSuchMethodException ex) {
-                ex.printStackTrace();
-            }
-        } else {
-            try {
-                packetConstructor = PacketTypeClasses.Play.Server.BLOCK_CHANGE.getConstructor();
-            } catch (NoSuchMethodException ex) {
-                ex.printStackTrace();
-            }
+        try {
+            packetConstructor = PacketTypeClasses.Play.Server.BLOCK_CHANGE.getConstructor();
+        } catch (NoSuchMethodException ex) {
+            ex.printStackTrace();
         }
     }
 
@@ -107,8 +95,8 @@ public class WrappedPacketOutBlockChange extends WrappedPacket implements Sendab
 
             try {
                 nmsBlock = getNMSBlockMethodCache.invoke(iBlockDataObj);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
+            } catch (IllegalAccessException | InvocationTargetException ex) {
+                ex.printStackTrace();
             }
             return NMSUtils.getMaterialFromNMSBlock(nmsBlock);
         } else {
@@ -129,33 +117,21 @@ public class WrappedPacketOutBlockChange extends WrappedPacket implements Sendab
 
     @Override
     public Object asNMSPacket() throws Exception {
-        Object packetPlayOutBlockChangeInstance;
-        WrappedPacketOutBlockChange blockChange;
+        Object packetPlayOutBlockChangeInstance = packetConstructor.newInstance();
+        WrappedPacketOutBlockChange blockChange = new WrappedPacketOutBlockChange(new NMSPacket(packetPlayOutBlockChangeInstance));
         Vector3i blockPosition = getBlockPosition();
+        Material material = getBlockType();
 
-        if (v_1_17) {
-            Object nmsBlockPos = NMSUtils.generateNMSBlockPos(blockPosition);
-            Object nmsBlock = NMSUtils.getNMSBlockFromMaterial(getBlockType());
-            WrappedPacket nmsBlockWrapper = new WrappedPacket(new NMSPacket(nmsBlock), NMSUtils.blockClass);
-            Object nmsIBlockData = nmsBlockWrapper.readObject(0, NMSUtils.iBlockDataClass);
-            packetPlayOutBlockChangeInstance = packetConstructor.newInstance(nmsBlockPos, nmsIBlockData);
-
+        if (material != null) {
+            blockChange.setBlockType(material);
         } else {
-            packetPlayOutBlockChangeInstance = packetConstructor.newInstance();
-            blockChange = new WrappedPacketOutBlockChange(new NMSPacket(packetPlayOutBlockChangeInstance));
-            Material bt = getBlockType();
-
-            if (bt != null) {
-                blockChange.setBlockType(bt);
-            } else {
-                Object nmsBlockPos = NMSUtils.generateNMSBlockPos(blockPosition);
-                Object worldServer = NMSUtils.convertBukkitWorldToWorldServer(world);
-                Object nmsBlockData = getNMSWorldTypeMethodCache.invoke(worldServer, nmsBlockPos);
-                blockChange.write(NMSUtils.iBlockDataClass, 0, nmsBlockData);
-            }
-
-            blockChange.setBlockPosition(blockPosition);
+            Object nmsBlockPos = NMSUtils.generateNMSBlockPos(blockPosition);
+            Object worldServer = NMSUtils.convertBukkitWorldToWorldServer(world);
+            Object nmsBlockData = getNMSWorldTypeMethodCache.invoke(worldServer, nmsBlockPos);
+            blockChange.write(NMSUtils.iBlockDataClass, 0, nmsBlockData);
         }
+
+        blockChange.setBlockPosition(blockPosition);
         return packetPlayOutBlockChangeInstance;
     }
 }

@@ -6,13 +6,13 @@ import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketE
 import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
 public final class WrappedPacketInEntityAction extends WrappedPacketEntityAbstraction {
 
     private static Class<? extends Enum<?>> enumPlayerActionClass;
-    private static boolean newerThan_v_1_8_8;
 
     public WrappedPacketInEntityAction(NMSPacket packet) {
         super(packet);
@@ -20,7 +20,6 @@ public final class WrappedPacketInEntityAction extends WrappedPacketEntityAbstra
 
     @Override
     protected void load() {
-        newerThan_v_1_8_8 = version.isNewerThan(ServerVersion.v_1_8_8);
         enumPlayerActionClass = NMSUtils.getNMSEnumClassWithoutException("EnumPlayerAction");
 
         if (enumPlayerActionClass == null) {
@@ -34,33 +33,19 @@ public final class WrappedPacketInEntityAction extends WrappedPacketEntityAbstra
             return PlayerAction.getByActionValue((byte) (animationIndex));
         } else {
             Enum<?> enumConst = readEnumConstant(0, enumPlayerActionClass);
-
-            if (newerThan_v_1_8_8) {
-                return PlayerAction.getByActionValue((byte) enumConst.ordinal());
-            }
             return PlayerAction.getByName(enumConst.name());
         }
     }
 
     public void setAction(PlayerAction action) throws UnsupportedOperationException {
         if (enumPlayerActionClass == null) {
-            byte animationIndex = action.actionID;
+            byte animationIndex = action.actionValue;
             writeInt(1, animationIndex + 1);
         } else {
-            Enum<?> enumConst;
+            Enum<?> enumConst = EnumUtil.valueOf(enumPlayerActionClass, action.name());
 
-            if (newerThan_v_1_8_8) {
-                if (action == PlayerAction.RIDING_JUMP) {
-                    throwUnsupportedOperation(action);
-                }
-                enumConst = EnumUtil.valueByIndex(enumPlayerActionClass, action.getActionValue());
-
-            } else {
-                enumConst = EnumUtil.valueOf(enumPlayerActionClass, action.name());
-
-                if (enumConst == null) {
-                    enumConst = EnumUtil.valueOf(enumPlayerActionClass, action.alias);
-                }
+            if (enumConst == null) {
+                enumConst = EnumUtil.valueOf(enumPlayerActionClass, action.alias);
             }
 
             writeEnumConstant(0, enumConst);
@@ -83,67 +68,48 @@ public final class WrappedPacketInEntityAction extends WrappedPacketEntityAbstra
         }
     }
 
+    @Getter
+    @AllArgsConstructor
     public enum PlayerAction {
         START_SNEAKING((byte) 0, "PRESS_SHIFT_KEY"),
         STOP_SNEAKING((byte) 1, "RELEASE_SHIFT_KEY"),
         STOP_SLEEPING((byte) 2),
         START_SPRINTING((byte) 3),
         STOP_SPRINTING((byte) 4),
+        RIDING_JUMP((byte) 5),
         START_RIDING_JUMP((byte) 5),
         STOP_RIDING_JUMP((byte) 6),
         OPEN_INVENTORY((byte) 7),
-        START_FALL_FLYING((byte) 8),
+        START_FALL_FLYING((byte) 8);
 
-        /**
-         * Removed in minecraft server version 1.9.
-         * This constant will only work on 1.7.10 - 1.8.8.
-         */
-        @SupportedVersions(ranges = {ServerVersion.v_1_7_10, ServerVersion.v_1_8_8})
-        RIDING_JUMP((byte) 5);
-
-        final byte actionID;
+        final byte actionValue;
         final String alias;
 
-        PlayerAction(byte actionID) {
-            this.actionID = actionID;
+        PlayerAction(byte actionValue) {
+            this.actionValue = actionValue;
             this.alias = "empty";
         }
 
-        PlayerAction(byte actionID, String alias) {
-            this.actionID = actionID;
-            this.alias = alias;
-        }
-
-        @Nullable
-        public static PlayerAction getByActionValue(byte value) {
-            if (version.isOlderThan(ServerVersion.v_1_9)) {
-                if (value == RIDING_JUMP.actionID) {
-                    return RIDING_JUMP;
-                } else {
-                    for (PlayerAction action : values()) {
-                        if (action.actionID == value) {
-                            return action;
-                        }
+        public static @Nullable PlayerAction getByActionValue(byte value) {
+            if (value == RIDING_JUMP.actionValue) {
+                return RIDING_JUMP;
+            } else {
+                for (PlayerAction action : values()) {
+                    if (action.actionValue == value) {
+                        return action;
                     }
                 }
-            } else {
-                return values()[value];
             }
             return null;
         }
 
-        @Nullable
-        public static PlayerAction getByName(String name) {
+        public static @Nullable PlayerAction getByName(String name) {
             for (PlayerAction action : values()) {
                 if (action.name().equals(name) || action.alias.equals(name)) {
                     return action;
                 }
             }
             return null;
-        }
-
-        public byte getActionValue() {
-            return actionID;
         }
     }
 }

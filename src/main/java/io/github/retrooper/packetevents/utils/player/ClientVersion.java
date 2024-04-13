@@ -110,7 +110,6 @@ public enum ClientVersion {
      * @param protocolVersion Protocol version.
      * @return ClientVersion
      */
-    @NotNull
     public static ClientVersion getClientVersion(int protocolVersion) {
         if (protocolVersion == -1) {
             return ClientVersion.TEMP_UNRESOLVED;

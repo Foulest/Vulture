@@ -6,6 +6,7 @@ import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -22,15 +23,11 @@ import java.net.InetSocketAddress;
  * @since 1.3
  */
 @Getter
+@AllArgsConstructor
 public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
 
     private final Player player;
     private final boolean async;
-
-    public PostPlayerInjectEvent(Player player, boolean async) {
-        this.player = player;
-        this.async = async;
-    }
 
     /**
      * This method returns the bukkit player object of the player that has been injected.
@@ -38,7 +35,6 @@ public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
      *
      * @return Injected Player.
      */
-    @NotNull
     @Override
     public Player getPlayer() {
         return player;
@@ -49,12 +45,10 @@ public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
      *
      * @return Netty channel of the injected player.
      */
-    @NotNull
     public Object getChannel() {
         return PacketEvents.get().getPlayerUtils().getChannel(player);
     }
 
-    @NotNull
     public InetSocketAddress getSocketAddress() {
         return ChannelUtils.getSocketAddress(getChannel());
     }
@@ -65,7 +59,6 @@ public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
      * @return ClientVersion of injected player.
      * @see ClientVersion
      */
-    @NotNull
     public ClientVersion getClientVersion() {
         return PacketEvents.get().getPlayerUtils().getClientVersion(player);
     }

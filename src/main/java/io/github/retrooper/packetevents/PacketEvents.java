@@ -7,11 +7,9 @@ import io.github.retrooper.packetevents.exceptions.PacketEventsLoadFailureExcept
 import io.github.retrooper.packetevents.injector.GlobalChannelInjector;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
-import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.play.out.entityequipment.WrappedPacketOutEntityEquipment;
 import io.github.retrooper.packetevents.processor.BukkitEventProcessorInternal;
 import io.github.retrooper.packetevents.processor.PacketProcessorInternal;
-import io.github.retrooper.packetevents.settings.PacketEventsSettings;
 import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
 import io.github.retrooper.packetevents.utils.guava.GuavaUtils;
 import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufUtil;
@@ -19,7 +17,6 @@ import io.github.retrooper.packetevents.utils.netty.bytebuf.ByteBufUtil_8;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.PlayerUtils;
 import io.github.retrooper.packetevents.utils.server.ServerUtils;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.version.PEVersion;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -44,7 +41,6 @@ public final class PacketEvents implements Listener, EventManager {
     private final GlobalChannelInjector injector = new GlobalChannelInjector();
     private final AtomicBoolean injectorReady = new AtomicBoolean();
     private String handlerName;
-    private PacketEventsSettings settings = new PacketEventsSettings();
     private ByteBufUtil byteBufUtil;
     private volatile boolean loading;
     private volatile boolean loaded;
@@ -83,12 +79,6 @@ public final class PacketEvents implements Listener, EventManager {
     public void load() {
         if (!loaded && !loading) {
             loading = true;
-
-            // Resolve server version and cache
-            ServerVersion version = ServerVersion.getVersion();
-            WrappedPacket.version = version;
-            NMSUtils.version = version;
-            EntityFinderUtils.version = version;
             handlerName = "pe-" + plugin.getName().toLowerCase();
 
             try {
@@ -99,18 +89,11 @@ public final class PacketEvents implements Listener, EventManager {
 
                 getServerUtils().entityCache = GuavaUtils.makeMap();
 
-                if (version.isNewerThanOrEquals(ServerVersion.v_1_9)) {
-                    for (WrappedPacketOutEntityEquipment.EquipmentSlot slot : WrappedPacketOutEntityEquipment.EquipmentSlot.values()) {
-                        slot.id = (byte) slot.ordinal();
-                    }
-                } else {
-                    WrappedPacketOutEntityEquipment.EquipmentSlot.MAINHAND.id = 0;
-                    WrappedPacketOutEntityEquipment.EquipmentSlot.OFFHAND.id = -1; // Invalid
-                    WrappedPacketOutEntityEquipment.EquipmentSlot.BOOTS.id = 1;
-                    WrappedPacketOutEntityEquipment.EquipmentSlot.LEGGINGS.id = 2;
-                    WrappedPacketOutEntityEquipment.EquipmentSlot.CHESTPLATE.id = 3;
-                    WrappedPacketOutEntityEquipment.EquipmentSlot.HELMET.id = 4;
-                }
+                WrappedPacketOutEntityEquipment.EquipmentSlot.MAINHAND.id = 0;
+                WrappedPacketOutEntityEquipment.EquipmentSlot.BOOTS.id = 1;
+                WrappedPacketOutEntityEquipment.EquipmentSlot.LEGGINGS.id = 2;
+                WrappedPacketOutEntityEquipment.EquipmentSlot.CHESTPLATE.id = 3;
+                WrappedPacketOutEntityEquipment.EquipmentSlot.HELMET.id = 4;
             } catch (Exception ex) {
                 loading = false;
                 throw new PacketEventsLoadFailureException(ex);
@@ -135,22 +118,12 @@ public final class PacketEvents implements Listener, EventManager {
         }
     }
 
-    public void loadSettings(PacketEventsSettings settings) {
-        this.settings = settings;
-    }
-
     public void init() {
-        init(getSettings());
-    }
-
-    public void init(PacketEventsSettings packetEventsSettings) {
         // Load if we haven't loaded already
         load();
 
         if (!initialized && !initializing) {
             initializing = true;
-            settings = packetEventsSettings;
-            settings.lock();
 
             // Wait for the injector to be ready.
             while (!injectorReady.get()) {

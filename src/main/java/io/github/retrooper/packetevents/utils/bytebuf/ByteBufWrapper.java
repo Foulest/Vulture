@@ -1,14 +1,12 @@
 package io.github.retrooper.packetevents.utils.bytebuf;
 
 import io.netty.buffer.ByteBuf;
+import lombok.AllArgsConstructor;
 
+@AllArgsConstructor
 public class ByteBufWrapper {
 
     private final ByteBuf byteBuf;
-
-    public ByteBufWrapper(ByteBuf byteBuf) {
-        this.byteBuf = byteBuf;
-    }
 
     public ByteBuf get() {
         return this.byteBuf;

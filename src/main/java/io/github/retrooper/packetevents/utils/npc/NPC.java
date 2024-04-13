@@ -85,8 +85,8 @@ public class NPC {
                     WrappedPacketOutEntityDestroy wrappedPacketOutEntityDestroy = new WrappedPacketOutEntityDestroy(entityId);
                     PacketEvents.get().getPlayerUtils().sendPacket(player, wrappedPacketOutEntityDestroy);
                 }).get();
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
+            } catch (InterruptedException | ExecutionException ex) {
+                ex.printStackTrace();
             }
         }
     }
@@ -106,8 +106,8 @@ public class NPC {
                     spawnedForPlayerMap.put(player.getUniqueId(), true);
                 }).get();
             }
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+        } catch (InterruptedException | ExecutionException ex) {
+            ex.printStackTrace();
         }
     }
 
@@ -119,8 +119,10 @@ public class NPC {
         this.position = targetPosition;
         this.yaw = yaw;
         this.pitch = pitch;
+
         if (hasSpawned(player)) {
-            PacketEvents.get().getPlayerUtils().sendPacket(player, new WrappedPacketOutEntityTeleport(entityId, position, yaw, pitch, onGround));
+            PacketEvents.get().getPlayerUtils().sendPacket(player,
+                    new WrappedPacketOutEntityTeleport(entityId, position, yaw, pitch, onGround));
         }
     }
 

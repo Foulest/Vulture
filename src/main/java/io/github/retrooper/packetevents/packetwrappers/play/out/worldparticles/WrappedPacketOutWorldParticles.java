@@ -4,9 +4,7 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
@@ -34,37 +32,23 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
 
     @Override
     protected void load() {
-        if (version.isNewerThan(ServerVersion.v_1_7_10)) {
-            try {
-                particleEnumClass = NMSUtils.getNMSEnumClass("EnumParticle");
-            } catch (ClassNotFoundException e) {
-                particleParamClass = NMSUtils.getNMSClassWithoutException("ParticleParam");
+        try {
+            particleEnumClass = NMSUtils.getNMSEnumClass("EnumParticle");
+        } catch (ClassNotFoundException ex) {
+            particleParamClass = NMSUtils.getNMSClassWithoutException("ParticleParam");
 
-                if (particleParamClass == null) {
-                    particleParamClass = NMSUtils.getNMClassWithoutException("core.particles.ParticleParam");
-                }
-
-                particleParamGetNameMethod = Reflection.getMethod(particleParamClass, String.class, 0);
+            if (particleParamClass == null) {
+                particleParamClass = NMSUtils.getNMClassWithoutException("core.particles.ParticleParam");
             }
+
+            particleParamGetNameMethod = Reflection.getMethod(particleParamClass, String.class, 0);
         }
     }
 
     protected String getParticleName() {
         if (packet != null) {
-            if (version.isNewerThan(ServerVersion.v_1_12_1)) {
-                Object particleParamObj = readObject(0, particleParamClass);
-                String particleParamName = null;
-
-                try {
-                    particleParamName = (String) particleParamGetNameMethod.invoke(particleParamObj);
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
-                }
-                return particleParamName; // starts with minecraft:
-            } else {
-                Enum<?> enumConst = readEnumConstant(0, particleEnumClass);
-                return enumConst.name(); // inconsistent
-            }
+            Enum<?> enumConst = readEnumConstant(0, particleEnumClass);
+            return enumConst.name(); // inconsistent
         } else {
             return particleName;
         }
@@ -199,10 +183,6 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
     }
 
     public Optional<int[]> getData() {
-        if (version.isOlderThan(ServerVersion.v_1_8)) {
-            return Optional.empty();
-        }
-
         if (packet != null) {
             return Optional.of(readIntArray(0));
         } else {
@@ -211,10 +191,6 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
     }
 
     public void setData(int[] data) {
-        if (version.isOlderThan(ServerVersion.v_1_8)) {
-            return;
-        }
-
         if (packet != null) {
             writeIntArray(0, data);
         } else {
@@ -223,10 +199,6 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
     }
 
     public Optional<Boolean> isLongDistance() {
-        if (version.isOlderThan(ServerVersion.v_1_8)) {
-            return Optional.empty();
-        }
-
         if (packet != null) {
             return Optional.of(readBoolean(0));
         } else {
@@ -235,10 +207,6 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
     }
 
     public void setLongDistance(boolean longDistance) {
-        if (version.isOlderThan(ServerVersion.v_1_8)) {
-            return;
-        }
-
         if (packet != null) {
             writeBoolean(0, longDistance);
         } else {

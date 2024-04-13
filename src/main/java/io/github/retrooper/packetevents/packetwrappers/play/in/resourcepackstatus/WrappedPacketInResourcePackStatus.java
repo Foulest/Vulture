@@ -31,11 +31,6 @@ public class WrappedPacketInResourcePackStatus extends WrappedPacket {
         writeEnumConstant(0, enumConst);
     }
 
-    @Override
-    public boolean isSupported() {
-        return version.isNewerThan(ServerVersion.v_1_7_10);
-    }
-
     public enum ResourcePackStatus {
         SUCCESSFULLY_LOADED,
         DECLINED,

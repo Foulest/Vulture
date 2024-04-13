@@ -7,10 +7,11 @@ import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
+import lombok.AllArgsConstructor;
 
 import java.lang.reflect.Constructor;
 
+@AllArgsConstructor
 public class WrappedPacketOutTitle extends WrappedPacket implements SendableWrapper {
 
     private static Class<? extends Enum<?>> enumTitleActionClass;
@@ -26,14 +27,6 @@ public class WrappedPacketOutTitle extends WrappedPacket implements SendableWrap
         super(packet);
     }
 
-    public WrappedPacketOutTitle(TitleAction action, String text, int fadeInTicks, int stayTicks, int fadeOutTicks) {
-        this.action = action;
-        this.text = text;
-        this.fadeInTicks = fadeInTicks;
-        this.stayTicks = stayTicks;
-        this.fadeOutTicks = fadeOutTicks;
-    }
-
     @Override
     protected void load() {
         enumTitleActionClass = SubclassUtil.getEnumSubClass(PacketTypeClasses.Play.Server.TITLE, 0);
@@ -41,8 +34,8 @@ public class WrappedPacketOutTitle extends WrappedPacket implements SendableWrap
         try {
             packetConstructor = PacketTypeClasses.Play.Server.TITLE.getConstructor(enumTitleActionClass,
                     NMSUtils.iChatBaseComponentClass, int.class, int.class, int.class);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+        } catch (NoSuchMethodException ex) {
+            ex.printStackTrace();
         }
     }
 
@@ -121,16 +114,10 @@ public class WrappedPacketOutTitle extends WrappedPacket implements SendableWrap
 
     public void setFadeOutTicks(int fadeOutTicks) {
         if (packet != null) {
-
             writeInt(2, fadeOutTicks);
         } else {
             this.fadeOutTicks = fadeOutTicks;
         }
-    }
-
-    @Override
-    public boolean isSupported() {
-        return version.isNewerThan(ServerVersion.v_1_7_10) && version.isOlderThan(ServerVersion.v_1_17);
     }
 
     @Override

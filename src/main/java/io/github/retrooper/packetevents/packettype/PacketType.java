@@ -1,7 +1,5 @@
 package io.github.retrooper.packetevents.packettype;
 
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
-
 import java.util.IdentityHashMap;
 import java.util.Map;
 
@@ -21,7 +19,6 @@ public class PacketType {
      */
     public static final byte INVALID = -128;
     public static final Map<Class<?>, Byte> packetIDMap = new IdentityHashMap<>();
-    private static final boolean isNine = ServerVersion.getVersion().isNewerThanOrEquals(ServerVersion.v_1_9);
 
     private static void insertPacketID(Class<?> cls, byte packetID) {
         if (cls != null) {
@@ -131,12 +128,10 @@ public class PacketType {
          */
         public static class Client {
 
-            public static final byte CUSTOM_PAYLOAD = -122;
             public static final byte START = -121;
             public static final byte ENCRYPTION_BEGIN = -120;
 
             private static void load() {
-                insertPacketID(PacketTypeClasses.Login.Client.CUSTOM_PAYLOAD, Client.CUSTOM_PAYLOAD);
                 insertPacketID(PacketTypeClasses.Login.Client.START, Client.START);
                 insertPacketID(PacketTypeClasses.Login.Client.ENCRYPTION_BEGIN, Client.ENCRYPTION_BEGIN);
             }
@@ -151,14 +146,12 @@ public class PacketType {
          */
         public static class Server {
 
-            public static final byte CUSTOM_PAYLOAD = -119;
             public static final byte DISCONNECT = -118;
             public static final byte ENCRYPTION_BEGIN = -117;
             public static final byte SUCCESS = -116;
             public static final byte SET_COMPRESSION = -115;
 
             private static void load() {
-                insertPacketID(PacketTypeClasses.Login.Server.CUSTOM_PAYLOAD, Server.CUSTOM_PAYLOAD);
                 insertPacketID(PacketTypeClasses.Login.Server.DISCONNECT, Server.DISCONNECT);
                 insertPacketID(PacketTypeClasses.Login.Server.ENCRYPTION_BEGIN, Server.ENCRYPTION_BEGIN);
                 insertPacketID(PacketTypeClasses.Login.Server.SUCCESS, Server.SUCCESS);
@@ -232,7 +225,6 @@ public class PacketType {
             public static final byte SPECTATE = -70;
             public static final byte USE_ITEM = -69;
             public static final byte BLOCK_PLACE = -68;
-            public static final byte PONG = 28;
 
             private static void load() {
                 insertPacketID(PacketTypeClasses.Play.Client.TELEPORT_ACCEPT, TELEPORT_ACCEPT);
@@ -282,7 +274,6 @@ public class PacketType {
                 insertPacketID(PacketTypeClasses.Play.Client.SPECTATE, SPECTATE);
                 insertPacketID(PacketTypeClasses.Play.Client.USE_ITEM, USE_ITEM);
                 insertPacketID(PacketTypeClasses.Play.Client.BLOCK_PLACE, BLOCK_PLACE);
-                insertPacketID(PacketTypeClasses.Play.Client.PONG, PONG);
             }
 
             /**
@@ -306,24 +297,6 @@ public class PacketType {
                             || packetID == POSITION
                             || packetID == POSITION_LOOK
                             || packetID == LOOK;
-                }
-
-                /**
-                 * Is this the packet where the client places a block?
-                 * On 1.7.10 - 1.8.8 the client sends a PacketPlayInBlockPlace packet when actually placing the block.
-                 * On 1.9 - now the client sends a PacketPlayInUseItem packet when placing the block and the
-                 * PacketPlayInBlockPlace has a different use.
-                 * This method is a nice utility supporting all these versions letting you know
-                 * if the client played a block.
-                 * The {@link io.github.retrooper.packetevents.packetwrappers.play.in.blockplace.WrappedPacketInBlockPlace} wrapper
-                 * only works on an actual block place.
-                 * Use this method before using the wrapper to support all minecraft versions.
-                 *
-                 * @param packetID Play Packet ID.
-                 * @return Has the client placed a block?
-                 */
-                public static boolean isBlockPlace(byte packetID) {
-                    return isNine ? packetID == PacketType.Play.Client.USE_ITEM : packetID == PacketType.Play.Client.BLOCK_PLACE;
                 }
             }
         }
@@ -432,22 +405,6 @@ public class PacketType {
             public static final byte TAGS = 25;
             public static final byte MAP_CHUNK_BULK = 26;
             public static final byte NAMED_ENTITY_SPAWN = 27;
-            public static final byte PING = 29;
-            public static final byte ADD_VIBRATION_SIGNAL = 30;
-            public static final byte CLEAR_TITLES = 31;
-            public static final byte INITIALIZE_BORDER = 32;
-            public static final byte PLAYER_COMBAT_END = 33;
-            public static final byte PLAYER_COMBAT_ENTER = 34;
-            public static final byte PLAYER_COMBAT_KILL = 35;
-            public static final byte SET_ACTIONBAR_TEXT = 36;
-            public static final byte SET_BORDER_CENTER = 37;
-            public static final byte SET_BORDER_LERP_SIZE = 38;
-            public static final byte SET_BORDER_SIZE = 39;
-            public static final byte SET_BORDER_WARNING_DELAY = 40;
-            public static final byte SET_BORDER_WARNING_DISTANCE = 41;
-            public static final byte SET_SUBTITLE_TEXT = 42;
-            public static final byte SET_TITLES_ANIMATION = 43;
-            public static final byte SET_TITLE_TEXT = 44;
 
             private static void load() {
                 insertPacketID(PacketTypeClasses.Play.Server.SPAWN_ENTITY, SPAWN_ENTITY);
@@ -545,22 +502,6 @@ public class PacketType {
                 insertPacketID(PacketTypeClasses.Play.Server.TAGS, TAGS);
                 insertPacketID(PacketTypeClasses.Play.Server.MAP_CHUNK_BULK, MAP_CHUNK_BULK);
                 insertPacketID(PacketTypeClasses.Play.Server.NAMED_ENTITY_SPAWN, NAMED_ENTITY_SPAWN);
-                insertPacketID(PacketTypeClasses.Play.Server.PING, PING);
-                insertPacketID(PacketTypeClasses.Play.Server.ADD_VIBRATION_SIGNAL, ADD_VIBRATION_SIGNAL);
-                insertPacketID(PacketTypeClasses.Play.Server.CLEAR_TITLES, CLEAR_TITLES);
-                insertPacketID(PacketTypeClasses.Play.Server.INITIALIZE_BORDER, INITIALIZE_BORDER);
-                insertPacketID(PacketTypeClasses.Play.Server.PLAYER_COMBAT_END, PLAYER_COMBAT_END);
-                insertPacketID(PacketTypeClasses.Play.Server.PLAYER_COMBAT_ENTER, PLAYER_COMBAT_ENTER);
-                insertPacketID(PacketTypeClasses.Play.Server.PLAYER_COMBAT_KILL, PLAYER_COMBAT_KILL);
-                insertPacketID(PacketTypeClasses.Play.Server.SET_ACTIONBAR_TEXT, SET_ACTIONBAR_TEXT);
-                insertPacketID(PacketTypeClasses.Play.Server.SET_BORDER_CENTER, SET_BORDER_CENTER);
-                insertPacketID(PacketTypeClasses.Play.Server.SET_BORDER_LERP_SIZE, SET_BORDER_LERP_SIZE);
-                insertPacketID(PacketTypeClasses.Play.Server.SET_BORDER_SIZE, SET_BORDER_SIZE);
-                insertPacketID(PacketTypeClasses.Play.Server.SET_BORDER_WARNING_DELAY, SET_BORDER_WARNING_DELAY);
-                insertPacketID(PacketTypeClasses.Play.Server.SET_BORDER_WARNING_DISTANCE, SET_BORDER_WARNING_DISTANCE);
-                insertPacketID(PacketTypeClasses.Play.Server.SET_SUBTITLE_TEXT, SET_SUBTITLE_TEXT);
-                insertPacketID(PacketTypeClasses.Play.Server.SET_TITLES_ANIMATION, SET_TITLES_ANIMATION);
-                insertPacketID(PacketTypeClasses.Play.Server.SET_TITLE_TEXT, SET_TITLE_TEXT);
             }
 
             /**
