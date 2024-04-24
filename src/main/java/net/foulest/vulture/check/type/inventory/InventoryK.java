@@ -10,9 +10,7 @@ import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
-import net.foulest.vulture.processor.type.PacketProcessor;
 
-@SuppressWarnings("deprecation")
 @CheckInfo(name = "Inventory (K)", type = CheckType.INVENTORY)
 public class InventoryK extends Check {
 
@@ -49,7 +47,7 @@ public class InventoryK extends Check {
                             || digType == WrappedPacketInBlockDig.PlayerDigType.DROP_ALL_ITEMS
                             || digType == WrappedPacketInBlockDig.PlayerDigType.DROP_ITEM) {
                         flag(false, "Sent invalid packet while in inventory: "
-                                + PacketProcessor.getPacketFromId(packetId).getSimpleName()
+                                + PacketType.getPacketFromId(packetId).getSimpleName()
                                 + " (" + digType + ")");
                     }
                     break;
@@ -60,7 +58,7 @@ public class InventoryK extends Check {
 
                     if (command != WrappedPacketInClientCommand.ClientCommand.OPEN_INVENTORY_ACHIEVEMENT) {
                         flag(false, "Sent invalid packet while in inventory: "
-                                + PacketProcessor.getPacketFromId(packetId).getSimpleName()
+                                + PacketType.getPacketFromId(packetId).getSimpleName()
                                 + " (" + command + ")");
                     }
                     break;
@@ -73,14 +71,14 @@ public class InventoryK extends Check {
                             || action == WrappedPacketInEntityAction.PlayerAction.START_SNEAKING
                             || action == WrappedPacketInEntityAction.PlayerAction.RIDING_JUMP) {
                         flag(false, "Sent invalid packet while in inventory: "
-                                + PacketProcessor.getPacketFromId(packetId).getSimpleName()
+                                + PacketType.getPacketFromId(packetId).getSimpleName()
                                 + " (" + action + ")");
                     }
                     break;
 
                 default:
                     flag(false, "Sent invalid packet while in inventory: "
-                            + PacketProcessor.getPacketFromId(packetId).getSimpleName());
+                            + PacketType.getPacketFromId(packetId).getSimpleName());
                     break;
             }
         }

@@ -49,15 +49,15 @@ public class Vector3i {
      * Default constructor setting all coordinates/angles/values to their default values (=0).
      */
     public Vector3i() {
-        this.x = 0;
-        this.y = 0;
-        this.z = 0;
+        x = 0;
+        y = 0;
+        z = 0;
     }
 
     public Vector3i(@NotNull Location location) {
-        this.x = location.getBlockX();
-        this.y = location.getBlockY();
-        this.z = location.getBlockZ();
+        x = location.getBlockX();
+        y = location.getBlockY();
+        z = location.getBlockZ();
     }
 
     /**

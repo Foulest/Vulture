@@ -32,7 +32,7 @@ public class WrappedPacketOutCollect extends WrappedPacket implements SendableWr
         if (packet != null) {
             return readInt(0);
         } else {
-            return this.collectedEntityId;
+            return collectedEntityId;
         }
     }
 
@@ -40,7 +40,7 @@ public class WrappedPacketOutCollect extends WrappedPacket implements SendableWr
         if (packet != null) {
             writeInt(0, id);
         } else {
-            this.collectedEntityId = id;
+            collectedEntityId = id;
         }
     }
 
@@ -48,7 +48,7 @@ public class WrappedPacketOutCollect extends WrappedPacket implements SendableWr
         if (packet != null) {
             return readInt(1);
         } else {
-            return this.collectorEntityId;
+            return collectorEntityId;
         }
     }
 
@@ -56,7 +56,7 @@ public class WrappedPacketOutCollect extends WrappedPacket implements SendableWr
         if (packet != null) {
             writeInt(1, id);
         } else {
-            this.collectorEntityId = id;
+            collectorEntityId = id;
         }
     }
 

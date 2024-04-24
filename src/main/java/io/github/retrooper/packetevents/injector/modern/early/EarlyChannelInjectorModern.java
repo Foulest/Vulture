@@ -12,6 +12,7 @@ import io.netty.channel.*;
 import io.netty.channel.epoll.EpollSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.jetbrains.annotations.NotNull;
@@ -168,6 +169,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         ChannelInitializer<?> oldChannelInitializer;
 
         try {
+            Validate.notNull(bootstrapAcceptorField, "Failed to find the 'childHandler' field in the channel pipeline!");
             oldChannelInitializer = (ChannelInitializer<?>) bootstrapAcceptorField.get(bootstrapAcceptor);
             ChannelInitializer<?> channelInitializer = new PEChannelInitializerModern(oldChannelInitializer);
 
@@ -227,8 +229,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                             bootstrapAcceptor = handler;
                         }
                     }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                } catch (Exception ignored) {
                 }
             }
 

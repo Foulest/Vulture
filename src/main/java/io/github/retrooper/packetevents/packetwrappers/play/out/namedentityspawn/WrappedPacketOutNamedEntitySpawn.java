@@ -33,37 +33,37 @@ public class WrappedPacketOutNamedEntitySpawn extends WrappedPacketEntityAbstrac
     public WrappedPacketOutNamedEntitySpawn(int entityID, UUID uuid, @NotNull Location location) {
         this.entityID = entityID;
         this.uuid = uuid;
-        this.position = new Vector3d(location.getX(), location.getY(), location.getZ());
-        this.yaw = location.getYaw();
-        this.pitch = location.getPitch();
+        position = new Vector3d(location.getX(), location.getY(), location.getZ());
+        yaw = location.getYaw();
+        pitch = location.getPitch();
     }
 
     public WrappedPacketOutNamedEntitySpawn(@NotNull Entity entity, UUID uuid, @NotNull Location location) {
-        this.entityID = entity.getEntityId();
+        entityID = entity.getEntityId();
         this.entity = entity;
         this.uuid = uuid;
-        this.position = new Vector3d(location.getX(), location.getY(), location.getZ());
-        this.yaw = location.getYaw();
-        this.pitch = location.getPitch();
+        position = new Vector3d(location.getX(), location.getY(), location.getZ());
+        yaw = location.getYaw();
+        pitch = location.getPitch();
     }
 
     public WrappedPacketOutNamedEntitySpawn(@NotNull Entity entity, @NotNull Location location) {
-        this.entityID = entity.getEntityId();
+        entityID = entity.getEntityId();
         this.entity = entity;
-        this.uuid = entity.getUniqueId();
-        this.position = new Vector3d(location.getX(), location.getY(), location.getZ());
-        this.yaw = location.getYaw();
-        this.pitch = location.getPitch();
+        uuid = entity.getUniqueId();
+        position = new Vector3d(location.getX(), location.getY(), location.getZ());
+        yaw = location.getYaw();
+        pitch = location.getPitch();
     }
 
     public WrappedPacketOutNamedEntitySpawn(@NotNull Entity entity) {
-        this.entityID = entity.getEntityId();
+        entityID = entity.getEntityId();
         this.entity = entity;
-        this.uuid = entity.getUniqueId();
+        uuid = entity.getUniqueId();
         Location location = entity.getLocation();
-        this.position = new Vector3d(location.getX(), location.getY(), location.getZ());
-        this.yaw = location.getYaw();
-        this.pitch = location.getPitch();
+        position = new Vector3d(location.getX(), location.getY(), location.getZ());
+        yaw = location.getYaw();
+        pitch = location.getPitch();
     }
 
     public WrappedPacketOutNamedEntitySpawn(int entityID, UUID uuid, Vector3d position, float yaw, float pitch) {
@@ -75,7 +75,7 @@ public class WrappedPacketOutNamedEntitySpawn extends WrappedPacketEntityAbstrac
     }
 
     public WrappedPacketOutNamedEntitySpawn(@NotNull Entity entity, UUID uuid, Vector3d position, float yaw, float pitch) {
-        this.entityID = entity.getEntityId();
+        entityID = entity.getEntityId();
         this.entity = entity;
         this.uuid = uuid;
         this.position = position;

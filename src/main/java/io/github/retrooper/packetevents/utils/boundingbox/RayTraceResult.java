@@ -49,14 +49,14 @@ public class RayTraceResult {
     }
 
     public Vector getHitPosition() {
-        return this.hitPosition.clone();
+        return hitPosition.clone();
     }
 
     public int hashCode() {
-        int result = 31 + this.hitPosition.hashCode();
-        result = 31 * result + (this.hitBlock == null ? 0 : this.hitBlock.hashCode());
-        result = 31 * result + (this.hitBlockFace == null ? 0 : this.hitBlockFace.hashCode());
-        result = 31 * result + (this.hitEntity == null ? 0 : this.hitEntity.hashCode());
+        int result = 31 + hitPosition.hashCode();
+        result = 31 * result + (hitBlock == null ? 0 : hitBlock.hashCode());
+        result = 31 * result + (hitBlockFace == null ? 0 : hitBlockFace.hashCode());
+        result = 31 * result + (hitEntity == null ? 0 : hitEntity.hashCode());
         return result;
     }
 
@@ -68,14 +68,14 @@ public class RayTraceResult {
         } else {
             RayTraceResult other = (RayTraceResult) obj;
 
-            if (!this.hitPosition.equals(other.hitPosition)) {
+            if (!hitPosition.equals(other.hitPosition)) {
                 return false;
-            } else if (!Objects.equals(this.hitBlock, other.hitBlock)) {
+            } else if (!Objects.equals(hitBlock, other.hitBlock)) {
                 return false;
-            } else if (!Objects.equals(this.hitBlockFace, other.hitBlockFace)) {
+            } else if (!Objects.equals(hitBlockFace, other.hitBlockFace)) {
                 return false;
             } else {
-                return Objects.equals(this.hitEntity, other.hitEntity);
+                return Objects.equals(hitEntity, other.hitEntity);
             }
         }
     }

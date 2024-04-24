@@ -28,7 +28,7 @@ public class WrappedPacketOutUpdateAttributes extends WrappedPacketEntityAbstrac
     }
 
     public WrappedPacketOutUpdateAttributes(@NotNull Entity entity, List<AttributeSnapshotWrapper> properties) {
-        this.entityID = entity.getEntityId();
+        entityID = entity.getEntityId();
         this.properties = properties;
     }
 

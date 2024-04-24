@@ -1014,8 +1014,8 @@ public class ClientBrand extends Check {
         }
 
         // Payload was not found in the list; handle as unknown data.
-        MessageUtil.sendAlert("&f" + player.getName() + " &7sent unknown data to the server."
-                + " &8(Type: " + dataType.getName() + ") (Data: " + data + ")");
+        MessageUtil.sendAlert("&f" + player.getName() + " &7sent unknown data to the server.",
+                " &8(Type: " + dataType.getName() + ") (Data: " + data + ")");
 
         // Prints the unknown data to a randomly generated text file.
         // TODO: Remove this in production.

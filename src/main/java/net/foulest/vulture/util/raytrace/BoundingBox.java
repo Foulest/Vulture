@@ -4,8 +4,6 @@ import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import net.foulest.vulture.util.data.EnumFacing;
-import net.foulest.vulture.util.data.MovingObjectPosition;
 import net.minecraft.server.v1_8_R3.AxisAlignedBB;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.IBlockData;
@@ -147,67 +145,6 @@ public class BoundingBox {
         double f = 0.6 / 2.0;
         double f1 = 1.8;
         return (new BoundingBox(x - f, y, z - f, x + f, y + f1, z + f));
-    }
-
-    public MovingObjectPosition calculateIntercept(Vector3d vecA, Vector3d vecB) {
-        Vector3d[] vectors = {
-                getIntermediateWithXValue(vecA, vecB, min.getX()),
-                getIntermediateWithXValue(vecA, vecB, max.getX()),
-                getIntermediateWithYValue(vecA, vecB, min.getY()),
-                getIntermediateWithYValue(vecA, vecB, max.getY()),
-                getIntermediateWithZValue(vecA, vecB, min.getZ()),
-                getIntermediateWithZValue(vecA, vecB, max.getZ())
-        };
-
-        boolean[] validityChecks = {
-                isVecInYZ(vectors[0]),
-                isVecInYZ(vectors[1]),
-                isVecInXZ(vectors[2]),
-                isVecInXZ(vectors[3]),
-                isVecInXY(vectors[4]),
-                isVecInXY(vectors[5])
-        };
-
-        Vector3d closest = null;
-        int closestIndex = -1;
-
-        for (int i = 0; i < vectors.length; i++) {
-            if (validityChecks[i] && (closest == null
-                    || squareDistanceTo(vecA, vectors[i]) < squareDistanceTo(vecA, closest))) {
-                closest = vectors[i];
-                closestIndex = i;
-            }
-        }
-
-        if (closest == null) {
-            return null;
-        }
-
-        EnumFacing facing;
-
-        switch (closestIndex) {
-            case 0:
-                facing = EnumFacing.WEST;
-                break;
-            case 1:
-                facing = EnumFacing.EAST;
-                break;
-            case 2:
-                facing = EnumFacing.DOWN;
-                break;
-            case 3:
-                facing = EnumFacing.UP;
-                break;
-            case 4:
-                facing = EnumFacing.NORTH;
-                break;
-            case 5:
-                facing = EnumFacing.SOUTH;
-                break;
-            default:
-                return null; // Or another default action
-        }
-        return new MovingObjectPosition(closest, facing);
     }
 
     public double squareDistanceTo(@NotNull Vector3d origin, @NotNull Vector3d vec) {

@@ -8,6 +8,7 @@ import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckManager;
 import net.foulest.vulture.check.type.pingspoof.PingSpoofB;
+import net.foulest.vulture.check.type.reach.ReachA;
 import net.foulest.vulture.util.yaml.CustomYamlConfiguration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -69,6 +70,8 @@ public class Settings {
 
     // Packet protections
     public static int maxPacketsPerTick;
+    public static int maxPacketsPerSecond;
+    public static int maxPacketsSmoothed;
     public static boolean abilitiesDuplicateFlying;
     public static boolean abilitiesInvalidFlightAllowed;
     public static boolean abilitiesInvalidFlySpeed;
@@ -219,10 +222,14 @@ public class Settings {
         // Blocked commands
         blockedCommands = config.getStringList("vulture.blocked.commands");
 
-        // PingSpoofB settings
+        // PingSpoof B settings
         PingSpoofB.maxPing = config.getLong("vulture.checks.pingspoof.B.maxPing");
         PingSpoofB.maxAveragePing = config.getLong("vulture.checks.pingspoof.B.maxAveragePing");
         PingSpoofB.maxPingDeviation = config.getLong("vulture.checks.pingspoof.B.maxPingDeviation");
+
+        // Reach A settings
+        ReachA.maxDistance = config.getDouble("vulture.checks.reach.A.maxDistance");
+        ReachA.cancelHits = config.getBoolean("vulture.checks.reach.A.cancelHits");
 
         // Check settings
         for (Class<? extends Check> check : CheckManager.CHECK_CLASSES) {
@@ -271,6 +278,8 @@ public class Settings {
 
         // Packet protections; max packets per tick
         maxPacketsPerTick = config.getInt("vulture.protections.packets.max-packets-per-tick");
+        maxPacketsPerSecond = config.getInt("vulture.protections.packets.max-packets-per-second");
+        maxPacketsSmoothed = config.getInt("vulture.protections.packets.max-packets-smoothed");
 
         // Packet protections; Abilities
         abilitiesDuplicateFlying = config.getBoolean("vulture.protections.packets.abilities.duplicate-flying");

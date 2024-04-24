@@ -7,13 +7,12 @@ import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.event.RotationEvent;
 import org.jetbrains.annotations.NotNull;
 
-@CheckInfo(name = "AimAssist (A)", type = CheckType.AIMASSIST)
+@CheckInfo(name = "AimAssist (A)", type = CheckType.AIMASSIST,
+        description = "Detects basic AimAssist.", experimental = true)
 public class AimAssistA extends Check {
 
-    private double lastYaw;
-    private double lastPitch;
-    private double buffer;
-    private double streak;
+    private double lastDeltaYaw;
+    private double lastDeltaPitch;
 
     public AimAssistA(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
@@ -24,24 +23,15 @@ public class AimAssistA extends Check {
         double deltaYaw = event.getDeltaYaw();
         double deltaPitch = event.getDeltaPitch();
 
-        double yawAccel = Math.abs(deltaYaw - lastYaw);
-        double pitchAccel = Math.abs(deltaPitch - lastPitch);
-
-        if (yawAccel > 1.5 && pitchAccel > 1.4252 && pitchAccel < 2.209 && deltaPitch > 1.354 && deltaPitch < 1.4) {
-            if (++buffer > 3) {
-                buffer = 0;
-
-                if (++streak > 2) {
-                    flag(false, "pitchAccel=" + pitchAccel
-                            + " deltaPitch=" + deltaPitch);
-                }
-            }
-        } else {
-            buffer = Math.max(buffer - 0.5, 0);
-            streak = Math.max(streak - 0.25, 0);
+        if (deltaYaw != 0.0 && Math.abs(deltaYaw) < 0.0001) {
+            flag(false, "(Impossibly Low) deltaYaw=" + deltaYaw);
         }
 
-        lastYaw = deltaYaw;
-        lastPitch = deltaPitch;
+        if (deltaPitch != 0.0 && Math.abs(deltaPitch) < 0.0001) {
+            flag(false, "(Impossibly Low) deltaPitch=" + deltaPitch);
+        }
+
+        lastDeltaYaw = deltaYaw;
+        lastDeltaPitch = deltaPitch;
     }
 }

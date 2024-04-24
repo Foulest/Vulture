@@ -8,7 +8,7 @@ public interface ChannelInjector {
         return true;
     }
 
-    void inject() throws IllegalAccessException;
+    void inject();
 
     void eject();
 

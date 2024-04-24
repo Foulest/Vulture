@@ -87,7 +87,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacketEntityAbstra
 
         PlayerAction(byte actionValue) {
             this.actionValue = actionValue;
-            this.alias = "empty";
+            alias = "empty";
         }
 
         public static @Nullable PlayerAction getByActionValue(byte value) {

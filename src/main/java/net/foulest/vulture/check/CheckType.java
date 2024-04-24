@@ -15,10 +15,8 @@ public enum CheckType {
     FLIGHT,
     GROUNDSPOOF,
     INVENTORY,
-    KILLAURA,
     PINGSPOOF,
     REACH,
     SPEED,
-    TIMER,
     VELOCITY
 }

@@ -44,7 +44,7 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacketEntityAbstracti
 
     public WrappedPacketOutEntityTeleport(@NotNull Entity entity, Vector3d position,
                                           float yaw, float pitch, boolean onGround) {
-        this.entityID = entity.getEntityId();
+        entityID = entity.getEntityId();
         this.entity = entity;
         this.position = position;
         this.yaw = yaw;
@@ -55,7 +55,7 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacketEntityAbstracti
     public WrappedPacketOutEntityTeleport(int entityID, double x, double y, double z,
                                           float yaw, float pitch, boolean onGround) {
         this.entityID = entityID;
-        this.position = new Vector3d(x, y, z);
+        position = new Vector3d(x, y, z);
         this.yaw = yaw;
         this.pitch = pitch;
         this.onGround = onGround;
@@ -63,9 +63,9 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacketEntityAbstracti
 
     public WrappedPacketOutEntityTeleport(@NotNull Entity entity, double x, double y, double z,
                                           float yaw, float pitch, boolean onGround) {
-        this.entityID = entity.getEntityId();
+        entityID = entity.getEntityId();
         this.entity = entity;
-        this.position = new Vector3d(x, y, z);
+        position = new Vector3d(x, y, z);
         this.yaw = yaw;
         this.pitch = pitch;
         this.onGround = onGround;

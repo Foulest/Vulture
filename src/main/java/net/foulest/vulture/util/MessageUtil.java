@@ -190,16 +190,17 @@ public final class MessageUtil {
      *
      * @param message The message to send.
      */
-    public static void sendAlert(String message) {
+    public static void sendAlert(String message, String verbose) {
         for (Player player : Bukkit.getOnlinePlayers()) {
             PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
             if (playerData.isAlertsEnabled()) {
                 messagePlayerClickable(player, Collections.singletonList("&aClick to teleport to the player."),
-                        "/tp " + player.getName(), Settings.prefix + " " + message);
+                        "/tp " + player.getName(), Settings.prefix + " " + message
+                                + (playerData.isVerboseEnabled() && !verbose.isEmpty() ? " " + verbose : ""));
             }
         }
 
-        messagePlayer(Bukkit.getConsoleSender(), Settings.prefix + " " + message);
+        messagePlayer(Bukkit.getConsoleSender(), Settings.prefix + " " + message + " " + verbose);
     }
 }

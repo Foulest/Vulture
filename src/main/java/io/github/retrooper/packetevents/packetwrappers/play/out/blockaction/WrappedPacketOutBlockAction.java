@@ -48,7 +48,7 @@ public class WrappedPacketOutBlockAction extends WrappedPacket implements Sendab
         if (packet != null) {
             return readBlockPosition(0);
         } else {
-            return this.blockPos;
+            return blockPos;
         }
     }
 
@@ -64,7 +64,7 @@ public class WrappedPacketOutBlockAction extends WrappedPacket implements Sendab
         if (packet != null) {
             return readInt(0);
         } else {
-            return this.actionID;
+            return actionID;
         }
     }
 
@@ -80,7 +80,7 @@ public class WrappedPacketOutBlockAction extends WrappedPacket implements Sendab
         if (packet != null) {
             return readInt(1);
         } else {
-            return this.actionData;
+            return actionData;
         }
     }
 
@@ -96,7 +96,7 @@ public class WrappedPacketOutBlockAction extends WrappedPacket implements Sendab
         if (packet != null) {
             return NMSUtils.getMaterialFromNMSBlock(readObject(0, NMSUtils.blockClass));
         } else {
-            return this.blockType;
+            return blockType;
         }
     }
 

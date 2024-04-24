@@ -109,8 +109,7 @@ public final class KickUtil {
 
         if (announceKick) {
             MessageUtil.sendAlert("&f" + player.getName() + " &7has been kicked by Vulture."
-                    + (debugMessage.isEmpty() ? "" : " &8(" + debugMessage + "&8)")
-            );
+                    + (debugMessage.isEmpty() ? "" : " &8(" + debugMessage + "&8)"), "");
         }
 
         // Kicks the player with a message.

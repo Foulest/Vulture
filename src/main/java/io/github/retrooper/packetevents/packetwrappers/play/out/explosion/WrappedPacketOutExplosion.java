@@ -32,14 +32,14 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
 
     public WrappedPacketOutExplosion(@NotNull Vector3d position, float strength, List<Vector3i> records,
                                      @NotNull Vector3f playerVelocity) {
-        this.x = position.x;
-        this.y = position.y;
-        this.z = position.z;
+        x = position.x;
+        y = position.y;
+        z = position.z;
         this.strength = strength;
         this.records = records;
-        this.playerVelocityX = playerVelocity.x;
-        this.playerVelocityY = playerVelocity.y;
-        this.playerVelocityZ = playerVelocity.z;
+        playerVelocityX = playerVelocity.x;
+        playerVelocityY = playerVelocity.y;
+        playerVelocityZ = playerVelocity.z;
     }
 
     public WrappedPacketOutExplosion(double x, double y, double z, float strength, List<Vector3i> records,
@@ -77,9 +77,9 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
             writeDouble(1, position.y);
             writeDouble(2, position.z);
         } else {
-            this.x = position.x;
-            this.y = position.y;
-            this.z = position.z;
+            x = position.x;
+            y = position.y;
+            z = position.z;
         }
     }
 
@@ -150,9 +150,9 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
             writeFloat(2, playerVelocity.y);
             writeFloat(3, playerVelocity.z);
         } else {
-            this.playerVelocityX = playerVelocity.x;
-            this.playerVelocityY = playerVelocity.y;
-            this.playerVelocityZ = playerVelocity.z;
+            playerVelocityX = playerVelocity.x;
+            playerVelocityY = playerVelocity.y;
+            playerVelocityZ = playerVelocity.z;
         }
     }
 

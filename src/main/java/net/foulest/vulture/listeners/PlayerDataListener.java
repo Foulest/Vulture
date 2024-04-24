@@ -40,7 +40,7 @@ public class PlayerDataListener implements Listener {
             if (!whitelistedIps.isEmpty() && !whitelistedIps.contains(playerIp)) {
                 event.disallow(PlayerLoginEvent.Result.KICK_FULL,
                         MessageUtil.nativeColorCode("&cYour IP address does not match the whitelist."
-                        + "\n\n&cContact an administrator for more information."));
+                                + "\n\n&cContact an administrator for more information."));
             }
         }
     }

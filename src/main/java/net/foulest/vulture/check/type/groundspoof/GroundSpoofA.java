@@ -24,8 +24,8 @@ public class GroundSpoofA extends Check {
     @Override
     public void handle(MovementEvent event, long timestamp) {
         // Checks the player for exemptions.
-        if (playerData.getTimeSince(ActionType.LOGIN) <= 2000L
-                || playerData.getTimeSince(ActionType.TELEPORT) <= 100L
+        if (playerData.getTicksSince(ActionType.LOGIN) <= 40
+                || playerData.getTicksSince(ActionType.TELEPORT) <= 2
                 || playerData.isNearbyBoat(0.6, 0.6, 0.6)) {
             return;
         }
@@ -53,7 +53,7 @@ public class GroundSpoofA extends Check {
                         + " velocity=" + velocity
                         + " underBlockTicks=" + underBlockTicks
                         + " insideBlock=" + insideBlock
-                        + " teleport=" + playerData.getTimeSince(ActionType.TELEPORT)
+                        + " teleport=" + playerData.getTicksSince(ActionType.TELEPORT)
                 );
             }
         } else {

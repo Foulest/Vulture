@@ -1,20 +1,25 @@
 package net.foulest.vulture.util;
 
-import io.github.retrooper.packetevents.utils.vector.Vector3d;
+import net.foulest.vulture.util.data.Area;
 import org.bukkit.Location;
-import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
+@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 public class MathUtil {
 
     private static final float[] SIN_TABLE = new float[65536];
-    private static final float[] SIN_TABLE_FAST = new float[4096];
-    public static boolean fastMath;
 
+    static {
+        for (int i = 0; i < SIN_TABLE.length; ++i) {
+            SIN_TABLE[i] = (float) Math.sin(i * Math.PI * 2.0D / 65536.0D);
+        }
+    }
+
+    @Contract(pure = true)
     public static float getDistanceBetweenAngles(float angle1, float angle2) {
         float distance = Math.abs(angle1 - angle2) % 360.0f;
 
@@ -22,22 +27,6 @@ public class MathUtil {
             distance = 360.0f - distance;
         }
         return distance;
-    }
-
-    @Contract("_, _ -> new")
-    public static @NotNull Vector getVectorSpeed(@NotNull Vector3d to,
-                                                 @NotNull Vector3d from) {
-        return new Vector(to.getX() - from.getX(), 0, to.getZ() - from.getZ());
-    }
-
-    @Contract("_ -> new")
-    public static @NotNull Vector getEyeDirection(@NotNull Player player) {
-        return new Vector(-Math.sin(player.getEyeLocation().getYaw() * Math.PI / 180.0) * 1.0 * 0.5, 0.0,
-                Math.cos(player.getEyeLocation().getYaw() * Math.PI / 180.0) * 1.0 * 0.5);
-    }
-
-    public static int getPingInTicks(long ping) {
-        return (int) Math.floor(ping / 50.0);
     }
 
     public static double getStandardDeviation(Collection<? extends Number> data) {
@@ -63,35 +52,23 @@ public class MathUtil {
         return variance;
     }
 
-    @Contract(value = "_, _, _, _ -> new", pure = true)
-    public static @NotNull Vector3d getPositionEyes(double x, double y, double z, float eyeHeight) {
-        return new Vector3d(x, y + eyeHeight, z);
-    }
-
-    @Contract("_, _ -> new")
-    public static @NotNull Vector3d getVectorForRotation(float pitch, float yaw) {
-        float f = cos(-yaw * 0.017453292F - (float) Math.PI);
-        float f1 = sin(-yaw * 0.017453292F - (float) Math.PI);
-        float f2 = -cos(-pitch * 0.017453292F);
-        float f3 = sin(-pitch * 0.017453292F);
-        return new Vector3d(f1 * f2, f3, f * f2);
-    }
-
+    @Contract(pure = true)
     public static float sin(float value) {
-        return fastMath ? SIN_TABLE_FAST[(int) (value * 651.8986F) & 4095]
-                : SIN_TABLE[(int) (value * 10430.378F) & 65535];
+        return SIN_TABLE[(int) (value * 10430.378F) & 65535];
     }
 
+    @Contract(pure = true)
     public static float cos(float value) {
-        return fastMath ? SIN_TABLE_FAST[(int) ((value + ((float) Math.PI / 2F)) * 651.8986F) & 4095]
-                : SIN_TABLE[(int) (value * 10430.378F + 16384.0F) & 65535];
+        return SIN_TABLE[(int) (value * 10430.378F + 16384.0F) & 65535];
     }
 
+    @Contract(pure = true)
     public static int floorDouble(double value) {
         int i = (int) value;
         return value < i ? i - 1 : i;
     }
 
+    @Contract(pure = true)
     public static double pingFormula(long ping) {
         return Math.ceil((ping + 5) / 50.0D);
     }
@@ -112,21 +89,129 @@ public class MathUtil {
         return (float) ((Math.atan2(difZ, difX) * 180.0D / Math.PI) - 90.0F);
     }
 
-    public static int getPingToTimer(long ping) {
-        return (int) ping / 10000;
+    public static org.joml.Vector3d calculateIntercept(@NotNull Area area, org.joml.Vector3d pos, org.joml.Vector3d ray) {
+        org.joml.Vector3d vec3 = getIntermediateWithXValue(pos, ray, area.minX);
+        org.joml.Vector3d vec31 = getIntermediateWithXValue(pos, ray, area.maxX);
+        org.joml.Vector3d vec32 = getIntermediateWithYValue(pos, ray, area.minY);
+        org.joml.Vector3d vec33 = getIntermediateWithYValue(pos, ray, area.maxY);
+        org.joml.Vector3d vec34 = getIntermediateWithZValue(pos, ray, area.minZ);
+        org.joml.Vector3d vec35 = getIntermediateWithZValue(pos, ray, area.maxZ);
+
+        if (!isVecInYZ(area, vec3)) {
+            vec3 = null;
+        }
+
+        if (!isVecInYZ(area, vec31)) {
+            vec31 = null;
+        }
+
+        if (!isVecInXZ(area, vec32)) {
+            vec32 = null;
+        }
+
+        if (!isVecInXZ(area, vec33)) {
+            vec33 = null;
+        }
+
+        if (!isVecInXY(area, vec34)) {
+            vec34 = null;
+        }
+
+        if (!isVecInXY(area, vec35)) {
+            vec35 = null;
+        }
+
+        org.joml.Vector3d vec36 = null;
+
+        if (vec3 != null) {
+            vec36 = vec3;
+        }
+
+        if (vec31 != null && (vec36 == null || pos.distanceSquared(vec31) < pos.distanceSquared(vec36))) {
+            vec36 = vec31;
+        }
+
+        if (vec32 != null && (vec36 == null || pos.distanceSquared(vec32) < pos.distanceSquared(vec36))) {
+            vec36 = vec32;
+        }
+
+        if (vec33 != null && (vec36 == null || pos.distanceSquared(vec33) < pos.distanceSquared(vec36))) {
+            vec36 = vec33;
+        }
+
+        if (vec34 != null && (vec36 == null || pos.distanceSquared(vec34) < pos.distanceSquared(vec36))) {
+            vec36 = vec34;
+        }
+
+        if (vec35 != null && (vec36 == null || pos.distanceSquared(vec35) < pos.distanceSquared(vec36))) {
+            vec36 = vec35;
+        }
+        return vec36;
     }
 
-    static {
-        for (int i = 0; i < 65536; ++i) {
-            SIN_TABLE[i] = (float) Math.sin(i * Math.PI * 2.0D / 65536.0D);
-        }
+    @Contract(value = "_, null -> false", pure = true)
+    private static boolean isVecInYZ(Area area, org.joml.Vector3d vec) {
+        return vec != null && vec.y >= area.minY && vec.y <= area.maxY && vec.z >= area.minZ && vec.z <= area.maxZ;
+    }
 
-        for (int j = 0; j < 4096; ++j) {
-            SIN_TABLE_FAST[j] = (float) Math.sin(((j + 0.5F) / 4096.0F * ((float) Math.PI * 2F)));
-        }
+    @Contract(value = "_, null -> false", pure = true)
+    private static boolean isVecInXZ(Area area, org.joml.Vector3d vec) {
+        return vec != null && vec.x >= area.minX && vec.x <= area.maxX && vec.z >= area.minZ && vec.z <= area.maxZ;
+    }
 
-        for (int l = 0; l < 360; l += 90) {
-            SIN_TABLE_FAST[(int) (l * 11.377778F) & 4095] = (float) Math.sin((l * 0.017453292F));
+    @Contract(value = "_, null -> false", pure = true)
+    private static boolean isVecInXY(Area area, org.joml.Vector3d vec) {
+        return vec != null && vec.x >= area.minX && vec.x <= area.maxX && vec.y >= area.minY && vec.y <= area.maxY;
+    }
+
+    @Contract(pure = true)
+    public static org.joml.@Nullable Vector3d getIntermediateWithXValue(@NotNull org.joml.Vector3d vec1, @NotNull org.joml.Vector3d vec2, double limit) {
+        double d0 = vec2.x - vec1.x;
+        double d1 = vec2.y - vec1.y;
+        double d2 = vec2.z - vec1.z;
+
+        if (d0 * d0 < 1.0000000116860974E-7D) {
+            return null;
+        } else {
+            double d3 = (limit - vec1.x) / d0;
+            return d3 >= 0.0D && d3 <= 1.0D ? new org.joml.Vector3d(vec1.x + d0 * d3, vec1.y + d1 * d3, vec1.z + d2 * d3) : null;
         }
+    }
+
+    @Contract(pure = true)
+    public static org.joml.@Nullable Vector3d getIntermediateWithYValue(@NotNull org.joml.Vector3d vec1, @NotNull org.joml.Vector3d vec2, double limit) {
+        double d0 = vec2.x - vec1.x;
+        double d1 = vec2.y - vec1.y;
+        double d2 = vec2.z - vec1.z;
+
+        if (d1 * d1 < 1.0000000116860974E-7D) {
+            return null;
+        } else {
+            double d3 = (limit - vec1.y) / d1;
+            return d3 >= 0.0D && d3 <= 1.0D ? new org.joml.Vector3d(vec1.x + d0 * d3, vec1.y + d1 * d3, vec1.z + d2 * d3) : null;
+        }
+    }
+
+    @Contract(pure = true)
+    public static org.joml.@Nullable Vector3d getIntermediateWithZValue(@NotNull org.joml.Vector3d vec1, @NotNull org.joml.Vector3d vec2, double limit) {
+        double d0 = vec2.x - vec1.x;
+        double d1 = vec2.y - vec1.y;
+        double d2 = vec2.z - vec1.z;
+
+        if (d2 * d2 < 1.0000000116860974E-7D) {
+            return null;
+        } else {
+            double d3 = (limit - vec1.z) / d2;
+            return d3 >= 0.0D && d3 <= 1.0D ? new org.joml.Vector3d(vec1.x + d0 * d3, vec1.y + d1 * d3, vec1.z + d2 * d3) : null;
+        }
+    }
+
+    @Contract("_, _ -> new")
+    public static org.joml.@NotNull Vector3d getLookVector(float yaw, float pitch) {
+        float f = MathUtil.cos(-yaw * 0.017453292F - (float) Math.PI);
+        float f1 = MathUtil.sin(-yaw * 0.017453292F - (float) Math.PI);
+        float f2 = -MathUtil.cos(-pitch * 0.017453292F);
+        float f3 = MathUtil.sin(-pitch * 0.017453292F);
+        return new org.joml.Vector3d(f1 * f2, f3, f * f2);
     }
 }

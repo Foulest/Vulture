@@ -3,17 +3,13 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.worldparticles;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.github.retrooper.packetevents.utils.reflection.Reflection;
 
-import java.lang.reflect.Method;
 import java.util.Optional;
 
 // TODO: finish this wrapper and test
 public class WrappedPacketOutWorldParticles extends WrappedPacket {
 
     private static Class<? extends Enum<?>> particleEnumClass;
-    private static Class<?> particleParamClass;
-    private static Method particleParamGetNameMethod;
     private String particleName;
     private boolean longDistance;
     private float x;
@@ -34,14 +30,7 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
     protected void load() {
         try {
             particleEnumClass = NMSUtils.getNMSEnumClass("EnumParticle");
-        } catch (ClassNotFoundException ex) {
-            particleParamClass = NMSUtils.getNMSClassWithoutException("ParticleParam");
-
-            if (particleParamClass == null) {
-                particleParamClass = NMSUtils.getNMClassWithoutException("core.particles.ParticleParam");
-            }
-
-            particleParamGetNameMethod = Reflection.getMethod(particleParamClass, String.class, 0);
+        } catch (ClassNotFoundException ignored) {
         }
     }
 

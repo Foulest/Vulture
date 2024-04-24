@@ -8,8 +8,10 @@
 
 ## Features
 
-- **Efficient Packet Handling:** Utilizes **[PacketEvents](https://github.com/retrooper/packetevents)** to handle packets.
-- **Robust Framework:** Built upon the framework provided by **[Rainnny7](https://github.com/Rainnny7/Anticheat-Framework)**.
+- **Efficient Packet Handling:** Utilizes **[PacketEvents](https://github.com/retrooper/packetevents)** and
+  **[Pledge](https://github.com/ThomasOM/Pledge)** to handle packets.
+- **Robust Framework:** Built upon the framework provided by
+  **[Rainnny7](https://github.com/Rainnny7/Anticheat-Framework)**.
 - **Exploit Protection:** Protects against various harmful in-game exploits.
 
 **Combat Checks**
@@ -18,7 +20,7 @@
 - AutoBlock _(x4)_
 - AutoClicker _(x1)_
 - KillAura _(x10)_
-- Reach _(x3)_
+- Reach _(x1)_
 - Velocity _(x1)_
 
 **Movement Checks**
@@ -26,7 +28,6 @@
 - Flight _(x4)_
 - GroundSpoof _(x2)_
 - Speed _(x5)_
-- Timer _(x1)_
 
 **Other Checks**
 

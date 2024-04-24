@@ -45,7 +45,7 @@ public final class WrappedPacketOutKickDisconnect extends WrappedPacket implemen
             Object iChatBaseComponent = NMSUtils.generateIChatBaseComponent(message);
             write(NMSUtils.iChatBaseComponentClass, 0, iChatBaseComponent);
         } else {
-            this.kickMessage = message;
+            kickMessage = message;
         }
     }
 

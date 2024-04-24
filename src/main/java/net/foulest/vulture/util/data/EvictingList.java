@@ -13,8 +13,6 @@ import java.util.List;
  * A list that evicts the oldest entry when the size limit is reached.
  *
  * @param <T> The type of the list.
- * @author Foulest
- * @project Vulture
  */
 @Getter
 @Setter

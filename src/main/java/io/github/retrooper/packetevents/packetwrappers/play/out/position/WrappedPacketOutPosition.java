@@ -30,7 +30,7 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
 
     public WrappedPacketOutPosition(double x, double y, double z, float yaw, float pitch,
                                     Set<PlayerTeleportFlags> relativeFlags) {
-        this.position = new Vector3d(x, y, z);
+        position = new Vector3d(x, y, z);
         this.yaw = yaw;
         this.pitch = pitch;
         this.relativeFlags = relativeFlags;
@@ -117,7 +117,7 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
 
             write(Set.class, 0, nmsRelativeFlags);
         } else {
-            this.relativeFlags = flags;
+            relativeFlags = flags;
         }
     }
 

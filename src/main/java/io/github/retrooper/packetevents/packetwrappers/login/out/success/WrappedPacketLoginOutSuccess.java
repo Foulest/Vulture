@@ -35,7 +35,7 @@ public class WrappedPacketLoginOutSuccess extends WrappedPacket implements Senda
         if (packet != null) {
             return GameProfileUtil.getWrappedGameProfile(readObject(0, NMSUtils.gameProfileClass));
         } else {
-            return this.wrappedGameProfile;
+            return wrappedGameProfile;
         }
     }
 

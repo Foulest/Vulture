@@ -17,7 +17,7 @@ import org.bukkit.Location;
 public class Violation {
 
     // Check Data
-    private final CheckInfo checkInfo;
+    private final CheckInfoData checkInfo;
     private final String[] data;
     private final int violations;
 

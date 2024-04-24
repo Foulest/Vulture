@@ -75,7 +75,7 @@ public class WrappedPacketOutTransaction extends WrappedPacket implements Sendab
         if (packet != null) {
             writeBoolean(0, isAccepted);
         } else {
-            this.accepted = isAccepted;
+            accepted = isAccepted;
         }
     }
 

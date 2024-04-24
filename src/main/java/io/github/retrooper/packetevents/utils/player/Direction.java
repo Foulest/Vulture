@@ -56,7 +56,7 @@ public enum Direction {
     final short faceValue;
 
     Direction() {
-        this.faceValue = (short) ordinal();
+        faceValue = (short) ordinal();
     }
 
     public static Direction getDirection(int face) {

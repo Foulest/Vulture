@@ -15,8 +15,6 @@ import java.util.Map;
  *
  * @param <K> The type of the key.
  * @param <V> The type of the value.
- * @author Foulest
- * @project Vulture
  */
 @Getter
 @Setter

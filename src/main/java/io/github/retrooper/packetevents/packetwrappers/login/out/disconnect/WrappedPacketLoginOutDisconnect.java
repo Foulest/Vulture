@@ -32,7 +32,7 @@ public class WrappedPacketLoginOutDisconnect extends WrappedPacket implements Se
         if (packet != null) {
             return readIChatBaseComponent(0);
         } else {
-            return this.reason;
+            return reason;
         }
     }
 

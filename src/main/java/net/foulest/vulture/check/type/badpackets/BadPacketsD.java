@@ -45,7 +45,7 @@ public class BadPacketsD extends Check {
     public void checkDifference() {
         // Checks the player for exemptions.
         if (player.isDead() || player.isInsideVehicle()
-                || playerData.getTimeSince(ActionType.LOGIN) < 10000L) {
+                || playerData.getTicksSince(ActionType.LOGIN) < 200) {
             return;
         }
 

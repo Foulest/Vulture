@@ -36,7 +36,7 @@ public class FlightC extends Check {
             if (playerData.isNearbyBoat(0.6, 0.6, 0.6)
                     || playerData.isNearSlimeBlock()
                     || playerData.isFlying()
-                    || playerData.getTimeSince(ActionType.STOP_FLYING) <= 200L
+                    || playerData.getTicksSince(ActionType.STOP_FLYING) <= 4
                     || playerData.isInLiquid()) {
                 lastY = flyingPosition.getY();
                 lastVelocity = velocity;

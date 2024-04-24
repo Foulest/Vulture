@@ -41,12 +41,12 @@ public class NPC {
 
     public NPC(String name) {
         this.name = name;
-        this.entityId = NMSUtils.generateEntityId();
-        this.uuid = NMSUtils.generateUUID();
-        this.gameProfile = new WrappedGameProfile(uuid, name);
-        this.position = new Vector3d(0, 0, 0);
-        this.yaw = 0;
-        this.pitch = 0;
+        entityId = NMSUtils.generateEntityId();
+        uuid = NMSUtils.generateUUID();
+        gameProfile = new WrappedGameProfile(uuid, name);
+        position = new Vector3d(0, 0, 0);
+        yaw = 0;
+        pitch = 0;
     }
 
     public NPC(String name, int entityId, UUID uuid, WrappedGameProfile gameProfile) {
@@ -54,16 +54,16 @@ public class NPC {
         this.entityId = entityId;
         this.uuid = uuid;
         this.gameProfile = gameProfile;
-        this.position = new Vector3d(0, 0, 0);
-        this.yaw = 0;
-        this.pitch = 0;
+        position = new Vector3d(0, 0, 0);
+        yaw = 0;
+        pitch = 0;
     }
 
     public NPC(String name, Vector3d position, float yaw, float pitch) {
         this.name = name;
-        this.entityId = NMSUtils.generateEntityId();
-        this.uuid = NMSUtils.generateUUID();
-        this.gameProfile = new WrappedGameProfile(uuid, name);
+        entityId = NMSUtils.generateEntityId();
+        uuid = NMSUtils.generateUUID();
+        gameProfile = new WrappedGameProfile(uuid, name);
         this.position = position;
         this.yaw = yaw;
         this.pitch = pitch;
@@ -116,7 +116,7 @@ public class NPC {
     }
 
     public void teleport(Player player, Vector3d targetPosition, float yaw, float pitch) {
-        this.position = targetPosition;
+        position = targetPosition;
         this.yaw = yaw;
         this.pitch = pitch;
 
@@ -127,7 +127,7 @@ public class NPC {
     }
 
     public void move(Player player, @NotNull Vector3d targetPosition) {
-        this.position = targetPosition;
+        position = targetPosition;
         double distX = targetPosition.x - position.x;
         double distY = targetPosition.y - position.y;
         double distZ = targetPosition.z - position.z;
@@ -146,7 +146,7 @@ public class NPC {
     }
 
     public void moveAndRotate(Player player, @NotNull Vector3d targetPosition, float yaw, float pitch) {
-        this.position = targetPosition;
+        position = targetPosition;
         this.yaw = yaw;
         this.pitch = pitch;
         double distX = targetPosition.x - position.x;
@@ -179,7 +179,7 @@ public class NPC {
     }
 
     public void teleport(@NotNull List<Player> players, Vector3d targetPosition, float yaw, float pitch) {
-        this.position = targetPosition;
+        position = targetPosition;
         this.yaw = yaw;
         this.pitch = pitch;
 
@@ -195,7 +195,7 @@ public class NPC {
         double distY = targetPosition.y - position.y;
         double distZ = targetPosition.z - position.z;
         double dist = distX + distY + distZ;
-        this.position = targetPosition;
+        position = targetPosition;
         SendableWrapper sentPacket;
 
         if (dist > 8) {
@@ -216,7 +216,7 @@ public class NPC {
         double distY = targetPosition.y - position.y;
         double distZ = targetPosition.z - position.z;
         double dist = distX + distY + distZ;
-        this.position = targetPosition;
+        position = targetPosition;
         this.yaw = yaw;
         this.pitch = pitch;
         SendableWrapper sentPacket;

@@ -31,7 +31,7 @@ public class SpeedA extends Check {
                 || player.getAllowFlight()
                 || player.getGameMode().equals(GameMode.CREATIVE)
                 || player.getGameMode().equals(GameMode.SPECTATOR)
-                || playerData.getTimeSince(ActionType.STEER_VEHICLE) < 500L
+                || playerData.getTicksSince(ActionType.STEER_VEHICLE) < 10
                 || player.isInsideVehicle()
                 || event.isTeleport(playerData)) {
             return;
@@ -52,8 +52,8 @@ public class SpeedA extends Check {
         int groundTicks = playerData.getGroundTicks();
         int groundTicksStrict = playerData.getGroundTicksStrict();
 
-        long timeSinceOnIce = playerData.getTimeSince(ActionType.ON_ICE);
-        long timeSinceUnderBlock = playerData.getTimeSince(ActionType.UNDER_BLOCK);
+        long timeSinceOnIce = playerData.getTicksSince(ActionType.ON_ICE);
+        long timeSinceUnderBlock = playerData.getTicksSince(ActionType.UNDER_BLOCK);
 
         float speedLevel = MovementUtil.getPotionEffectLevel(player, PotionEffectType.SPEED);
         float slownessLevel = MovementUtil.getPotionEffectLevel(player, PotionEffectType.SLOW);

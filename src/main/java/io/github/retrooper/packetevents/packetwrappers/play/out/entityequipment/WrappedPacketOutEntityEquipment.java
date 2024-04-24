@@ -4,7 +4,6 @@ import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
-import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.pair.Pair;
 import lombok.Getter;
 import org.bukkit.entity.Entity;
@@ -19,7 +18,6 @@ import java.util.List;
 
 public class WrappedPacketOutEntityEquipment extends WrappedPacketEntityAbstraction implements SendableWrapper {
 
-    private static Class<? extends Enum<?>> enumItemSlotClass;
     private static Constructor<?> packetConstructor;
     private List<Pair<EquipmentSlot, ItemStack>> equipment;
     private EquipmentSlot legacySlot;
@@ -32,33 +30,33 @@ public class WrappedPacketOutEntityEquipment extends WrappedPacketEntityAbstract
     public WrappedPacketOutEntityEquipment(int entityID, EquipmentSlot slot, ItemStack itemStack) {
         setEntityId(entityID);
         Pair<EquipmentSlot, ItemStack> pair = new Pair<>(slot, itemStack);
-        this.equipment = new ArrayList<>();
-        this.equipment.add(pair);
-        this.legacySlot = slot;
-        this.legacyItemStack = itemStack;
+        equipment = new ArrayList<>();
+        equipment.add(pair);
+        legacySlot = slot;
+        legacyItemStack = itemStack;
     }
 
     public WrappedPacketOutEntityEquipment(Entity entity, EquipmentSlot slot, ItemStack itemStack) {
         setEntity(entity);
         Pair<EquipmentSlot, ItemStack> pair = new Pair<>(slot, itemStack);
-        this.equipment = new ArrayList<>();
-        this.equipment.add(pair);
-        this.legacySlot = slot;
-        this.legacyItemStack = itemStack;
+        equipment = new ArrayList<>();
+        equipment.add(pair);
+        legacySlot = slot;
+        legacyItemStack = itemStack;
     }
 
     public WrappedPacketOutEntityEquipment(int entityID, @NotNull List<Pair<EquipmentSlot, ItemStack>> equipment) {
         setEntityId(entityID);
         this.equipment = equipment;
-        this.legacySlot = equipment.get(0).getFirst();
-        this.legacyItemStack = equipment.get(0).getSecond();
+        legacySlot = equipment.get(0).getFirst();
+        legacyItemStack = equipment.get(0).getSecond();
     }
 
     public WrappedPacketOutEntityEquipment(Entity entity, @NotNull List<Pair<EquipmentSlot, ItemStack>> equipment) {
         setEntity(entity);
         this.equipment = equipment;
-        this.legacySlot = equipment.get(0).getFirst();
-        this.legacyItemStack = equipment.get(0).getSecond();
+        legacySlot = equipment.get(0).getFirst();
+        legacyItemStack = equipment.get(0).getSecond();
     }
 
     @Override
@@ -67,12 +65,6 @@ public class WrappedPacketOutEntityEquipment extends WrappedPacketEntityAbstract
             packetConstructor = PacketTypeClasses.Play.Server.ENTITY_EQUIPMENT.getConstructor();
         } catch (NoSuchMethodException ex) {
             ex.printStackTrace();
-        }
-
-        enumItemSlotClass = NMSUtils.getNMSEnumClassWithoutException("EnumItemSlot");
-
-        if (enumItemSlotClass == null) {
-            enumItemSlotClass = NMSUtils.getNMEnumClassWithoutException("world.entity.EnumItemSlot");
         }
     }
 
@@ -91,7 +83,7 @@ public class WrappedPacketOutEntityEquipment extends WrappedPacketEntityAbstract
         if (packet != null) {
             writeInt(1, slot.getId());
         } else {
-            this.legacySlot = slot;
+            legacySlot = slot;
         }
     }
 
@@ -107,7 +99,7 @@ public class WrappedPacketOutEntityEquipment extends WrappedPacketEntityAbstract
         if (packet != null) {
             writeItemStack(0, itemStack);
         } else {
-            this.legacyItemStack = itemStack;
+            legacyItemStack = itemStack;
         }
     }
 

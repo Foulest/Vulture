@@ -10,7 +10,6 @@ import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
-import net.foulest.vulture.processor.type.PacketProcessor;
 import net.foulest.vulture.util.KickUtil;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -39,14 +38,9 @@ public class BadPacketsA extends Check {
                 return;
             }
 
-            String packetName = PacketProcessor.getPacketFromId(packetId).getSimpleName();
+            String packetName = PacketType.getPacketFromId(packetId).getSimpleName();
             boolean olderThan1_8 = playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8);
             boolean inCreative = player.getGameMode() == GameMode.CREATIVE;
-            long timeSinceDelayed = playerData.getTimeSince(ActionType.SERVER_PACKET_DELAYED);
-
-            if (timeSinceDelayed < 1000L) {
-                return;
-            }
 
             switch (packetId) {
                 case PacketType.Play.Client.BLOCK_PLACE:
@@ -106,7 +100,7 @@ public class BadPacketsA extends Check {
                     break;
 
                 case PacketType.Play.Client.STEER_VEHICLE:
-                    if (count >= (playerData.getTimeSince(ActionType.LOGIN) < 2000L ? 13 : (olderThan1_8 ? 2 : 5))) {
+                    if (count >= (playerData.getTicksSince(ActionType.LOGIN) < 40 ? 13 : (olderThan1_8 ? 2 : 5))) {
                         KickUtil.kickPlayer(player, event, "packet=" + packetName + " count=" + count);
                     }
                     break;

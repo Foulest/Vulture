@@ -59,9 +59,9 @@ public class PingSpoofA extends Check {
 
             // If the client has sent a Transaction packet that was not sent by the server, kick them.
             if (transactionsOut.stream().noneMatch(pair -> pair.getX() == transaction.getActionNumber())) {
-                if (playerData.getTimeSince(ActionType.LOGIN) < 1000
-                        || playerData.getTimeSince(ActionType.RESPAWN) < 1000
-                        || playerData.getTimeSince(ActionType.TELEPORT) < 1000) {
+                if (playerData.getTicksSince(ActionType.LOGIN) < 20
+                        || playerData.getTicksSince(ActionType.RESPAWN) < 20
+                        || playerData.getTicksSince(ActionType.TELEPORT) < 20) {
                     return;
                 }
 

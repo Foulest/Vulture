@@ -9,7 +9,6 @@ import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
-import net.foulest.vulture.processor.type.PacketProcessor;
 
 @CheckInfo(name = "BadPackets (B)", type = CheckType.BADPACKETS,
         description = "Detects sending invalid packets while in a bed.")
@@ -45,7 +44,8 @@ public class BadPacketsB extends Check {
 
         } else if (packetId != PacketType.Play.Client.CHAT
                 && packetId != PacketType.Play.Client.KEEP_ALIVE) {
-            flag(false, event, "Sent invalid packet while in bed: " + PacketProcessor.getPacketFromId(packetId).getSimpleName());
+            flag(false, event, "Sent invalid packet while in bed: "
+                    + PacketType.getPacketFromId(packetId).getSimpleName());
         }
     }
 }

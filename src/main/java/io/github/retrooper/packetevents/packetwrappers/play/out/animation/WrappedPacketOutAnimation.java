@@ -20,15 +20,15 @@ public final class WrappedPacketOutAnimation extends WrappedPacketEntityAbstract
 
     public WrappedPacketOutAnimation(@NotNull Entity target, EntityAnimationType type) {
         super(0);
-        this.entityID = target.getEntityId();
-        this.entity = target;
+        entityID = target.getEntityId();
+        entity = target;
         this.type = type;
     }
 
     public WrappedPacketOutAnimation(int entityID, EntityAnimationType type) {
         super(0);
         this.entityID = entityID;
-        this.entity = null;
+        entity = null;
         this.type = type;
     }
 

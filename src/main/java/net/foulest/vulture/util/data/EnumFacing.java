@@ -405,4 +405,3 @@ public enum EnumFacing implements IStringSerializable {
         }
     }
 }
-

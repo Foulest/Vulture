@@ -26,6 +26,6 @@ public class Pair<A, B> {
         }
 
         Pair b = (Pair) o;
-        return Objects.equals(this.first, b.first) && Objects.equals(this.second, b.second);
+        return Objects.equals(first, b.first) && Objects.equals(second, b.second);
     }
 }

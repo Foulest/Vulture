@@ -19,7 +19,7 @@ public class WrappedPacketOutEntityStatus extends WrappedPacketEntityAbstraction
     }
 
     public WrappedPacketOutEntityStatus(@NotNull Entity entity, byte status) {
-        this.entityID = entity.getEntityId();
+        entityID = entity.getEntityId();
         this.entity = entity;
         this.status = status;
     }

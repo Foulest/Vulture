@@ -2,6 +2,7 @@ package io.github.retrooper.packetevents.packettype;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Packet Type IDs.
@@ -528,5 +529,19 @@ public class PacketType {
                 }
             }
         }
+    }
+
+    /**
+     * Get the packet class from the given packet id.
+     *
+     * @param packetId The packet id.
+     * @return The packet class.
+     */
+    public static Class<?> getPacketFromId(Byte packetId) {
+        return PacketType.packetIDMap.entrySet().stream()
+                .filter(entry -> Objects.equals(entry.getValue(), packetId))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(null);
     }
 }

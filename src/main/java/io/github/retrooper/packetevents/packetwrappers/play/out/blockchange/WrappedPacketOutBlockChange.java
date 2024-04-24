@@ -35,8 +35,8 @@ public class WrappedPacketOutBlockChange extends WrappedPacket implements Sendab
     }
 
     public WrappedPacketOutBlockChange(Location location) {
-        this.blockPos = new Vector3i(location);
-        this.world = location.getWorld();
+        blockPos = new Vector3i(location);
+        world = location.getWorld();
     }
 
     public WrappedPacketOutBlockChange(World world, Vector3i blockPos, Material blockType) {

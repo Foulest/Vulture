@@ -37,9 +37,9 @@ public class PingSpoofB extends Check {
     @Override
     public void handle(CancellableNMSPacketEvent event, byte packetId,
                        NMSPacket nmsPacket, Object packet, long timestamp) {
-        long timeSinceRespawn = playerData.getTimeSince(ActionType.RESPAWN);
-        long timeSinceTeleport = playerData.getTimeSince(ActionType.TELEPORT);
-        long timeSinceLogin = playerData.getTimeSince(ActionType.LOGIN);
+        long timeSinceRespawn = playerData.getTicksSince(ActionType.RESPAWN);
+        long timeSinceTeleport = playerData.getTicksSince(ActionType.TELEPORT);
+        long timeSinceLogin = playerData.getTicksSince(ActionType.LOGIN);
 
         if (packetId == PacketType.Play.Server.KEEP_ALIVE) {
             WrappedPacketOutKeepAlive keepAlive = new WrappedPacketOutKeepAlive(nmsPacket);

@@ -27,12 +27,12 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
 
     public WrappedPacketOutEntityEffect(@NotNull Entity entity, int effectID, int amplifier, int duration) {
         super(0);
-        this.entityID = entity.getEntityId();
+        entityID = entity.getEntityId();
         this.entity = entity;
         this.effectID = effectID;
         this.amplifier = amplifier;
         this.duration = duration;
-        this.byteMaskInitialized = true;
+        byteMaskInitialized = true;
     }
 
     public WrappedPacketOutEntityEffect(int entityID, int effectID, int amplifier, int duration, boolean hideParticles) {
@@ -41,7 +41,7 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
         this.effectID = effectID;
         this.amplifier = amplifier;
         this.duration = duration;
-        this.byteMaskInitialized = true;
+        byteMaskInitialized = true;
         byteMask = hideParticles ? (byte) 1 : (byte) 0;
     }
 

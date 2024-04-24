@@ -3,7 +3,6 @@ package io.github.retrooper.packetevents.packetwrappers.play.in.blockplace;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.player.Direction;
-import io.github.retrooper.packetevents.utils.player.Hand;
 import io.github.retrooper.packetevents.utils.vector.Vector3f;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
 import org.bukkit.inventory.ItemStack;
@@ -15,10 +14,6 @@ public final class WrappedPacketInBlockPlace extends WrappedPacket {
 
     public WrappedPacketInBlockPlace(NMSPacket packet) {
         super(packet);
-    }
-
-    public Hand getHand() {
-        return Hand.MAIN_HAND;
     }
 
     public Direction getDirection() {

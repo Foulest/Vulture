@@ -3,26 +3,32 @@ package net.foulest.vulture.data;
 import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
 import io.github.retrooper.packetevents.packetwrappers.play.out.position.WrappedPacketOutPosition;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
-import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import lombok.Getter;
 import lombok.Setter;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.Violation;
 import net.foulest.vulture.check.type.clientbrand.type.PayloadType;
+import net.foulest.vulture.ping.PingTask;
+import net.foulest.vulture.ping.PingTaskScheduler;
+import net.foulest.vulture.timing.Timing;
+import net.foulest.vulture.tracking.EntityTracker;
+import net.foulest.vulture.tracking.EntityTrackerEntry;
+import net.foulest.vulture.util.Constants;
+import net.foulest.vulture.util.MathUtil;
+import net.foulest.vulture.util.data.Area;
+import net.foulest.vulture.util.data.CustomLocation;
 import net.foulest.vulture.util.data.EvictingList;
-import net.foulest.vulture.util.data.Observable;
-import net.foulest.vulture.util.data.Pair;
-import net.foulest.vulture.util.raytrace.BoundingBox;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Vector3d;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 @Getter
 @Setter
@@ -32,14 +38,25 @@ public class PlayerData {
     private UUID uniqueId;
     private Player player;
     private ClientVersion version = ClientVersion.TEMP_UNRESOLVED;
+
+    // Anti-cheat data
     @Getter
     private final List<Check> checks = new ArrayList<>();
+    private boolean alertsEnabled = false;
+    private boolean verboseEnabled = false;
+    private boolean newViolationsPaused;
+    private List<Violation> violations = new ArrayList<>();
+    private List<PayloadType> payloads = new ArrayList<>();
 
-    // Packet Counts
+    // Packet counts
+    private int ticksBeforeReset;
+    private int packetsSentPerTick;
+    private int packetsSentPerSecond;
+    private final EvictingList<Integer> smoothedSentPerSecond = new EvictingList<>(5);
     private final Map<Byte, Integer> packetCounts = new HashMap<>();
 
     // Timestamps
-    private Map<ActionType, Long> actionTimestamps = new HashMap<>();
+    private Map<ActionType, Integer> actionTimestamps = new HashMap<>();
     private long transPing;
 
     // Ticks
@@ -54,11 +71,7 @@ public class PlayerData {
     private int lastAttackTick;
     private int lastDroppedPackets;
     private int lastFlyingTicks;
-    private int lastPacketDrop;
-    private int lastPosition2;
-    private int lastPosition;
     private int lastServerPositionTick;
-    private int lastTeleportReset;
     private int velocityTicks;
 
     // Packets
@@ -66,45 +79,19 @@ public class PlayerData {
     private WrappedPacketInFlying lastRotationPacket;
     private WrappedPacketInFlying lastPositionPacket;
 
-    // Other data
-    private boolean alertsEnabled;
-    private boolean newViolationsPaused;
-    private int positionCheckerTaskId;
-    private List<Violation> violations = new ArrayList<>();
-    private List<PayloadType> payloads = new ArrayList<>();
-
     // Reach data
     private Map<Short, Long> transactionSentMap = new HashMap<>();
-    private HashMap<Short, Vector> velocityIds = new HashMap<>();
     private Map<Short, Long> transactionTime = new HashMap<>();
     private Location lastOnGroundLocation;
     private Location lastLastLastLocation;
     private Location lastLastLocation;
     private Location lastLocation;
     private Location location;
-    private boolean droppedPackets;
-    private boolean lastLastOnGroundPacket;
-    private boolean lastOnGround;
-    private boolean lastOnGroundPacket;
-    private boolean onGroundPacket;
     private boolean teleportReset;
 
-    // Attacker data
-    private double attackerX;
-    private double attackerY;
-    private double attackerZ;
-    private double attackerX2;
-    private double attackerY2;
-    private double attackerZ2;
-    private float attackerYaw;
-    private float attackerPitch;
-    private float attackerYaw2;
-    private float attackerPitch2;
-
-    // Target data
-    private Observable<Player> target = new Observable<>(null);
-    private Player lastLastTarget;
-    private Player lastTarget;
+    // Attacking data
+    private boolean attacking;
+    private int lastAttacked;
 
     // Velocity check data
     // This data is retrieved a tick later than the other data.
@@ -116,11 +103,6 @@ public class PlayerData {
     private double velocityX;
     private double velocityY;
     private double velocityZ;
-
-    // Past locations
-    private EvictingList<Pair<BoundingBox, Integer>> pastLocsA = new EvictingList<>(30);
-    private EvictingList<Pair<BoundingBox, Integer>> pastLocsB = new EvictingList<>(20);
-    private EvictingList<Pair<BoundingBox, Integer>> pastLocsC = new EvictingList<>(20);
 
     // Block data
     private boolean moving;
@@ -182,14 +164,28 @@ public class PlayerData {
     // EntityAction packet
     private boolean sprinting;
     private boolean sneaking;
+    private boolean wasSneaking;
     private boolean inventoryOpen;
 
     // HeldItemSlot packet
     private int currentSlot = -1;
 
+    // Dusk
+    private final EntityTracker entityTracker;
+    private final PingTaskScheduler pingTaskScheduler;
+    private final Timing timing;
+    private final CustomLocation locO = new CustomLocation();
+    private final CustomLocation loc = new CustomLocation();
+    private final Queue<CustomLocation> teleports = new ArrayDeque<>();
+    private boolean accuratePosition;
+    private boolean hasPosition;
+
     public PlayerData(UUID uniqueId, @NotNull Player player) {
         this.uniqueId = uniqueId;
         this.player = player;
+        entityTracker = new EntityTracker();
+        pingTaskScheduler = new PingTaskScheduler();
+        timing = new Timing(player, System.currentTimeMillis());
 
         location = player.getLocation();
         lastLocation = location;
@@ -198,74 +194,171 @@ public class PlayerData {
         lastOnGroundLocation = location;
 
         for (ActionType action : ActionType.values()) {
-            actionTimestamps.put(action, 0L);
+            actionTimestamps.put(action, 0);
         }
 
         setTimestamp(ActionType.LOGIN);
     }
 
-    /**
-     * Updates the player's location values for Reach checks.
-     *
-     * @param data         Player data.
-     * @param flying       Flying packet.
-     * @param isPrimarySet If the primary location is being set.
-     */
-    public static void updateFlyingLocations(PlayerData data,
-                                             @NotNull WrappedPacketInFlying flying,
-                                             boolean isPrimarySet) {
-        if (flying.isMoving()) {
-            if (isPrimarySet) {
-                data.lastPosition = 0;
-                data.attackerX = flying.getPosition().getX();
-                data.attackerY = flying.getPosition().getY();
-                data.attackerZ = flying.getPosition().getZ();
-            } else {
-                data.lastPosition2 = 0;
-                data.attackerX2 = flying.getPosition().getX();
-                data.attackerY2 = flying.getPosition().getY();
-                data.attackerZ2 = flying.getPosition().getZ();
-            }
-        }
-
-        if (!flying.isMoving()) {
-            if (isPrimarySet) {
-                data.lastPosition++;
-            } else {
-                data.lastPosition2++;
-            }
-        }
-
-        if (flying.isRotating()) {
-            if (isPrimarySet) {
-                data.attackerYaw = flying.getYaw();
-                data.attackerPitch = flying.getPitch();
-            } else {
-                data.attackerYaw2 = flying.getYaw();
-                data.attackerPitch2 = flying.getPitch();
-            }
-        }
+    public void onPingSendStart() {
+        pingTaskScheduler.onPingSendStart();
     }
 
-    /**
-     * If the player "has fast", which is needed for a KillAura check.
-     *
-     * @return If the player "has fast".
-     */
-    public boolean hasFast() {
-        return getTimestamp(ActionType.FLYING_PACKET) != 0L
-                && getTimestamp(ActionType.FAST) != 0L
-                && getTimestamp(ActionType.FLYING_PACKET) - getTimestamp(ActionType.FAST) < 100L;
+    public void onPingSendEnd() {
+        // Increment the total ticks
+        totalTicks++;
+
+        // Clears the packet count for the next tick
+        packetsSentPerTick = 0;
+        packetCounts.clear();
+
+        // Resets the packets sent per second count every second
+        if (++ticksBeforeReset >= 20) {
+            smoothedSentPerSecond.add(packetsSentPerSecond);
+            packetsSentPerSecond = 0;
+            ticksBeforeReset = 0;
+        }
+
+        // First schedule the timing synchronization task
+        long time = System.currentTimeMillis();
+        pingTaskScheduler.scheduleTask(PingTask.end(() -> timing.ping(time)));
+        pingTaskScheduler.onPingSendEnd();
     }
 
-    /**
-     * Sets a timestamp for an action.
-     *
-     * @param action Action to set the timestamp for.
-     */
-    public void setTimestamp(ActionType action) {
-        actionTimestamps.put(action, System.currentTimeMillis());
+    public void onPongReceiveStart() {
+        pingTaskScheduler.onPongReceiveStart();
     }
+
+    public void onPongReceiveEnd() {
+        pingTaskScheduler.onPongReceiveEnd();
+    }
+
+    public void handlePlayerPacket(CustomLocation location) {
+        // Handle teleports separately
+        if (handleTeleport(location)) {
+            return;
+        }
+
+        preTick();
+
+        if (location.hasPos()) {
+            loc.setPos(location.getPos());
+        }
+
+        if (location.hasRot()) {
+            loc.setRot(location.getRot());
+        }
+
+        hasPosition = location.hasPos();
+
+        tick();
+        postTick();
+    }
+
+    // Called before the tick runs, only used for setting previous locations here
+    private void preTick() {
+        locO.set(loc);
+    }
+
+    // Called after the tick has been completed on the client
+    private void tick() {
+        if (attacking) {
+            attacking = false;
+        }
+
+        // Interpolating tracked entities is after attacking in the client tick
+        entityTracker.interpolate();
+
+        // Tick timing
+        timing.tick();
+    }
+
+    // Called after tick runs
+    private void postTick() {
+        wasSneaking = sneaking;
+        accuratePosition = hasPosition;
+    }
+
+    // Only for client responses to teleports
+    private boolean handleTeleport(@NotNull CustomLocation location) {
+        CustomLocation teleport = teleports.peek();
+
+        if (location.equals(teleport)) {
+            teleports.poll();
+            loc.set(teleport);
+            accuratePosition = true; // Position from last tick is no longer inaccurate
+            return true;
+        }
+        return false;
+    }
+
+    // Tries to mirror client logic as closely as possible while including a few errors
+    public Optional<Double> performReachCheck(@NotNull EntityTrackerEntry entry) {
+        // Get position area of entity we have been tracking
+        Area position = entry.getPosition();
+
+        // Expand position area into bounding box
+        float width = Constants.PLAYER_BOX_WIDTH;
+        float height = Constants.PLAYER_BOX_HEIGHT;
+
+        Area box = new Area(position)
+                .expand(width / 2.0, 0.0, width / 2.0)
+                .addCoord(0.0, height, 0.0);
+
+        // The hitbox is actually 0.1 blocks bigger than the bounding box
+        float offset = Constants.COLLISION_BORDER_SIZE;
+        box.expand(offset, offset, offset);
+
+        // Compensate for fast math errors in the look vector calculations (Can remove if support not needed)
+        double error = Constants.FAST_MATH_ERROR;
+        box.expand(error, error, error);
+
+        /*
+        Expand the box by the root of the minimum move amount in each axis if the player was not moving the last tick.
+        This is because they could have moved this amount on the client making a difference between a hit or miss.
+         */
+        if (!accuratePosition) {
+            double minMove = Constants.MIN_MOVE_UPDATE_ROOT;
+            box.expand(minMove, minMove, minMove);
+        }
+
+        // Mouse input is done before any sneaking updates
+        float eyeHeight = 1.62F;
+        if (wasSneaking) {
+            eyeHeight -= 0.08F;
+        }
+
+        // Previous position since movement is done after attacking in the client tick
+        Vector3d eye = locO.getPos().add(0, eyeHeight, 0, new Vector3d());
+
+        // First check if the eye position is inside
+        if (box.isInside(eye.x, eye.y, eye.z)) {
+            return Optional.of(0.0D);
+        }
+
+        // Originally Minecraft uses the old yaw value for mouse intercepts, but some clients and mods fix this
+        float yawO = locO.getRot().x;
+        float yaw = loc.getRot().x;
+        float pitch = loc.getRot().y;
+
+        Vector3d viewO = MathUtil.getLookVector(yawO, pitch).mul(Constants.RAY_LENGTH);
+        Vector3d view = MathUtil.getLookVector(yaw, pitch).mul(Constants.RAY_LENGTH);
+
+        Vector3d eyeViewO = eye.add(viewO, new Vector3d());
+        Vector3d eyeView = eye.add(view, new Vector3d());
+
+        // Calculate intercepts with Minecraft ray logic
+        Vector3d interceptO = MathUtil.calculateIntercept(box, eye, eyeViewO);
+        Vector3d intercept = MathUtil.calculateIntercept(box, eye, eyeView);
+
+        // Get minimum value of intercepts
+        return Stream.of(interceptO, intercept)
+                .filter(Objects::nonNull)
+                .map(eye::distance)
+                .min(Double::compare);
+    }
+
+    // TODO: Convert timestamps to ticks
 
     /**
      * Gets a timestamp for an action.
@@ -274,7 +367,16 @@ public class PlayerData {
      * @return Timestamp for the action.
      */
     public long getTimestamp(ActionType action) {
-        return actionTimestamps.getOrDefault(action, 0L);
+        return actionTimestamps.getOrDefault(action, 0);
+    }
+
+    /**
+     * Sets a timestamp for an action.
+     *
+     * @param action Action to set the timestamp for.
+     */
+    public void setTimestamp(ActionType action) {
+        actionTimestamps.put(action, totalTicks);
     }
 
     /**
@@ -283,8 +385,8 @@ public class PlayerData {
      * @param action Action to get the time since.
      * @return Time since the action occurred.
      */
-    public long getTimeSince(ActionType action) {
-        return System.currentTimeMillis() - actionTimestamps.getOrDefault(action, 0L);
+    public int getTicksSince(ActionType action) {
+        return totalTicks - actionTimestamps.getOrDefault(action, 0);
     }
 
     /**
@@ -293,8 +395,8 @@ public class PlayerData {
      * @param toPosition Position to check.
      * @return If the player is teleporting.
      */
-    public boolean isTeleporting(Vector3d toPosition) {
-        Vector3d lastTeleportPosition = lastTeleportPacket != null ? lastTeleportPacket.getPosition() : null;
+    public boolean isTeleporting(io.github.retrooper.packetevents.utils.vector.Vector3d toPosition) {
+        io.github.retrooper.packetevents.utils.vector.Vector3d lastTeleportPosition = lastTeleportPacket != null ? lastTeleportPacket.getPosition() : null;
 
         return lastTeleportPacket != null && lastTeleportPosition != null
                 && lastTeleportPosition.getX() == toPosition.getX()
@@ -317,5 +419,17 @@ public class PlayerData {
             }
         }
         return false;
+    }
+
+    public int incrementPacketsSentPerTick() {
+        return ++packetsSentPerTick;
+    }
+
+    public int incrementPacketsSentPerSecond() {
+        return ++packetsSentPerSecond;
+    }
+
+    public int getSmoothedPacketsPerSecond() {
+        return (int) smoothedSentPerSecond.stream().mapToInt(Integer::intValue).average().orElse(0);
     }
 }

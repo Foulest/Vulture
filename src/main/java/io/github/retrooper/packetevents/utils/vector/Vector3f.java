@@ -47,9 +47,9 @@ public class Vector3f {
      * Default constructor setting all coordinates/angles/values to their default values (=0).
      */
     public Vector3f() {
-        this.x = 0.0f;
-        this.y = 0.0f;
-        this.z = 0.0f;
+        x = 0.0f;
+        y = 0.0f;
+        z = 0.0f;
     }
 
     /**

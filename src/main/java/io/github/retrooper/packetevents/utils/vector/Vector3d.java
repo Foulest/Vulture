@@ -29,34 +29,23 @@ public class Vector3d {
      */
     public static final Vector3d INVALID = new Vector3d(-1, -1, -1);
 
-    /**
-     * X (coordinate/angle/whatever you wish)
-     */
     public double x;
-
-    /**
-     * Y (coordinate/angle/whatever you wish)
-     */
     public double y;
-
-    /**
-     * Z (coordinate/angle/whatever you wish)
-     */
     public double z;
 
     /**
      * Default constructor setting all coordinates/angles/values to their default values (=0).
      */
     public Vector3d() {
-        this.x = 0.0;
-        this.y = 0.0;
-        this.z = 0.0;
+        x = 0.0;
+        y = 0.0;
+        z = 0.0;
     }
 
     public Vector3d(@NotNull Location location) {
-        this.x = location.getX();
-        this.y = location.getY();
-        this.z = location.getZ();
+        x = location.getX();
+        y = location.getY();
+        z = location.getZ();
     }
 
     /**
@@ -141,6 +130,14 @@ public class Vector3d {
         return result;
     }
 
+    public Vector3d multiply(double target) {
+        Vector3d result = new Vector3d(x, y, z);
+        result.x *= target;
+        result.y *= target;
+        result.z *= target;
+        return result;
+    }
+
     public double distance(Vector3d target) {
         return Math.sqrt(distanceSquared(target));
     }
@@ -150,5 +147,11 @@ public class Vector3d {
         double distY = (y - target.y) * (y - target.y);
         double distZ = (z - target.z) * (z - target.z);
         return distX + distY + distZ;
+    }
+
+    public void set(double x, double y, double z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
 }

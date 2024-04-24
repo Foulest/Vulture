@@ -25,7 +25,7 @@ public class WrappedPacketOutEntityHeadRotation extends WrappedPacketEntityAbstr
     }
 
     public WrappedPacketOutEntityHeadRotation(@NotNull Entity entity, float yaw) {
-        this.entityID = entity.getEntityId();
+        entityID = entity.getEntityId();
         this.entity = entity;
         this.yaw = yaw;
     }

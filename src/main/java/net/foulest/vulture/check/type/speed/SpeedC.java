@@ -40,7 +40,7 @@ public class SpeedC extends Check {
         if (player.getAllowFlight()
                 || playerData.isOnClimbable()
                 || player.isInsideVehicle()
-                || playerData.getTimeSince(ActionType.STEER_VEHICLE) < 100L
+                || playerData.getTicksSince(ActionType.STEER_VEHICLE) <= 2
                 || player.getGameMode().equals(GameMode.CREATIVE)
                 || player.getGameMode().equals(GameMode.SPECTATOR)
                 || event.isTeleport(playerData)) {

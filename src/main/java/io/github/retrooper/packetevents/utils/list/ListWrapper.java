@@ -3,10 +3,7 @@ package io.github.retrooper.packetevents.utils.list;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
 @AllArgsConstructor
 public abstract class ListWrapper implements List {
@@ -22,14 +19,14 @@ public abstract class ListWrapper implements List {
     @Override
     public int size() {
         synchronized (this) {
-            return this.list.size();
+            return list.size();
         }
     }
 
     @Override
     public boolean isEmpty() {
         synchronized (this) {
-            return this.list.isEmpty();
+            return list.isEmpty();
         }
     }
 
@@ -37,7 +34,7 @@ public abstract class ListWrapper implements List {
     @Override
     public boolean contains(Object o) {
         synchronized (this) {
-            return this.list.contains(o);
+            return list.contains(o);
         }
     }
 
@@ -51,7 +48,7 @@ public abstract class ListWrapper implements List {
     @Override
     public Object @NotNull [] toArray() {
         synchronized (this) {
-            return this.list.toArray();
+            return list.toArray();
         }
     }
 
@@ -60,14 +57,14 @@ public abstract class ListWrapper implements List {
         processAdd(o);
 
         synchronized (this) {
-            return this.list.add(o);
+            return list.add(o);
         }
     }
 
     @Override
     public boolean remove(Object o) {
         synchronized (this) {
-            return this.list.remove(o);
+            return list.remove(o);
         }
     }
 
@@ -78,7 +75,7 @@ public abstract class ListWrapper implements List {
         }
 
         synchronized (this) {
-            return this.list.addAll(c);
+            return list.addAll(c);
         }
     }
 
@@ -89,105 +86,105 @@ public abstract class ListWrapper implements List {
         }
 
         synchronized (this) {
-            return this.list.addAll(index, c);
+            return list.addAll(index, c);
         }
     }
 
     @Override
     public void clear() {
         synchronized (this) {
-            this.list.clear();
+            list.clear();
         }
     }
 
     @Override
     public Object get(int index) {
         synchronized (this) {
-            return this.list.get(index);
+            return list.get(index);
         }
     }
 
     @Override
     public Object set(int index, Object element) {
         synchronized (this) {
-            return this.list.set(index, element);
+            return list.set(index, element);
         }
     }
 
     @Override
     public void add(int index, Object element) {
         synchronized (this) {
-            this.list.add(index, element);
+            list.add(index, element);
         }
     }
 
     @Override
     public Object remove(int index) {
         synchronized (this) {
-            return this.list.remove(index);
+            return list.remove(index);
         }
     }
 
     @Override
     public int indexOf(Object o) {
         synchronized (this) {
-            return this.list.indexOf(o);
+            return list.indexOf(o);
         }
     }
 
     @Override
     public int lastIndexOf(Object o) {
         synchronized (this) {
-            return this.list.lastIndexOf(o);
+            return list.lastIndexOf(o);
         }
     }
 
     @Override
     public @NotNull ListIterator listIterator() {
         synchronized (this) {
-            return this.list.listIterator();
+            return list.listIterator();
         }
     }
 
     @Override
     public @NotNull ListIterator listIterator(int index) {
         synchronized (this) {
-            return this.list.listIterator(index);
+            return list.listIterator(index);
         }
     }
 
     @Override
     public @NotNull List subList(int fromIndex, int toIndex) {
         synchronized (this) {
-            return this.list.subList(fromIndex, toIndex);
+            return list.subList(fromIndex, toIndex);
         }
     }
 
     @Override
     public boolean retainAll(@NotNull Collection c) {
         synchronized (this) {
-            return this.list.retainAll(c);
+            return list.retainAll(c);
         }
     }
 
     @Override
     public boolean removeAll(@NotNull Collection c) {
         synchronized (this) {
-            return this.list.removeAll(c);
+            return list.removeAll(c);
         }
     }
 
     @Override
     public boolean containsAll(@NotNull Collection c) {
         synchronized (this) {
-            return this.list.containsAll(c);
+            return new HashSet<>(list).containsAll(c);
         }
     }
 
     @Override
     public Object @NotNull [] toArray(Object @NotNull [] a) {
         synchronized (this) {
-            return this.list.toArray(a);
+            return list.toArray(a);
         }
     }
 }

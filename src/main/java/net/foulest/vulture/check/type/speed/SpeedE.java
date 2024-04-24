@@ -36,8 +36,8 @@ public class SpeedE extends Check {
 
         WrappedPacketInFlying to = event.getTo();
 
-        long timeSinceBlocking = playerData.getTimeSince(ActionType.BLOCKING);
-        long timeSinceRelease = playerData.getTimeSince(ActionType.RELEASE_USE_ITEM);
+        long timeSinceBlocking = playerData.getTicksSince(ActionType.BLOCKING);
+        long timeSinceRelease = playerData.getTicksSince(ActionType.RELEASE_USE_ITEM);
         long timeBlocking = (timeSinceBlocking < timeSinceRelease ? timeSinceBlocking : 0);
 
         boolean onIce = playerData.isOnIce();

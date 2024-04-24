@@ -19,7 +19,7 @@ public class WrappedPacketOutRemoveEntityEffect extends WrappedPacketEntityAbstr
     }
 
     public WrappedPacketOutRemoveEntityEffect(@NotNull Entity entity, int effectID) {
-        this.entityID = entity.getEntityId();
+        entityID = entity.getEntityId();
         this.entity = entity;
         this.effectID = effectID;
     }

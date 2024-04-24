@@ -43,7 +43,7 @@ public class VultureCmd {
         // Handle sub-commands.
         String subCommand = args.getArgs(0);
         switch (subCommand.toLowerCase()) {
-            case "alerts":
+            case "alerts": {
                 if (!(sender instanceof Player)) {
                     MessageUtil.messagePlayer(sender, "&cOnly players can use this command!");
                     return;
@@ -66,8 +66,9 @@ public class VultureCmd {
                 MessageUtil.messagePlayer(player, Settings.prefix + " &7Alerts have been &f"
                         + (playerData.isAlertsEnabled() ? "enabled" : "disabled") + "&7.");
                 break;
+            }
 
-            case "debug":
+            case "debug": {
                 if (!sender.hasPermission("vulture.debug")) {
                     MessageUtil.messagePlayer(sender, "&cNo permission.");
                     return;
@@ -82,8 +83,14 @@ public class VultureCmd {
                 MessageUtil.messagePlayer(sender, Settings.prefix + " &7Debug mode has been &f"
                         + (Vulture.instance.debugMode ? "enabled" : "disabled") + "&7.");
                 break;
+            }
 
-            case "verbose":
+            case "verbose": {
+                if (!(sender instanceof Player)) {
+                    MessageUtil.messagePlayer(sender, "&cOnly players can use this command!");
+                    return;
+                }
+
                 if (!sender.hasPermission("vulture.verbose")) {
                     MessageUtil.messagePlayer(sender, "&cNo permission.");
                     return;
@@ -94,12 +101,16 @@ public class VultureCmd {
                     return;
                 }
 
-                Vulture.instance.verboseMode = !Vulture.instance.verboseMode;
-                MessageUtil.messagePlayer(sender, Settings.prefix + " &7Verbose mode has been &f"
-                        + (Vulture.instance.verboseMode ? "enabled" : "disabled") + "&7.");
-                break;
+                Player player = args.getPlayer();
+                PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
-            case "info":
+                playerData.setVerboseEnabled(!playerData.isVerboseEnabled());
+                MessageUtil.messagePlayer(sender, Settings.prefix + " &7Verbose mode has been &f"
+                        + (playerData.isVerboseEnabled() ? "enabled" : "disabled") + "&7.");
+                break;
+            }
+
+            case "info": {
                 if (!sender.hasPermission("vulture.info")) {
                     MessageUtil.messagePlayer(sender, "&cNo permission.");
                     return;
@@ -110,19 +121,19 @@ public class VultureCmd {
                     return;
                 }
 
-                Player infoTarget = Bukkit.getPlayer(args.getArgs(1));
+                Player target = Bukkit.getPlayer(args.getArgs(1));
 
-                if (infoTarget == null || !infoTarget.isOnline()) {
+                if (target == null || !target.isOnline()) {
                     MessageUtil.messagePlayer(sender, "&cPlayer not found.");
                     return;
                 }
 
-                PlayerData targetData = PlayerDataManager.getPlayerData(infoTarget);
+                PlayerData targetData = PlayerDataManager.getPlayerData(target);
 
                 MessageUtil.messagePlayer(sender, "");
-                MessageUtil.messagePlayer(sender, "&e" + infoTarget.getName() + "'s Info");
+                MessageUtil.messagePlayer(sender, "&e" + target.getName() + "'s Info");
                 MessageUtil.messagePlayer(sender, "&7* &fVersion: &e" + targetData.getVersion().getDisplayName());
-                MessageUtil.messagePlayer(sender, "&7* &fPing: &e" + Vulture.instance.getPacketEvents().getPlayerUtils().getPing(infoTarget) + "ms");
+                MessageUtil.messagePlayer(sender, "&7* &fPing: &e" + Vulture.instance.getPacketEvents().getPlayerUtils().getPing(target) + "ms");
                 MessageUtil.messagePlayer(sender, "&7* &fViolations: &e" + targetData.getViolations().size());
 
                 if (!targetData.getPayloads().isEmpty()) {
@@ -137,8 +148,9 @@ public class VultureCmd {
 
                 MessageUtil.messagePlayer(sender, "");
                 break;
+            }
 
-            case "kick":
+            case "kick": {
                 if (!sender.hasPermission("vulture.kick")) {
                     MessageUtil.messagePlayer(sender, "&cNo permission.");
                     return;
@@ -149,9 +161,9 @@ public class VultureCmd {
                     return;
                 }
 
-                Player kickTarget = Bukkit.getPlayer(args.getArgs(1));
+                Player target = Bukkit.getPlayer(args.getArgs(1));
 
-                if (kickTarget == null || !kickTarget.isOnline()) {
+                if (target == null || !target.isOnline()) {
                     MessageUtil.messagePlayer(sender, "&cPlayer not found.");
                     return;
                 }
@@ -163,10 +175,11 @@ public class VultureCmd {
                 }
 
                 String reason = reasonBuilder.toString().trim();
-                KickUtil.kickPlayer(kickTarget, reason);
+                KickUtil.kickPlayer(target, reason);
                 break;
+            }
 
-            case "whitelist":
+            case "whitelist": {
                 if (!sender.hasPermission("vulture.whitelist")) {
                     MessageUtil.messagePlayer(sender, "&cNo permission.");
                     return;
@@ -297,8 +310,9 @@ public class VultureCmd {
                         break;
                 }
                 break;
+            }
 
-            case "reload":
+            case "reload": {
                 if (!sender.hasPermission("vulture.reload")) {
                     MessageUtil.messagePlayer(sender, "&cNo permission.");
                     return;
@@ -312,6 +326,7 @@ public class VultureCmd {
                 Settings.loadSettings();
                 MessageUtil.messagePlayer(sender, "&aReloaded the config files successfully.");
                 break;
+            }
 
             default:
                 handleHelp(sender, args);

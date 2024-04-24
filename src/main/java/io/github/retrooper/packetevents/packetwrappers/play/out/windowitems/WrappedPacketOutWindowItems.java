@@ -91,7 +91,7 @@ public class WrappedPacketOutWindowItems extends WrappedPacket implements Sendab
 
             writeAnyObject(1, nmsItemStacks);
         } else {
-            this.slotData = slots;
+            slotData = slots;
         }
     }
 

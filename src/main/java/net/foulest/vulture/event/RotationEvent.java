@@ -36,7 +36,7 @@ public class RotationEvent {
     /**
      * Checks if the player is teleporting.
      *
-     * @return Whether or not the player is teleporting.
+     * @return Whether the player is teleporting.
      */
     public boolean isTeleport(@NotNull PlayerData playerData) {
         return playerData.isTeleporting(to.getPosition());

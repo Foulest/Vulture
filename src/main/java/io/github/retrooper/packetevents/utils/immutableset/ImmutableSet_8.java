@@ -12,11 +12,11 @@ class ImmutableSet_8<T> extends ImmutableSetAbstract<T> {
     private ImmutableSet<T> immutableSet;
 
     public ImmutableSet_8() {
-        this.immutableSet = ImmutableSet.<T>builder().build();
+        immutableSet = ImmutableSet.<T>builder().build();
     }
 
     public ImmutableSet_8(List<T> data) {
-        this.immutableSet = ImmutableSet.<T>builder().addAll(data).build();
+        immutableSet = ImmutableSet.<T>builder().addAll(data).build();
     }
 
     @SafeVarargs
@@ -27,7 +27,7 @@ class ImmutableSet_8<T> extends ImmutableSetAbstract<T> {
             builder.add(value);
         }
 
-        this.immutableSet = builder.build();
+        immutableSet = builder.build();
     }
 
     @Override

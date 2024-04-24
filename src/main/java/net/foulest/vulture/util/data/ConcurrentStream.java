@@ -11,6 +11,11 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+/**
+ * Utility class to define a concurrent stream that can be used to perform parallel operations on a collection.
+ *
+ * @param <T> The type of the elements in the stream.
+ */
 @Getter
 @Setter
 @SuppressWarnings("unused")

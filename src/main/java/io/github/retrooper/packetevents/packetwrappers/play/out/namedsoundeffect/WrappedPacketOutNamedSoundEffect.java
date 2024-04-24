@@ -37,7 +37,7 @@ public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements S
     public WrappedPacketOutNamedSoundEffect(String soundEffectName, double effectPositionX, double effectPositionY,
                                             double effectPositionZ, float volume, float pitch) {
         this.soundEffectName = soundEffectName;
-        this.effectPosition = new Vector3d(effectPositionX, effectPositionY, effectPositionZ);
+        effectPosition = new Vector3d(effectPositionX, effectPositionY, effectPositionZ);
         this.volume = volume;
         this.pitch = pitch;
     }

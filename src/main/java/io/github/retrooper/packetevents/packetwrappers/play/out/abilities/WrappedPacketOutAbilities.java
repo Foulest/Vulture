@@ -14,7 +14,6 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
 
     private static Constructor<?> packetConstructor;
     private static Constructor<?> playerAbilitiesConstructor;
-    private static Class<?> playerAbilitiesClass;
     private boolean vulnerable;
     private boolean flying;
     private boolean allowFlight;
@@ -28,34 +27,36 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
 
     public WrappedPacketOutAbilities(boolean isVulnerable, boolean isFlying, boolean allowFlight,
                                      boolean canBuildInstantly, float flySpeed, float walkSpeed) {
-        this.vulnerable = isVulnerable;
-        this.flying = isFlying;
+        vulnerable = isVulnerable;
+        flying = isFlying;
         this.allowFlight = allowFlight;
-        this.instantBuild = canBuildInstantly;
+        instantBuild = canBuildInstantly;
         this.flySpeed = flySpeed;
         this.walkSpeed = walkSpeed;
     }
 
     @Override
     protected void load() {
+        Class<?> playerAbilitiesClass;
+
         try {
             playerAbilitiesClass = NMSUtils.getNMSClass("PlayerAbilities");
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException ex) {
             playerAbilitiesClass = NMSUtils.getNMClassWithoutException("world.entity.player.PlayerAbilities");
         }
 
         if (playerAbilitiesClass != null) {
             try {
                 playerAbilitiesConstructor = playerAbilitiesClass.getConstructor();
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
+            } catch (NoSuchMethodException ex) {
+                ex.printStackTrace();
             }
         }
 
         try {
             packetConstructor = PacketTypeClasses.Play.Server.ABILITIES.getConstructor(playerAbilitiesClass);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+        } catch (NoSuchMethodException ex) {
+            ex.printStackTrace();
         }
     }
 
@@ -71,7 +72,7 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
         if (packet != null) {
             writeBoolean(0, isVulnerable);
         } else {
-            this.vulnerable = isVulnerable;
+            vulnerable = isVulnerable;
         }
     }
 
@@ -87,7 +88,7 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
         if (packet != null) {
             writeBoolean(1, isFlying);
         } else {
-            this.flying = isFlying;
+            flying = isFlying;
         }
     }
 
@@ -103,7 +104,7 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
         if (packet != null) {
             writeBoolean(2, isFlightAllowed);
         } else {
-            this.allowFlight = isFlightAllowed;
+            allowFlight = isFlightAllowed;
         }
     }
 
@@ -119,7 +120,7 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
         if (packet != null) {
             writeBoolean(3, canBuildInstantly);
         } else {
-            this.instantBuild = canBuildInstantly;
+            instantBuild = canBuildInstantly;
         }
     }
 

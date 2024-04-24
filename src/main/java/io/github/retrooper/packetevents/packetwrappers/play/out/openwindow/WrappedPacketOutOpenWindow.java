@@ -64,7 +64,7 @@ public class WrappedPacketOutOpenWindow extends WrappedPacket {
             }
             writeInt(1, inventoryTypeID);
         } else {
-            this.windowTypeID = inventoryTypeID;
+            windowTypeID = inventoryTypeID;
         }
     }
 

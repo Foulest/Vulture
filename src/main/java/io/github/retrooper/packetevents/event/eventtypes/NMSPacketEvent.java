@@ -27,7 +27,7 @@ public abstract class NMSPacketEvent extends PacketEvent {
 
     public NMSPacketEvent(Object channel, @NotNull NMSPacket packet) {
         this.channel = channel;
-        this.socketAddress = ChannelUtils.getSocketAddress(channel);
+        socketAddress = ChannelUtils.getSocketAddress(channel);
         this.packet = packet;
         packetId = PacketType.packetIDMap.getOrDefault(packet.getRawNMSPacket().getClass(), PacketType.INVALID);
     }

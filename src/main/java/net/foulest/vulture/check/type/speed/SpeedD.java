@@ -33,7 +33,7 @@ public class SpeedD extends Check {
         float speedLevel = MovementUtil.getPotionEffectLevel(player, PotionEffectType.SPEED);
         float slownessLevel = MovementUtil.getPotionEffectLevel(player, PotionEffectType.SPEED);
 
-        long timeSinceOpen = playerData.getTimeSince(ActionType.INVENTORY_OPEN);
+        long timeSinceOpen = playerData.getTicksSince(ActionType.INVENTORY_OPEN);
 
         double deltaXZ = event.getDeltaXZ();
         double maxSpeed = player.getInventory().getType() == InventoryType.PLAYER ? 0.1 : 0.16;

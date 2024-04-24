@@ -21,17 +21,15 @@ public abstract class WrappedPacketEntityAbstraction extends WrappedPacket {
 
     public WrappedPacketEntityAbstraction(NMSPacket packet) {
         super(packet);
-        this.entityIDFieldIndex = 0;
+        entityIDFieldIndex = 0;
     }
 
     public WrappedPacketEntityAbstraction(int entityIDFieldIndex) {
-        super();
         this.entityIDFieldIndex = entityIDFieldIndex;
     }
 
     public WrappedPacketEntityAbstraction() {
-        super();
-        this.entityIDFieldIndex = 0;
+        entityIDFieldIndex = 0;
     }
 
     public int getEntityId() {
@@ -47,7 +45,7 @@ public abstract class WrappedPacketEntityAbstraction extends WrappedPacket {
         } else {
             this.entityID = entityID;
         }
-        this.entity = null;
+        entity = null;
     }
 
     public Entity getEntity(@Nullable World world) {

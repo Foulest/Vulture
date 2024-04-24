@@ -48,8 +48,8 @@ public class FlightA extends Check {
 
         // Checks the player for exemptions.
         if (playerData.isFlying()
-                || playerData.getTimeSince(ActionType.LEAVE_VEHICLE) <= 15L
-                || playerData.getTimeSince(ActionType.STOP_FLYING) <= 200L
+                || playerData.getTicksSince(ActionType.LEAVE_VEHICLE) <= 1
+                || playerData.getTicksSince(ActionType.STOP_FLYING) <= 4
                 || event.isTeleport(playerData)) {
             setLastValues(deltaY, velocity);
             return;
@@ -192,7 +192,7 @@ public class FlightA extends Check {
         }
 
         // Checks for invalid y-axis movement when stepping up a block.
-        if (Math.abs(lastDeltaY - jumpY) < threshold && playerData.getTimeSince(ActionType.DAMAGE) > 500L) {
+        if (Math.abs(lastDeltaY - jumpY) < threshold && playerData.getTicksSince(ActionType.DAMAGE) > 10) {
             double diff = (deltaY - (0.33319999363422426
                     + (0.1 * MovementUtil.getPotionEffectLevel(player, PotionEffectType.JUMP)))
                     + (0.002 * MovementUtil.getPotionEffectLevel(player, PotionEffectType.JUMP)));
@@ -253,7 +253,7 @@ public class FlightA extends Check {
 
             // Ignores quirks of the movement system.
             if (diffYGroundV < threshold) {
-                if (diffYLastV < threshold && playerData.getTimeSince(ActionType.DAMAGE) < 100L) {
+                if (diffYLastV < threshold && playerData.getTicksSince(ActionType.DAMAGE) < 2) {
                     MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (C1) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
@@ -271,7 +271,7 @@ public class FlightA extends Check {
                     return;
                 }
 
-                if (playerData.getTimeSince(ActionType.LEAVE_VEHICLE) <= 72L) {
+                if (playerData.getTicksSince(ActionType.LEAVE_VEHICLE) <= 2) {
                     MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (C4) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
@@ -289,7 +289,7 @@ public class FlightA extends Check {
                     return;
                 }
 
-                if (playerData.getTimeSince(ActionType.TELEPORT) <= 100L) {
+                if (playerData.getTicksSince(ActionType.TELEPORT) <= 2) {
                     MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (C7) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
@@ -333,10 +333,10 @@ public class FlightA extends Check {
 
             // Ignores players who are teleporting to unloaded chunks.
             if (deltaY == -0.09800000190735147
-                    && (playerData.getTimeSince(ActionType.IN_UNLOADED_CHUNK) < 1500L
-                    || playerData.getTimeSince(ActionType.TELEPORT) < 750L)) {
+                    && (playerData.getTicksSince(ActionType.IN_UNLOADED_CHUNK) < 30
+                    || playerData.getTicksSince(ActionType.TELEPORT) < 15)) {
                 MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (G1) (Y=" + deltaY + ")"
-                        + " (T=" + playerData.getTimeSince(ActionType.IN_UNLOADED_CHUNK) + ")");
+                        + " (T=" + playerData.getTicksSince(ActionType.IN_UNLOADED_CHUNK) + ")");
                 setLastValues(deltaY, velocity);
                 return;
             }
@@ -548,7 +548,7 @@ public class FlightA extends Check {
                     return;
                 }
 
-                if (diffYPredV < threshold && playerData.getTimeSince(ActionType.TELEPORT) <= 500L) {
+                if (diffYPredV < threshold && playerData.getTicksSince(ActionType.TELEPORT) <= 10) {
                     MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (K3) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
@@ -593,7 +593,7 @@ public class FlightA extends Check {
                 }
             }
 
-            if (nearGround && playerData.getTimeSince(ActionType.IN_LIQUID) < 100L && diffYPredY < 0.02) {
+            if (nearGround && playerData.getTicksSince(ActionType.IN_LIQUID) < 2 && diffYPredY < 0.02) {
                 MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (L1) (Y=" + deltaY + ")");
                 setLastValues(deltaY, velocity);
                 return;
@@ -646,14 +646,14 @@ public class FlightA extends Check {
                         + " notOnGround=" + notOnGroundTicks
                         + " flatDeltaY=" + flatDeltaYTicks
                         + " |"
-                        + " enterVehicle=" + playerData.getTimeSince(ActionType.ENTER_VEHICLE)
-                        + " steerVehicle=" + playerData.getTimeSince(ActionType.STEER_VEHICLE)
-                        + " leaveVehicle=" + playerData.getTimeSince(ActionType.LEAVE_VEHICLE)
-                        + " damage=" + playerData.getTimeSince(ActionType.DAMAGE)
-                        + " teleport=" + playerData.getTimeSince(ActionType.TELEPORT)
-                        + " liquid=" + playerData.getTimeSince(ActionType.IN_LIQUID)
-                        + " stopFlying=" + playerData.getTimeSince(ActionType.STOP_FLYING)
-                        + " inUnloadedChunk=" + playerData.getTimeSince(ActionType.IN_UNLOADED_CHUNK)
+                        + " enterVehicle=" + playerData.getTicksSince(ActionType.ENTER_VEHICLE)
+                        + " steerVehicle=" + playerData.getTicksSince(ActionType.STEER_VEHICLE)
+                        + " leaveVehicle=" + playerData.getTicksSince(ActionType.LEAVE_VEHICLE)
+                        + " damage=" + playerData.getTicksSince(ActionType.DAMAGE)
+                        + " teleport=" + playerData.getTicksSince(ActionType.TELEPORT)
+                        + " liquid=" + playerData.getTicksSince(ActionType.IN_LIQUID)
+                        + " stopFlying=" + playerData.getTicksSince(ActionType.STOP_FLYING)
+                        + " inUnloadedChunk=" + playerData.getTicksSince(ActionType.IN_UNLOADED_CHUNK)
                         + " |"
                         + " underBlock=" + underBlock
                         + " againstBlock=" + againstBlock

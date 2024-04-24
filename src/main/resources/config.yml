@@ -60,38 +60,6 @@ vulture:
         enabled: true
         maxViolations: 10
         banCommand: vulture kick %player% %check%
-      B:
-        enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
-      C:
-        enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
-      D:
-        enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
-      E:
-        enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
-      F:
-        enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
-      G:
-        enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
-      H:
-        enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
-      I:
-        enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
     autoblock:
       A:
         enabled: true
@@ -111,10 +79,6 @@ vulture:
         banCommand: vulture kick %player% %check%
     autoclicker:
       A:
-        enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
-      B:
         enabled: true
         maxViolations: 10
         banCommand: vulture kick %player% %check%
@@ -220,47 +184,6 @@ vulture:
         enabled: true
         maxViolations: 10
         banCommand: vulture kick %player% %check%
-    killaura:
-      A:
-        enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
-      B:
-        enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
-      C:
-        enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
-      D:
-        enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
-      E:
-        enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
-      F:
-        enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
-      G:
-        enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
-      H:
-        enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
-      I:
-        enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
-      J:
-        enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
     pingspoof:
       A:
         enabled: true
@@ -268,19 +191,13 @@ vulture:
         enabled: true
         maxPing: 1000
         maxAveragePing: 500
-        maxPingDeviation: 200
+        maxPingDeviation: 500
     reach:
       A:
         enabled: true
         maxViolations: 10
-        banCommand: vulture kick %player% %check%
-      B:
-        enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
-      C:
-        enabled: true
-        maxViolations: 10
+        maxDistance: 3.00075
+        cancelHits: true
         banCommand: vulture kick %player% %check%
     speed:
       A:
@@ -307,9 +224,6 @@ vulture:
         enabled: true
         maxViolations: 50
         banCommand: vulture kick %player% %check%
-    timer:
-      A:
-        enabled: true
     velocity:
       A:
         enabled: true
@@ -323,7 +237,7 @@ vulture:
   # -----------------------------------------------
   ip-whitelist:
     enabled: false
-    whitelist: []
+    whitelist: [ ]
   # -----------------------------------------------
   # Protection Settings
   #
@@ -344,7 +258,9 @@ vulture:
       portals:
         block-affected-mobs: true
     packets:
-      max-packets-per-tick: 50
+      max-packets-per-tick: 300
+      max-packets-per-second: 300
+      max-packets-smoothed: 150
       abilities:
         duplicate-flying: true
         invalid-flight-allowed: true

@@ -5,7 +5,6 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
-import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import org.jetbrains.annotations.NotNull;
 
 public class WrappedPacketInResourcePackStatus extends WrappedPacket {

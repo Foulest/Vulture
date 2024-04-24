@@ -28,7 +28,7 @@ public class WrappedPacketOutBlockBreakAnimation extends WrappedPacketEntityAbst
     }
 
     public WrappedPacketOutBlockBreakAnimation(@NotNull Entity entity, Vector3i blockPosition, int destroyStage) {
-        this.entityID = entity.getEntityId();
+        entityID = entity.getEntityId();
         this.entity = entity;
         this.blockPosition = blockPosition;
         this.destroyStage = destroyStage;
@@ -53,7 +53,7 @@ public class WrappedPacketOutBlockBreakAnimation extends WrappedPacketEntityAbst
         if (packet != null) {
             return readBlockPosition(0);
         } else {
-            return this.blockPosition;
+            return blockPosition;
         }
     }
 
@@ -69,7 +69,7 @@ public class WrappedPacketOutBlockBreakAnimation extends WrappedPacketEntityAbst
         if (packet != null) {
             return readInt(1);
         } else {
-            return this.destroyStage;
+            return destroyStage;
         }
     }
 

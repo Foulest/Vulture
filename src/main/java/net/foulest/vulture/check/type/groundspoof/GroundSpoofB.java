@@ -28,9 +28,9 @@ public class GroundSpoofB extends Check {
             double velocity = player.getVelocity().getY();
 
             // Checks the player for exemptions.
-            if (playerData.getTimeSince(ActionType.RESPAWN) < 1000L
-                    || playerData.getTimeSince(ActionType.TELEPORT) < 1000L
-                    || playerData.getTimeSince(ActionType.LOGIN) < 1000L
+            if (playerData.getTicksSince(ActionType.RESPAWN) < 20
+                    || playerData.getTicksSince(ActionType.TELEPORT) < 20
+                    || playerData.getTicksSince(ActionType.LOGIN) < 20
                     || playerData.isNearClimbable()
                     || playerData.isAgainstBlock()
                     || playerData.isNearSlimeBlock()

@@ -105,7 +105,7 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
                     factoredVelY / VELOCITY_FACTOR,
                     factoredVelZ / VELOCITY_FACTOR);
         } else {
-            return this.velocity;
+            return velocity;
         }
     }
 
@@ -162,7 +162,7 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
             byte factoredHeadPitch = readByte(2);
             return factoredHeadPitch / ROTATION_FACTOR;
         } else {
-            return this.headPitch;
+            return headPitch;
         }
     }
 

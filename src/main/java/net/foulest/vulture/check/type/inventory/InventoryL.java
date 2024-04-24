@@ -7,7 +7,6 @@ import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
-import net.foulest.vulture.processor.type.PacketProcessor;
 
 @CheckInfo(name = "Inventory (L)", type = CheckType.INVENTORY,
         description = "Detects sending packets with an open inventory.")
@@ -22,7 +21,7 @@ public class InventoryL extends Check {
     @Override
     public void handle(CancellableNMSPacketEvent event, byte packetId,
                        NMSPacket nmsPacket, Object packet, long timestamp) {
-        String packetName = PacketProcessor.getPacketFromId(packetId).getSimpleName();
+        String packetName = PacketType.getPacketFromId(packetId).getSimpleName();
 
         // This is a very bare-bones way of checking if an inventory is open.
         // It's not perfect, but it's good enough for clients above 1.8 who don't

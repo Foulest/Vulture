@@ -25,7 +25,7 @@ public class PEVersion {
      * @param version Array version.
      */
     public PEVersion(int... version) {
-        this.versionIntArray = version;
+        versionIntArray = version;
     }
 
     /**
@@ -36,7 +36,7 @@ public class PEVersion {
     public PEVersion(@NotNull String version) {
         String[] versionIntegers = version.split("\\.");
         int length = versionIntegers.length;
-        this.versionIntArray = new int[length];
+        versionIntArray = new int[length];
 
         for (int i = 0; i < length; i++) {
             versionIntArray[i] = Integer.parseInt(versionIntegers[i]);

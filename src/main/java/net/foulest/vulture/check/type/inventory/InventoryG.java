@@ -10,7 +10,6 @@ import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 
-@SuppressWarnings("deprecation")
 @CheckInfo(name = "Inventory (G)", type = CheckType.INVENTORY)
 public class InventoryG extends Check {
 

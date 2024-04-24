@@ -25,7 +25,7 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacketEntityAbs
     }
 
     public WrappedPacketOutEntityVelocity(@NotNull Entity entity, double velocityX, double velocityY, double velocityZ) {
-        this.entityID = entity.getEntityId();
+        entityID = entity.getEntityId();
         this.entity = entity;
         this.velocityX = velocityX;
         this.velocityY = velocityY;
@@ -34,9 +34,9 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacketEntityAbs
 
     public WrappedPacketOutEntityVelocity(int entityID, double velX, double velY, double velZ) {
         this.entityID = entityID;
-        this.velocityX = velX;
-        this.velocityY = velY;
-        this.velocityZ = velZ;
+        velocityX = velX;
+        velocityY = velY;
+        velocityZ = velZ;
     }
 
     @Override
@@ -75,9 +75,9 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacketEntityAbs
             writeInt(2, (int) (velocity.y * 8000.0));
             writeInt(3, (int) (velocity.z * 8000.0));
         } else {
-            this.velocityX = velocity.x;
-            this.velocityY = velocity.y;
-            this.velocityZ = velocity.z;
+            velocityX = velocity.x;
+            velocityY = velocity.y;
+            velocityZ = velocity.z;
         }
     }
 

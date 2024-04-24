@@ -35,8 +35,8 @@ public class FlightB extends Check {
         // Checks the player for exemptions.
         if (player.getGameMode() == GameMode.CREATIVE
                 || player.getGameMode() == GameMode.SPECTATOR
-                || playerData.getTimeSince(ActionType.LOGIN) < 2000L
-                || playerData.getTimeSince(ActionType.STEER_VEHICLE) < 500L
+                || playerData.getTicksSince(ActionType.LOGIN) < 40
+                || playerData.getTicksSince(ActionType.STEER_VEHICLE) < 10
                 || !playerData.isInLiquid()
                 || playerData.isOnClimbable()
                 || BlockUtil.isPlayerInUnloadedChunk(player)

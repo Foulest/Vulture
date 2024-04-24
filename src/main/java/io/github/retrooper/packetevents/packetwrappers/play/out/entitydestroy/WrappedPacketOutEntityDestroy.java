@@ -36,7 +36,7 @@ public class WrappedPacketOutEntityDestroy extends WrappedPacketEntityAbstractio
 
     @Override
     public int getEntityId() {
-        if (entityID == -1 && entityIds.length <= 0 && packet != null) {
+        if (entityID == -1 && entityIds.length == 0 && packet != null) {
             entityIds = readIntArray(0);
         }
         return entityIds[0];
@@ -45,13 +45,13 @@ public class WrappedPacketOutEntityDestroy extends WrappedPacketEntityAbstractio
     @Override
     public void setEntityId(int entityID) {
         if (packet != null) {
-            this.entityIds = new int[]{entityID};
-            writeIntArray(0, new int[]{this.entityIds[0]});
+            entityIds = new int[]{entityID};
+            writeIntArray(0, new int[]{entityIds[0]});
         } else {
-            this.entityIds = new int[]{entityID};
+            entityIds = new int[]{entityID};
         }
 
-        this.entity = null;
+        entity = null;
     }
 
     public int[] getEntityIds() {

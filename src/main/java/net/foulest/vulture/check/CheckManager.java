@@ -2,7 +2,7 @@ package net.foulest.vulture.check;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.foulest.vulture.check.type.aimassist.*;
+import net.foulest.vulture.check.type.aimassist.AimAssistA;
 import net.foulest.vulture.check.type.autoblock.AutoBlockA;
 import net.foulest.vulture.check.type.autoblock.AutoBlockB;
 import net.foulest.vulture.check.type.autoblock.AutoBlockC;
@@ -17,14 +17,10 @@ import net.foulest.vulture.check.type.flight.FlightD;
 import net.foulest.vulture.check.type.groundspoof.GroundSpoofA;
 import net.foulest.vulture.check.type.groundspoof.GroundSpoofB;
 import net.foulest.vulture.check.type.inventory.*;
-import net.foulest.vulture.check.type.killaura.*;
 import net.foulest.vulture.check.type.pingspoof.PingSpoofA;
 import net.foulest.vulture.check.type.pingspoof.PingSpoofB;
 import net.foulest.vulture.check.type.reach.ReachA;
-import net.foulest.vulture.check.type.reach.ReachB;
-import net.foulest.vulture.check.type.reach.ReachC;
 import net.foulest.vulture.check.type.speed.*;
-import net.foulest.vulture.check.type.timer.TimerA;
 import net.foulest.vulture.check.type.velocity.VelocityA;
 
 import java.util.Arrays;
@@ -48,8 +44,7 @@ public class CheckManager {
      */
     public static final List<Class<? extends Check>> CHECK_CLASSES = Collections.unmodifiableList(Arrays.asList(
             // AimAssist
-            AimAssistA.class, AimAssistB.class, AimAssistC.class, AimAssistD.class, AimAssistE.class,
-            AimAssistF.class, AimAssistG.class, AimAssistH.class, AimAssistD.class,
+            AimAssistA.class,
 
             // AutoBlock
             AutoBlockA.class, AutoBlockB.class, AutoBlockC.class, AutoBlockD.class,
@@ -75,21 +70,14 @@ public class CheckManager {
             InventoryF.class, InventoryG.class, InventoryH.class, InventoryI.class, InventoryJ.class,
             InventoryK.class, InventoryL.class,
 
-            // KillAura
-            KillAuraA.class, KillAuraB.class, KillAuraC.class, KillAuraD.class, KillAuraE.class,
-            KillAuraF.class, KillAuraG.class, KillAuraH.class, KillAuraI.class, KillAuraJ.class,
-
             // PingSpoof
             PingSpoofA.class, PingSpoofB.class,
 
             // Reach
-            ReachA.class, ReachB.class, ReachC.class,
+            ReachA.class,
 
             // Speed
             SpeedA.class, SpeedB.class, SpeedC.class, SpeedD.class, SpeedE.class,
-
-            // Timer
-            TimerA.class,
 
             // Velocity
             VelocityA.class
