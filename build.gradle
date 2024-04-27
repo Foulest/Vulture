@@ -52,7 +52,7 @@ dependencies {
 
     // ViaVersion - for version checking in PacketEvents
     // https://github.com/ViaVersion/ViaVersion
-    compileOnly group: 'com.viaversion', name: 'viaversion-api', version: '4.9.3'
+    compileOnly group: 'com.viaversion', name: 'viaversion-api', version: '4.10.0'
 
     // Lombok - for reducing boilerplate code
     // https://projectlombok.org
