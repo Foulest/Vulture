@@ -20,7 +20,7 @@ public class RotationEvent {
      *
      * @return The change in yaw.
      */
-    public double getDeltaYaw() {
+    public float getDeltaYaw() {
         return Math.abs(to.getYaw() - from.getYaw());
     }
 
@@ -29,7 +29,7 @@ public class RotationEvent {
      *
      * @return The change in pitch.
      */
-    public double getDeltaPitch() {
+    public float getDeltaPitch() {
         return Math.abs(to.getPitch() - from.getPitch());
     }
 

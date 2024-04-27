@@ -16,10 +16,9 @@
 
 **Combat Checks**
 
-- AimAssist _(x8)_
+- AimAssist _(x1)_
 - AutoBlock _(x4)_
 - AutoClicker _(x1)_
-- KillAura _(x10)_
 - Reach _(x1)_
 - Velocity _(x1)_
 

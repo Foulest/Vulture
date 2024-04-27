@@ -127,6 +127,7 @@ public class PacketSendProcessor extends Processor {
                     playerData.setVelocityXZ(Math.hypot(velocity.getX(), velocity.getZ()));
 
                     playerData.setVelocityTicks(playerData.getTotalTicks());
+                    playerData.setTimestamp(ActionType.VELOCITY_GIVEN);
                 }
                 break;
 

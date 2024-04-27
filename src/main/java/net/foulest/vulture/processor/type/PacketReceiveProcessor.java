@@ -1062,6 +1062,21 @@ public class PacketReceiveProcessor extends Processor {
                 playerData.setLastLocation(currentLocation);
                 playerData.setLocation(location);
 
+                // Handles player packet data (from Dusk).
+                // Ignores Flying packets sent after blocking/releasing.
+                if (playerData.getTicksSince(ActionType.BLOCKING) > 1
+                        && playerData.getTicksSince(ActionType.RELEASE_USE_ITEM) > 1) {
+                    if (!flying.isMoving() && !flying.isRotating()) {
+                        playerData.handlePlayerPacket(new CustomLocation(null, null));
+                    } else if (!flying.isMoving() && flying.isRotating()) {
+                        playerData.handlePlayerPacket(new CustomLocation(null, new Vector2f(flying.getYaw(), flying.getPitch())));
+                    } else if (flying.isMoving() && !flying.isRotating()) {
+                        playerData.handlePlayerPacket(new CustomLocation(new org.joml.Vector3d(flying.getPosition().getX(), flying.getPosition().getY(), flying.getPosition().getZ()), null));
+                    } else {
+                        playerData.handlePlayerPacket(new CustomLocation(new org.joml.Vector3d(flying.getPosition().getX(), flying.getPosition().getY(), flying.getPosition().getZ()), new Vector2f(flying.getYaw(), flying.getPitch())));
+                    }
+                }
+
                 // Handles player rotations.
                 if (flying.isRotating()) {
                     if (Math.abs(flyingPitch) > 90.0) {
@@ -1084,17 +1099,6 @@ public class PacketReceiveProcessor extends Processor {
                     }
 
                     playerData.setLastRotationPacket(flying);
-                }
-
-                // Handles player packet data (from Dusk).
-                if (!flying.isMoving() && !flying.isRotating()) {
-                    playerData.handlePlayerPacket(new CustomLocation(null, null));
-                } else if (!flying.isMoving() && flying.isRotating()) {
-                    playerData.handlePlayerPacket(new CustomLocation(null, new Vector2f(flying.getYaw(), flying.getPitch())));
-                } else if (flying.isMoving() && !flying.isRotating()) {
-                    playerData.handlePlayerPacket(new CustomLocation(new org.joml.Vector3d(flying.getPosition().getX(), flying.getPosition().getY(), flying.getPosition().getZ()), null));
-                } else {
-                    playerData.handlePlayerPacket(new CustomLocation(new org.joml.Vector3d(flying.getPosition().getX(), flying.getPosition().getY(), flying.getPosition().getZ()), new Vector2f(flying.getYaw(), flying.getPitch())));
                 }
 
                 // Handles player movement.

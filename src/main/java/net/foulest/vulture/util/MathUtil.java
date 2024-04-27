@@ -7,6 +7,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("BooleanMethodIsAlwaysInverted")
 public class MathUtil {
@@ -213,5 +216,34 @@ public class MathUtil {
         float f2 = -MathUtil.cos(-pitch * 0.017453292F);
         float f3 = MathUtil.sin(-pitch * 0.017453292F);
         return new org.joml.Vector3d(f1 * f2, f3, f * f2);
+    }
+
+    public static double getGcd(double a, double b) {
+        while (b > 0.001) {
+            double temp = b;
+            b = a % b;
+            a = temp;
+        }
+        return a;
+    }
+
+    public static float getGcd(float a, float b) {
+        while (b > 0.001F) {
+            float temp = b;
+            b = a % b;
+            a = temp;
+        }
+        return a;
+    }
+
+    public static <T extends Number> T getMode(@NotNull Collection<T> collect) {
+        Map<T, Integer> repeated = collect.stream()
+                .collect(Collectors.toMap(Function.identity(), v -> 1, Integer::sum));
+
+        return repeated.entrySet()
+                .stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElseThrow(NullPointerException::new);
     }
 }

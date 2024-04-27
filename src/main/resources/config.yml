@@ -122,10 +122,6 @@ vulture:
         enabled: true
         maxViolations: 50
         banCommand: vulture kick %player% %check%
-      E:
-        enabled: true
-        maxViolations: 50
-        banCommand: vulture kick %player% %check%
     groundspoof:
       A:
         enabled: true
@@ -196,7 +192,7 @@ vulture:
       A:
         enabled: true
         maxViolations: 10
-        maxDistance: 3.00075
+        maxDistance: 3.0017
         cancelHits: true
         banCommand: vulture kick %player% %check%
     speed:

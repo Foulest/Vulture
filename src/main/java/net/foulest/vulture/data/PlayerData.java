@@ -93,6 +93,17 @@ public class PlayerData {
     private boolean attacking;
     private int lastAttacked;
 
+    // Sensitivity data
+    private int sensitivity;
+    private float sensitivityY;
+    private float smallestRotationGCD;
+    private float pitchGCD;
+
+    // Cinematic data
+    private boolean cinematic;
+    private float predictYaw;
+    private float predictPitch;
+
     // Velocity check data
     // This data is retrieved a tick later than the other data.
     private double lastVelocityX;
@@ -358,8 +369,6 @@ public class PlayerData {
                 .min(Double::compare);
     }
 
-    // TODO: Convert timestamps to ticks
-
     /**
      * Gets a timestamp for an action.
      *
@@ -380,10 +389,10 @@ public class PlayerData {
     }
 
     /**
-     * Gets the time since an action occurred.
+     * Gets the ticks since an action occurred.
      *
-     * @param action Action to get the time since.
-     * @return Time since the action occurred.
+     * @param action Action to get the ticks since.
+     * @return Ticks since the action occurred.
      */
     public int getTicksSince(ActionType action) {
         return totalTicks - actionTimestamps.getOrDefault(action, 0);

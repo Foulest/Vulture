@@ -3,6 +3,8 @@ package net.foulest.vulture.check;
 import lombok.Getter;
 import lombok.Setter;
 import net.foulest.vulture.check.type.aimassist.AimAssistA;
+import net.foulest.vulture.check.type.aimassist.data.Cinematic;
+import net.foulest.vulture.check.type.aimassist.data.Sensitivity;
 import net.foulest.vulture.check.type.autoblock.AutoBlockA;
 import net.foulest.vulture.check.type.autoblock.AutoBlockB;
 import net.foulest.vulture.check.type.autoblock.AutoBlockC;
@@ -10,10 +12,7 @@ import net.foulest.vulture.check.type.autoblock.AutoBlockD;
 import net.foulest.vulture.check.type.autoclicker.AutoClickerA;
 import net.foulest.vulture.check.type.badpackets.*;
 import net.foulest.vulture.check.type.clientbrand.ClientBrand;
-import net.foulest.vulture.check.type.flight.FlightA;
-import net.foulest.vulture.check.type.flight.FlightB;
-import net.foulest.vulture.check.type.flight.FlightC;
-import net.foulest.vulture.check.type.flight.FlightD;
+import net.foulest.vulture.check.type.flight.*;
 import net.foulest.vulture.check.type.groundspoof.GroundSpoofA;
 import net.foulest.vulture.check.type.groundspoof.GroundSpoofB;
 import net.foulest.vulture.check.type.inventory.*;
@@ -43,6 +42,9 @@ public class CheckManager {
      * @see Check
      */
     public static final List<Class<? extends Check>> CHECK_CLASSES = Collections.unmodifiableList(Arrays.asList(
+            // Data
+            Cinematic.class, Sensitivity.class,
+
             // AimAssist
             AimAssistA.class,
 

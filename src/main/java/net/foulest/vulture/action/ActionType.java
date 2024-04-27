@@ -6,6 +6,7 @@ public enum ActionType {
     BLOCKING,
     CHANGE_SLOT,
     CHATTING,
+    CINEMATIC,
     CLOSE_WINDOW,
     DAMAGE,
     DELAYED_PACKET,
@@ -33,5 +34,7 @@ public enum ActionType {
     STEER_VEHICLE,
     TELEPORT,
     UNDER_BLOCK,
+    VELOCITY_GIVEN,
+    VELOCITY_TAKEN,
     WINDOW_CLICK
 }

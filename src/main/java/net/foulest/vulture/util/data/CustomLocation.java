@@ -3,6 +3,7 @@ package net.foulest.vulture.util.data;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2f;
 import org.joml.Vector2fc;
@@ -13,6 +14,7 @@ import org.joml.Vector3dc;
  * Utility class to define a custom location containing a position and rotation.
  */
 @Getter
+@ToString
 @AllArgsConstructor
 @EqualsAndHashCode
 public class CustomLocation {
