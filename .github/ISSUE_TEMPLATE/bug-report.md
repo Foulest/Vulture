@@ -8,6 +8,7 @@ assignees: ''
 ---
 
 **Before you submit this issue, please make sure you have done the following:**
+
 - [ ] I am using the latest version of Vulture
 - [ ] I am using Spigot 1.8.8 or a public fork of it
 - [ ] I have searched the issue tracker for a similar issue
@@ -23,6 +24,7 @@ A clear and concise description of what actually happened.
 
 **To Reproduce**
 Steps to reproduce the behavior:
+
 1. Go to '...'
 2. Click on '....'
 3. Scroll down to '....'
@@ -32,9 +34,10 @@ Steps to reproduce the behavior:
 If applicable, add screenshots or animated GIFs to help explain your problem.
 
 **Server Information (please complete the following information):**
- - Server version: [e.g. PaperSpigot 1.8.8]
- - Plugin version: [e.g. 1.0.0]
- - Other plugins: [e.g. EssentialsX, WorldEdit]
+
+- Server version: [e.g. PaperSpigot 1.8.8]
+- Plugin version: [e.g. 1.0.0]
+- Other plugins: [e.g. EssentialsX, WorldEdit]
 
 **Additional context**
 Add any other context about the problem here.
