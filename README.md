@@ -12,9 +12,10 @@
   **[Pledge](https://github.com/ThomasOM/Pledge)** to handle packets.
 - **Robust Framework:** Built upon the framework provided by
   **[Rainnny7](https://github.com/Rainnny7/Anticheat-Framework)**.
-- **Exploit Protection:** Protects against in-game exploits like **[IllegalStack](https://github.com/dniym/IllegalStack)**.
+- **Exploit Protection:** Protects against in-game exploits like **[IllegalStack](https://github.com/dniym/IllegalStack)
+  **.
 
-**Combat Checks**
+### Combat Checks
 
 - AimAssist _(x1)_
 - AutoBlock _(x4)_
@@ -22,22 +23,25 @@
 - Reach _(x1)_
 - Velocity _(x1)_
 
-**Movement Checks**
+### Movement Checks
 
 - Flight _(x4)_
 - GroundSpoof _(x2)_
 - Speed _(x5)_
 
-**Other Checks**
+### Other Checks
 
 - BadPackets _(x7)_
 - ClientBrand _(x1)_
 - Inventory _(x12)_
 - PingSpoof _(x2)_
 
-## Dependencies
+## Compiling
 
-- **[Spigot 1.8.9](https://papermc.io/downloads/all)**
+1. Clone the repository.
+2. Open a command prompt/terminal to the repository directory.
+3. Run `gradlew shadowJar` on Windows, or `./gradlew shadowJar` on macOS or Linux.
+4. The built `Vulture-X.X.X.jar` file will be in the `build/libs` folder.
 
 ## Getting Help
 
