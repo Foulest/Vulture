@@ -12,8 +12,8 @@
   **[Pledge](https://github.com/ThomasOM/Pledge)** to handle packets.
 - **Robust Framework:** Built upon the framework provided by
   **[Rainnny7](https://github.com/Rainnny7/Anticheat-Framework)**.
-- **Exploit Protection:** Protects against in-game exploits like **[IllegalStack](https://github.com/dniym/IllegalStack)
-  **.
+- **Exploit Protection:** Protects against in-game exploits like
+  **[IllegalStack](https://github.com/dniym/IllegalStack)**.
 
 ### Combat Checks
 
