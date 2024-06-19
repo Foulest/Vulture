@@ -7,9 +7,9 @@ name: 'CodeQL'
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ 'main' ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ 'main' ]
   schedule:
     - cron: '0 8 * * 1'
 
@@ -39,4 +39,4 @@ jobs:
       - name: 'Run CodeQL Analysis'
         uses: github/codeql-action/analyze@v3
         with:
-          category: "/language:java-kotlin"
+          category: '/language:java-kotlin'
