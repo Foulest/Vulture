@@ -26,7 +26,7 @@ public class WrappedPacketInResourcePackStatus extends WrappedPacket {
     }
 
     public void setStatus(@NotNull ResourcePackStatus status) {
-        Enum<?> enumConst = EnumUtil.valueByIndex(enumResourcePackStatusClass, status.ordinal());
+        Enum<?> enumConst = EnumUtil.valueByIndex(enumResourcePackStatusClass.asSubclass(Enum.class), status.ordinal());
         writeEnumConstant(0, enumConst);
     }
 

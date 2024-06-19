@@ -8,7 +8,7 @@ import net.foulest.vulture.util.MathUtil;
 // TODO: Make this sendable
 public class WrappedPacketOutSpawnEntity extends WrappedPacketEntityAbstraction {
 
-    private static final float rotationFactor = 256.0F / 360.0F;
+    private static final float ROTATION_FACTOR = 256.0F / 360.0F;
     private Vector3d position;
     private Vector3d velocity;
     private float pitch;
@@ -67,7 +67,7 @@ public class WrappedPacketOutSpawnEntity extends WrappedPacketEntityAbstraction 
     public float getPitch() {
         if (packet != null) {
             int factoredPitch = readInt(7);
-            return factoredPitch / rotationFactor;
+            return factoredPitch / ROTATION_FACTOR;
         } else {
             return pitch;
         }
@@ -75,7 +75,7 @@ public class WrappedPacketOutSpawnEntity extends WrappedPacketEntityAbstraction 
 
     public void setPitch(float pitch) {
         if (packet != null) {
-            writeInt(7, MathUtil.floorDouble(pitch * rotationFactor));
+            writeInt(7, MathUtil.floorDouble(pitch * ROTATION_FACTOR));
         } else {
             this.pitch = pitch;
         }
@@ -84,7 +84,7 @@ public class WrappedPacketOutSpawnEntity extends WrappedPacketEntityAbstraction 
     public float getYaw() {
         if (packet != null) {
             int factoredYaw = readInt(8);
-            return factoredYaw / rotationFactor;
+            return factoredYaw / ROTATION_FACTOR;
         } else {
             return yaw;
         }
@@ -92,7 +92,7 @@ public class WrappedPacketOutSpawnEntity extends WrappedPacketEntityAbstraction 
 
     public void setYaw(float yaw) {
         if (packet != null) {
-            writeInt(8, MathUtil.floorDouble(yaw * rotationFactor));
+            writeInt(8, MathUtil.floorDouble(yaw * ROTATION_FACTOR));
         } else {
             this.yaw = yaw;
         }

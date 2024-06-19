@@ -1,10 +1,26 @@
+/*
+ * Vulture - an advanced anti-cheat plugin designed for Minecraft 1.8.9 servers.
+ * Copyright (C) 2024 Foulest (https://github.com/Foulest)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 package net.foulest.vulture.check;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.foulest.vulture.check.type.aimassist.AimAssistA;
-import net.foulest.vulture.check.type.aimassist.data.Cinematic;
-import net.foulest.vulture.check.type.aimassist.data.Sensitivity;
 import net.foulest.vulture.check.type.autoblock.AutoBlockA;
 import net.foulest.vulture.check.type.autoblock.AutoBlockB;
 import net.foulest.vulture.check.type.autoblock.AutoBlockC;
@@ -12,7 +28,10 @@ import net.foulest.vulture.check.type.autoblock.AutoBlockD;
 import net.foulest.vulture.check.type.autoclicker.AutoClickerA;
 import net.foulest.vulture.check.type.badpackets.*;
 import net.foulest.vulture.check.type.clientbrand.ClientBrand;
-import net.foulest.vulture.check.type.flight.*;
+import net.foulest.vulture.check.type.flight.FlightA;
+import net.foulest.vulture.check.type.flight.FlightB;
+import net.foulest.vulture.check.type.flight.FlightC;
+import net.foulest.vulture.check.type.flight.FlightD;
 import net.foulest.vulture.check.type.groundspoof.GroundSpoofA;
 import net.foulest.vulture.check.type.groundspoof.GroundSpoofB;
 import net.foulest.vulture.check.type.inventory.*;
@@ -34,6 +53,7 @@ import java.util.List;
  */
 @Getter
 @Setter
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CheckManager {
 
     /**
@@ -42,12 +62,6 @@ public class CheckManager {
      * @see Check
      */
     public static final List<Class<? extends Check>> CHECK_CLASSES = Collections.unmodifiableList(Arrays.asList(
-            // Data
-            Cinematic.class, Sensitivity.class,
-
-            // AimAssist
-            AimAssistA.class,
-
             // AutoBlock
             AutoBlockA.class, AutoBlockB.class, AutoBlockC.class, AutoBlockD.class,
 
@@ -70,7 +84,7 @@ public class CheckManager {
             // Inventory
             InventoryA.class, InventoryB.class, InventoryC.class, InventoryD.class, InventoryE.class,
             InventoryF.class, InventoryG.class, InventoryH.class, InventoryI.class, InventoryJ.class,
-            InventoryK.class, InventoryL.class,
+            InventoryK.class,
 
             // PingSpoof
             PingSpoofA.class, PingSpoofB.class,

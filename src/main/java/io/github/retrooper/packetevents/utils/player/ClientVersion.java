@@ -1,10 +1,26 @@
+/*
+ * This file is part of packetevents - https://github.com/retrooper/packetevents
+ * Copyright (C) 2022 retrooper and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.retrooper.packetevents.utils.player;
 
 import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
@@ -73,8 +89,10 @@ public enum ClientVersion {
     v_1_20_2(764, "1.20.2"),
     v_1_20_3(765, "1.20.3 - 1.20.4"),
 
+    v_1_20_5(766, "1.20.5"),
+
     LOWER_THAN_SUPPORTED_VERSIONS(v_1_8.protocolVersion - 1, "Lower Than Supported"),
-    HIGHER_THAN_SUPPORTED_VERSIONS(v_1_20_3.protocolVersion + 1, "Higher Than Supported"),
+    HIGHER_THAN_SUPPORTED_VERSIONS(v_1_20_5.protocolVersion + 1, "Higher Than Supported"),
 
     /**
      * Pre releases just aren't supported, we would end up with so many enum constants.
@@ -90,11 +108,6 @@ public enum ClientVersion {
     private static final int HIGHEST_SUPPORTED_PROTOCOL_VERSION = HIGHER_THAN_SUPPORTED_VERSIONS.protocolVersion - 1;
 
     private static final Map<Integer, ClientVersion> CLIENT_VERSION_CACHE = new IdentityHashMap<>();
-
-    private static final int[] CLIENT_VERSIONS = new int[]{5, 47, 107, 108, 109, 110, 210, 315, 316, 335, 338, 340,
-            393, 401, 404, 477, 480, 485, 490, 498, 573, 575, 578, 735, 736, 751, 753, 754, 755, 756, 757, 758, 759,
-            760, 761, 762, 763, 764, 765
-    };
 
     private int protocolVersion;
     private final String displayName;
@@ -191,20 +204,6 @@ public enum ClientVersion {
      */
     public boolean isOlderThanOrEquals(ClientVersion target) {
         return this == target || isOlderThan(target);
-    }
-
-    /**
-     * Is this client version a pre-release?
-     * This method checks if this version is a pre-release.
-     *
-     * @return Is pre-release
-     */
-    public boolean isPreRelease() {
-        if (protocolVersion > LOWEST_SUPPORTED_PROTOCOL_VERSION && protocolVersion < HIGHEST_SUPPORTED_PROTOCOL_VERSION) {
-            // We don't have to iterate through the LOWEST and the HIGHEST supported version anymore...
-            return Arrays.binarySearch(CLIENT_VERSIONS, protocolVersion) < 0;
-        }
-        return true;
     }
 
     /**

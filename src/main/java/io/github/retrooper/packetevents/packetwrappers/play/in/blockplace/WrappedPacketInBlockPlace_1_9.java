@@ -59,7 +59,7 @@ final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
     }
 
     public void setDirection(@NotNull Direction direction) {
-        Enum<?> enumConst = EnumUtil.valueByIndex(NMSUtils.enumDirectionClass, direction.ordinal());
+        Enum<?> enumConst = EnumUtil.valueByIndex(NMSUtils.enumDirectionClass.asSubclass(Enum.class), direction.ordinal());
 
         if (NMSUtils.movingObjectPositionBlockClass == null) {
             writeEnumConstant(0, enumConst);

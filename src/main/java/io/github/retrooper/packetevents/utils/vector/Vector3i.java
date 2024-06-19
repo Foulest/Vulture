@@ -1,3 +1,20 @@
+/*
+ * This file is part of packetevents - https://github.com/retrooper/packetevents
+ * Copyright (C) 2022 retrooper and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.retrooper.packetevents.utils.vector;
 
 import lombok.AllArgsConstructor;
@@ -8,14 +25,17 @@ import org.bukkit.Location;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 /**
  * 3D int Vector.
  * This vector can represent coordinates, angles, or anything you want.
  * You can use this to represent an array if you really want.
  * PacketEvents usually uses this for block positions as they don't need any decimals.
- *
- * @author retrooper
- * @since 1.7
+ * <p>
+ * This is the invalid vector.
+ * In wrappers, when a vector is null in the actual packet, PacketEvents will set our high level vector X,Y,Z values
+ * to -1 to avoid null pointer exceptions.
  */
 @Getter
 @Setter
@@ -23,11 +43,6 @@ import org.jetbrains.annotations.NotNull;
 @AllArgsConstructor
 public class Vector3i {
 
-    /**
-     * This is the invalid vector.
-     * In wrappers, when a vector is null in the actual packet, PacketEvents will set our high level vector X,Y,Z values
-     * to -1 to avoid null pointer exceptions.
-     */
     public static final Vector3i INVALID = new Vector3i(-1, -1, -1);
 
     /**
@@ -103,17 +118,21 @@ public class Vector3i {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Vector3i) {
-            Vector3i vec = (Vector3i) obj;
-            return x == vec.x && y == vec.y && z == vec.z;
-        } else if (obj instanceof Vector3d) {
-            Vector3d vec = (Vector3d) obj;
-            return x == vec.x && y == vec.y && z == vec.z;
-        } else if (obj instanceof Vector3f) {
-            Vector3f vec = (Vector3f) obj;
-            return x == vec.x && y == vec.y && z == vec.z;
+        if (this == obj) {
+            return true;
         }
-        return false;
+
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+
+        Vector3i vec = (Vector3i) obj;
+        return x == vec.x && y == vec.y && z == vec.z;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y, z);
     }
 
     /**

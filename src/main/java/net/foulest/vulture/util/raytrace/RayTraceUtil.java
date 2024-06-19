@@ -1,30 +1,45 @@
+/*
+ * Vulture - an advanced anti-cheat plugin designed for Minecraft 1.8.9 servers.
+ * Copyright (C) 2024 Foulest (https://github.com/Foulest)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 package net.foulest.vulture.util.raytrace;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 @Getter
 @Setter
 @SuppressWarnings("unused")
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RayTraceUtil {
 
     public static @Nullable Block getBlockPlayerLookingAt(@NotNull Player player, double distance) {
         RayTrace rayTrace = new RayTrace(player.getEyeLocation().toVector(), player.getEyeLocation().getDirection());
-        ArrayList<Vector> positions = rayTrace.traverse(distance, 0.01);
+        List<Vector> positions = rayTrace.traverse(distance, 0.01);
 
         for (Vector vector : positions) {
             Location position = vector.toLocation(player.getWorld());
@@ -36,34 +51,6 @@ public class RayTraceUtil {
             }
         }
         return null;
-    }
-
-    public static Entity getEntityPlayerLookingAt(@NotNull Player player, double distance) {
-        RayTrace rayTrace = new RayTrace(player.getEyeLocation().toVector(), player.getEyeLocation().getDirection());
-        ArrayList<Vector> positions = rayTrace.traverse(distance, 0.01);
-
-        double closestEntityDistance = Double.MAX_VALUE;
-        Entity closestEntity = null;
-
-        for (Vector vector : positions) {
-            Collection<Entity> nearbyEntities = player.getWorld().getNearbyEntities(vector.toLocation(player.getWorld()), 0.5, 0.5, 0.5);
-
-            for (Entity entity : nearbyEntities) {
-                if (!entity.equals(player)) {
-                    BoundingBox entityBoundingBox = new BoundingBox(entity);
-
-                    if (rayTrace.intersects(entityBoundingBox, distance, 0.01)) {
-                        double eyeLocDistance = player.getEyeLocation().distance(entity.getLocation());
-
-                        if (eyeLocDistance < closestEntityDistance) {
-                            closestEntityDistance = eyeLocDistance;
-                            closestEntity = entity;
-                        }
-                    }
-                }
-            }
-        }
-        return closestEntity;
     }
 
     /**
@@ -90,7 +77,7 @@ public class RayTraceUtil {
         }
 
         // Get all positions on a raytrace
-        public ArrayList<Vector> traverse(double blocksAway, double accuracy) {
+        public List<Vector> traverse(double blocksAway, double accuracy) {
             ArrayList<Vector> positions = new ArrayList<>();
 
             for (double d = 0; d <= blocksAway; d += accuracy) {
@@ -102,7 +89,7 @@ public class RayTraceUtil {
         // Intersection detection for current raytrace
         public boolean intersects(Vector min, Vector max,
                                   double blocksAway, double accuracy) {
-            ArrayList<Vector> positions = traverse(blocksAway, accuracy);
+            List<Vector> positions = traverse(blocksAway, accuracy);
 
             for (Vector position : positions) {
                 if (intersects(position, min, max)) {
@@ -114,7 +101,7 @@ public class RayTraceUtil {
 
         // BoundingBox instead of Vector
         public boolean intersects(BoundingBox boundingBox, double blocksAway, double accuracy) {
-            ArrayList<Vector> positions = traverse(blocksAway, accuracy);
+            List<Vector> positions = traverse(blocksAway, accuracy);
 
             for (Vector position : positions) {
                 if (intersects(position, boundingBox.min, boundingBox.max)) {
@@ -138,7 +125,7 @@ public class RayTraceUtil {
         // Intersection detection for current raytrace with return
         public Vector positionOfIntersect(Vector min, Vector max,
                                           double blocksAway, double accuracy) {
-            ArrayList<Vector> positions = traverse(blocksAway, accuracy);
+            List<Vector> positions = traverse(blocksAway, accuracy);
 
             for (Vector position : positions) {
                 if (intersects(position, min, max)) {
@@ -150,7 +137,7 @@ public class RayTraceUtil {
 
         // BoundingBox instead of Vector
         public Vector positionOfIntersect(BoundingBox boundingBox, double blocksAway, double accuracy) {
-            ArrayList<Vector> positions = traverse(blocksAway, accuracy);
+            List<Vector> positions = traverse(blocksAway, accuracy);
 
             for (Vector position : positions) {
                 if (intersects(position, boundingBox.min, boundingBox.max)) {

@@ -1,3 +1,20 @@
+/*
+ * Vulture - an advanced anti-cheat plugin designed for Minecraft 1.8.9 servers.
+ * Copyright (C) 2024 Foulest (https://github.com/Foulest)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 package net.foulest.vulture.check.type.badpackets;
 
 import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
@@ -50,10 +67,16 @@ public class BadPacketsA extends Check {
                     }
                     break;
 
+                case PacketType.Play.Client.CLIENT_COMMAND:
                 case PacketType.Play.Client.TAB_COMPLETE:
-                case PacketType.Play.Client.CUSTOM_PAYLOAD:
                 case PacketType.Play.Client.ENTITY_ACTION:
                     if (count >= 3) {
+                        KickUtil.kickPlayer(player, event, "packet=" + packetName + " count=" + count);
+                    }
+                    break;
+
+                case PacketType.Play.Client.CUSTOM_PAYLOAD:
+                    if (count >= 15) {
                         KickUtil.kickPlayer(player, event, "packet=" + packetName + " count=" + count);
                     }
                     break;
@@ -85,7 +108,10 @@ public class BadPacketsA extends Check {
                             KickUtil.kickPlayer(player, event, "packet=" + packetName + " count=" + count);
                         }
                     } else {
-                        if (count >= (olderThan1_8 ? 9 : 30)) {
+                        // TODO: Remove in production.
+                        System.out.println(count);
+
+                        if (count >= 30) {
                             KickUtil.kickPlayer(player, event, "packet=" + packetName + " count=" + count
                                     + " slot=" + creativeSlot.getSlot()
                                     + " item=" + creativeSlot.getClickedItem().getType().name());
@@ -94,13 +120,21 @@ public class BadPacketsA extends Check {
                     break;
 
                 case PacketType.Play.Client.SETTINGS:
-                    if (count >= (olderThan1_8 ? 2 : 41)) {
+                    if (count >= (olderThan1_8 ? 3 : 41)) {
                         KickUtil.kickPlayer(player, event, "packet=" + packetName + " count=" + count);
                     }
                     break;
 
                 case PacketType.Play.Client.STEER_VEHICLE:
-                    if (count >= (playerData.getTicksSince(ActionType.LOGIN) < 40 ? 13 : (olderThan1_8 ? 2 : 5))) {
+                    int threshold;
+
+                    if (playerData.getTicksSince(ActionType.LOGIN) < 40) {
+                        threshold = 13;
+                    } else {
+                        threshold = olderThan1_8 ? 2 : 5;
+                    }
+
+                    if (count >= threshold) {
                         KickUtil.kickPlayer(player, event, "packet=" + packetName + " count=" + count);
                     }
                     break;
@@ -115,7 +149,8 @@ public class BadPacketsA extends Check {
 
                 default:
                     if (count >= 2) {
-                        KickUtil.kickPlayer(player, event, "packet=" + packetName + " count=" + count);
+                        KickUtil.kickPlayer(player, event, "(default)"
+                                + " packet=" + packetName + " count=" + count);
                     }
                     break;
             }

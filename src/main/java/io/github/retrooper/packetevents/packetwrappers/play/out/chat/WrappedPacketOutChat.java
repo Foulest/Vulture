@@ -104,7 +104,7 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
         Enum<?> chatMessageTypeInstance = null;
 
         if (chatMessageTypeEnum != null) {
-            chatMessageTypeInstance = EnumUtil.valueByIndex(chatMessageTypeEnum, chatPos);
+            chatMessageTypeInstance = EnumUtil.valueByIndex(chatMessageTypeEnum.asSubclass(Enum.class), chatPos);
         }
 
         switch (constructorMode) {
@@ -197,7 +197,7 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
 
                 case 2:
                 case 3:
-                    Enum<?> chatTypeEnumInstance = EnumUtil.valueByIndex(chatMessageTypeEnum, chatPosition.ordinal());
+                    Enum<?> chatTypeEnumInstance = EnumUtil.valueByIndex(chatMessageTypeEnum.asSubclass(Enum.class), chatPosition.ordinal());
                     writeEnumConstant(0, chatTypeEnumInstance);
                     break;
 

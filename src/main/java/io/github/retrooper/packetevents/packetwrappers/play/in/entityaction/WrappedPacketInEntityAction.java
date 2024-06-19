@@ -42,10 +42,10 @@ public final class WrappedPacketInEntityAction extends WrappedPacketEntityAbstra
             byte animationIndex = action.actionValue;
             writeInt(1, animationIndex + 1);
         } else {
-            Enum<?> enumConst = EnumUtil.valueOf(enumPlayerActionClass, action.name());
+            Enum<?> enumConst = EnumUtil.valueOf(enumPlayerActionClass.asSubclass(Enum.class), action.name());
 
             if (enumConst == null) {
-                enumConst = EnumUtil.valueOf(enumPlayerActionClass, action.alias);
+                enumConst = EnumUtil.valueOf(enumPlayerActionClass.asSubclass(Enum.class), action.alias);
             }
 
             writeEnumConstant(0, enumConst);

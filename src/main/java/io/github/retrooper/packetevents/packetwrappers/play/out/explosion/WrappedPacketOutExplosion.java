@@ -102,7 +102,7 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
     public List<Vector3i> getRecords() {
         if (packet != null) {
             List<Vector3i> recordsList = new ArrayList<>();
-            List<?> rawRecordsList = (List<?>) readObject(0, List.class);
+            List<?> rawRecordsList = readObject(0, List.class);
 
             if (rawRecordsList.isEmpty()) {
                 return new ArrayList<>();
@@ -125,8 +125,8 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
         if (packet != null) {
             List<Object> nmsRecordsList = new ArrayList<>();
 
-            for (Vector3i record : records) {
-                Object position = NMSUtils.generateNMSBlockPos(record);
+            for (Vector3i vector3i : records) {
+                Object position = NMSUtils.generateNMSBlockPos(vector3i);
                 nmsRecordsList.add(position);
             }
 
@@ -160,8 +160,8 @@ public class WrappedPacketOutExplosion extends WrappedPacket implements Sendable
     public Object asNMSPacket() throws Exception {
         List<Object> positions = new ArrayList<>();
 
-        for (Vector3i record : getRecords()) {
-            Object position = NMSUtils.generateNMSBlockPos(record);
+        for (Vector3i vector3i : getRecords()) {
+            Object position = NMSUtils.generateNMSBlockPos(vector3i);
             positions.add(position);
         }
 

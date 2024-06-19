@@ -1,3 +1,20 @@
+/*
+ * This file is part of packetevents - https://github.com/retrooper/packetevents
+ * Copyright (C) 2022 retrooper and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.retrooper.packetevents.processor;
 
 import io.github.retrooper.packetevents.PacketEvents;
@@ -247,7 +264,7 @@ public class PacketProcessorInternal {
      * @param event PLAY client-bound packet event.
      */
     private void interceptPlaySend(PacketPlaySendEvent event) {
-
+        // Do nothing
     }
 
     /**
@@ -256,7 +273,7 @@ public class PacketProcessorInternal {
      * @param event LOGIN server-bound packet event.
      */
     private void interceptLoginReceive(PacketLoginReceiveEvent event) {
-
+        // Do nothing
     }
 
     /**
@@ -265,7 +282,7 @@ public class PacketProcessorInternal {
      * @param event client-bound LOGIN packet event.
      */
     private void interceptLoginSend(PacketLoginSendEvent event) {
-
+        // Do nothing
     }
 
     /**
@@ -289,7 +306,7 @@ public class PacketProcessorInternal {
      * @param event server-bound STATUS packet event.
      */
     private void interceptStatusReceive(PacketStatusReceiveEvent event) {
-
+        // Do nothing
     }
 
     /**
@@ -298,7 +315,7 @@ public class PacketProcessorInternal {
      * @param event client-bound STATUS packet event.
      */
     private void interceptStatusSend(PacketStatusSendEvent event) {
-
+        // Do nothing
     }
 
     /**
@@ -307,7 +324,7 @@ public class PacketProcessorInternal {
      * @param event post server-bound play packet event.
      */
     private void interceptPostPlayReceive(PostPacketPlayReceiveEvent event) {
-
+        // Do nothing
     }
 
     /**
@@ -317,10 +334,8 @@ public class PacketProcessorInternal {
      * @param event post client-bound play packet event.
      */
     private void interceptPostPlaySend(@NotNull PostPacketPlaySendEvent event) {
-        if (event.getPacketId() == PacketType.Play.Server.KEEP_ALIVE) {
-            if (event.getPlayer() != null) {
-                PacketEvents.get().getPlayerUtils().keepAliveMap.put(event.getPlayer().getUniqueId(), event.getTimestamp());
-            }
+        if (event.getPacketId() == PacketType.Play.Server.KEEP_ALIVE && event.getPlayer() != null) {
+            PacketEvents.get().getPlayerUtils().keepAliveMap.put(event.getPlayer().getUniqueId(), event.getTimestamp());
         }
     }
 

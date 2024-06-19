@@ -1,9 +1,27 @@
+/*
+ * Vulture - an advanced anti-cheat plugin designed for Minecraft 1.8.9 servers.
+ * Copyright (C) 2024 Foulest (https://github.com/Foulest)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 package net.foulest.vulture.util.raytrace;
 
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import net.minecraft.server.v1_8_R3.AxisAlignedBB;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.IBlockData;
@@ -14,7 +32,6 @@ import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -28,6 +45,7 @@ import java.util.List;
  */
 @Getter
 @Setter
+@ToString
 @AllArgsConstructor
 @SuppressWarnings("unused")
 public class BoundingBox {
@@ -130,21 +148,6 @@ public class BoundingBox {
             }
         }
         return blocks;
-    }
-
-    @Contract("_ -> new")
-    public static @NotNull BoundingBox getEntityBoundingBox(@NotNull Location location) {
-        double f = 0.6 / 2.0;
-        double f1 = 1.8;
-        return (new BoundingBox(location.getX() - f, location.getY(), location.getZ() - f,
-                location.getX() + f, location.getY() + f1, location.getZ() + f));
-    }
-
-    @Contract("_, _, _ -> new")
-    public static @NotNull BoundingBox getEntityBoundingBox(double x, double y, double z) {
-        double f = 0.6 / 2.0;
-        double f1 = 1.8;
-        return (new BoundingBox(x - f, y, z - f, x + f, y + f1, z + f));
     }
 
     public double squareDistanceTo(@NotNull Vector3d origin, @NotNull Vector3d vec) {

@@ -1,3 +1,20 @@
+/*
+ * Vulture - an advanced anti-cheat plugin designed for Minecraft 1.8.9 servers.
+ * Copyright (C) 2024 Foulest (https://github.com/Foulest)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 package net.foulest.vulture;
 
 import dev.thomazz.pledge.Pledge;
@@ -5,6 +22,7 @@ import dev.thomazz.pledge.pinger.ClientPinger;
 import dev.thomazz.pledge.pinger.ClientPingerListener;
 import io.github.retrooper.packetevents.PacketEvents;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import net.foulest.vulture.cmds.VultureCmd;
 import net.foulest.vulture.data.PlayerData;
@@ -36,6 +54,7 @@ import java.util.logging.Level;
 public class Vulture extends JavaPlugin implements ClientPingerListener {
 
     @Getter
+    @Setter
     public static Vulture instance;
     public Pledge pledge;
     public CommandFramework framework;

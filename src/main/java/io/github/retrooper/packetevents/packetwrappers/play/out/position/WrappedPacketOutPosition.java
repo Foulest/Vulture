@@ -59,14 +59,8 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
         byte relativeMask = 0;
         Set<PlayerTeleportFlags> flags = getRelativeFlags();
 
-        if (packet != null) {
-            for (PlayerTeleportFlags flag : flags) {
-                relativeMask |= flag.maskFlag;
-            }
-        } else {
-            for (PlayerTeleportFlags flag : flags) {
-                relativeMask |= flag.maskFlag;
-            }
+        for (PlayerTeleportFlags flag : flags) {
+            relativeMask |= flag.maskFlag;
         }
         return relativeMask;
     }
@@ -77,7 +71,7 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
 
             for (PlayerTeleportFlags flag : PlayerTeleportFlags.values()) {
                 if ((mask & flag.maskFlag) == flag.maskFlag) {
-                    nmsRelativeFlags.add(EnumUtil.valueOf(enumPlayerTeleportFlagsClass, flag.name()));
+                    nmsRelativeFlags.add(EnumUtil.valueOf(enumPlayerTeleportFlagsClass.asSubclass(Enum.class), flag.name()));
                 }
             }
 
@@ -112,7 +106,7 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
             Set<Enum<?>> nmsRelativeFlags = new HashSet<>();
 
             for (PlayerTeleportFlags flag : flags) {
-                nmsRelativeFlags.add(EnumUtil.valueOf(enumPlayerTeleportFlagsClass, flag.name()));
+                nmsRelativeFlags.add(EnumUtil.valueOf(enumPlayerTeleportFlagsClass.asSubclass(Enum.class), flag.name()));
             }
 
             write(Set.class, 0, nmsRelativeFlags);
@@ -179,7 +173,7 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
         Set<Object> nmsRelativeFlags = new HashSet<>();
 
         for (PlayerTeleportFlags flag : getRelativeFlags()) {
-            nmsRelativeFlags.add(EnumUtil.valueOf(enumPlayerTeleportFlagsClass, flag.name()));
+            nmsRelativeFlags.add(EnumUtil.valueOf(enumPlayerTeleportFlagsClass.asSubclass(Enum.class), flag.name()));
         }
 
         Vector3d position = getPosition();

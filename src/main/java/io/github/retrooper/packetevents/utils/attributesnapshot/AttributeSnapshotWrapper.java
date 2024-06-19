@@ -1,3 +1,20 @@
+/*
+ * This file is part of packetevents - https://github.com/retrooper/packetevents
+ * Copyright (C) 2022 retrooper and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.retrooper.packetevents.utils.attributesnapshot;
 
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
@@ -63,12 +80,10 @@ public class AttributeSnapshotWrapper extends WrappedPacket {
                         attributeBaseClass = NMSUtils.getNMSClassWithoutException("AttributeBase");
                     }
 
-                    if (attributeSnapshotConstructor == null) {
-                        try {
-                            attributeSnapshotConstructor = attributeSnapshotClass.getConstructor(attributeBaseClass, double.class, Collection.class);
-                        } catch (NoSuchMethodException e3) {
-                            e3.printStackTrace();
-                        }
+                    try {
+                        attributeSnapshotConstructor = attributeSnapshotClass.getConstructor(attributeBaseClass, double.class, Collection.class);
+                    } catch (NoSuchMethodException e3) {
+                        e3.printStackTrace();
                     }
 
                     Class<?> iRegistryClass = NMSUtils.getNMSClassWithoutException("IRegistry");
@@ -83,6 +98,11 @@ public class AttributeSnapshotWrapper extends WrappedPacket {
                     }
                 }
             }
+        }
+
+        // Check if attributeSnapshotConstructor is still null after initialization attempts
+        if (attributeSnapshotConstructor == null) {
+            throw new IllegalStateException("Failed to initialize attributeSnapshotConstructor");
         }
 
         List<Object> nmsModifiers = new ArrayList<>(modifiers.size());

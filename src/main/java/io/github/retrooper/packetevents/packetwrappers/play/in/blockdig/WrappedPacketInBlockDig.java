@@ -49,7 +49,7 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
     }
 
     public void setDirection(@NotNull Direction direction) {
-        Enum<?> enumConst = EnumUtil.valueByIndex(NMSUtils.enumDirectionClass, direction.ordinal());
+        Enum<?> enumConst = EnumUtil.valueByIndex(NMSUtils.enumDirectionClass.asSubclass(Enum.class), direction.ordinal());
         write(NMSUtils.enumDirectionClass, 0, enumConst);
     }
 
@@ -63,7 +63,7 @@ public final class WrappedPacketInBlockDig extends WrappedPacket {
     }
 
     public void setDigType(@NotNull PlayerDigType type) {
-        Enum<?> enumConst = EnumUtil.valueByIndex(digTypeClass, type.ordinal());
+        Enum<?> enumConst = EnumUtil.valueByIndex(digTypeClass.asSubclass(Enum.class), type.ordinal());
         writeEnumConstant(0, enumConst);
     }
 

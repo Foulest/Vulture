@@ -1,3 +1,20 @@
+/*
+ * Vulture - an advanced anti-cheat plugin designed for Minecraft 1.8.9 servers.
+ * Copyright (C) 2024 Foulest (https://github.com/Foulest)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 package net.foulest.vulture.processor.type;
 
 import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
@@ -124,56 +141,55 @@ public class PacketReceiveProcessor extends Processor {
                         return;
                     }
 
-                    if (abilities.isFlightAllowed().isPresent()
-                            && abilities.isFlightAllowed().get() != playerData.isFlightAllowed()) {
-                        KickUtil.kickPlayer(player, event, Settings.abilitiesInvalidFlightAllowed,
-                                "Sent Abilities packet with invalid flight allowed values"
-                                        + " (flightAllowed=" + abilities.isFlightAllowed().get()
-                                        + " playerFlightAllowed=" + playerData.isFlightAllowed() + ")"
-                        );
-                        return;
-                    }
+                    abilities.isFlightAllowed().ifPresent(flightAllowed -> {
+                        if (Boolean.TRUE.equals(flightAllowed) != playerData.isFlightAllowed()) {
+                            KickUtil.kickPlayer(player, event, Settings.abilitiesInvalidFlightAllowed,
+                                    "Sent Abilities packet with invalid flight allowed values"
+                                            + " (flightAllowed=" + flightAllowed
+                                            + " playerFlightAllowed=" + playerData.isFlightAllowed() + ")"
+                            );
+                        }
+                    });
 
-                    if (abilities.canInstantlyBuild().isPresent()
-                            && abilities.canInstantlyBuild().get() != playerData.isInstantBuild()) {
-                        KickUtil.kickPlayer(player, event, Settings.abilitiesInvalidInstantBuild,
-                                "Sent Abilities packet with invalid instant build values"
-                                        + " (instantBuild=" + abilities.canInstantlyBuild().get()
-                                        + " playerInstantBuild=" + playerData.isInstantBuild() + ")"
-                        );
-                        return;
-                    }
+                    abilities.canInstantlyBuild().ifPresent(instantBuild -> {
+                        if (Boolean.TRUE.equals(instantBuild) != playerData.isInstantBuild()) {
+                            KickUtil.kickPlayer(player, event, Settings.abilitiesInvalidInstantBuild,
+                                    "Sent Abilities packet with invalid instant build values"
+                                            + " (instantBuild=" + instantBuild
+                                            + " playerInstantBuild=" + playerData.isInstantBuild() + ")"
+                            );
+                        }
+                    });
 
-                    if (abilities.isVulnerable().isPresent()
-                            && abilities.isVulnerable().get() != playerData.isVulnerable()) {
-                        KickUtil.kickPlayer(player, event, Settings.abilitiesInvalidInvulnerable,
-                                "Sent Abilities packet with invalid invulnerable values"
-                                        + " (invulnerable=" + abilities.isVulnerable().get()
-                                        + " playerInvulnerable=" + playerData.isVulnerable() + ")"
-                        );
-                        return;
-                    }
+                    abilities.isVulnerable().ifPresent(vulnerable -> {
+                        if (Boolean.TRUE.equals(vulnerable) != playerData.isVulnerable()) {
+                            KickUtil.kickPlayer(player, event, Settings.abilitiesInvalidInvulnerable,
+                                    "Sent Abilities packet with invalid invulnerable values"
+                                            + " (invulnerable=" + vulnerable
+                                            + " playerInvulnerable=" + playerData.isVulnerable() + ")"
+                            );
+                        }
+                    });
 
-                    if (abilities.getFlySpeed().isPresent()
-                            && !playerData.isFlightAllowed()
-                            && abilities.getFlySpeed().get() != playerData.getFlySpeed()) {
-                        KickUtil.kickPlayer(player, event, Settings.abilitiesInvalidFlySpeed,
-                                "Sent Abilities packet with invalid fly speed values"
-                                        + " (flySpeed=" + abilities.getFlySpeed().get()
-                                        + " playerFlySpeed=" + playerData.getFlySpeed() + ")"
-                        );
-                        return;
-                    }
+                    abilities.getFlySpeed().ifPresent(flySpeed -> {
+                        if (flySpeed != playerData.getFlySpeed()) {
+                            KickUtil.kickPlayer(player, event, Settings.abilitiesInvalidFlySpeed,
+                                    "Sent Abilities packet with invalid fly speed values"
+                                            + " (flySpeed=" + flySpeed
+                                            + " playerFlySpeed=" + playerData.getFlySpeed() + ")"
+                            );
+                        }
+                    });
 
-                    if (abilities.getWalkSpeed().isPresent()
-                            && abilities.getWalkSpeed().get() != playerData.getWalkSpeed()) {
-                        KickUtil.kickPlayer(player, event, Settings.abilitiesInvalidWalkSpeed,
-                                "Sent Abilities packet with invalid walk speed values"
-                                        + " (walkSpeed=" + abilities.getWalkSpeed().get()
-                                        + " playerWalkSpeed=" + playerData.getWalkSpeed() + ")"
-                        );
-                        return;
-                    }
+                    abilities.getWalkSpeed().ifPresent(walkSpeed -> {
+                        if (walkSpeed != playerData.getWalkSpeed()) {
+                            KickUtil.kickPlayer(player, event, Settings.abilitiesInvalidWalkSpeed,
+                                    "Sent Abilities packet with invalid walk speed values"
+                                            + " (walkSpeed=" + walkSpeed
+                                            + " playerWalkSpeed=" + playerData.getWalkSpeed() + ")"
+                            );
+                        }
+                    });
                 }
 
                 if (abilities.isFlying()) {
@@ -270,6 +286,7 @@ public class PacketReceiveProcessor extends Processor {
                                 case VINE:
                                 case WATER_LILY:
                                 case YELLOW_FLOWER:
+                                    playerData.setTimestamp(ActionType.BLOCK_BREAK);
                                     break;
 
                                 default:
@@ -281,6 +298,7 @@ public class PacketReceiveProcessor extends Processor {
 
                     case STOP_DESTROY_BLOCK:
                     case ABORT_DESTROY_BLOCK:
+                        playerData.setTimestamp(ActionType.BLOCK_BREAK);
                         playerData.setDigging(false);
                         break;
 
@@ -676,11 +694,9 @@ public class PacketReceiveProcessor extends Processor {
                 }
 
                 // Checks for invalid pick item payloads.
-                if (channelName.equals("MC|PickItem")) {
-                    if (!data.equals("\t")) {
-                        // TODO: Remove this in production.
-                        FileUtil.printDataToFile(data, "pick-item-data.txt");
-                    }
+                if (channelName.equals("MC|PickItem") && !data.equals("\t")) {
+                    // TODO: Remove this in production.
+                    FileUtil.printDataToFile(data, "pick-item-data.txt");
                 }
 
                 // Checks for invalid beacon payloads.
@@ -845,27 +861,30 @@ public class PacketReceiveProcessor extends Processor {
 
                 switch (playerAction) {
                     case START_SPRINTING:
-                        if ((playerData.isBlocking() && playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8))
+                        if (!playerData.isAgainstBlock() && !playerData.isFlightAllowed()
+                                && ((playerData.isBlocking() && playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8))
                                 || playerData.isShootingBow()
                                 || playerData.isDrinking()
-                                || player.hasPotionEffect(PotionEffectType.BLINDNESS)) {
+                                || playerData.getPlayer().getFoodLevel() <= 6
+                                || player.hasPotionEffect(PotionEffectType.BLINDNESS))) {
                             KickUtil.kickPlayer(player, event, Settings.startSprintingInvalidConditions,
                                     "Sent StartSprinting packet with invalid conditions"
                                             + " (blocking=" + playerData.isBlocking()
                                             + " shootingBow=" + playerData.isShootingBow()
                                             + " drinking=" + playerData.isDrinking()
+                                            + " foodLevel=" + playerData.getPlayer().getFoodLevel()
                                             + " blindness=" + player.hasPotionEffect(PotionEffectType.BLINDNESS) + ")"
                             );
                             return;
                         }
 
                         playerData.setSprinting(true);
-                        playerData.setTimestamp(ActionType.SPRINTING);
+                        playerData.setTimestamp(ActionType.START_SPRINTING);
                         break;
 
                     case STOP_SPRINTING:
                         playerData.setSprinting(false);
-                        playerData.setTimestamp(ActionType.SPRINTING);
+                        playerData.setTimestamp(ActionType.STOP_SPRINTING);
                         break;
 
                     case START_SNEAKING:
@@ -1063,9 +1082,13 @@ public class PacketReceiveProcessor extends Processor {
                 playerData.setLocation(location);
 
                 // Handles player packet data (from Dusk).
-                // Ignores Flying packets sent after blocking/releasing.
+                // Bug fix: Ignores Flying packets sent after blocking/releasing.
+                // Bug fix: Ignores Flying packets sent after breaking blocks.
+                // Bug fix: Ignores Flying packets sent after being teleported.
                 if (playerData.getTicksSince(ActionType.BLOCKING) > 1
-                        && playerData.getTicksSince(ActionType.RELEASE_USE_ITEM) > 1) {
+                        && playerData.getTicksSince(ActionType.RELEASE_USE_ITEM) > 1
+                        && playerData.getTicksSince(ActionType.BLOCK_BREAK) > 1
+                        && playerData.getTicksSince(ActionType.TELEPORT) > 1) {
                     if (!flying.isMoving() && !flying.isRotating()) {
                         playerData.handlePlayerPacket(new CustomLocation(null, null));
                     } else if (!flying.isMoving() && flying.isRotating()) {
@@ -1234,6 +1257,10 @@ public class PacketReceiveProcessor extends Processor {
                     }
 
                     playerData.setLastPositionPacket(flying);
+                }
+
+                if (playerData.getTicksSince(ActionType.ARM_ANIMATION) > 0) {
+                    playerData.setDigging(false);
                 }
 
                 playerData.setPlacingBlock(false);
@@ -1437,7 +1464,7 @@ public class PacketReceiveProcessor extends Processor {
                         || entity.isDead()
                         || entity.getWorld() != player.getWorld()) {
                     event.setCancelled(true);
-                    break;
+                    return;
                 }
 
                 double distance = entity.getLocation().distance(player.getLocation());

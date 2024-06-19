@@ -1,3 +1,20 @@
+/*
+ * Vulture - an advanced anti-cheat plugin designed for Minecraft 1.8.9 servers.
+ * Copyright (C) 2024 Foulest (https://github.com/Foulest)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 package net.foulest.vulture.check.type.clientbrand;
 
 import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
@@ -40,7 +57,11 @@ public class ClientBrand extends Check {
             new PayloadType("fabric", "Fabric", DataType.BRAND, false),
             new PayloadType("fml,forge", "Forge", DataType.BRAND, false),
             new PayloadType("vanilla", "Vanilla", DataType.BRAND, false),
+            new PayloadType("\nminebuilders8", "Minebuilders Client", DataType.BRAND, false),
+            new PayloadType("\nminebuilders9", "Minebuilders Client", DataType.BRAND, false),
 
+            new PayloadType("\u0005eyser", "Geyser Spoof", DataType.BRAND, true), // TODO: Test with real Geyser
+            new PayloadType("\boptifine", "OptiFine Spoof", DataType.BRAND, true),
             new PayloadType("Created By", "Vape Client", DataType.BRAND, true),
             new PayloadType("Geyser", "Geyser Spoof", DataType.BRAND, true),
             new PayloadType("PLC18", "PvPLounge Client Spoof", DataType.BRAND, true),
@@ -129,7 +150,7 @@ public class ClientBrand extends Check {
             new PayloadType("BiblioTypeFlag", "BiblioCraft", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("BiblioTypeUpdate", "BiblioCraft", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("BiblioUpdateInv", "BiblioCraft", DataType.REGISTER_DATA_MOD, false),
-            new PayloadType("CCL_INTERNAL", "CharsetCrafting", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("CCL_INTERNAL", "CodeChicken Lib", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("CallableHorses", "Callable Horses", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("CapsuleChannel", "Capsule", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("CarryOn", "Carry On", DataType.REGISTER_DATA_MOD, false),
@@ -175,7 +196,7 @@ public class ClientBrand extends Check {
             new PayloadType("PortalGun", "PortalGun", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("RC", "RebornCore", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("Replay|Restrict", "Replay Mod", DataType.REGISTER_DATA_MOD, false),
-            new PayloadType("SM|FX", "Unknown (SM|FX)", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("SM|FX", "Special Mobs", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("SRParasites", "Scape and Run Parasites", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("Schematica", "Schematica", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("Sonar-Packets", "SonarCore", DataType.REGISTER_DATA_MOD, false),
@@ -211,8 +232,8 @@ public class ClientBrand extends Check {
             new PayloadType("architecturecraft", "Architecture Craft", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("architectury:network", "Architectury", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("architectury:spawn_e", "Architectury", DataType.REGISTER_DATA_MOD, false),
-            new PayloadType("aroma1997core", "Aroma1997", DataType.REGISTER_DATA_MOD, false),
-            new PayloadType("aroma1997sdimension", "Aroma1997", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("aroma1997core", "Aroma1997Core", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("aroma1997sdimension", "Aroma1997s Dimensional World", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("artemislib", "ArtemisLib", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("artifacts", "Artifacts", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("asmodeuscore", "AsmodeusCore", DataType.REGISTER_DATA_MOD, false),
@@ -255,7 +276,7 @@ public class ClientBrand extends Check {
             new PayloadType("buildcrafttransport", "BuildCraft", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("caelus:main", "Caelus", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("carryon:carryonpacke", "CarryOn", DataType.REGISTER_DATA_MOD, false),
-            new PayloadType("ccl:internal", "Unknown (CCL)", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("ccl:internal", "CodeChicken Lib", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("cfm", "FurnitureMod", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("cfm:network", "FurnitureMod", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("champions", "Champions", DataType.REGISTER_DATA_MOD, false),
@@ -264,9 +285,9 @@ public class ClientBrand extends Check {
             new PayloadType("chisel:main", "Chisel", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("chococraft", "Chococraft", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("chococraftplus", "ChocoCraft Plus", DataType.REGISTER_DATA_MOD, false),
-            new PayloadType("chrs:barrels", "Unknown (chrs:barrels)", DataType.REGISTER_DATA_MOD, false),
-            new PayloadType("chrs:lib", "Chrs", DataType.REGISTER_DATA_MOD, false),
-            new PayloadType("chrs:pocket", "Chrs", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("chrs:barrels", "Charset", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("chrs:lib", "Charset", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("chrs:pocket", "Charset", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("chunkloaders:main", "ChunkLoaders", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("citadel:main_channel", "Citadel", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("cofh_core:general", "CoFH Core", DataType.REGISTER_DATA_MOD, false),
@@ -306,7 +327,7 @@ public class ClientBrand extends Check {
             new PayloadType("eidolon:network", "Eidolon", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("eiococ", "EnderIO", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("eleccore", "ElecCore", DataType.REGISTER_DATA_MOD, false),
-            new PayloadType("eleccoreloader", "eleccoreloader", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("eleccoreloader", "ElecCoreloader", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("elenaidodge", "Elenai Dodge", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("elevatorid", "Elevator Mod", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("elevatorid:main_chan", "Elevator Mod", DataType.REGISTER_DATA_MOD, false),
@@ -400,7 +421,7 @@ public class ClientBrand extends Check {
             new PayloadType("jee", "JustEnoughEnergistics", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("jei", "JustEnoughItems", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("jei:channel", "JustEnoughItems", DataType.REGISTER_DATA_MOD, false),
-            new PayloadType("jeid", "JustEnoughItems", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("jeid", "JustEnoughIDs", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("jm_dim_permission", "JourneyMap", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("jm_init_login", "JourneyMap", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("journeymap_channel", "JourneyMap", DataType.REGISTER_DATA_MOD, false),
@@ -496,7 +517,7 @@ public class ClientBrand extends Check {
             new PayloadType("rc&reborncore.&64769", "RebornCore", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("rc&techreborn.&42258", "RebornCore", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("rc&vswe.steves&10928", "RebornCore", DataType.REGISTER_DATA_MOD, false),
-            new PayloadType("reachfix", "ReachFix Mod", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("reachfix", "ReachFix", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("reccomplex", "RecComplex", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("recipemod:key", "YARCF", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("refinedstorage:main_", "Refined Storage", DataType.REGISTER_DATA_MOD, false),
@@ -542,7 +563,7 @@ public class ClientBrand extends Check {
             new PayloadType("tcg", "Pixelmon Reforged", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("tcinventoryscan", "Thaumcraft Inventory Scanning", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("tcomplement", "Tinkers Complement", DataType.REGISTER_DATA_MOD, false),
-            new PayloadType("tconstruct", "TinkersConstruct", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("tconstruct", "Tinkers Construct", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("tconstruct:network", "Tinkers Construct", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("teamlapenlib:main", "TeamLapenLib", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("teslacorelib", "TeslaCoreLib", DataType.REGISTER_DATA_MOD, false),
@@ -643,7 +664,7 @@ public class ClientBrand extends Check {
             new PayloadType("BiblioTypeFlag", "BiblioCraft", DataType.CHANNEL, false),
             new PayloadType("BiblioTypeUpdate", "BiblioCraft", DataType.CHANNEL, false),
             new PayloadType("BiblioUpdateInv", "BiblioCraft", DataType.CHANNEL, false),
-            new PayloadType("CCL_INTERNAL", "CharsetCrafting", DataType.CHANNEL, false),
+            new PayloadType("CCL_INTERNAL", "CodeChicken Lib", DataType.CHANNEL, false),
             new PayloadType("CarryOn", "Carry On", DataType.CHANNEL, false),
             new PayloadType("ChickenChunks", "ChickenChunks", DataType.CHANNEL, false),
             new PayloadType("ChiselsAndBits", "ChiselsAndBits", DataType.CHANNEL, false),
@@ -722,8 +743,8 @@ public class ClientBrand extends Check {
             new PayloadType("carryon:carryonpacke", "CarryOn", DataType.CHANNEL, false),
             new PayloadType("cfm", "FurnitureMod", DataType.CHANNEL, false),
             new PayloadType("chisel", "Chisel", DataType.CHANNEL, false),
-            new PayloadType("chrs:lib", "Chrs", DataType.CHANNEL, false),
-            new PayloadType("chrs:pocket", "Chrs", DataType.CHANNEL, false),
+            new PayloadType("chrs:lib", "Charset", DataType.CHANNEL, false),
+            new PayloadType("chrs:pocket", "Charset", DataType.CHANNEL, false),
             new PayloadType("computercraft", "ComputerCraft", DataType.CHANNEL, false),
             new PayloadType("computronics", "Computronics", DataType.CHANNEL, false),
             new PayloadType("cookingforblockheads", "CookingForBlockheads", DataType.CHANNEL, false),
@@ -850,6 +871,9 @@ public class ClientBrand extends Check {
             new PayloadType("xreliquary", "Reliquary", DataType.CHANNEL, false),
             new PayloadType("zettaindustries", "ZettaIndustries", DataType.CHANNEL, false),
             new PayloadType("FML|HS", "Forge", DataType.CHANNEL, false),
+            new PayloadType("energycontrol", "Energy Control", DataType.CHANNEL, false),
+            new PayloadType("collisiondamage", "CollisionDamage", DataType.CHANNEL, false),
+            new PayloadType("spartanweaponry", "Spartan Weaponry", DataType.CHANNEL, false),
 
             new PayloadType("eosclient:a", "Eos Client", DataType.CHANNEL, true),
             new PayloadType("#unbanearwax", "Vape Client", DataType.CHANNEL, true),
@@ -892,6 +916,8 @@ public class ClientBrand extends Check {
             String data = new String(payload.getData(), StandardCharsets.UTF_8).replace(" (Velocity)", "");
             String channelName = payload.getChannelName();
 
+            System.out.println("channelName=" + channelName + " data=" + data);
+
             // Handles and validates the payload sent by the player.
             if (channelName.equals("minecraft:brand") || channelName.equals("MC|Brand")) {
                 handleBrandData(data, event);
@@ -913,6 +939,14 @@ public class ClientBrand extends Check {
      * @param event The event to cancel.
      */
     private void handleBrandData(@NotNull String data, CancellableNMSPacketEvent event) {
+        // Kicks players sending the Log4J Exploit through their brand.
+        if (data.contains("jndi") || data.contains("ldap")
+                || data.contains("://") || data.contains("${")
+                || data.contains("192.168")) {
+            KickUtil.kickPlayer(player, event, "Blocked Brand: Log4J Exploit");
+            return;
+        }
+
         // Kicks players on Crystalware.
         if (data.contains("CRYSTAL|") || data.contains("Winterware")) {
             KickUtil.kickPlayer(player, event, "Blocked Brand: Crystalware");
@@ -1001,7 +1035,7 @@ public class ClientBrand extends Check {
                 // If the payload is blocked, kick the player.
                 if (payloadType.isBlocked()) {
                     KickUtil.kickPlayer(player, event, "Blocked "
-                            + dataType.getName() + ": " + payloadType.data);
+                            + dataType.getName() + ": " + payloadType.name);
                     return;
                 }
 
@@ -1015,7 +1049,7 @@ public class ClientBrand extends Check {
 
         // Payload was not found in the list; handle as unknown data.
         MessageUtil.sendAlert("&f" + player.getName() + " &7sent unknown data to the server.",
-                " &8(Type: " + dataType.getName() + ") (Data: " + data + ")");
+                "&8(Type: " + dataType.getName() + ") (Data: " + data + ")");
 
         // Prints the unknown data to a randomly generated text file.
         // TODO: Remove this in production.

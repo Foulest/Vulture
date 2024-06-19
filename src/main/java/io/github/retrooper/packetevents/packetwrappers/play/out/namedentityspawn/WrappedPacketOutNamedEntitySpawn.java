@@ -16,7 +16,7 @@ import java.util.UUID;
 
 public class WrappedPacketOutNamedEntitySpawn extends WrappedPacketEntityAbstraction implements SendableWrapper {
 
-    private static final float rotationDividend = 256.0F / 360.0F;
+    private static final float ROTATION_DIVIDEND = 256.0F / 360.0F;
     private static boolean doublesPresent;
     private static boolean dataWatcherPresent;
     private static Constructor<?> packetConstructor;
@@ -144,8 +144,8 @@ public class WrappedPacketOutNamedEntitySpawn extends WrappedPacketEntityAbstrac
                 writeInt(3, (int) (position.z * 32.0D));
             }
 
-            writeByte(0, (byte) (yaw * rotationDividend));
-            writeByte(1, (byte) (pitch * rotationDividend));
+            writeByte(0, (byte) (yaw * ROTATION_DIVIDEND));
+            writeByte(1, (byte) (pitch * ROTATION_DIVIDEND));
         } else {
             this.position = position;
         }
@@ -153,7 +153,7 @@ public class WrappedPacketOutNamedEntitySpawn extends WrappedPacketEntityAbstrac
 
     public float getYaw() {
         if (packet != null) {
-            return readByte(0) / rotationDividend;
+            return readByte(0) / ROTATION_DIVIDEND;
         } else {
             return yaw;
         }
@@ -161,7 +161,7 @@ public class WrappedPacketOutNamedEntitySpawn extends WrappedPacketEntityAbstrac
 
     public void setYaw(float yaw) {
         if (packet != null) {
-            writeByte(0, (byte) (yaw * rotationDividend));
+            writeByte(0, (byte) (yaw * ROTATION_DIVIDEND));
         } else {
             this.yaw = yaw;
         }
@@ -169,7 +169,7 @@ public class WrappedPacketOutNamedEntitySpawn extends WrappedPacketEntityAbstrac
 
     public float getPitch() {
         if (packet != null) {
-            return readByte(1) / rotationDividend;
+            return readByte(1) / ROTATION_DIVIDEND;
         } else {
             return pitch;
         }
@@ -177,7 +177,7 @@ public class WrappedPacketOutNamedEntitySpawn extends WrappedPacketEntityAbstrac
 
     public void setPitch(float pitch) {
         if (packet != null) {
-            writeByte(1, (byte) (pitch * rotationDividend));
+            writeByte(1, (byte) (pitch * ROTATION_DIVIDEND));
         } else {
             this.pitch = pitch;
         }

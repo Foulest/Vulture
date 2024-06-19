@@ -1,13 +1,27 @@
+/*
+ * Vulture - an advanced anti-cheat plugin designed for Minecraft 1.8.9 servers.
+ * Copyright (C) 2024 Foulest (https://github.com/Foulest)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 package net.foulest.vulture.util.data;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Maps;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import net.foulest.vulture.util.MathUtil;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -58,7 +72,7 @@ public enum EnumFacing implements IStringSerializable {
     /**
      * All facings in D-U-N-S-W-E order
      */
-    public static final EnumFacing[] VALUES = new EnumFacing[6];
+    private static final EnumFacing[] FACINGS = new EnumFacing[6];
 
     /**
      * All Facings with horizontal axis in order S-W-N-E
@@ -71,7 +85,7 @@ public enum EnumFacing implements IStringSerializable {
      * Get the opposite Facing (e.g. DOWN => UP)
      */
     public EnumFacing getOpposite() {
-        return VALUES[opposite];
+        return FACINGS[opposite];
     }
 
     /**
@@ -204,7 +218,7 @@ public enum EnumFacing implements IStringSerializable {
      * Get a Facing by its index (0-5). The order is D-U-N-S-W-E. Named getFront for legacy reasons.
      */
     public static EnumFacing getFront(int index) {
-        return VALUES[Math.abs(index % VALUES.length)];
+        return FACINGS[Math.abs(index % FACINGS.length)];
     }
 
     /**
@@ -256,7 +270,7 @@ public enum EnumFacing implements IStringSerializable {
 
     static {
         for (EnumFacing facing : values()) {
-            VALUES[facing.index] = facing;
+            FACINGS[facing.index] = facing;
 
             if (facing.getAxis().isHorizontal()) {
                 HORIZONTALS[facing.horizontalIndex] = facing;
@@ -268,6 +282,7 @@ public enum EnumFacing implements IStringSerializable {
 
     @Getter
     @Setter
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     static final class EnumFacingUtils {
 
         static final int[] AXIS_ORDINAL_MAP;

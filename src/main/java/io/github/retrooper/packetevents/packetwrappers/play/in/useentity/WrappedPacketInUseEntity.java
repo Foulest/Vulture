@@ -47,17 +47,19 @@ public final class WrappedPacketInUseEntity extends WrappedPacketEntityAbstracti
             Enum<?> useActionEnum = readEnumConstant(0, enumEntityUseActionClass);
 
             if (useActionEnum == null) {
+                action = EntityUseAction.INTERACT;
                 // This happens on some weird spigots apparently? Not sure why this is null.
-                return action = EntityUseAction.INTERACT;
+                return action;
             }
-            return action = EntityUseAction.values()[useActionEnum.ordinal()];
+            action = EntityUseAction.values()[useActionEnum.ordinal()];
+            return action;
         }
         return action;
     }
 
     private void setAction(@NotNull EntityUseAction action) {
         this.action = action;
-        Enum<?> enumConst = EnumUtil.valueByIndex(enumEntityUseActionClass, action.ordinal());
+        Enum<?> enumConst = EnumUtil.valueByIndex(enumEntityUseActionClass.asSubclass(Enum.class), action.ordinal());
         writeEnumConstant(0, enumConst);
     }
 

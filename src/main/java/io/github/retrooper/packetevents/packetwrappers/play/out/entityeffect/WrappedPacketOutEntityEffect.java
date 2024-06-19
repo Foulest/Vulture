@@ -121,10 +121,9 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
 
     private @NotNull Optional<Byte> getByteMask() {
         if (packet != null && !byteMaskInitialized) {
-            return Optional.of(byteMask = readByte(2));
-        } else {
-            return Optional.of(byteMask);
+            byteMask = readByte(2);
         }
+        return Optional.of(byteMask);
     }
 
     private void setByteMask(byte byteMask) {

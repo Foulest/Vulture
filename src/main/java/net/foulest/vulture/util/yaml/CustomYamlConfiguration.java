@@ -1,6 +1,22 @@
+/*
+ * Vulture - an advanced anti-cheat plugin designed for Minecraft 1.8.9 servers.
+ * Copyright (C) 2024 Foulest (https://github.com/Foulest)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 package net.foulest.vulture.util.yaml;
 
-import com.google.common.base.Charsets;
 import lombok.Cleanup;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -8,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -42,7 +59,7 @@ public class CustomYamlConfiguration extends YamlConfiguration {
         String dataWithoutComments = super.saveToString().trim();
 
         // Use a pattern to match YAML comments and remove them
-        String dataStrippedOfComments = dataWithoutComments.replaceAll("(?m)^\\s*#.*?$", "").trim();
+        String dataStrippedOfComments = dataWithoutComments.replaceAll("(?m)^\\s*#.*$", "").trim();
 
         StringBuilder dataWithComments = new StringBuilder();
 
@@ -101,7 +118,7 @@ public class CustomYamlConfiguration extends YamlConfiguration {
     @Override
     public void load(File file) throws IOException, InvalidConfigurationException {
         @Cleanup FileInputStream stream = new FileInputStream(file);
-        @Cleanup InputStreamReader reader = new InputStreamReader(stream, Charsets.UTF_8);
+        @Cleanup InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
         load(reader);
     }
 

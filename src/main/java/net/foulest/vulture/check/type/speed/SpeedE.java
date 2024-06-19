@@ -1,3 +1,20 @@
+/*
+ * Vulture - an advanced anti-cheat plugin designed for Minecraft 1.8.9 servers.
+ * Copyright (C) 2024 Foulest (https://github.com/Foulest)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 package net.foulest.vulture.check.type.speed;
 
 import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
@@ -36,13 +53,13 @@ public class SpeedE extends Check {
 
         WrappedPacketInFlying to = event.getTo();
 
-        long timeSinceBlocking = playerData.getTicksSince(ActionType.BLOCKING);
-        long timeSinceRelease = playerData.getTicksSince(ActionType.RELEASE_USE_ITEM);
-        long timeBlocking = (timeSinceBlocking < timeSinceRelease ? timeSinceBlocking : 0);
+        int ticksSinceBlocking = playerData.getTicksSince(ActionType.BLOCKING);
+        int ticksSinceRelease = playerData.getTicksSince(ActionType.RELEASE_USE_ITEM);
+        int ticksBlocking = (ticksSinceBlocking < ticksSinceRelease ? ticksSinceBlocking : 0);
 
         boolean onIce = playerData.isOnIce();
         boolean blocking = playerData.isBlocking();
-        boolean rapidlyBlocking = timeSinceBlocking <= 100 && timeSinceRelease <= 100;
+        boolean rapidlyBlocking = ticksSinceBlocking <= 2 && ticksSinceRelease <= 2;
 
         float speedLevel = MovementUtil.getPotionEffectLevel(player, PotionEffectType.SPEED);
         float walkSpeed = player.getWalkSpeed();
@@ -68,7 +85,7 @@ public class SpeedE extends Check {
                     flag(true, "Standard"
                             + " (deltaXZ=" + deltaXZ
                             + " maxSpeed=" + maxSpeed
-                            + " timeBlocking=" + timeBlocking
+                            + " timeBlocking=" + ticksBlocking
                             + " buffer=" + bufferStandard + ")");
                 }
             } else {
@@ -85,7 +102,7 @@ public class SpeedE extends Check {
                     flag(true, "Rapidly blocking"
                             + " (deltaXZ=" + deltaXZ
                             + " maxSpeed=" + maxSpeed
-                            + " timeBlocking=" + timeBlocking
+                            + " timeBlocking=" + ticksBlocking
                             + " buffer=" + bufferRapid + ")");
                 }
             } else {

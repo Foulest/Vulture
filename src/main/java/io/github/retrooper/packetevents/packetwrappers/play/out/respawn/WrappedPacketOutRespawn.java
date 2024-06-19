@@ -24,7 +24,7 @@ class WrappedPacketOutRespawn extends WrappedPacket {
 
     public void setDimension(World.Environment dimension) {
         if (packet != null) {
-            writeDimension(0, 0, dimension);
+            writeDimension(0, dimension);
         } else {
             this.dimension = dimension;
         }

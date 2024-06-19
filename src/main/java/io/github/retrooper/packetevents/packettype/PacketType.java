@@ -1,4 +1,25 @@
+/*
+ * This file is part of packetevents - https://github.com/retrooper/packetevents
+ * Copyright (C) 2022 retrooper and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.retrooper.packetevents.packettype;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -12,6 +33,7 @@ import java.util.Objects;
  * @author retrooper
  * @since 1.6.8
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PacketType {
 
     /**
@@ -19,7 +41,8 @@ public class PacketType {
      * This value may change over the versions, so it is important to use the variable and not hard code its value.
      */
     public static final byte INVALID = -128;
-    public static final Map<Class<?>, Byte> packetIDMap = new IdentityHashMap<>();
+    @Getter
+    protected static final Map<Class<?>, Byte> packetIDMap = new IdentityHashMap<>();
 
     private static void insertPacketID(Class<?> cls, byte packetID) {
         if (cls != null) {
@@ -47,6 +70,7 @@ public class PacketType {
      * @see <a href="https://wiki.vg/Protocol#Status">https://wiki.vg/Protocol#Status</a>
      * @since 1.7
      */
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Status {
 
         /**
@@ -56,6 +80,7 @@ public class PacketType {
          * @see <a href="https://wiki.vg/Protocol#Serverbound_2">https://wiki.vg/Protocol#Serverbound_2</a>
          * @since 1.8
          */
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class Client {
 
             public static final byte START = -127;
@@ -74,6 +99,7 @@ public class PacketType {
          * @see <a href="https://wiki.vg/Protocol#Clientbound_2">https://wiki.vg/Protocol#Clientbound_2</a>
          * @since 1.8
          */
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class Server {
 
             public static final byte PONG = -125;
@@ -93,6 +119,7 @@ public class PacketType {
      * @see <a href="https://wiki.vg/Protocol#Handshaking">https://wiki.vg/Protocol#Handshaking</a>
      * @since 1.8
      */
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Handshaking {
 
         /**
@@ -101,6 +128,7 @@ public class PacketType {
          * @author retrooper
          * @since 1.8
          */
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class Client {
 
             public static final byte SET_PROTOCOL = -123;
@@ -118,6 +146,7 @@ public class PacketType {
      * @see <a href="https://wiki.vg/Protocol#Login">https://wiki.vg/Protocol#Login</a>
      * @since 1.7
      */
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Login {
 
         /**
@@ -127,6 +156,7 @@ public class PacketType {
          * @see <a href="https://wiki.vg/Protocol#Serverbound_3">https://wiki.vg/Protocol#Serverbound_3</a>
          * @since 1.8
          */
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class Client {
 
             public static final byte START = -121;
@@ -145,6 +175,7 @@ public class PacketType {
          * @see <a href="https://wiki.vg/Protocol#Clientbound_3">https://wiki.vg/Protocol#Clientbound_3</a>
          * @since 1.8
          */
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class Server {
 
             public static final byte DISCONNECT = -118;
@@ -168,6 +199,7 @@ public class PacketType {
      * @see <a href="https://wiki.vg/Protocol#Play">https://wiki.vg/Protocol#Play</a>
      * @since 1.8
      */
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Play {
 
         /**
@@ -177,6 +209,7 @@ public class PacketType {
          * @see <a href="https://wiki.vg/Protocol#Serverbound_4">https://wiki.vg/Protocol#Serverbound_4</a>
          * @since 1.8
          */
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class Client {
 
             public static final byte TELEPORT_ACCEPT = -114;
@@ -284,6 +317,7 @@ public class PacketType {
              * @author retrooper
              * @since 1.8
              */
+            @NoArgsConstructor(access = AccessLevel.PRIVATE)
             public static class Util {
 
                 /**
@@ -309,6 +343,7 @@ public class PacketType {
          * @see <a href="https://wiki.vg/Protocol#Clientbound_4">https://wiki.vg/Protocol#Clientbound_4</a>
          * @since 1.8
          */
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class Server {
 
             public static final byte SPAWN_ENTITY = -67;
@@ -512,6 +547,7 @@ public class PacketType {
              * @author retrooper
              * @since 1.8
              */
+            @NoArgsConstructor(access = AccessLevel.PRIVATE)
             public static class Util {
 
                 /**

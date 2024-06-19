@@ -1,3 +1,20 @@
+/*
+ * This file is part of packetevents - https://github.com/retrooper/packetevents
+ * Copyright (C) 2022 retrooper and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.retrooper.packetevents.utils.attributesnapshot;
 
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
@@ -6,7 +23,6 @@ import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
@@ -29,7 +45,6 @@ public class AttributeModifierWrapper extends WrappedPacket {
         super(create(id, name, amount, operation).packet);
     }
 
-    @Contract("_, _, _, _ -> new")
     public static @NotNull AttributeModifierWrapper create(UUID id, String name, double amount, Operation operation) {
         if (attributeModifierConstructor == null) {
             try {
@@ -39,6 +54,11 @@ public class AttributeModifierWrapper extends WrappedPacket {
             }
         }
 
+        // Check if attributeModifierConstructor is still null after initialization attempt
+        if (attributeModifierConstructor == null) {
+            throw new IllegalStateException("Failed to initialize attributeModifierConstructor");
+        }
+
         int operationIndex = operation.ordinal();
         Object attributeModifierObj = null;
 
@@ -46,7 +66,7 @@ public class AttributeModifierWrapper extends WrappedPacket {
             if (operationEnumClass == null) {
                 attributeModifierObj = attributeModifierConstructor.newInstance(id, name, amount, operationIndex);
             } else {
-                Enum<?> enumConst = EnumUtil.valueByIndex(operationEnumClass, operationIndex);
+                Enum<?> enumConst = EnumUtil.valueByIndex(operationEnumClass.asSubclass(Enum.class), operationIndex);
                 attributeModifierObj = attributeModifierConstructor.newInstance(id, name, amount, enumConst);
             }
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException ex) {
@@ -84,7 +104,7 @@ public class AttributeModifierWrapper extends WrappedPacket {
         if (operationEnumClass == null) {
             writeInt(0, operation.ordinal());
         } else {
-            Enum<?> enumConst = EnumUtil.valueByIndex(operationEnumClass, operation.ordinal());
+            Enum<?> enumConst = EnumUtil.valueByIndex(operationEnumClass.asSubclass(Enum.class), operation.ordinal());
             writeEnumConstant(0, enumConst);
         }
     }

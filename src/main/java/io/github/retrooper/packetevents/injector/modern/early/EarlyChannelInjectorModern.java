@@ -1,3 +1,20 @@
+/*
+ * This file is part of packetevents - https://github.com/retrooper/packetevents
+ * Copyright (C) 2022 retrooper and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.retrooper.packetevents.injector.modern.early;
 
 import io.github.retrooper.packetevents.PacketEvents;
@@ -64,16 +81,12 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
             for (Field field : serverConnection.getClass().getDeclaredFields()) {
                 field.setAccessible(true);
-                Object value = null;
+                Object value = getFieldValue(field, serverConnection);
 
-                try {
-                    value = field.get(serverConnection);
-                } catch (IllegalAccessException ex) {
-                    ex.printStackTrace();
-                }
+                if (value instanceof List<?>) {
+                    List<?> originalList = (List<?>) value;
 
-                if (value instanceof List) {
-                    List listWrapper = new ListWrapper((List) value) {
+                    ListWrapper listWrapper = new ListWrapper(originalList) {
                         @Override
                         public void processAdd(Object object) {
                             if (object instanceof ChannelFuture) {
@@ -92,8 +105,8 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
                     field.set(serverConnection, listWrapper);
 
-                    synchronized (listWrapper) {
-                        for (Object serverChannel : (List) value) {
+                    synchronized (originalList) {
+                        for (Object serverChannel : originalList) {
                             if (serverChannel instanceof ChannelFuture) {
                                 injectChannelFuture((ChannelFuture) serverChannel);
                             } else {
@@ -142,6 +155,15 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                     pipeline.addBefore("packet_handler", PacketEvents.get().getHandlerName(), channelHandler);
                 }
             }
+        }
+    }
+
+    private @Nullable Object getFieldValue(@NotNull Field field, Object serverConnection) {
+        try {
+            return field.get(serverConnection);
+        } catch (IllegalAccessException ex) {
+            ex.printStackTrace();
+            return null;
         }
     }
 
@@ -255,9 +277,10 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
         for (Map<Field, Object> map : injectedLists) {
             try {
-                for (Field key : map.keySet()) {
+                for (Map.Entry<Field, Object> entry : map.entrySet()) {
+                    Field key = entry.getKey();
                     key.setAccessible(true);
-                    Object object = map.get(key);
+                    Object object = entry.getValue();
 
                     if (object instanceof ListWrapper) {
                         key.set(object, ((ListWrapper) object).getOriginalList());
@@ -268,6 +291,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                         + " injection handler! Please reboot!");
             }
         }
+
 
         injectedLists.clear();
     }
@@ -306,7 +330,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
         PlayerChannelHandlerModern handler = getHandler(rawChannel);
         PlayerDecodeHandlerModern decodeHandler = getDecoderHandler(rawChannel);
-        return handler != null && handler.player != null && decodeHandler != null && decodeHandler.player != null;
+        return handler != null && decodeHandler != null;
     }
 
     @Override
@@ -357,12 +381,12 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
         // Update the player object in the player decode handler.
         if (decodeHandler instanceof PlayerDecodeHandlerModern) {
-            ((PlayerDecodeHandlerModern) decodeHandler).player = player;
+            ((PlayerDecodeHandlerModern) decodeHandler).player.set(player);
         }
 
         // Update the player object in the player channel handler.
         if (channelHandler instanceof PlayerChannelHandlerModern) {
-            ((PlayerChannelHandlerModern) channelHandler).player = player;
+            ((PlayerChannelHandlerModern) channelHandler).player.set(player);
         }
     }
 }

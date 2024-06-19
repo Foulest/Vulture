@@ -10,7 +10,7 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
  */
 public class WrappedWatchableObject extends WrappedPacket {
 
-    private static final int valueIndex = 2;
+    private static final int VALUE_INDEX = 2;
 
     public WrappedWatchableObject(NMSPacket packet) {
         super(packet);
@@ -33,11 +33,11 @@ public class WrappedWatchableObject extends WrappedPacket {
     }
 
     public Object getRawValue() {
-        return readAnyObject(valueIndex);
+        return readAnyObject(VALUE_INDEX);
     }
 
     public void setRawValue(Object rawValue) {
-        writeAnyObject(valueIndex, rawValue);
+        writeAnyObject(VALUE_INDEX, rawValue);
     }
 
     // TODO: Finish get WrappedWatchableObject#getValue

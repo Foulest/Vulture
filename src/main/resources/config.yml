@@ -30,6 +30,9 @@ vulture:
   blocked:
     payloads:
       - GalactiCraft
+      - JustEnoughIDs
+      - Tinkers Construct
+      - InventoryTweaks
     commands:
       - /calc
       - /eval
@@ -55,11 +58,6 @@ vulture:
   # These checks do not have a maximum amount of violations and do not ban players; they only kick players.
   # -----------------------------------------------
   checks:
-    aimassist:
-      A:
-        enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
     autoblock:
       A:
         enabled: true
@@ -176,10 +174,6 @@ vulture:
         enabled: true
         maxViolations: 10
         banCommand: vulture kick %player% %check%
-      L:
-        enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
     pingspoof:
       A:
         enabled: true
@@ -254,9 +248,9 @@ vulture:
       portals:
         block-affected-mobs: true
     packets:
-      max-packets-per-tick: 300
-      max-packets-per-second: 300
-      max-packets-smoothed: 150
+      max-packets-per-tick: 350
+      max-packets-per-second: 400
+      max-packets-smoothed: 400
       abilities:
         duplicate-flying: true
         invalid-flight-allowed: true

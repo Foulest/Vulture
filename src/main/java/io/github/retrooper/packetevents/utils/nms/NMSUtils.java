@@ -1,3 +1,20 @@
+/*
+ * This file is part of packetevents - https://github.com/retrooper/packetevents
+ * Copyright (C) 2022 retrooper and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.retrooper.packetevents.utils.nms;
 
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
@@ -8,6 +25,8 @@ import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import io.github.retrooper.packetevents.utils.vector.Vector3f;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -24,6 +43,7 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class NMSUtils {
 
     public static final String NMS_DIR = ServerVersion.getNMSDirectory() + ".";
@@ -484,21 +504,21 @@ public final class NMSUtils {
         }
     }
 
-    public static @Nullable Class<? extends Enum<?>> getNMEnumClassWithoutException(String name) {
+    public static @Nullable <E extends Enum<E>> Class<E> getNMEnumClassWithoutException(String name) {
         try {
-            return (Class<? extends Enum<?>>) Class.forName("net.minecraft." + name);
+            return (Class<E>) Class.forName("net.minecraft." + name);
         } catch (ClassNotFoundException ex) {
             return null;
         }
     }
 
-    public static @NotNull Class<? extends Enum<?>> getNMSEnumClass(String name) throws ClassNotFoundException {
-        return (Class<? extends Enum<?>>) Class.forName(NMS_DIR + name);
+    public static @NotNull <E extends Enum<E>> Class<E> getNMSEnumClass(String name) throws ClassNotFoundException {
+        return (Class<E>) Class.forName(NMS_DIR + name);
     }
 
-    public static @Nullable Class<? extends Enum<?>> getNMSEnumClassWithoutException(String name) {
+    public static @Nullable <E extends Enum<E>> Class<E> getNMSEnumClassWithoutException(String name) {
         try {
-            return (Class<? extends Enum<?>>) getNMSClass(name);
+            return (Class<E>) getNMSClass(name);
         } catch (Exception ex) {
             return null;
         }
@@ -639,18 +659,18 @@ public final class NMSUtils {
 
         for (int i = 0; true; i++) {
             try {
-                List<?> list = (List<?>) serverConnectionWrapper.readObject(i, List.class);
+                List<Object> list = serverConnectionWrapper.readObject(i, List.class);
 
                 for (Object obj : list) {
                     if (obj.getClass().isAssignableFrom(networkManagerClass)) {
-                        return (List<Object>) list;
+                        return list;
                     }
                 }
             } catch (Exception ex) {
                 break;
             }
         }
-        return (List<Object>) serverConnectionWrapper.readObject(1, List.class);
+        return serverConnectionWrapper.readObject(1, List.class);
     }
 
     public static @Nullable ItemStack toBukkitItemStack(Object nmsItemStack) {
@@ -829,7 +849,9 @@ public final class NMSUtils {
     public static @NotNull UUID generateUUID() {
         long var1 = randomThreadLocal.get().nextLong() & -61441L | 16384L;
         long var3 = randomThreadLocal.get().nextLong() & 4611686018427387903L | -9223372036854775808L;
-        return new UUID(var1, var3);
+        UUID uuid = new UUID(var1, var3);
+        randomThreadLocal.remove();
+        return uuid;
     }
 
     public static int generateEntityId() {

@@ -1,8 +1,25 @@
+/*
+ * Vulture - an advanced anti-cheat plugin designed for Minecraft 1.8.9 servers.
+ * Copyright (C) 2024 Foulest (https://github.com/Foulest)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 package net.foulest.vulture.tracking;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.foulest.vulture.util.Constants;
+import net.foulest.vulture.util.ConstantUtil;
 import net.foulest.vulture.util.data.Area;
 
 /**
@@ -35,8 +52,8 @@ public class EntityTrackerEntry {
     }
 
     public void teleport(double x, double y, double z) {
-        double errorH = Constants.MIN_TELEPORT_HORIZONTAL;
-        double errorV = Constants.MIN_TELEPORT_VERTICAL;
+        double errorH = ConstantUtil.MIN_TELEPORT_HORIZONTAL;
+        double errorV = ConstantUtil.MIN_TELEPORT_VERTICAL;
 
         rootBase.set(x, y, z);
         base.addCoord(x, y, z);

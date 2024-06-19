@@ -14,7 +14,7 @@ import java.lang.reflect.Constructor;
 
 public class WrappedPacketOutEntityTeleport extends WrappedPacketEntityAbstraction implements SendableWrapper {
 
-    private static final float rotationMultiplier = 256.0F / 360.0F;
+    private static final float ROTATION_MULTIPLIER = 256.0F / 360.0F;
     private static Constructor<?> constructor;
 
     private Vector3d position;
@@ -110,7 +110,7 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacketEntityAbstracti
 
     public float getYaw() {
         if (packet != null) {
-            return (readByte(0) / rotationMultiplier);
+            return (readByte(0) / ROTATION_MULTIPLIER);
         } else {
             return yaw;
         }
@@ -118,7 +118,7 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacketEntityAbstracti
 
     public void setYaw(float yaw) {
         if (packet != null) {
-            writeByte(0, (byte) (yaw * rotationMultiplier));
+            writeByte(0, (byte) (yaw * ROTATION_MULTIPLIER));
         } else {
             this.yaw = yaw;
         }
@@ -126,7 +126,7 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacketEntityAbstracti
 
     public float getPitch() {
         if (packet != null) {
-            return (readByte(1) / rotationMultiplier);
+            return (readByte(1) / ROTATION_MULTIPLIER);
         } else {
             return pitch;
         }
@@ -134,7 +134,7 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacketEntityAbstracti
 
     public void setPitch(float pitch) {
         if (packet != null) {
-            writeByte(1, (byte) (pitch * rotationMultiplier));
+            writeByte(1, (byte) (pitch * ROTATION_MULTIPLIER));
         } else {
             this.pitch = pitch;
         }
@@ -160,6 +160,6 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacketEntityAbstracti
     public Object asNMSPacket() throws Exception {
         Vector3d pos = getPosition();
         return constructor.newInstance(entityID, floor(pos.x * 32.0D), floor(pos.y * 32.0D), floor(pos.z * 32.0D),
-                (byte) ((int) getYaw() * rotationMultiplier), (byte) (int) (getPitch() * rotationMultiplier), false);
+                (byte) ((int) getYaw() * ROTATION_MULTIPLIER), (byte) (int) (getPitch() * ROTATION_MULTIPLIER), false);
     }
 }

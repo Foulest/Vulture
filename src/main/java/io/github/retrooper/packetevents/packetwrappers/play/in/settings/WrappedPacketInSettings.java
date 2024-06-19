@@ -55,7 +55,7 @@ public class WrappedPacketInSettings extends WrappedPacket {
     }
 
     public void setChatVisibility(@NotNull ChatVisibility visibility) {
-        Enum<?> enumConst = EnumUtil.valueByIndex(chatVisibilityEnumClass, visibility.ordinal());
+        Enum<?> enumConst = EnumUtil.valueByIndex(chatVisibilityEnumClass.asSubclass(Enum.class), visibility.ordinal());
         writeEnumConstant(0, enumConst);
     }
 

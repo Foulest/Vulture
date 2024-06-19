@@ -55,15 +55,11 @@ public class WrappedPacketOutKeepAlive extends WrappedPacket implements Sendable
     }
 
     public void setId(long id) throws UnsupportedOperationException {
-        if (packet != null) {
-            if (integerMode) {
-                if (id < Integer.MIN_VALUE || id > Integer.MAX_VALUE) {
-                    throw new UnsupportedOperationException("PacketEvents failed to set the Keep Alive ID"
-                            + " in WrappedPacketOutKeepAlive. Your server version does not support IDs outside"
-                            + " the range of an int primitive type. Your Keep Alive ID seems to be in the range"
-                            + " of a long primitive type.");
-                }
-            }
+        if (packet != null && integerMode && (id < Integer.MIN_VALUE || id > Integer.MAX_VALUE)) {
+            throw new UnsupportedOperationException("PacketEvents failed to set the Keep Alive ID"
+                    + " in WrappedPacketOutKeepAlive. Your server version does not support IDs outside"
+                    + " the range of an int primitive type. Your Keep Alive ID seems to be in the range"
+                    + " of a long primitive type.");
         }
     }
 

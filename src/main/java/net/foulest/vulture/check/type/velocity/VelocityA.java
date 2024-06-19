@@ -1,3 +1,20 @@
+/*
+ * Vulture - an advanced anti-cheat plugin designed for Minecraft 1.8.9 servers.
+ * Copyright (C) 2024 Foulest (https://github.com/Foulest)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 package net.foulest.vulture.check.type.velocity;
 
 import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
@@ -67,7 +84,7 @@ public class VelocityA extends Check {
 
         } else {
             // Detects if the player is ignoring velocity.
-            if (ticksSinceGiven > 1 && playerData.getVelocityY() > 0.0
+            if (ticksSinceGiven > 2 && playerData.getVelocityY() > 0.0
                     && (ticksSinceTaken - ticksSinceGiven) > 1) {
                 flag(false, "Ignored Velocity"
                         + " (GIVEN=" + ticksSinceGiven

@@ -1,3 +1,20 @@
+/*
+ * Vulture - an advanced anti-cheat plugin designed for Minecraft 1.8.9 servers.
+ * Copyright (C) 2024 Foulest (https://github.com/Foulest)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 package net.foulest.vulture.processor.type;
 
 import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
@@ -14,6 +31,7 @@ import io.github.retrooper.packetevents.packetwrappers.play.out.entityvelocity.W
 import io.github.retrooper.packetevents.packetwrappers.play.out.namedentityspawn.WrappedPacketOutNamedEntitySpawn;
 import io.github.retrooper.packetevents.packetwrappers.play.out.position.WrappedPacketOutPosition;
 import io.github.retrooper.packetevents.packetwrappers.play.out.resourcepacksend.WrappedPacketOutResourcePackSend;
+import io.github.retrooper.packetevents.packetwrappers.play.out.spawnentityliving.WrappedPacketOutSpawnEntityLiving;
 import io.github.retrooper.packetevents.packetwrappers.play.out.transaction.WrappedPacketOutTransaction;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import net.foulest.vulture.action.ActionType;
@@ -206,13 +224,27 @@ public class PacketSendProcessor extends Processor {
                 }
                 break;
 
+            case PacketType.Play.Server.SPAWN_ENTITY_LIVING:
+                WrappedPacketOutSpawnEntityLiving spawnEntityLiving = new WrappedPacketOutSpawnEntityLiving(event.getNMSPacket());
+
+                playerData.getPingTaskScheduler().scheduleTask(
+                        PingTask.start(
+                                () -> playerData.getEntityTracker().addEntity(spawnEntityLiving.getEntityId(),
+                                        spawnEntityLiving.getPosition().x, spawnEntityLiving.getPosition().y,
+                                        spawnEntityLiving.getPosition().z)
+                        )
+                );
+                break;
+
             case PacketType.Play.Server.NAMED_ENTITY_SPAWN:
                 WrappedPacketOutNamedEntitySpawn namedEntitySpawn = new WrappedPacketOutNamedEntitySpawn(event.getNMSPacket());
 
                 if (namedEntitySpawn.getEntity().getType() == EntityType.PLAYER) {
                     playerData.getPingTaskScheduler().scheduleTask(
                             PingTask.start(
-                                    () -> playerData.getEntityTracker().addEntity(namedEntitySpawn.getEntityId(), namedEntitySpawn.getPosition().x, namedEntitySpawn.getPosition().y, namedEntitySpawn.getPosition().z)
+                                    () -> playerData.getEntityTracker().addEntity(namedEntitySpawn.getEntityId(),
+                                            namedEntitySpawn.getPosition().x, namedEntitySpawn.getPosition().y,
+                                            namedEntitySpawn.getPosition().z)
                             )
                     );
                 }

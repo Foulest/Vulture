@@ -1,5 +1,24 @@
+/*
+ * Vulture - an advanced anti-cheat plugin designed for Minecraft 1.8.9 servers.
+ * Copyright (C) 2024 Foulest (https://github.com/Foulest)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 package net.foulest.vulture.util;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import net.foulest.vulture.util.data.Area;
 import org.bukkit.Location;
 import org.jetbrains.annotations.Contract;
@@ -12,6 +31,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class MathUtil {
 
     private static final float[] SIN_TABLE = new float[65536];
@@ -45,6 +65,10 @@ public class MathUtil {
         for (Number number : data) {
             sum += number.doubleValue();
             ++count;
+        }
+
+        if (count == 0) {
+            return 0.0;
         }
 
         average = sum / count;
@@ -93,12 +117,12 @@ public class MathUtil {
     }
 
     public static org.joml.Vector3d calculateIntercept(@NotNull Area area, org.joml.Vector3d pos, org.joml.Vector3d ray) {
-        org.joml.Vector3d vec3 = getIntermediateWithXValue(pos, ray, area.minX);
-        org.joml.Vector3d vec31 = getIntermediateWithXValue(pos, ray, area.maxX);
-        org.joml.Vector3d vec32 = getIntermediateWithYValue(pos, ray, area.minY);
-        org.joml.Vector3d vec33 = getIntermediateWithYValue(pos, ray, area.maxY);
-        org.joml.Vector3d vec34 = getIntermediateWithZValue(pos, ray, area.minZ);
-        org.joml.Vector3d vec35 = getIntermediateWithZValue(pos, ray, area.maxZ);
+        org.joml.Vector3d vec3 = getIntermediateWithXValue(pos, ray, area.getMin().getX());
+        org.joml.Vector3d vec31 = getIntermediateWithXValue(pos, ray, area.getMax().getX());
+        org.joml.Vector3d vec32 = getIntermediateWithYValue(pos, ray, area.getMin().getY());
+        org.joml.Vector3d vec33 = getIntermediateWithYValue(pos, ray, area.getMax().getY());
+        org.joml.Vector3d vec34 = getIntermediateWithZValue(pos, ray, area.getMin().getZ());
+        org.joml.Vector3d vec35 = getIntermediateWithZValue(pos, ray, area.getMax().getZ());
 
         if (!isVecInYZ(area, vec3)) {
             vec3 = null;
@@ -154,21 +178,25 @@ public class MathUtil {
 
     @Contract(value = "_, null -> false", pure = true)
     private static boolean isVecInYZ(Area area, org.joml.Vector3d vec) {
-        return vec != null && vec.y >= area.minY && vec.y <= area.maxY && vec.z >= area.minZ && vec.z <= area.maxZ;
+        return vec != null && vec.y >= area.getMin().getY() && vec.y <= area.getMax().getY()
+                && vec.z >= area.getMin().getZ() && vec.z <= area.getMax().getZ();
     }
 
     @Contract(value = "_, null -> false", pure = true)
     private static boolean isVecInXZ(Area area, org.joml.Vector3d vec) {
-        return vec != null && vec.x >= area.minX && vec.x <= area.maxX && vec.z >= area.minZ && vec.z <= area.maxZ;
+        return vec != null && vec.x >= area.getMin().getX() && vec.x <= area.getMax().getX()
+                && vec.z >= area.getMin().getZ() && vec.z <= area.getMax().getZ();
     }
 
     @Contract(value = "_, null -> false", pure = true)
     private static boolean isVecInXY(Area area, org.joml.Vector3d vec) {
-        return vec != null && vec.x >= area.minX && vec.x <= area.maxX && vec.y >= area.minY && vec.y <= area.maxY;
+        return vec != null && vec.x >= area.getMin().getX() && vec.x <= area.getMax().getX()
+                && vec.y >= area.getMin().getY() && vec.y <= area.getMax().getY();
     }
 
     @Contract(pure = true)
-    public static org.joml.@Nullable Vector3d getIntermediateWithXValue(@NotNull org.joml.Vector3d vec1, @NotNull org.joml.Vector3d vec2, double limit) {
+    public static org.joml.@Nullable Vector3d getIntermediateWithXValue(@NotNull org.joml.Vector3d vec1,
+                                                                        @NotNull org.joml.Vector3d vec2, double limit) {
         double d0 = vec2.x - vec1.x;
         double d1 = vec2.y - vec1.y;
         double d2 = vec2.z - vec1.z;
@@ -182,7 +210,8 @@ public class MathUtil {
     }
 
     @Contract(pure = true)
-    public static org.joml.@Nullable Vector3d getIntermediateWithYValue(@NotNull org.joml.Vector3d vec1, @NotNull org.joml.Vector3d vec2, double limit) {
+    public static org.joml.@Nullable Vector3d getIntermediateWithYValue(@NotNull org.joml.Vector3d vec1,
+                                                                        @NotNull org.joml.Vector3d vec2, double limit) {
         double d0 = vec2.x - vec1.x;
         double d1 = vec2.y - vec1.y;
         double d2 = vec2.z - vec1.z;
@@ -196,7 +225,8 @@ public class MathUtil {
     }
 
     @Contract(pure = true)
-    public static org.joml.@Nullable Vector3d getIntermediateWithZValue(@NotNull org.joml.Vector3d vec1, @NotNull org.joml.Vector3d vec2, double limit) {
+    public static org.joml.@Nullable Vector3d getIntermediateWithZValue(@NotNull org.joml.Vector3d vec1,
+                                                                        @NotNull org.joml.Vector3d vec2, double limit) {
         double d0 = vec2.x - vec1.x;
         double d1 = vec2.y - vec1.y;
         double d2 = vec2.z - vec1.z;

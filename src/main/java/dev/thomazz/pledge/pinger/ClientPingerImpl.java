@@ -1,3 +1,25 @@
+/*
+ * This file is part of Pledge - https://github.com/ThomasOM/Pledge
+ * Copyright (C) 2021 Thomazz
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package dev.thomazz.pledge.pinger;
 
 import dev.thomazz.pledge.PledgeImpl;
@@ -10,6 +32,7 @@ import dev.thomazz.pledge.util.ChannelUtils;
 import io.netty.channel.Channel;
 import lombok.Getter;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -26,7 +49,7 @@ public class ClientPingerImpl implements ClientPinger {
 
     protected Predicate<Player> playerFilter = player -> true;
 
-    public ClientPingerImpl(PledgeImpl api, int startId, int endId) {
+    public ClientPingerImpl(@NotNull PledgeImpl api, int startId, int endId) {
         this.api = api;
 
         PingPacketProvider provider = api.getPacketProvider();
@@ -37,11 +60,11 @@ public class ClientPingerImpl implements ClientPinger {
         this.endId = Math.max(Math.min(upperBound, endId), lowerBound);
 
         if (this.startId != startId) {
-            this.api.getLogger().warning("Changed start ID to fit bounds: " + startId + " -> " + this.startId);
+            this.api.getLogger().warning(String.format("Changed start ID to fit bounds: %d -> %d", startId, this.startId));
         }
 
         if (this.endId != endId) {
-            this.api.getLogger().warning("Changed end ID to fit bounds: " + endId + " -> " + this.endId);
+            this.api.getLogger().warning(String.format("Changed end ID to fit bounds: %d -> %d", endId, this.endId));
         }
     }
 
@@ -94,7 +117,7 @@ public class ClientPingerImpl implements ClientPinger {
     }
 
     // Note: Should run in channel event loop
-    protected void ping(Player player, Channel channel, Ping ping) {
+    protected void ping(Player player, @NotNull Channel channel, Ping ping) {
         if (!channel.eventLoop().inEventLoop()) {
             throw new IllegalStateException("Tried to run ping outside event loop!");
         }
@@ -108,11 +131,12 @@ public class ClientPingerImpl implements ClientPinger {
         return id >= Math.min(startId, endId) && id <= Math.max(startId, endId);
     }
 
+    // Fixes an NPE in the original code
     public Optional<PingData> getPingData(Player player) {
-        return Optional.of(pingDataMap.get(player));
+        return Optional.ofNullable(pingDataMap.get(player));
     }
 
-    protected void onSend(Player player, Ping ping) {
+    protected void onSend(Player player, @NotNull Ping ping) {
         switch (ping.getOrder()) {
             case TICK_START:
                 onSendStart(player, ping.getId());
@@ -120,16 +144,20 @@ public class ClientPingerImpl implements ClientPinger {
             case TICK_END:
                 onSendEnd(player, ping.getId());
                 break;
+            default:
+                break;
         }
     }
 
-    public void onReceive(Player player, Ping ping) {
+    public void onReceive(Player player, @NotNull Ping ping) {
         switch (ping.getOrder()) {
             case TICK_START:
                 onReceiveStart(player, ping.getId());
                 break;
             case TICK_END:
                 onReceiveEnd(player, ping.getId());
+                break;
+            default:
                 break;
         }
     }
@@ -155,6 +183,7 @@ public class ClientPingerImpl implements ClientPinger {
                 api.getChannel(player).ifPresent(channel ->
                         ChannelUtils.runInEventLoop(channel, () -> {
                             NetworkPacketConsolidator consolidator = channel.pipeline().get(NetworkPacketConsolidator.class);
+
                             if (consolidator != null) {
                                 consolidator.open();
                                 ping(player, channel, new Ping(PingOrder.TICK_START, data.pullId()));
@@ -170,6 +199,7 @@ public class ClientPingerImpl implements ClientPinger {
                 api.getChannel(player).ifPresent(channel ->
                         ChannelUtils.runInEventLoop(channel, () -> {
                             NetworkPacketConsolidator consolidator = channel.pipeline().get(NetworkPacketConsolidator.class);
+
                             if (consolidator != null) {
                                 ping(player, channel, new Ping(PingOrder.TICK_END, data.pullId()));
                                 consolidator.close();

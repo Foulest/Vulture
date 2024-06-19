@@ -1,3 +1,20 @@
+/*
+ * Vulture - an advanced anti-cheat plugin designed for Minecraft 1.8.9 servers.
+ * Copyright (C) 2024 Foulest (https://github.com/Foulest)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 package net.foulest.vulture.data;
 
 import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
@@ -13,10 +30,6 @@ import net.foulest.vulture.ping.PingTask;
 import net.foulest.vulture.ping.PingTaskScheduler;
 import net.foulest.vulture.timing.Timing;
 import net.foulest.vulture.tracking.EntityTracker;
-import net.foulest.vulture.tracking.EntityTrackerEntry;
-import net.foulest.vulture.util.Constants;
-import net.foulest.vulture.util.MathUtil;
-import net.foulest.vulture.util.data.Area;
 import net.foulest.vulture.util.data.CustomLocation;
 import net.foulest.vulture.util.data.EvictingList;
 import org.bukkit.Location;
@@ -25,10 +38,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Vector3d;
 
 import java.util.*;
-import java.util.stream.Stream;
 
 @Getter
 @Setter
@@ -56,7 +67,7 @@ public class PlayerData {
     private final Map<Byte, Integer> packetCounts = new HashMap<>();
 
     // Timestamps
-    private Map<ActionType, Integer> actionTimestamps = new HashMap<>();
+    private Map<ActionType, Integer> actionTimestamps = new EnumMap<>(ActionType.class);
     private long transPing;
 
     // Ticks
@@ -92,17 +103,6 @@ public class PlayerData {
     // Attacking data
     private boolean attacking;
     private int lastAttacked;
-
-    // Sensitivity data
-    private int sensitivity;
-    private float sensitivityY;
-    private float smallestRotationGCD;
-    private float pitchGCD;
-
-    // Cinematic data
-    private boolean cinematic;
-    private float predictYaw;
-    private float predictPitch;
 
     // Velocity check data
     // This data is retrieved a tick later than the other data.
@@ -185,7 +185,7 @@ public class PlayerData {
     private final EntityTracker entityTracker;
     private final PingTaskScheduler pingTaskScheduler;
     private final Timing timing;
-    private final CustomLocation locO = new CustomLocation();
+    private final CustomLocation lastLoc = new CustomLocation();
     private final CustomLocation loc = new CustomLocation();
     private final Queue<CustomLocation> teleports = new ArrayDeque<>();
     private boolean accuratePosition;
@@ -268,7 +268,7 @@ public class PlayerData {
 
     // Called before the tick runs, only used for setting previous locations here
     private void preTick() {
-        locO.set(loc);
+        lastLoc.set(loc);
     }
 
     // Called after the tick has been completed on the client
@@ -301,72 +301,6 @@ public class PlayerData {
             return true;
         }
         return false;
-    }
-
-    // Tries to mirror client logic as closely as possible while including a few errors
-    public Optional<Double> performReachCheck(@NotNull EntityTrackerEntry entry) {
-        // Get position area of entity we have been tracking
-        Area position = entry.getPosition();
-
-        // Expand position area into bounding box
-        float width = Constants.PLAYER_BOX_WIDTH;
-        float height = Constants.PLAYER_BOX_HEIGHT;
-
-        Area box = new Area(position)
-                .expand(width / 2.0, 0.0, width / 2.0)
-                .addCoord(0.0, height, 0.0);
-
-        // The hitbox is actually 0.1 blocks bigger than the bounding box
-        float offset = Constants.COLLISION_BORDER_SIZE;
-        box.expand(offset, offset, offset);
-
-        // Compensate for fast math errors in the look vector calculations (Can remove if support not needed)
-        double error = Constants.FAST_MATH_ERROR;
-        box.expand(error, error, error);
-
-        /*
-        Expand the box by the root of the minimum move amount in each axis if the player was not moving the last tick.
-        This is because they could have moved this amount on the client making a difference between a hit or miss.
-         */
-        if (!accuratePosition) {
-            double minMove = Constants.MIN_MOVE_UPDATE_ROOT;
-            box.expand(minMove, minMove, minMove);
-        }
-
-        // Mouse input is done before any sneaking updates
-        float eyeHeight = 1.62F;
-        if (wasSneaking) {
-            eyeHeight -= 0.08F;
-        }
-
-        // Previous position since movement is done after attacking in the client tick
-        Vector3d eye = locO.getPos().add(0, eyeHeight, 0, new Vector3d());
-
-        // First check if the eye position is inside
-        if (box.isInside(eye.x, eye.y, eye.z)) {
-            return Optional.of(0.0D);
-        }
-
-        // Originally Minecraft uses the old yaw value for mouse intercepts, but some clients and mods fix this
-        float yawO = locO.getRot().x;
-        float yaw = loc.getRot().x;
-        float pitch = loc.getRot().y;
-
-        Vector3d viewO = MathUtil.getLookVector(yawO, pitch).mul(Constants.RAY_LENGTH);
-        Vector3d view = MathUtil.getLookVector(yaw, pitch).mul(Constants.RAY_LENGTH);
-
-        Vector3d eyeViewO = eye.add(viewO, new Vector3d());
-        Vector3d eyeView = eye.add(view, new Vector3d());
-
-        // Calculate intercepts with Minecraft ray logic
-        Vector3d interceptO = MathUtil.calculateIntercept(box, eye, eyeViewO);
-        Vector3d intercept = MathUtil.calculateIntercept(box, eye, eyeView);
-
-        // Get minimum value of intercepts
-        return Stream.of(interceptO, intercept)
-                .filter(Objects::nonNull)
-                .map(eye::distance)
-                .min(Double::compare);
     }
 
     /**

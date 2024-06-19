@@ -37,7 +37,6 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
     @Override
     protected void load() {
         reasonClassType = SubclassUtil.getSubClass(PacketTypeClasses.Play.Server.GAME_STATE_CHANGE, 0);
-        net.minecraft.server.v1_8_R3.PacketPlayOutGameStateChange gsc;
 
         if (reasonClassType != null) {
             try {
@@ -67,11 +66,11 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
 
             packetConstructor = PacketTypeClasses.Play.Server.GAME_STATE_CHANGE.getConstructor(reasonClassType, valueClassType);
 
-        } catch (NullPointerException e) {
+        } catch (NullPointerException ex) {
             Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "PacketEvents failed to find the constructor for the outbound Game state packet wrapper.");
 
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+        } catch (NoSuchMethodException ex) {
+            ex.printStackTrace();
         }
     }
 

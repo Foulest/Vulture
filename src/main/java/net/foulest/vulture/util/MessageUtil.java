@@ -1,5 +1,24 @@
+/*
+ * Vulture - an advanced anti-cheat plugin designed for Minecraft 1.8.9 servers.
+ * Copyright (C) 2024 Foulest (https://github.com/Foulest)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 package net.foulest.vulture.util;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import net.foulest.vulture.Vulture;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.data.PlayerDataManager;
@@ -26,6 +45,7 @@ import java.util.logging.Logger;
  * @project Vulture
  */
 @SuppressWarnings("unused")
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MessageUtil {
 
     private static final Logger logger = Bukkit.getLogger();
@@ -37,7 +57,9 @@ public final class MessageUtil {
      * @param message The message to log.
      */
     public static void log(Level level, String message) {
-        logger.log(level, "[Vulture] " + message);
+        if (logger.isLoggable(level)) {
+            logger.log(level, String.format("[Vulture] %s", message));
+        }
     }
 
     /**

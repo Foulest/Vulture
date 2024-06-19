@@ -50,7 +50,7 @@ public class WrappedPacketOutTitle extends WrappedPacket implements SendableWrap
 
     public void setAction(TitleAction action) {
         if (packet != null) {
-            Enum<?> enumConst = EnumUtil.valueByIndex(enumTitleActionClass, action.ordinal());
+            Enum<?> enumConst = EnumUtil.valueByIndex(enumTitleActionClass.asSubclass(Enum.class), action.ordinal());
             writeEnumConstant(0, enumConst);
         } else {
             this.action = action;
@@ -122,7 +122,7 @@ public class WrappedPacketOutTitle extends WrappedPacket implements SendableWrap
 
     @Override
     public Object asNMSPacket() throws Exception {
-        Enum<?> enumConst = EnumUtil.valueByIndex(enumTitleActionClass, getAction().ordinal());
+        Enum<?> enumConst = EnumUtil.valueByIndex(enumTitleActionClass.asSubclass(Enum.class), getAction().ordinal());
         return packetConstructor.newInstance(enumConst, NMSUtils.generateIChatBaseComponent(getText()),
                 getFadeInTicks(), getStayTicks(), getFadeOutTicks());
     }

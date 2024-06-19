@@ -77,7 +77,7 @@ public class WrappedPacketOutPlayerInfo extends WrappedPacket implements Sendabl
 
     public void setAction(PlayerInfoAction action) {
         if (packet != null) {
-            Enum<?> enumConst = EnumUtil.valueByIndex(enumPlayerInfoActionClass, action.ordinal());
+            Enum<?> enumConst = EnumUtil.valueByIndex(enumPlayerInfoActionClass.asSubclass(Enum.class), action.ordinal());
             writeEnumConstant(0, enumConst);
         } else {
             this.action = action;
@@ -112,7 +112,7 @@ public class WrappedPacketOutPlayerInfo extends WrappedPacket implements Sendabl
             for (PlayerInfo playerInfo : playerInfoArray) {
                 Object usernameIChatBaseComponent = NMSUtils.generateIChatBaseComponent(NMSUtils.fromStringToJSON(playerInfo.username));
                 Object mojangGameProfile = GameProfileUtil.getGameProfile(playerInfo.gameProfile.getId(), playerInfo.gameProfile.getName());
-                Enum<?> nmsGameModeEnumConstant = EnumUtil.valueByIndex(NMSUtils.enumGameModeClass, playerInfo.gameMode.ordinal());
+                Enum<?> nmsGameModeEnumConstant = EnumUtil.valueByIndex(NMSUtils.enumGameModeClass.asSubclass(Enum.class), playerInfo.gameMode.ordinal());
                 int ping = playerInfo.ping;
 
                 try {

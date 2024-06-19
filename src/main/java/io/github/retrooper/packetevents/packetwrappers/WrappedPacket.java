@@ -62,19 +62,19 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         if (!LOADED_WRAPPERS.containsKey(clazz)) {
             try {
                 load();
+                LOADED_WRAPPERS.put(clazz, true);
             } catch (Exception ex) {
                 String wrapperName = ClassUtil.getClassSimpleName(clazz);
-                PacketEvents.get().getPlugin().getLogger().log(Level.SEVERE, "PacketEvents found an"
+                PacketEvents.get().getPlugin().getLogger().log(Level.SEVERE, ex, () -> "PacketEvents found an"
                         + " exception while loading the " + wrapperName + " packet wrapper. Please report this bug!"
-                        + " Tell us about your server version, spigot and code(of you using the wrapper)", ex);
+                        + " Tell us about your server version, spigot and code (of you using the wrapper)");
                 LOADED_WRAPPERS.put(clazz, false);
             }
-
-            LOADED_WRAPPERS.put(clazz, true);
         }
     }
 
     protected void load() {
+        // Do nothing
     }
 
     protected boolean hasLoaded() {
@@ -164,22 +164,25 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     @Override
     public Object readAnyObject(int index) {
         try {
-            Field f = packetClass.getDeclaredFields()[index];
+            Field field = packetClass.getDeclaredFields()[index];
 
-            if (!f.isAccessible()) {
-                f.setAccessible(true);
+            if (!field.isAccessible()) {
+                field.setAccessible(true);
             }
-
-            try {
-                return f.get(packet.getRawNMSPacket());
-            } catch (IllegalAccessException | NullPointerException | ArrayIndexOutOfBoundsException e) {
-                e.printStackTrace();
-            }
-        } catch (ArrayIndexOutOfBoundsException e) {
+            return getFieldObject(field);
+        } catch (ArrayIndexOutOfBoundsException ex) {
             throw new WrapperFieldNotFoundException("PacketEvents failed to find any field indexed "
                     + index + " in the " + ClassUtil.getClassSimpleName(packetClass) + " class!");
         }
-        return null;
+    }
+
+    private @Nullable Object getFieldObject(Field field) {
+        try {
+            return field.get(packet.getRawNMSPacket());
+        } catch (IllegalAccessException | NullPointerException | ArrayIndexOutOfBoundsException ex) {
+            ex.printStackTrace();
+            return null;
+        }
     }
 
     @Override
@@ -375,7 +378,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     public void writeGameMode(int index, @Nullable GameMode gameMode) {
         int i = gameMode != null ? (gameMode.ordinal() + 1) : (0);
-        Enum<?> enumConst = EnumUtil.valueByIndex(NMSUtils.enumGameModeClass, i);
+        Enum<?> enumConst = EnumUtil.valueByIndex(NMSUtils.enumGameModeClass.asSubclass(Enum.class), i);
         writeEnumConstant(index, enumConst);
     }
 
@@ -394,7 +397,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
         }
     }
 
-    public void writeDimension(int index, int dimensionIDLegacyIndex, World.@NotNull Environment dimension) {
+    public void writeDimension(int dimensionIDLegacyIndex, World.@NotNull Environment dimension) {
         writeInt(dimensionIDLegacyIndex, dimension.getId());
     }
 
@@ -404,7 +407,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
     }
 
     public void writeDifficulty(int index, @NotNull Difficulty difficulty) {
-        Enum<?> enumConstant = EnumUtil.valueByIndex(NMSUtils.enumDifficultyClass, difficulty.ordinal());
+        Enum<?> enumConstant = EnumUtil.valueByIndex(NMSUtils.enumDifficultyClass.asSubclass(Enum.class), difficulty.ordinal());
         writeEnumConstant(index, enumConstant);
     }
 

@@ -1,3 +1,20 @@
+/*
+ * Vulture - an advanced anti-cheat plugin designed for Minecraft 1.8.9 servers.
+ * Copyright (C) 2024 Foulest (https://github.com/Foulest)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 package net.foulest.vulture.cmds;
 
 import lombok.Getter;
@@ -18,6 +35,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+
+import static net.foulest.vulture.util.ConstantUtil.NO_PERMISSION;
 
 /**
  * Main command for Vulture.
@@ -50,7 +69,7 @@ public class VultureCmd {
                 }
 
                 if (!sender.hasPermission("vulture.alerts")) {
-                    MessageUtil.messagePlayer(sender, "&cNo permission.");
+                    MessageUtil.messagePlayer(sender, NO_PERMISSION);
                     return;
                 }
 
@@ -70,7 +89,7 @@ public class VultureCmd {
 
             case "debug": {
                 if (!sender.hasPermission("vulture.debug")) {
-                    MessageUtil.messagePlayer(sender, "&cNo permission.");
+                    MessageUtil.messagePlayer(sender, NO_PERMISSION);
                     return;
                 }
 
@@ -92,7 +111,7 @@ public class VultureCmd {
                 }
 
                 if (!sender.hasPermission("vulture.verbose")) {
-                    MessageUtil.messagePlayer(sender, "&cNo permission.");
+                    MessageUtil.messagePlayer(sender, NO_PERMISSION);
                     return;
                 }
 
@@ -112,7 +131,7 @@ public class VultureCmd {
 
             case "info": {
                 if (!sender.hasPermission("vulture.info")) {
-                    MessageUtil.messagePlayer(sender, "&cNo permission.");
+                    MessageUtil.messagePlayer(sender, NO_PERMISSION);
                     return;
                 }
 
@@ -152,7 +171,7 @@ public class VultureCmd {
 
             case "kick": {
                 if (!sender.hasPermission("vulture.kick")) {
-                    MessageUtil.messagePlayer(sender, "&cNo permission.");
+                    MessageUtil.messagePlayer(sender, NO_PERMISSION);
                     return;
                 }
 
@@ -181,7 +200,7 @@ public class VultureCmd {
 
             case "whitelist": {
                 if (!sender.hasPermission("vulture.whitelist")) {
-                    MessageUtil.messagePlayer(sender, "&cNo permission.");
+                    MessageUtil.messagePlayer(sender, NO_PERMISSION);
                     return;
                 }
 
@@ -314,7 +333,7 @@ public class VultureCmd {
 
             case "reload": {
                 if (!sender.hasPermission("vulture.reload")) {
-                    MessageUtil.messagePlayer(sender, "&cNo permission.");
+                    MessageUtil.messagePlayer(sender, NO_PERMISSION);
                     return;
                 }
 
@@ -342,7 +361,7 @@ public class VultureCmd {
      */
     private void handleHelp(@NotNull CommandSender sender, CommandArgs args) {
         if (!sender.hasPermission("vulture.main")) {
-            MessageUtil.messagePlayer(sender, "&cNo permission.");
+            MessageUtil.messagePlayer(sender, NO_PERMISSION);
             return;
         }
 

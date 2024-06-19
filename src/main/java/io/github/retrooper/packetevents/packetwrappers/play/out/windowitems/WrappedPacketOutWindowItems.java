@@ -107,14 +107,6 @@ public class WrappedPacketOutWindowItems extends WrappedPacket implements Sendab
         }
     }
 
-    private Object getNMSItemHeld() {
-        if (packet != null) {
-            return readObject(0, NMSUtils.nmsItemStackClass);
-        } else {
-            return NMSUtils.toNMSItemStack(heldItem);
-        }
-    }
-
     @Override
     public Object asNMSPacket() throws Exception {
         Object packetInstance = packetConstructor.newInstance();
