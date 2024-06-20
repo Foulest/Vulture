@@ -108,9 +108,6 @@ public class BadPacketsA extends Check {
                             KickUtil.kickPlayer(player, event, "packet=" + packetName + " count=" + count);
                         }
                     } else {
-                        // TODO: Remove in production.
-                        System.out.println(count);
-
                         if (count >= 30) {
                             KickUtil.kickPlayer(player, event, "packet=" + packetName + " count=" + count
                                     + " slot=" + creativeSlot.getSlot()

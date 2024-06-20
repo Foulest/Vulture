@@ -916,8 +916,6 @@ public class ClientBrand extends Check {
             String data = new String(payload.getData(), StandardCharsets.UTF_8).replace(" (Velocity)", "");
             String channelName = payload.getChannelName();
 
-            System.out.println("channelName=" + channelName + " data=" + data);
-
             // Handles and validates the payload sent by the player.
             if (channelName.equals("minecraft:brand") || channelName.equals("MC|Brand")) {
                 handleBrandData(data, event);

@@ -73,14 +73,10 @@ public class ReachA extends Check {
             double width = (boundingBox.max.getX() - boundingBox.min.getX());
             double height = (boundingBox.max.getY() - boundingBox.min.getY());
 
-            System.out.println("Width: " + width + " Height: " + height);
-
             // Create a bounding box for the entity
             Area box = new Area(position)
                     .expand(width / 2.0, 0.0, width / 2.0)
                     .addCoord(0.0, height, 0.0);
-
-            System.out.println("Box: " + box.toString());
 
             // Get the intercept result
             // The hitbox is actually 0.1 blocks bigger than the bounding box
@@ -149,7 +145,7 @@ public class ReachA extends Check {
             if (range > maxDistance) {
                 if (range > 3.1) {
                     event.setCancelled(cancelHits);
-                    System.out.println("Cancelled hit for " + player.getName()
+                    MessageUtil.debug("Cancelled hit for " + player.getName()
                             + " (Range: " + range + " Entity: " + entityType.name() + ")");
                 }
 
