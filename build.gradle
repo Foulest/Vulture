@@ -44,7 +44,7 @@ dependencies {
 
     // JOML - for vector math
     // https://mvnrepository.com/artifact/org.joml/joml
-    implementation group: 'org.joml', name: 'joml', version: '1.10.5'
+    implementation group: 'org.joml', name: 'joml', version: '1.10.6'
 
     // JetBrains Annotations - for code inspection and documentation
     // https://mvnrepository.com/artifact/org.jetbrains/annotations
