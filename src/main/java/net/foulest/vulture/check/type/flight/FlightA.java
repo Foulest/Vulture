@@ -43,7 +43,6 @@ public class FlightA extends Check {
 
     private double lastDeltaY;
     private double lastVelocity;
-
     private double buffer;
 
     private int nearGroundTicks;
@@ -359,12 +358,14 @@ public class FlightA extends Check {
                 return;
             }
 
+            // Ignores players who are near beds.
             if (BlockUtil.isNearBed(player) && Math.abs(deltaY) < 0.1) {
                 MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (G2) (Y=" + deltaY + ")");
                 setLastValues(deltaY, velocity);
                 return;
             }
 
+            // Ignores players who are near beds.
             if (BlockUtil.isNearBed(player) && onGroundTicks == 1 && Math.abs(deltaY) <= 0.5625) {
                 MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (G3) (Y=" + deltaY + ")");
                 setLastValues(deltaY, velocity);
@@ -404,6 +405,20 @@ public class FlightA extends Check {
                         setLastValues(deltaY, velocity);
                         return;
                     }
+                }
+
+                if (deltaY > 0 && deltaY < 0.47 && (nearGroundTicks == 1
+                        || notNearGroundTicks == 1 || onGroundTicks == 1
+                        || notOnGroundTicks == 1)) {
+                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (H6) (Y=" + deltaY + ")");
+                    setLastValues(deltaY, velocity);
+                    return;
+                }
+
+                if (deltaY == 0.5 && onGround && (playerData.isNearStairs() || playerData.isNearSlab())) {
+                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (H7) (Y=" + deltaY + ")");
+                    setLastValues(deltaY, velocity);
+                    return;
                 }
 
                 // Ignores players jumping under blocks.
@@ -480,12 +495,19 @@ public class FlightA extends Check {
                         setLastValues(deltaY, velocity);
                         return;
                     }
+
+                    if (playerData.getTicksSince(ActionType.TELEPORT) <= 5) {
+                        MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (J5) (Y=" + deltaY + ")");
+                        setLastValues(deltaY, velocity);
+                        return;
+                    }
                 }
 
                 // Ignores players stepping on specific blocks.
-                if (velocity == ON_GROUND_VELOCITY) {
+                if (velocity == ON_GROUND_VELOCITY || velocity == 0.0) {
                     if (deltaY == 0.125 && (BlockUtil.isNearChest(player) || BlockUtil.isNearBrewingStand(player))
                             || (BlockUtil.isNearTrapdoor(player) && BlockUtil.isNearCarpet(player))
+                            || (BlockUtil.isOnRepeater(player))
                             || (BlockUtil.isNearSlab(player) && BlockUtil.isNearFlowerPot(player))) {
                         MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (J5) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
@@ -606,6 +628,14 @@ public class FlightA extends Check {
                 if (deltaY == 0.0 && lastDeltaY < 0.0 && velocity == lastVelocity && onGround
                         && Math.abs(lastDeltaY) - Math.abs(velocity) < threshold) {
                     MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (K9) (Y=" + deltaY + ")");
+                    setLastValues(deltaY, velocity);
+                    return;
+                }
+
+                if (deltaY > 0 && deltaY < 0.47 && (nearGroundTicks == 1
+                        || notNearGroundTicks == 1 || onGroundTicks == 1
+                        || notOnGroundTicks == 1)) {
+                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (K10) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
                 }

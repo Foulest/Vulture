@@ -50,6 +50,12 @@ public class FlightD extends Check {
 
         double deltaY = event.getDeltaY();
 
+        // Ignores false positives with slabs and stairs.
+        if (deltaY == 0.5 && lastDeltaY == 0.5
+                && (playerData.isNearStairs() || playerData.isNearSlab())) {
+            return;
+        }
+
         // Checks if the player is continually rising for more than 2 ticks.
         if (deltaY > 0 && deltaY >= lastDeltaY) {
             if (++ticksRising > 2) {

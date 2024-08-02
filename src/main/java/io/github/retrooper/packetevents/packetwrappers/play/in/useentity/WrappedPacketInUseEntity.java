@@ -9,7 +9,6 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -42,7 +41,7 @@ public final class WrappedPacketInUseEntity extends WrappedPacketEntityAbstracti
         return Optional.of(new Vector3d(vec3DWrapper.readDouble(0), vec3DWrapper.readDouble(1), vec3DWrapper.readDouble(2)));
     }
 
-    public @Nullable EntityUseAction getAction() {
+    public EntityUseAction getAction() {
         if (action == null) {
             Enum<?> useActionEnum = readEnumConstant(0, enumEntityUseActionClass);
 

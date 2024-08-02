@@ -368,6 +368,21 @@ public class BlockUtil {
                 || block.getType() == Material.PACKED_ICE);
     }
 
+    public static boolean isOnRepeater(Player player) {
+        if (isPlayerInUnloadedChunk(player)) {
+            return false;
+        }
+
+        BoundingBox boundingBox = getPlayerCustomBoundingBox(player, 0.0, 0.0, 0.0);
+        ConcurrentStream<Block> collidingBlocks = getCollidingBlocks(player, boundingBox);
+        return collidingBlocks.any(block -> block.getType() == Material.DIODE_BLOCK_OFF
+                || block.getType() == Material.DIODE
+                || block.getType() == Material.REDSTONE_COMPARATOR
+                || block.getType() == Material.DIODE_BLOCK_ON
+                || block.getType() == Material.REDSTONE_COMPARATOR_OFF
+                || block.getType() == Material.REDSTONE_COMPARATOR_ON);
+    }
+
     public static boolean isOnSoulSand(Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;

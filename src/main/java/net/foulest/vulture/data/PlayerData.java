@@ -122,6 +122,7 @@ public class PlayerData {
     private boolean onSlab;
     private boolean onStairs;
     private boolean nearStairs;
+    private boolean nearSlab;
     private boolean nearPiston;
     private boolean nearCactus;
     private boolean inWeb;
@@ -324,6 +325,7 @@ public class PlayerData {
 
     /**
      * Gets the ticks since an action occurred.
+     * One tick is 50ms.
      *
      * @param action Action to get the ticks since.
      * @return Ticks since the action occurred.

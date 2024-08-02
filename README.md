@@ -6,6 +6,8 @@
 
 **Vulture** is an advanced anti-cheat plugin designed for Minecraft 1.8.9 servers.
 
+> **Note:** This project is still in development and is not yet ready for production use.
+
 ## Features
 
 - **Efficient Packet Handling:** Utilizes **[PacketEvents](https://github.com/retrooper/packetevents)** and
@@ -17,7 +19,6 @@
 
 ### Combat Checks
 
-- AimAssist _(x1)_
 - AutoBlock _(x4)_
 - AutoClicker _(x1)_
 - Reach _(x1)_
@@ -33,7 +34,7 @@
 
 - BadPackets _(x7)_
 - ClientBrand _(x1)_
-- Inventory _(x12)_
+- Inventory _(x11)_
 - PingSpoof _(x2)_
 
 ## Compiling

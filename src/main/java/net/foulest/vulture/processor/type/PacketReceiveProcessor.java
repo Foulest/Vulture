@@ -60,10 +60,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Beacon;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Horse;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
@@ -1184,6 +1181,7 @@ public class PacketReceiveProcessor extends Processor {
                     playerData.setOnSlab(BlockUtil.isOnSlab(player));
                     playerData.setOnStairs(BlockUtil.isOnStairs(player));
                     playerData.setNearStairs(BlockUtil.isNearStairs(player));
+                    playerData.setNearSlab(BlockUtil.isNearSlab(player));
                     playerData.setNearPiston(BlockUtil.isNearPiston(player));
                     playerData.setNearCactus(BlockUtil.isNearCactus(player));
                     playerData.setInWeb(BlockUtil.isInWeb(player));
@@ -1369,10 +1367,10 @@ public class PacketReceiveProcessor extends Processor {
                 float sidewaysValue = steerVehicle.getSideValue();
                 float forwardValue = steerVehicle.getForwardValue();
 
-                // Ignores horse dismount packets.
+                // Ignores vehicle dismount packets.
                 if (sidewaysValue == 0.0f && forwardValue == 0.0f
                         && !steerVehicle.isJump() && !player.isInsideVehicle()) {
-                    if (player.getNearbyEntities(3, 3, 3).stream().anyMatch(entity -> entity.getType() == EntityType.HORSE)) {
+                    if (player.getNearbyEntities(3, 3, 3).stream().anyMatch(entity -> entity instanceof Vehicle)) {
                         playerData.setTimestamp(ActionType.STEER_VEHICLE);
                         break;
                     }

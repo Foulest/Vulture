@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'net.foulest'
-version = '1.5.1'
+version = '1.5.2'
 description = project.name
 
 compileJava.options.encoding = 'UTF-8'
@@ -22,18 +22,18 @@ repositories {
     }
 
     maven {
-        url 'https://jitpack.io'
         name 'JitPack'
+        url 'https://jitpack.io'
     }
 
     maven {
-        url 'https://repo.viaversion.com'
         name 'ViaVersion'
+        url 'https://repo.viaversion.com'
     }
 
     maven {
-        url 'https://raw.github.com/ThomasOM/Pledge/repository'
         name 'Pledge'
+        url 'https://raw.github.com/ThomasOM/Pledge/repository'
     }
 }
 

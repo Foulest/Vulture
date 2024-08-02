@@ -117,7 +117,7 @@ public class BadPacketsA extends Check {
                     break;
 
                 case PacketType.Play.Client.SETTINGS:
-                    if (count >= (olderThan1_8 ? 3 : 41)) {
+                    if (count >= (olderThan1_8 ? 6 : 41)) {
                         KickUtil.kickPlayer(player, event, "packet=" + packetName + " count=" + count);
                     }
                     break;
@@ -128,7 +128,7 @@ public class BadPacketsA extends Check {
                     if (playerData.getTicksSince(ActionType.LOGIN) < 40) {
                         threshold = 13;
                     } else {
-                        threshold = olderThan1_8 ? 2 : 5;
+                        threshold = olderThan1_8 ? 3 : 5;
                     }
 
                     if (count >= threshold) {

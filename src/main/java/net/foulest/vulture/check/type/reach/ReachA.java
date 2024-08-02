@@ -42,6 +42,8 @@ import java.util.stream.Stream;
         description = "Detects players with invalid reach.")
 public class ReachA extends Check {
 
+    // TODO: Fix false positives with projectiles (e.g. snowballs, fishing rod)
+
     public static double maxDistance;
     public static boolean cancelHits;
 
