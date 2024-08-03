@@ -244,8 +244,7 @@ public class Settings {
         PingSpoofB.maxPingDeviation = config.getLong("vulture.checks.pingspoof.B.maxPingDeviation");
 
         // Reach A settings
-        ReachA.maxDistance = config.getDouble("vulture.checks.reach.A.maxDistance");
-        ReachA.cancelHits = config.getBoolean("vulture.checks.reach.A.cancelHits");
+        ReachA.cancelDistance = config.getDouble("vulture.checks.reach.A.cancelDistance");
 
         // Check settings
         for (Class<? extends Check> check : CheckManager.CHECK_CLASSES) {

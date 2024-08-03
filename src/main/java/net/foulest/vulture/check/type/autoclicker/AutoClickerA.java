@@ -66,7 +66,7 @@ public class AutoClickerA extends Check {
                             // This is a very low standard deviation that only appears when using
                             // an auto-clicker with a very limited range (e.g. 8-10 CPS).
                             // Any good auto-clicker with a range of four or more numbers will not be detected by this.
-                            if (stdDevCombined < 0.40) { // TODO: Test this against clicking with a mouse; repeatedly.
+                            if (stdDevCombined < 0.3415) { // TODO: Test this against clicking with a mouse; repeatedly.
                                 flag(false, "stdDevCombined=" + stdDevCombined);
                             }
 

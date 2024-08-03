@@ -54,7 +54,7 @@ public class Timing implements Listener {
         if (clientTimePassed > upperBound) {
             long timeOver = clientTimePassed - upperBound; // Time over the upper bound
 
-            if (timeOver > 0) {
+            if (timeOver >= 10) {
                 KickUtil.kickPlayer(player, "Modifying game speed (" + timeOver + "ms)");
             }
         }

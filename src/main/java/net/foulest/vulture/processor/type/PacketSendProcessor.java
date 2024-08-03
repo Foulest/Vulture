@@ -42,6 +42,7 @@ import net.foulest.vulture.ping.PingTask;
 import net.foulest.vulture.processor.Processor;
 import net.foulest.vulture.util.BlockUtil;
 import net.foulest.vulture.util.data.CustomLocation;
+import net.foulest.vulture.util.data.Pair;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -86,8 +87,6 @@ public class PacketSendProcessor extends Processor {
 
                 playerData.setFlying(abilities.isFlying());
                 playerData.setFlightAllowed(abilities.isFlightAllowed());
-                playerData.setFlySpeed(abilities.getFlySpeed());
-                playerData.setWalkSpeed(abilities.getWalkSpeed());
                 playerData.setInstantBuild(abilities.canBuildInstantly());
                 playerData.setVulnerable(abilities.isVulnerable());
 
@@ -132,19 +131,16 @@ public class PacketSendProcessor extends Processor {
             case PacketType.Play.Server.ENTITY_VELOCITY:
                 WrappedPacketOutEntityVelocity entityVelocity = new WrappedPacketOutEntityVelocity(event.getNMSPacket());
                 Vector3d velocity = entityVelocity.getVelocity();
+                int totalTicks = playerData.getTotalTicks();
 
                 if (entityVelocity.getEntityId() == player.getEntityId()) {
-                    playerData.setLastVelocityX(playerData.getVelocityX());
                     playerData.setLastVelocityY(playerData.getVelocityY());
-                    playerData.setLastVelocityZ(playerData.getVelocityZ());
                     playerData.setLastVelocityXZ(playerData.getVelocityXZ());
 
-                    playerData.setVelocityX(velocity.getX());
-                    playerData.setVelocityY(velocity.getY());
-                    playerData.setVelocityZ(velocity.getZ());
-                    playerData.setVelocityXZ(Math.hypot(velocity.getX(), velocity.getZ()));
+                    playerData.setVelocityY(new Pair<>(totalTicks, velocity.getY()));
+                    playerData.setVelocityXZ(new Pair<>(totalTicks, Math.hypot(velocity.getX(), velocity.getZ())));
 
-                    playerData.setVelocityTicks(playerData.getTotalTicks());
+                    playerData.setVelocityTicks(totalTicks);
                     playerData.setTimestamp(ActionType.VELOCITY_GIVEN);
                 }
                 break;

@@ -64,7 +64,6 @@ public class SpeedA extends Check {
 
         double deltaXZ = event.getDeltaXZ();
         double maxSpeed = to.isOnGround() && !nearLilyPad ? 0.3125 : 0.35855;
-        double velocityHorizontal = playerData.getVelocityXZ();
 
         int groundTicks = playerData.getGroundTicks();
         int groundTicksStrict = playerData.getGroundTicksStrict();
@@ -86,7 +85,6 @@ public class SpeedA extends Check {
         maxSpeed += nearLiquid ? depthStriderLevel * 0.45 : 0.0;
         maxSpeed += (walkSpeed - 0.2) * 2.5;
         maxSpeed += (flySpeed - 0.1) * 2.5;
-        maxSpeed += velocityHorizontal;
 
         maxSpeed *= (onStairs || onSlab) ? 1.5 : 1.0;
         maxSpeed *= inWeb ? 0.11 : 1.0;
@@ -107,11 +105,17 @@ public class SpeedA extends Check {
             } else {
                 buffer += 0.1 + difference;
 
+                // TODO: This false flags with velocity.
+
                 if (buffer > 1) {
                     flag(true, "deltaXZ=" + deltaXZ
                             + " maxSpeed=" + maxSpeed
                             + " difference=" + difference
-                            + " buffer=" + buffer);
+                            + " buffer=" + buffer
+                            + " givenTicks=" + playerData.getTicksSince(ActionType.VELOCITY_GIVEN)
+                            + " takenTicks=" + playerData.getTicksSince(ActionType.VELOCITY_TAKEN)
+                            + " velXZ=" + playerData.getVelocityXZ().getLast()
+                    );
                 }
             }
         } else {

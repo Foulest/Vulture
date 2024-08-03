@@ -42,10 +42,7 @@ import java.util.stream.Stream;
         description = "Detects players with invalid reach.")
 public class ReachA extends Check {
 
-    // TODO: Fix false positives with projectiles (e.g. snowballs, fishing rod)
-
-    public static double maxDistance;
-    public static boolean cancelHits;
+    public static double cancelDistance;
 
     public ReachA(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
@@ -132,8 +129,9 @@ public class ReachA extends Check {
 
             // If the intercept result is not present, cancel the event.
             if (!result.isPresent()) {
-                event.setCancelled(cancelHits);
-                MessageUtil.debug("Cancelled hit for " + player.getName() + " (invalid range)");
+                event.setCancelled(true);
+                MessageUtil.debug("Cancelled hit for " + player.getName()
+                        + " (Range: Invalid) (Entity: " + entityType.name() + ")");
                 return;
             }
 
@@ -144,16 +142,10 @@ public class ReachA extends Check {
             range = Math.round(range * 100.0) / 100.0;
 
             // Flags the player if the range is greater than the max distance.
-            if (range > maxDistance) {
-                if (range > 3.1) {
-                    event.setCancelled(cancelHits);
-                    MessageUtil.debug("Cancelled hit for " + player.getName()
-                            + " (Range: " + range + " Entity: " + entityType.name() + ")");
-                }
-
-                if (entityType == EntityType.PLAYER) {
-                    flag(false, "Range: " + range + " Entity: " + entityType.name());
-                }
+            if (range > cancelDistance) {
+                event.setCancelled(true);
+                MessageUtil.debug("Cancelled hit for " + player.getName()
+                        + " (Range: " + range + ") (Entity: " + entityType.name() + ")");
             }
         }
     }

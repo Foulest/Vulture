@@ -90,6 +90,11 @@ public class PledgeImpl implements Pledge, Listener {
         Channel channel = ChannelAccess.getChannel(player);
         playerChannels.put(player, channel);
 
+        // Remove pre-existing pong listener
+        if (channel.pipeline().get("vulture_pledge_packet_listener") != null) {
+            channel.pipeline().remove("vulture_pledge_packet_listener");
+        }
+
         // Inject pong listener
         channel.pipeline().addBefore(
                 "packet_handler",

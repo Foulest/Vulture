@@ -167,26 +167,6 @@ public class PacketReceiveProcessor extends Processor {
                             );
                         }
                     });
-
-                    abilities.getFlySpeed().ifPresent(flySpeed -> {
-                        if (flySpeed != playerData.getFlySpeed()) {
-                            KickUtil.kickPlayer(player, event, Settings.abilitiesInvalidFlySpeed,
-                                    "Sent Abilities packet with invalid fly speed values"
-                                            + " (flySpeed=" + flySpeed
-                                            + " playerFlySpeed=" + playerData.getFlySpeed() + ")"
-                            );
-                        }
-                    });
-
-                    abilities.getWalkSpeed().ifPresent(walkSpeed -> {
-                        if (walkSpeed != playerData.getWalkSpeed()) {
-                            KickUtil.kickPlayer(player, event, Settings.abilitiesInvalidWalkSpeed,
-                                    "Sent Abilities packet with invalid walk speed values"
-                                            + " (walkSpeed=" + walkSpeed
-                                            + " playerWalkSpeed=" + playerData.getWalkSpeed() + ")"
-                            );
-                        }
-                    });
                 }
 
                 if (abilities.isFlying()) {
@@ -200,8 +180,6 @@ public class PacketReceiveProcessor extends Processor {
                 abilities.isFlightAllowed().ifPresent(playerData::setFlightAllowed);
                 abilities.canInstantlyBuild().ifPresent(playerData::setInstantBuild);
                 abilities.isVulnerable().ifPresent(playerData::setVulnerable);
-                abilities.getFlySpeed().ifPresent(playerData::setFlySpeed);
-                abilities.getWalkSpeed().ifPresent(playerData::setWalkSpeed);
                 break;
 
             case PacketType.Play.Client.ARM_ANIMATION:
@@ -1003,18 +981,6 @@ public class PacketReceiveProcessor extends Processor {
                 float flyingYaw = flying.getYaw();
                 float flyingPitch = flying.getPitch();
 
-                // Handles resetting velocity data.
-                if (playerData.getTotalTicks() - playerData.getVelocityTicks() > 1) {
-                    playerData.setLastVelocityX(playerData.getVelocityX());
-                    playerData.setLastVelocityY(playerData.getVelocityY());
-                    playerData.setLastVelocityZ(playerData.getVelocityZ());
-                    playerData.setLastVelocityXZ(playerData.getVelocityXZ());
-                    playerData.setVelocityX(0);
-                    playerData.setVelocityY(0);
-                    playerData.setVelocityZ(0);
-                    playerData.setVelocityXZ(0);
-                }
-
                 // Handles teleport resets.
                 if (flying.isMoving()) {
                     if (playerData.isTeleportReset()) {
@@ -1370,7 +1336,7 @@ public class PacketReceiveProcessor extends Processor {
                 // Ignores vehicle dismount packets.
                 if (sidewaysValue == 0.0f && forwardValue == 0.0f
                         && !steerVehicle.isJump() && !player.isInsideVehicle()) {
-                    if (player.getNearbyEntities(3, 3, 3).stream().anyMatch(entity -> entity instanceof Vehicle)) {
+                    if (player.getNearbyEntities(3, 3, 3).stream().anyMatch(Vehicle.class::isInstance)) {
                         playerData.setTimestamp(ActionType.STEER_VEHICLE);
                         break;
                     }

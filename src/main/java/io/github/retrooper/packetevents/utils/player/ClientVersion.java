@@ -88,11 +88,12 @@ public enum ClientVersion {
     v_1_20(763, "1.20 - 1.20.1"),
     v_1_20_2(764, "1.20.2"),
     v_1_20_3(765, "1.20.3 - 1.20.4"),
+    v_1_20_5(766, "1.20.5 - 1.20.6"),
 
-    v_1_20_5(766, "1.20.5"),
+    v_1_21(767, "1.21"),
 
     LOWER_THAN_SUPPORTED_VERSIONS(v_1_8.protocolVersion - 1, "Lower Than Supported"),
-    HIGHER_THAN_SUPPORTED_VERSIONS(v_1_20_5.protocolVersion + 1, "Higher Than Supported"),
+    HIGHER_THAN_SUPPORTED_VERSIONS(v_1_21.protocolVersion + 1, "Higher Than Supported"),
 
     /**
      * Pre releases just aren't supported, we would end up with so many enum constants.

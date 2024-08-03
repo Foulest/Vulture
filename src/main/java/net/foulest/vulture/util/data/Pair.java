@@ -38,8 +38,8 @@ import java.util.Objects;
 @AllArgsConstructor
 public final class Pair<X, Y> {
 
-    private final X x;
-    private final Y y;
+    private final X first;
+    private final Y last;
 
     @Contract("_, _ -> new")
     public static <X, Y> @NotNull Pair<X, Y> of(X x, Y y) {
@@ -54,11 +54,20 @@ public final class Pair<X, Y> {
         }
 
         Pair<X, Y> pair = (Pair<X, Y>) obj;
-        return Objects.equals(x, pair.x) && Objects.equals(y, pair.y);
+        return Objects.equals(first, pair.first) && Objects.equals(last, pair.last);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(x, y);
+        return Objects.hash(first, last);
+    }
+
+    @Override
+    @Contract(pure = true)
+    public @NotNull String toString() {
+        return "Pair{" +
+                "first=" + first +
+                ", last=" + last +
+                '}';
     }
 }

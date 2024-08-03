@@ -61,7 +61,7 @@ public class FlightC extends Check {
             }
 
             if (velocity != ON_GROUND_VELOCITY && !playerData.isOnGround()
-                    && velocity != lastVelocity && deltaY == 0.0
+                    && velocity != lastVelocity && velocity != 0.0 && deltaY == 0.0
                     && !playerData.isNearbyBoat(0.6, 0.6, 0.6)) {
                 if (++ticksInAir >= 4) {
                     flag(true, "ticks=" + ticksInAir

@@ -40,6 +40,7 @@ import net.foulest.vulture.check.type.pingspoof.PingSpoofB;
 import net.foulest.vulture.check.type.reach.ReachA;
 import net.foulest.vulture.check.type.speed.*;
 import net.foulest.vulture.check.type.velocity.VelocityA;
+import net.foulest.vulture.check.type.velocity.VelocityB;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -96,6 +97,6 @@ public class CheckManager {
             SpeedA.class, SpeedB.class, SpeedC.class, SpeedD.class, SpeedE.class,
 
             // Velocity
-            VelocityA.class
+            VelocityA.class, VelocityB.class
     ));
 }

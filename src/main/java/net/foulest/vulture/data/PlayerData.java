@@ -32,6 +32,7 @@ import net.foulest.vulture.timing.Timing;
 import net.foulest.vulture.tracking.EntityTracker;
 import net.foulest.vulture.util.data.CustomLocation;
 import net.foulest.vulture.util.data.EvictingList;
+import net.foulest.vulture.util.data.Pair;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -105,15 +106,10 @@ public class PlayerData {
     private int lastAttacked;
 
     // Velocity check data
-    // This data is retrieved a tick later than the other data.
-    private double lastVelocityX;
-    private double lastVelocityY;
-    private double lastVelocityZ;
-    private double lastVelocityXZ;
-    private double velocityXZ;
-    private double velocityX;
-    private double velocityY;
-    private double velocityZ;
+    private Pair<Integer, Double> velocityY = new Pair<>(0, 0.0);
+    private Pair<Integer, Double> velocityXZ = new Pair<>(0, 0.0);
+    private Pair<Integer, Double> lastVelocityY = new Pair<>(0, 0.0);
+    private Pair<Integer, Double> lastVelocityXZ = new Pair<>(0, 0.0);
 
     // Block data
     private boolean moving;
@@ -155,8 +151,6 @@ public class PlayerData {
     private boolean flightAllowed;
     private boolean instantBuild;
     private boolean vulnerable;
-    private float flySpeed;
-    private float walkSpeed;
 
     // Other packets
     private boolean eating;
@@ -310,7 +304,7 @@ public class PlayerData {
      * @param action Action to get the timestamp for.
      * @return Timestamp for the action.
      */
-    public long getTimestamp(ActionType action) {
+    public int getTimestamp(ActionType action) {
         return actionTimestamps.getOrDefault(action, 0);
     }
 

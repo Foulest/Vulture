@@ -78,7 +78,7 @@ public class PingSpoofB extends Check {
             }
 
             // Calculates the ping, average ping, and ping deviation of the client.
-            long ping = timestamp - keepAliveOut.getLast().getY();
+            long ping = timestamp - keepAliveOut.getLast().getLast();
             pingValues.add(ping);
             int averagePing = (int) pingValues.stream().mapToLong(val -> val).average().orElse(0.0);
             int pingDeviation = (int) Math.sqrt(pingValues.stream().mapToLong(val -> val).map(i -> i - averagePing).map(i -> i * i).average().orElse(0.0));
@@ -123,12 +123,12 @@ public class PingSpoofB extends Check {
 
             // If the client has sent a KeepAlive packet that was not sent by the server, kick them.
             if (keepAlive.getId() != 0) {
-                if (keepAliveOut.stream().noneMatch(pair -> pair.getX() == keepAlive.getId())) {
+                if (keepAliveOut.stream().noneMatch(pair -> pair.getFirst() == keepAlive.getId())) {
                     KickUtil.kickPlayer(player, event, "Sent a KeepAlive packet that was not sent by the server: "
                             + keepAlive.getId());
                 } else {
                     // Remove the KeepAlive packet sent by the server.
-                    keepAliveOut.removeIf(pair -> pair.getX() == keepAlive.getId());
+                    keepAliveOut.removeIf(pair -> pair.getFirst() == keepAlive.getId());
                 }
             }
         }

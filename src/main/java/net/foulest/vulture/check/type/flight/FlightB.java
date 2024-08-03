@@ -88,10 +88,14 @@ public class FlightB extends Check {
         int jumpBoostLevel = MovementUtil.getPotionEffectLevel(player, PotionEffectType.JUMP);
         double maxDeltaY = 0.461 + jumpBoostLevel * 0.1;
 
+        // TODO: This can false flag when players get hit in water.
+
         if (deltaY > maxDeltaY) {
             flag(true, "deltaY=" + deltaY
                     + " velocity=" + velocity
-                    + " maxDeltaY=" + maxDeltaY);
+                    + " maxDeltaY=" + maxDeltaY
+                    + " velTicks=" + playerData.getTicksSince(ActionType.VELOCITY_GIVEN)
+            );
         }
     }
 

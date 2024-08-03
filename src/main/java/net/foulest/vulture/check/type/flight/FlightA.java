@@ -59,8 +59,8 @@ public class FlightA extends Check {
     public void handle(@NotNull MovementEvent event, long timestamp) {
         double deltaY = event.getDeltaY();
         double velocity = player.getVelocity().getY();
-        double takenVelocity = playerData.getVelocityY();
-        double lastTakenVelocity = playerData.getLastVelocityY();
+        double takenVelocity = playerData.getVelocityY().getLast();
+        double lastTakenVelocity = playerData.getLastVelocityY().getLast();
 
         // Checks the player for exemptions.
         if (playerData.isFlying()
@@ -461,8 +461,14 @@ public class FlightA extends Check {
                     return;
                 }
 
-                if (BlockUtil.isNearLilyPad(player) && Math.abs(deltaY) < 0.1) {
+                if (playerData.isNearLilyPad() && Math.abs(deltaY) < 0.1) {
                     MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (I5) (Y=" + deltaY + ")");
+                    setLastValues(deltaY, velocity);
+                    return;
+                }
+
+                if (onGround && toY % 0.5 == 0.0 && deltaY == 0.4641593749554431) {
+                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (I6) (Y=" + deltaY + ")");
                     setLastValues(deltaY, velocity);
                     return;
                 }
@@ -498,6 +504,12 @@ public class FlightA extends Check {
 
                     if (playerData.getTicksSince(ActionType.TELEPORT) <= 5) {
                         MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (J5) (Y=" + deltaY + ")");
+                        setLastValues(deltaY, velocity);
+                        return;
+                    }
+
+                    if (playerData.isNearStairs() && lastDeltaY == 0.0 && toY % 0.5 == 0.0 && fromY % 0.5 == 0.0) {
+                        MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (J6) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
                     }
@@ -654,9 +666,9 @@ public class FlightA extends Check {
             }
 
             // Increase the buffer.
-            buffer += deltaY + 0.5;
+            buffer += 0.25;
 
-            if (buffer >= 1.0) {
+            if (buffer >= 1.0 || buffer >= 0.5 && deltaY == 0.0 || Math.abs(deltaY) > 0.5) {
                 flag(true, "deltaY=" + deltaY
                         + " lastDeltaY=" + lastDeltaY
                         + " predDeltaY=" + predDeltaY

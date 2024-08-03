@@ -61,7 +61,8 @@ public class PunishUtil {
         if (playerData.isNewViolationsPaused()
                 || KickUtil.isPlayerBeingKicked(player)
                 || PacketEvents.get().getServerUtils().getTPS() < 18
-                || !checkInfo.isEnabled()) {
+                || !checkInfo.isEnabled()
+                || !checkInfo.isPunishable()) {
             return;
         }
 
@@ -87,7 +88,7 @@ public class PunishUtil {
      *
      * @param verbose The verbose to add to the violation.
      */
-    public static void handleNewViolation(@NotNull PlayerData playerData, CheckInfoData checkInfo, String... verbose) {
+    public static void handleNewViolation(@NotNull PlayerData playerData, @NotNull CheckInfoData checkInfo, String... verbose) {
         Player player = playerData.getPlayer();
 
         // Removes older violations before adding new ones.

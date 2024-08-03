@@ -185,10 +185,7 @@ vulture:
     reach:
       A:
         enabled: true
-        maxViolations: 10
-        maxDistance: 3.0017
-        cancelHits: true
-        banCommand: vulture kick %player% %check%
+        cancelDistance: 3.0
     speed:
       A:
         enabled: true
@@ -216,6 +213,10 @@ vulture:
         banCommand: vulture kick %player% %check%
     velocity:
       A:
+        enabled: true
+        maxViolations: 10
+        banCommand: vulture kick %player% %check%
+      B:
         enabled: true
         maxViolations: 10
         banCommand: vulture kick %player% %check%
@@ -254,11 +255,9 @@ vulture:
       abilities:
         duplicate-flying: true
         invalid-flight-allowed: true
-        invalid-fly-speed: true
         invalid-flying: true
         invalid-instant-build: true
         invalid-invulnerable: true
-        invalid-walk-speed: true
       arm-animation:
         invalid-conditions: true
       attack-entity:

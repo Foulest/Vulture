@@ -41,8 +41,8 @@ public class FlightD extends Check {
         if (player.isFlying()
                 || playerData.isNearClimbable()
                 || playerData.isNearLiquid()
-                || playerData.getVelocityY() > 0
-                || playerData.getLastVelocityY() > 0
+                || playerData.getVelocityY().getLast() > 0
+                || playerData.getLastVelocityY().getLast() > 0
                 || event.isTeleport(playerData)) {
             buffer = 0;
             return;

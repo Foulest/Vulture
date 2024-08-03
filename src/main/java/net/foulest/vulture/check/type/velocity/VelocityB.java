@@ -28,15 +28,17 @@ import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 
-@CheckInfo(name = "Velocity (A)", type = CheckType.VELOCITY,
-        description = "Checks for incorrect vertical velocity.", experimental = true)
-public class VelocityA extends Check {
+@CheckInfo(name = "Velocity (B)", type = CheckType.VELOCITY,
+        description = "Checks for incorrect horizontal velocity.", experimental = true)
+public class VelocityB extends Check {
 
-    private double lastPosY;
+    private double lastPosX;
+    private double lastPosZ;
+
     private int lastGivenTicks;
-    private boolean takenCorrectY;
+    private boolean takenCorrectXZ;
 
-    public VelocityA(PlayerData playerData) throws ClassNotFoundException {
+    public VelocityB(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
@@ -44,38 +46,40 @@ public class VelocityA extends Check {
     public void handle(CancellableNMSPacketEvent event, byte packetId,
                        NMSPacket nmsPacket, Object packet, long timestamp) {
         int nowTicks = playerData.getTotalTicks();
-        int givenTicks = playerData.getVelocityY().getFirst();
+        int givenTicks = playerData.getVelocityXZ().getFirst();
         int tickDiff = nowTicks - givenTicks;
 
         if (PacketType.Play.Client.Util.isInstanceOfFlying(packetId)) {
             WrappedPacketInFlying flying = new WrappedPacketInFlying(nmsPacket);
             Vector3d flyingPosition = flying.getPosition();
 
-            double deltaY = (flying.isMoving() ? flyingPosition.getY() - lastPosY : 0.0);
-            double takenY = playerData.getVelocityY().getLast();
-            double diffY = Math.abs(deltaY - takenY);
+            double deltaXZ = (flying.isMoving() ? Math.hypot(flyingPosition.getX() - lastPosX, flyingPosition.getZ() - lastPosZ) : 0.0);
+            double takenXZ = playerData.getVelocityXZ().getLast();
+            double diffXZ = Math.abs(deltaXZ - takenXZ);
 
             // Checks the player for exemptions.
-            if (playerData.isUnderBlock()) {
-                lastPosY = (flying.isMoving() ? flyingPosition.getY() : lastPosY);
+            if (playerData.isAgainstBlock()) {
+                lastPosX = (flying.isMoving() ? flyingPosition.getX() : lastPosX);
+                lastPosZ = (flying.isMoving() ? flyingPosition.getZ() : lastPosZ);
                 return;
             }
 
-            if (takenY > 0.0) {
+            if (takenXZ > 0.0) {
                 // Check if player ever took correct velocity
-                if (diffY < 0.001) {
-                    takenCorrectY = true;
+                if (diffXZ < 0.001) {
+                    takenCorrectXZ = true;
                     playerData.setTimestamp(ActionType.VELOCITY_TAKEN);
                 }
 
                 // Velocity packet sent; flag if player never took correct velocity
-                if (lastGivenTicks != givenTicks && tickDiff > 0 && !takenCorrectY) {
-                    flag(false, "dY=" + deltaY + " vY=" + takenY + " diffY=" + diffY + " tDiff=" + tickDiff);
+                if (lastGivenTicks != givenTicks && tickDiff > 0 && !takenCorrectXZ) {
+                    flag(false, "dXZ=" + deltaXZ + " vXZ=" + takenXZ + " diffXZ=" + diffXZ + " tDiff=" + tickDiff);
                     lastGivenTicks = givenTicks;
                 }
             }
 
-            lastPosY = (flying.isMoving() ? flyingPosition.getY() : lastPosY);
+            lastPosX = (flying.isMoving() ? flyingPosition.getX() : lastPosX);
+            lastPosZ = (flying.isMoving() ? flyingPosition.getZ() : lastPosZ);
         }
     }
 }
