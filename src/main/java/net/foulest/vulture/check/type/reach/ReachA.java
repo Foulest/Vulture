@@ -38,7 +38,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-@CheckInfo(name = "Reach (A)", type = CheckType.REACH,
+@CheckInfo(name = "Reach (A)", type = CheckType.REACH, punishable = false,
         description = "Detects players with invalid reach.")
 public class ReachA extends Check {
 

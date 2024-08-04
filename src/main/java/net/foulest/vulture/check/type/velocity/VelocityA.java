@@ -64,13 +64,25 @@ public class VelocityA extends Check {
             if (takenY > 0.0) {
                 // Check if player ever took correct velocity
                 if (diffY < 0.001) {
+                    // Player repeating correct velocity
+                    if (takenCorrectY) {
+                        flag(false, "(repeated) dY=" + deltaY + " vY=" + takenY + " diffY=" + diffY + " tDiff=" + tickDiff);
+                    }
+
                     takenCorrectY = true;
                     playerData.setTimestamp(ActionType.VELOCITY_TAKEN);
                 }
 
+                // TODO: This flags:
+                //  dY=0.20312687040733124 vY=0.46075
+
                 // Velocity packet sent; flag if player never took correct velocity
-                if (lastGivenTicks != givenTicks && tickDiff > 0 && !takenCorrectY) {
-                    flag(false, "dY=" + deltaY + " vY=" + takenY + " diffY=" + diffY + " tDiff=" + tickDiff);
+                if (lastGivenTicks != givenTicks && tickDiff > 0) {
+                    if (!takenCorrectY) {
+                        flag(false, "dY=" + deltaY + " vY=" + takenY + " diffY=" + diffY + " tDiff=" + tickDiff);
+                    }
+
+                    takenCorrectY = false;
                     lastGivenTicks = givenTicks;
                 }
             }

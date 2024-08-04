@@ -1192,6 +1192,7 @@ public class PacketReceiveProcessor extends Processor {
                     }
 
                     playerData.setAgainstBlock(BlockUtil.isAgainstBlock(player));
+                    playerData.setAgainstBlockWide(BlockUtil.isAgainstBlockWide(player));
                     playerData.setCollidingBlock(BlockUtil.getCollidingBlock(player));
 
                     if (playerData.isOnIce()) {

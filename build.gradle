@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'net.foulest'
-version = '1.5.3'
+version = '1.5.4'
 description = project.name
 
 compileJava.options.encoding = 'UTF-8'

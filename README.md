@@ -20,7 +20,6 @@
 ### Combat Checks
 
 - AutoBlock _(x4)_
-- AutoClicker _(x1)_
 - Reach _(x1)_
 - Velocity _(x1)_
 

@@ -139,6 +139,7 @@ public class PlayerData {
     private boolean nearSlimeBlock;
     private boolean underBlock;
     private boolean againstBlock;
+    private boolean againstBlockWide;
     private boolean isInsideBlock;
     private Block collidingBlock;
     private boolean inCamera;

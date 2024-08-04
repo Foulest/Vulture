@@ -163,6 +163,16 @@ public class BlockUtil {
         return collidesWithSolid(player, boundingBox);
     }
 
+    public static boolean isAgainstBlockWide(Player player) {
+        if (isPlayerInUnloadedChunk(player)) {
+            return false;
+        }
+
+        BoundingBox boundingBox = getPlayerCustomBoundingBox(player, 0.1, 0.0, 0.0);
+        visualizeBoundingBox(player, boundingBox);
+        return collidesWithSolid(player, boundingBox);
+    }
+
     public static boolean isOnSlab(Player player) {
         if (isPlayerInUnloadedChunk(player)) {
             return false;

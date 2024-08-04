@@ -25,7 +25,6 @@ package net.foulest.vulture.check;
  */
 public enum CheckType {
     AUTOBLOCK,
-    AUTOCLICKER,
     BADPACKETS,
     CLIENTBRAND,
     FLIGHT,
