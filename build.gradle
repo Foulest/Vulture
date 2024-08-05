@@ -82,7 +82,7 @@ tasks {
 
     processResources {
         filesMatching('**/*.yml') {
-            filter { line ->
+            filter { final line ->
                 line.replace('${project.version}', project.version)
             }
         }
@@ -96,8 +96,8 @@ tasks {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            groupId = 'net.foulest.vulture' as Publication
-            artifactId = project.name as Publication
+            groupId = 'net.foulest.vulture'
+            artifactId = project.name
             version = project.version
 
             from components.java
