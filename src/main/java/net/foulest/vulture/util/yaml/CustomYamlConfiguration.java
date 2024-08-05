@@ -130,9 +130,14 @@ public class CustomYamlConfiguration extends YamlConfiguration {
         StringBuilder builder = new StringBuilder();
         String line;
 
-        while ((line = input.readLine()) != null) {
-            builder.append(line);
-            builder.append('\n');
+        while (true) {
+            line = input.readLine();
+
+            if (line == null) {
+                break;
+            }
+
+            builder.append(line).append('\n');
         }
 
         loadFromString(builder.toString());

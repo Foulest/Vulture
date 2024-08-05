@@ -54,6 +54,7 @@ import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -166,12 +167,13 @@ public class PledgeImpl implements Pledge, Listener {
         );
     }
 
-    public void sendPingRaw(Player player, Channel channel, int pingId) {
+    public void sendPingRaw(Player player, @NotNull Channel channel, int pingId) {
         try {
             Object packet = packetProvider.buildPacket(pingId);
             Bukkit.getPluginManager().callEvent(new PingSendEvent(player, pingId));
             channel.writeAndFlush(packet);
-        } catch (Exception ex) {
+        } catch (IllegalStateException | InvocationTargetException
+                 | InstantiationException | IllegalAccessException ex) {
             logger.severe(String.format("Failed to send ping! Player:%s Id:%o", player.getName(), pingId));
             ex.printStackTrace();
         }

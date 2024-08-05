@@ -201,7 +201,7 @@ public class CommandFramework implements CommandExecutor {
         commandMap.put(label.toLowerCase(Locale.ROOT), new AbstractMap.SimpleEntry<>(method, obj));
         commandMap.put(plugin.getName() + ':' + label.toLowerCase(Locale.ROOT), new AbstractMap.SimpleEntry<>(method, obj));
 
-        String cmdLabel = label.replace(".", ",").split(",")[0].toLowerCase();
+        String cmdLabel = label.replace(".", ",").split(",")[0].toLowerCase(Locale.ROOT);
 
         if (map.getCommand(cmdLabel) == null) {
             org.bukkit.command.Command cmd = new BukkitCommand(cmdLabel, this, plugin);
@@ -273,7 +273,7 @@ public class CommandFramework implements CommandExecutor {
                     MessageUtil.log(Level.WARNING, ConstantUtil.UNABLE_TO_REGISTER_TAB_COMPLETER
                             + method.getName() + "; a tab completer is already registered for that command.");
                 }
-            } catch (Exception ex) {
+            } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
                 ex.printStackTrace();
             }
         }

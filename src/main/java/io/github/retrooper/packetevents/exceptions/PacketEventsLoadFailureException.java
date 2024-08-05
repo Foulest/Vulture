@@ -17,14 +17,20 @@
  */
 package io.github.retrooper.packetevents.exceptions;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 /**
  * An exception thrown by PacketEvents when the {@link io.github.retrooper.packetevents.PacketEvents#load}
- * method fails to execute without any exceptions.
- * Resulting in PacketEvents failing to load.
+ * method fails to execute without any exceptions, resulting in PacketEvents failing to load.
  *
  * @author retrooper
  * @since 1.7.6
  */
+@SuppressWarnings("unused")
 public class PacketEventsLoadFailureException extends RuntimeException {
 
     private static final long serialVersionUID = -3740781881127764470L;
@@ -43,5 +49,13 @@ public class PacketEventsLoadFailureException extends RuntimeException {
 
     public PacketEventsLoadFailureException(Throwable cause) {
         this("PacketEvents failed to load...", cause);
+    }
+
+    private void writeObject(@NotNull ObjectOutputStream out) throws IOException {
+        out.defaultWriteObject();
+    }
+
+    private void readObject(@NotNull ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
     }
 }

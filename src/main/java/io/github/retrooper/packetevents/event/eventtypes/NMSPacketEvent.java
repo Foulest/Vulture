@@ -68,9 +68,4 @@ public abstract class NMSPacketEvent extends PacketEvent {
     public void setNMSPacket(NMSPacket nmsPacket) {
         this.nmsPacket = nmsPacket;
     }
-
-    @Override
-    public boolean isInbuilt() {
-        return true;
-    }
 }

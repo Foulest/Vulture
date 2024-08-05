@@ -40,8 +40,8 @@ import java.util.*;
 @NoArgsConstructor
 public class EarlyChannelInjectorModern implements EarlyInjector {
 
-    private final List<ChannelFuture> injectedFutures = new ArrayList<>();
-    private final List<Map<Field, Object>> injectedLists = new ArrayList<>();
+    private final Collection<ChannelFuture> injectedFutures = new ArrayList<>();
+    private final Collection<Map<Field, Object>> injectedLists = new ArrayList<>();
 
     @Override
     public boolean isBound() {
@@ -58,7 +58,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
                 if (value instanceof List) {
                     synchronized (value) {
-                        for (Object object : (Iterable) value) {
+                        for (Object object : (Iterable<?>) value) {
                             if (object instanceof ChannelFuture) {
                                 return true;
                             } else {

@@ -28,7 +28,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ConcurrentModificationException;
 import java.util.Objects;
 
 /**
@@ -85,14 +84,10 @@ public final class EntityFinderUtils {
         }
 
         for (World world : Bukkit.getWorlds()) {
-            try {
-                for (Entity entity : world.getEntities()) {
-                    if (entity.getEntityId() == id) {
-                        return entity;
-                    }
+            for (Entity entity : world.getEntities()) {
+                if (entity.getEntityId() == id) {
+                    return entity;
                 }
-            } catch (ConcurrentModificationException ex) {
-                return null;
             }
         }
         return null;

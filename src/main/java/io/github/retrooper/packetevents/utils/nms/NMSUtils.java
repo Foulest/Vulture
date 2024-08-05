@@ -40,6 +40,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -463,7 +464,9 @@ public final class NMSUtils {
     private static Object getMinecraftServerInstance(Server server) {
         if (minecraftServer == null) {
             try {
-                minecraftServer = Reflection.getField(craftServerClass, minecraftServerClass, 0).get(server);
+                if (Reflection.getField(craftServerClass, minecraftServerClass, 0) != null) {
+                    minecraftServer = Objects.requireNonNull(Reflection.getField(craftServerClass, minecraftServerClass, 0)).get(server);
+                }
             } catch (IllegalAccessException ex) {
                 ex.printStackTrace();
             }
@@ -474,7 +477,9 @@ public final class NMSUtils {
     public static Object getMinecraftServerConnection() {
         if (minecraftServerConnection == null) {
             try {
-                minecraftServerConnection = Reflection.getField(minecraftServerClass, serverConnectionClass, 0).get(getMinecraftServerInstance(Bukkit.getServer()));
+                if (Reflection.getField(minecraftServerClass, serverConnectionClass, 0) != null) {
+                    minecraftServerConnection = Objects.requireNonNull(Reflection.getField(minecraftServerClass, serverConnectionClass, 0)).get(getMinecraftServerInstance(Bukkit.getServer()));
+                }
             } catch (IllegalAccessException ex) {
                 ex.printStackTrace();
             }
@@ -733,8 +738,9 @@ public final class NMSUtils {
 
     public static Object @NotNull [] generateIChatBaseComponents(String @NotNull ... texts) {
         Object[] components = new Object[texts.length];
+        int size = components.length;
 
-        for (int i = 0; i < components.length; i++) {
+        for (int i = 0; i < size; i++) {
             components[i] = generateIChatBaseComponent(texts[i]);
         }
         return components;
@@ -755,8 +761,9 @@ public final class NMSUtils {
 
     public static String @NotNull [] readIChatBaseComponents(Object @NotNull ... components) {
         String[] texts = new String[components.length];
+        int size = texts.length;
 
-        for (int i = 0; i < texts.length; i++) {
+        for (int i = 0; i < size; i++) {
             texts[i] = readIChatBaseComponent(components[i]);
         }
         return texts;

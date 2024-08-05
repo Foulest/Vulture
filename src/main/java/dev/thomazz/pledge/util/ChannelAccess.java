@@ -28,6 +28,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -53,7 +54,8 @@ public class ChannelAccess {
             "PlayerConnection"
     );
 
-    public Channel getChannel(Player player) {
+    @SuppressWarnings("OverlyBroadCatchBlock")
+    public Channel getChannel(@NotNull Player player) {
         try {
             UUID playerId = player.getUniqueId();
             Object handle = player.getClass().getDeclaredMethod("getHandle").invoke(player);
@@ -110,7 +112,8 @@ public class ChannelAccess {
             }
 
             throw new NoSuchElementException("Did not find player channel!");
-        } catch (Exception ex) {
+        } catch (IllegalArgumentException | SecurityException
+                 | NoSuchElementException | ReflectiveOperationException ex) {
             throw new RuntimeException("Could not get channel for player: " + player.getName(), ex);
         }
     }
@@ -136,7 +139,8 @@ public class ChannelAccess {
             }
 
             throw new NoSuchElementException("Did not find correct list in server connection");
-        } catch (Exception ex) {
+        } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException | NoSuchMethodException
+                 | SecurityException | InvocationTargetException | NoSuchElementException ex) {
             throw new RuntimeException("Cannot retrieve network managers", ex);
         }
     }

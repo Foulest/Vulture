@@ -15,10 +15,8 @@ public class WrappedPacketOutOpenWindow extends WrappedPacket {
     private static boolean ultraLegacyMode;
     private int windowID;
     private int windowTypeID;
-
     @Deprecated
     private String windowType;
-
     private String windowTitle;
 
     public WrappedPacketOutOpenWindow(NMSPacket packet) {
@@ -77,7 +75,6 @@ public class WrappedPacketOutOpenWindow extends WrappedPacket {
                 return Optional.empty();
             }
             return Optional.of(readString(0));
-
         } else {
             return Optional.of(windowType);
         }

@@ -268,7 +268,7 @@ public class PacketProcessorInternal {
      * @param event PLAY client-bound packet event.
      */
     private void interceptPlaySend(PacketPlaySendEvent event) {
-        // Do nothing
+        // This method is intentionally left blank.
     }
 
     /**
@@ -277,7 +277,7 @@ public class PacketProcessorInternal {
      * @param event LOGIN server-bound packet event.
      */
     private void interceptLoginReceive(PacketLoginReceiveEvent event) {
-        // Do nothing
+        // This method is intentionally left blank.
     }
 
     /**
@@ -286,7 +286,7 @@ public class PacketProcessorInternal {
      * @param event client-bound LOGIN packet event.
      */
     private void interceptLoginSend(PacketLoginSendEvent event) {
-        // Do nothing
+        // This method is intentionally left blank.
     }
 
     /**
@@ -310,7 +310,7 @@ public class PacketProcessorInternal {
      * @param event server-bound STATUS packet event.
      */
     private void interceptStatusReceive(PacketStatusReceiveEvent event) {
-        // Do nothing
+        // This method is intentionally left blank.
     }
 
     /**
@@ -319,7 +319,7 @@ public class PacketProcessorInternal {
      * @param event client-bound STATUS packet event.
      */
     private void interceptStatusSend(PacketStatusSendEvent event) {
-        // Do nothing
+        // This method is intentionally left blank.
     }
 
     /**
@@ -328,7 +328,7 @@ public class PacketProcessorInternal {
      * @param event post server-bound play packet event.
      */
     private void interceptPostPlayReceive(PostPacketPlayReceiveEvent event) {
-        // Do nothing
+        // This method is intentionally left blank.
     }
 
     /**

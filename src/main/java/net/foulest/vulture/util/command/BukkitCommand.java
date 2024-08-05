@@ -36,7 +36,7 @@ class BukkitCommand extends org.bukkit.command.Command {
 
     private final Plugin owningPlugin;
     private final CommandExecutor executor;
-    protected BukkitCompleter completer;
+    BukkitCompleter completer;
 
     /**
      * Constructs a BukkitCommand instance.

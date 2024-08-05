@@ -20,15 +20,19 @@ package io.github.retrooper.packetevents.exceptions;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 /**
- * An exception thrown by PacketEvents when a wrapper fails
- * to find a field.
+ * An exception thrown by PacketEvents when a wrapper fails to find a field.
  *
  * @author retrooper
  * @see io.github.retrooper.packetevents.packetwrappers.WrappedPacket#read(int, Class)
  * @see io.github.retrooper.packetevents.packetwrappers.WrappedPacket#write(Class, int, Object)
  * @since 1.6.9
  */
+@SuppressWarnings("unused")
 public class WrapperFieldNotFoundException extends RuntimeException {
 
     private static final long serialVersionUID = 4872909960607964761L;
@@ -40,5 +44,13 @@ public class WrapperFieldNotFoundException extends RuntimeException {
     public WrapperFieldNotFoundException(@NotNull Class<?> packetClass, Class<?> type, int index) {
         this("PacketEvents failed to find a " + ClassUtil.getClassSimpleName(type)
                 + " indexed " + index + " by its type in the " + packetClass.getName() + " class!");
+    }
+
+    private void writeObject(@NotNull ObjectOutputStream out) throws IOException {
+        out.defaultWriteObject();
+    }
+
+    private void readObject(@NotNull ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
     }
 }

@@ -553,11 +553,12 @@ public class BoundingBox implements Cloneable, ConfigurationSerializable {
         }
     }
 
+    @Override
     public BoundingBox clone() {
         try {
             return (BoundingBox) super.clone();
-        } catch (CloneNotSupportedException var2) {
-            throw new Error(var2);
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException("Failed to clone BoundingBox", e);
         }
     }
 

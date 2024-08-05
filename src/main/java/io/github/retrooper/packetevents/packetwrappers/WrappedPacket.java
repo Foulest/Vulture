@@ -163,22 +163,17 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     @Override
     public Object readAnyObject(int index) {
-        try {
-            if (packetClass == null) {
-                throw new WrapperFieldNotFoundException("PacketEvents failed to find any field indexed "
-                        + index + " in the null class!");
-            }
-
-            Field field = packetClass.getDeclaredFields()[index];
-
-            if (!field.isAccessible()) {
-                field.setAccessible(true);
-            }
-            return getFieldObject(field);
-        } catch (ArrayIndexOutOfBoundsException ex) {
+        if (packetClass == null) {
             throw new WrapperFieldNotFoundException("PacketEvents failed to find any field indexed "
-                    + index + " in the " + ClassUtil.getClassSimpleName(packetClass) + " class!");
+                    + index + " in the null class!");
         }
+
+        Field field = packetClass.getDeclaredFields()[index];
+
+        if (!field.isAccessible()) {
+            field.setAccessible(true);
+        }
+        return getFieldObject(field);
     }
 
     private @Nullable Object getFieldObject(Field field) {
@@ -188,7 +183,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
                         + field.getName() + " in the null packet!");
             }
             return field.get(nmsPacket.getRawNMSPacket());
-        } catch (IllegalAccessException | NullPointerException | ArrayIndexOutOfBoundsException ex) {
+        } catch (IllegalAccessException ex) {
             ex.printStackTrace();
             return null;
         }
@@ -214,7 +209,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
             Field field = getField(type, index);
             return (T) field.get(nmsPacket.getRawNMSPacket());
-        } catch (IllegalAccessException | NullPointerException | ArrayIndexOutOfBoundsException e) {
+        } catch (IllegalAccessException ex) {
             if (packetClass == null) {
                 throw new WrapperFieldNotFoundException("PacketEvents failed to find any field indexed "
                         + index + " in the null class!");
@@ -363,7 +358,7 @@ public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
         try {
             field.set(nmsPacket.getRawNMSPacket(), value);
-        } catch (IllegalAccessException | NullPointerException ex) {
+        } catch (IllegalAccessException ex) {
             ex.printStackTrace();
         }
     }

@@ -89,7 +89,7 @@ public final class ServerUtils {
     }
 
     private @Nullable Entity getEntityByIdIterateWorld(@NotNull World world, int entityID) {
-        for (Entity entity : ServerUtils.getEntityList(world)) {
+        for (Entity entity : getEntityList(world)) {
             if (entity.getEntityId() == entityID) {
                 entityCache.putIfAbsent(entity.getEntityId(), entity);
                 return entity;

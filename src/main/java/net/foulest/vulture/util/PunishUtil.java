@@ -30,7 +30,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
 import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -93,11 +92,7 @@ public final class PunishUtil {
         Player player = playerData.getPlayer();
 
         // Removes older violations before adding new ones.
-        try {
-            playerData.getViolations().removeIf(violation -> System.currentTimeMillis() - violation.getTimestamp() > Settings.resetViolations * 1000L);
-        } catch (ConcurrentModificationException ex) {
-            ex.printStackTrace();
-        }
+        playerData.getViolations().removeIf(violation -> System.currentTimeMillis() - violation.getTimestamp() > Settings.resetViolations * 1000L);
 
         int violations = getViolationCount(playerData, checkInfo) + 1;
 

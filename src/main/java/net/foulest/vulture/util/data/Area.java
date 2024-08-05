@@ -42,6 +42,7 @@ public class Area {
         this(0, 0, 0);
     }
 
+    @SuppressWarnings("SameParameterValue")
     private Area(double x, double y, double z) {
         set(x, y, z);
     }

@@ -22,13 +22,15 @@
  */
 package dev.thomazz.pledge.packet;
 
+import java.lang.reflect.InvocationTargetException;
+
 public interface PingPacketProvider {
 
-    Object buildPacket(int id) throws Exception;
+    Object buildPacket(int id) throws InvocationTargetException, InstantiationException, IllegalAccessException;
 
-    int idFromPong(Object packet) throws Exception;
+    int idFromPong(Object packet) throws IllegalAccessException;
 
-    boolean isPong(Object packet) throws Exception;
+    boolean isPong(Object packet) throws IllegalAccessException;
 
     int getLowerBound();
 

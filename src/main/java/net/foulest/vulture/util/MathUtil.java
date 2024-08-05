@@ -20,6 +20,7 @@ package net.foulest.vulture.util;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.foulest.vulture.util.data.Area;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -28,18 +29,32 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("BooleanMethodIsAlwaysInverted")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MathUtil {
 
-    private static final float[] SIN_TABLE = new float[65536];
+    private static final float[] SIN_TABLE;
 
     static {
-        for (int i = 0; i < SIN_TABLE.length; ++i) {
-            SIN_TABLE[i] = (float) StrictMath.sin(i * Math.PI * 2.0D / 65536.0D);
+        float[] tempSinTable = null;
+
+        try {
+            tempSinTable = new float[65536];
+            int size = tempSinTable.length;
+
+            for (int i = 0; i < size; ++i) {
+                tempSinTable[i] = (float) StrictMath.sin(i * Math.PI * 2.0D / 65536.0D);
+            }
+        } catch (OutOfMemoryError ex) {
+            MessageUtil.log(Level.SEVERE, "Failed to initialize SIN_TABLE due to insufficient memory.");
+            ex.printStackTrace();
+            Bukkit.getServer().shutdown();
         }
+
+        SIN_TABLE = tempSinTable;
     }
 
     @Contract(pure = true)
@@ -274,6 +289,6 @@ public final class MathUtil {
                 .stream()
                 .max(Map.Entry.comparingByValue())
                 .map(Map.Entry::getKey)
-                .orElseThrow(NullPointerException::new);
+                .orElseThrow(() -> new NullPointerException("No mode found"));
     }
 }

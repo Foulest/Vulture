@@ -33,8 +33,8 @@ import org.bukkit.potion.PotionEffectType;
         description = "Prevents players from using NoSlowdown.")
 public class SpeedE extends Check {
 
-    public double bufferStandard;
-    public double bufferRapid;
+    private double bufferStandard;
+    private double bufferRapid;
 
     public SpeedE(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);

@@ -41,14 +41,20 @@ public class WrappedGameProfile {
         return id != null && !isBlank(name);
     }
 
-    private boolean isBlank(CharSequence cs) {
-        int strLen;
+    private static boolean isBlank(CharSequence cs) {
+        if (cs == null) {
+            return true;
+        }
 
-        if (cs != null && (strLen = cs.length()) != 0) {
-            for (int i = 0; i < strLen; ++i) {
-                if (!Character.isWhitespace(cs.charAt(i))) {
-                    return false;
-                }
+        int strLen = cs.length();
+
+        if (strLen == 0) {
+            return true;
+        }
+
+        for (int i = 0; i < strLen; ++i) {
+            if (!Character.isWhitespace(cs.charAt(i))) {
+                return false;
             }
         }
         return true;

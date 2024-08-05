@@ -28,6 +28,7 @@ import lombok.NoArgsConstructor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.UUID;
@@ -68,7 +69,7 @@ public final class PlayerUtils {
      * @return NMS smoothed ping.
      */
     @Deprecated
-    public int getNMSPing(Player player) {
+    public static int getNMSPing(Player player) {
         return NMSUtils.getPlayerPing(player);
     }
 
@@ -182,11 +183,11 @@ public final class PlayerUtils {
         return version;
     }
 
-    public void writePacket(Player player, SendableWrapper wrapper) {
+    public void writePacket(Player player, @NotNull SendableWrapper wrapper) {
         try {
             Object nmsPacket = wrapper.asNMSPacket();
             PacketEvents.getInstance().getInjector().writePacket(getChannel(player), nmsPacket);
-        } catch (Exception ex) {
+        } catch (InvocationTargetException | InstantiationException | IllegalAccessException ex) {
             ex.printStackTrace();
         }
     }
@@ -205,11 +206,11 @@ public final class PlayerUtils {
      * @param player  Packet receiver.
      * @param wrapper Client-bound wrapper supporting sending.
      */
-    public void sendPacket(Player player, SendableWrapper wrapper) {
+    public void sendPacket(Player player, @NotNull SendableWrapper wrapper) {
         try {
             Object nmsPacket = wrapper.asNMSPacket();
             PacketEvents.getInstance().getInjector().sendPacket(getChannel(player), nmsPacket);
-        } catch (Exception ex) {
+        } catch (InvocationTargetException | InstantiationException | IllegalAccessException ex) {
             ex.printStackTrace();
         }
     }

@@ -21,8 +21,10 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FileUtil {
@@ -34,7 +36,7 @@ public final class FileUtil {
      * @param fileName The file name to print to.
      */
     public static void printDataToFile(String data, String fileName) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(fileName), StandardCharsets.UTF_8)) {
             writer.write(data);
         } catch (IOException ex) {
             ex.printStackTrace();

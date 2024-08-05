@@ -26,6 +26,7 @@ import com.google.common.collect.ImmutableSet;
 import dev.thomazz.pledge.packet.providers.PingPongPacketProvider;
 import dev.thomazz.pledge.packet.providers.TransactionPacketProvider;
 import lombok.experimental.UtilityClass;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 import java.util.Set;
@@ -47,10 +48,10 @@ public class PacketProviderFactory {
                 .orElseThrow(() -> new RuntimeException("Could not create packet provider!"));
     }
 
-    private Optional<PingPacketProvider> buildProvider(ThrowingSupplier<PingPacketProvider> supplier) {
+    private Optional<PingPacketProvider> buildProvider(@NotNull ThrowingSupplier<PingPacketProvider> supplier) {
         try {
             return Optional.of(supplier.get());
-        } catch (Exception ignored) {
+        } catch (NoSuchFieldException | ClassNotFoundException | NoSuchMethodException ignored) {
             return Optional.empty();
         }
     }
@@ -58,6 +59,6 @@ public class PacketProviderFactory {
     @FunctionalInterface
     private interface ThrowingSupplier<T> {
 
-        T get() throws Exception;
+        T get() throws NoSuchFieldException, ClassNotFoundException, NoSuchMethodException;
     }
 }

@@ -56,45 +56,59 @@ public abstract class PacketListenerAbstract {
     }
 
     public void onPacketDecode(PacketDecodeEvent event) {
+        // This method is intentionally left blank.
     }
 
     public void onPacketStatusReceive(PacketStatusReceiveEvent event) {
+        // This method is intentionally left blank.
     }
 
     public void onPacketStatusSend(PacketStatusSendEvent event) {
+        // This method is intentionally left blank.
     }
 
     public void onPacketHandshakeReceive(PacketHandshakeReceiveEvent event) {
+        // This method is intentionally left blank.
     }
 
     public void onPacketLoginReceive(PacketLoginReceiveEvent event) {
+        // This method is intentionally left blank.
     }
 
     public void onPacketLoginSend(PacketLoginSendEvent event) {
+        // This method is intentionally left blank.
     }
 
     public void onPacketPlayReceive(PacketPlayReceiveEvent event) {
+        // This method is intentionally left blank.
     }
 
     public void onPacketPlaySend(PacketPlaySendEvent event) {
+        // This method is intentionally left blank.
     }
 
     public void onPostPacketPlayReceive(PostPacketPlayReceiveEvent event) {
+        // This method is intentionally left blank.
     }
 
     public void onPostPacketPlaySend(PostPacketPlaySendEvent event) {
+        // This method is intentionally left blank.
     }
 
     public void onPostPlayerInject(PostPlayerInjectEvent event) {
+        // This method is intentionally left blank.
     }
 
     public void onPlayerInject(PlayerInjectEvent event) {
+        // This method is intentionally left blank.
     }
 
     public void onPlayerEject(PlayerEjectEvent event) {
+        // This method is intentionally left blank.
     }
 
     public void onPacketEventExternal(PacketEvent event) {
+        // This method is intentionally left blank.
     }
 
     public void addServerSidedStatusFilter(Byte... statusPacketIDs) {

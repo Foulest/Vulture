@@ -162,8 +162,9 @@ public class PEVersion implements Cloneable {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder((versionIntArray.length << 1) - 1).append(versionIntArray[0]);
+        int size = versionIntArray.length;
 
-        for (int i = 1; i < versionIntArray.length; i++) {
+        for (int i = 1; i < size; i++) {
             sb.append(".").append(versionIntArray[i]);
         }
         return sb.toString();

@@ -17,6 +17,8 @@
  */
 package io.github.retrooper.packetevents.packetwrappers.api;
 
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * Packet-Wrappers that can be sent to clients.
  *
@@ -25,5 +27,5 @@ package io.github.retrooper.packetevents.packetwrappers.api;
 @FunctionalInterface
 public interface SendableWrapper {
 
-    Object asNMSPacket() throws Exception;
+    Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException;
 }

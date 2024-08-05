@@ -40,8 +40,4 @@ public abstract class PacketEvent implements CallableEvent {
     public void callPacketEventExternal(@NotNull PacketListenerAbstract listener) {
         listener.onPacketEventExternal(this);
     }
-
-    public boolean isInbuilt() {
-        return false;
-    }
 }

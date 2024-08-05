@@ -58,6 +58,5 @@ class WrappedWatchableObject extends WrappedPacket {
 
     // TODO: Finish WrappedWatchableObject#setValue
     protected void setValue(Object value) {
-
     }
 }

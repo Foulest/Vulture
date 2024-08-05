@@ -32,7 +32,6 @@ public class ConstantUtil {
 
     // Movement
     public final double FAST_MATH_ERROR = MAX_RANGE / 4096.0D; // Error for sin table of 4096 and max range
-    public final double MIN_MOVE_UPDATE = 9.0E-4D; // In player position send logic
     public final double MIN_MOVE_UPDATE_ROOT = 0.03;
 
     // Entity move

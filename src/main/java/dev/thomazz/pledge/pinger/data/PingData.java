@@ -40,7 +40,7 @@ public class PingData {
     private final Player player;
     private final ClientPingerImpl pinger;
 
-    private boolean validated = false;
+    private boolean validated;
     private int id;
 
     public PingData(Player player, @NotNull ClientPingerImpl pinger) {
