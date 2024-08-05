@@ -8,7 +8,6 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.ToString;
 import org.jetbrains.annotations.Nullable;
 
 public final class WrappedPacketInEntityAction extends WrappedPacketEntityAbstraction {
@@ -70,7 +69,6 @@ public final class WrappedPacketInEntityAction extends WrappedPacketEntityAbstra
     }
 
     @Getter
-    @ToString
     @AllArgsConstructor
     public enum PlayerAction {
         START_SNEAKING((byte) 0, "PRESS_SHIFT_KEY"),

@@ -18,9 +18,7 @@
 package io.github.retrooper.packetevents.event.eventtypes;
 
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import lombok.ToString;
 
-@ToString
 public abstract class CancellableNMSPacketEvent extends NMSPacketEvent implements CancellableEvent {
 
     private boolean cancelled;

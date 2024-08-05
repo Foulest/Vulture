@@ -28,7 +28,6 @@ import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,7 +46,6 @@ import java.util.UUID;
 @NoArgsConstructor
 public class PacketProcessorInternal {
 
-    @ToString
     @NoArgsConstructor
     public static class PacketData {
 

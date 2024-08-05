@@ -24,7 +24,6 @@ import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
 import lombok.Getter;
-import lombok.ToString;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -40,7 +39,6 @@ import java.net.InetSocketAddress;
  * @since 1.6.9
  */
 @Getter
-@ToString
 public final class PlayerInjectEvent extends PacketEvent implements CancellableEvent, PlayerEvent {
 
     private final Player player;

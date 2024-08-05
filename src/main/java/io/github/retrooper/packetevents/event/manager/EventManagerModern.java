@@ -24,7 +24,6 @@ import io.github.retrooper.packetevents.event.PacketListenerPriority;
 import io.github.retrooper.packetevents.event.eventtypes.CallableEvent;
 import lombok.NoArgsConstructor;
 import lombok.Synchronized;
-import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
@@ -33,7 +32,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
-@ToString
 @NoArgsConstructor
 class EventManagerModern {
 

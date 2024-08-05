@@ -17,7 +17,6 @@
  */
 package net.foulest.vulture.check.type.speed;
 
-import lombok.ToString;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
@@ -25,7 +24,6 @@ import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.event.MovementEvent;
 import org.jetbrains.annotations.NotNull;
 
-@ToString
 @CheckInfo(name = "Speed (B)", type = CheckType.SPEED)
 public class SpeedB extends Check {
 

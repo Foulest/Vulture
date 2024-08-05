@@ -19,7 +19,6 @@ package net.foulest.vulture.util.yaml;
 
 import lombok.Cleanup;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
@@ -39,7 +38,6 @@ import java.util.regex.Pattern;
  * @author Foulest
  * @project Vulture
  */
-@ToString
 @NoArgsConstructor
 public class CustomYamlConfiguration extends YamlConfiguration {
 

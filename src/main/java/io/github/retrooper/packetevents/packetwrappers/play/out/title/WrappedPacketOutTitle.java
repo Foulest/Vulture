@@ -8,12 +8,10 @@ import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import lombok.AllArgsConstructor;
-import lombok.ToString;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-@ToString
 @AllArgsConstructor
 public class WrappedPacketOutTitle extends WrappedPacket implements SendableWrapper {
 

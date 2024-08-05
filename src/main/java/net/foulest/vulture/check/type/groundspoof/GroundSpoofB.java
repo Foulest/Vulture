@@ -21,14 +21,12 @@ import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEve
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
-import lombok.ToString;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 
-@ToString
 @CheckInfo(name = "GroundSpoof (B)", type = CheckType.GROUNDSPOOF,
         description = "Detects clients sending invalid on-ground Flying packets.")
 public class GroundSpoofB extends Check {

@@ -21,14 +21,12 @@ import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEve
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.play.in.resourcepackstatus.WrappedPacketInResourcePackStatus;
-import lombok.ToString;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.util.KickUtil;
 
-@ToString
 @CheckInfo(name = "BadPackets (E)", type = CheckType.BADPACKETS,
         acceptsServerPackets = true, punishable = false,
         description = "Detects sending invalid ResourcePackStatus packets.")

@@ -18,7 +18,6 @@
 package net.foulest.vulture.check.type.flight;
 
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
-import lombok.ToString;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
@@ -31,7 +30,6 @@ import net.foulest.vulture.util.MovementUtil;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 
-@ToString
 @CheckInfo(name = "Flight (A)", type = CheckType.FLIGHT,
         description = "Checks for invalid y-axis movement when falling.")
 public class FlightA extends Check {

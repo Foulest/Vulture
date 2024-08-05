@@ -17,7 +17,6 @@
  */
 package net.foulest.vulture.util.command;
 
-import lombok.ToString;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -33,7 +32,6 @@ import java.util.List;
  * @author minnymin3
  * @see <a href="https://github.com/mcardy/CommandFramework">CommandFramework GitHub</a>
  */
-@ToString
 class BukkitCommand extends org.bukkit.command.Command {
 
     private final Plugin owningPlugin;

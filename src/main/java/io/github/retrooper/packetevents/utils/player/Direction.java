@@ -19,7 +19,6 @@ package io.github.retrooper.packetevents.utils.player;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.ToString;
 
 /**
  * The {@code Direction} enum contains constants for the different valid faces in the minecraft protocol.
@@ -29,7 +28,6 @@ import lombok.ToString;
  * @since 1.7.8
  */
 @Getter
-@ToString
 @AllArgsConstructor
 public enum Direction {
     /**

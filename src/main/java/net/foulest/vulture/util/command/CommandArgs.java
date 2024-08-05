@@ -19,7 +19,6 @@ package net.foulest.vulture.util.command;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -35,7 +34,6 @@ import org.jetbrains.annotations.Nullable;
  */
 @Getter
 @Setter
-@ToString
 public class CommandArgs {
 
     private final CommandSender sender;

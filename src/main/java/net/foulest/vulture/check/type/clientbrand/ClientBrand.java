@@ -22,7 +22,6 @@ import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEve
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.play.in.custompayload.WrappedPacketInCustomPayload;
-import lombok.ToString;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
@@ -39,7 +38,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
-@ToString
 @CheckInfo(name = "ClientBrand", type = CheckType.CLIENTBRAND,
         punishable = false, description = "Checks for modified client brands.")
 public class ClientBrand extends Check {

@@ -20,13 +20,11 @@ package io.github.retrooper.packetevents.packetwrappers.api.helper;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
-import lombok.ToString;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-@ToString
 public abstract class WrappedPacketEntityAbstraction extends WrappedPacket {
 
     private final int entityIDFieldIndex;

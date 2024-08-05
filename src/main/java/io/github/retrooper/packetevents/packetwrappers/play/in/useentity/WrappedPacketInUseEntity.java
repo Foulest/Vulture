@@ -9,12 +9,10 @@ import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
-import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
-@ToString
 public final class WrappedPacketInUseEntity extends WrappedPacketEntityAbstraction {
 
     private static Class<? extends Enum<?>> enumEntityUseActionClass;

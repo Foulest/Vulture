@@ -20,13 +20,11 @@ package io.github.retrooper.packetevents.utils.list;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Synchronized;
-import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
 @Getter
-@ToString
 @AllArgsConstructor
 public abstract class ListWrapper implements List {
 

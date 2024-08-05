@@ -18,7 +18,6 @@
 package io.github.retrooper.packetevents.utils.player;
 
 import lombok.Getter;
-import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,7 +37,6 @@ import java.util.Map;
  * @since 1.6.9
  */
 @Getter
-@ToString
 public enum ClientVersion {
     v_1_8(47, "1.8 - 1.8.9"),
 

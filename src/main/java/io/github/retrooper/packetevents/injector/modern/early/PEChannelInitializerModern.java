@@ -27,14 +27,12 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.epoll.EpollSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.Getter;
-import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 @Getter
-@ToString
 class PEChannelInitializerModern extends ChannelInitializer<Channel> {
 
     private final ChannelInitializer<?> oldChannelInitializer;

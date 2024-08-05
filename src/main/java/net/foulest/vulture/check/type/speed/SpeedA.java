@@ -18,7 +18,6 @@
 package net.foulest.vulture.check.type.speed;
 
 import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
-import lombok.ToString;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
@@ -30,7 +29,6 @@ import org.bukkit.GameMode;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 
-@ToString
 @CheckInfo(name = "Speed (A)", type = CheckType.SPEED)
 public class SpeedA extends Check {
 

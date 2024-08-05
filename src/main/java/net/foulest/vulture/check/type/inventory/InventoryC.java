@@ -23,14 +23,12 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.play.in.blockplace.WrappedPacketInBlockPlace;
 import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
 import io.github.retrooper.packetevents.utils.player.Direction;
-import lombok.ToString;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import org.bukkit.Material;
 
-@ToString
 @CheckInfo(name = "Inventory (C)", type = CheckType.INVENTORY,
         description = "Detects this Inventory pattern: HeldItemSlot, BlockPlace, HeldItemSlot")
 public class InventoryC extends Check {

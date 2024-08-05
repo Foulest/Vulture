@@ -22,13 +22,11 @@ import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
-import lombok.ToString;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 
-@ToString
 @CheckInfo(name = "BadPackets (B)", type = CheckType.BADPACKETS,
         description = "Detects sending invalid packets while in a bed.")
 public class BadPacketsB extends Check {

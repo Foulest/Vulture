@@ -20,7 +20,6 @@ package net.foulest.vulture.util.command;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -39,7 +38,6 @@ import java.util.*;
  */
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 public class BukkitCompleter implements TabCompleter {
 

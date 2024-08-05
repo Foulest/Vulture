@@ -23,13 +23,11 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.play.in.blockplace.WrappedPacketInBlockPlace;
 import io.github.retrooper.packetevents.utils.player.Direction;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
-import lombok.ToString;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 
-@ToString
 @CheckInfo(name = "Inventory (J)", type = CheckType.INVENTORY)
 public class InventoryJ extends Check {
 

@@ -20,7 +20,6 @@ package io.github.retrooper.packetevents.event;
 import io.github.retrooper.packetevents.event.impl.*;
 import io.github.retrooper.packetevents.utils.immutableset.ImmutableSetCustom;
 import lombok.Getter;
-import lombok.ToString;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -30,7 +29,6 @@ import org.jetbrains.annotations.Nullable;
  * @since 1.8
  */
 @Getter
-@ToString
 public abstract class PacketListenerAbstract {
 
     private final PacketListenerPriority priority;

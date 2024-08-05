@@ -5,12 +5,10 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import lombok.AllArgsConstructor;
-import lombok.ToString;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-@ToString
 @AllArgsConstructor
 public class WrappedPacketOutCollect extends WrappedPacket implements SendableWrapper {
 

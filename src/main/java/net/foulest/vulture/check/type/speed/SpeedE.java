@@ -19,7 +19,6 @@ package net.foulest.vulture.check.type.speed;
 
 import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
-import lombok.ToString;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
@@ -30,7 +29,6 @@ import net.foulest.vulture.util.MovementUtil;
 import org.bukkit.GameMode;
 import org.bukkit.potion.PotionEffectType;
 
-@ToString
 @CheckInfo(name = "Speed (E)", type = CheckType.SPEED,
         description = "Prevents players from using NoSlowdown.")
 public class SpeedE extends Check {

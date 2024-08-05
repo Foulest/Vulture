@@ -18,7 +18,6 @@
 package net.foulest.vulture.check.type.flight;
 
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
-import lombok.ToString;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
@@ -31,7 +30,6 @@ import org.bukkit.GameMode;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 
-@ToString
 @CheckInfo(name = "Flight (B)", type = CheckType.FLIGHT,
         description = "Checks for invalid y-axis movement when in water.")
 public class FlightB extends Check {

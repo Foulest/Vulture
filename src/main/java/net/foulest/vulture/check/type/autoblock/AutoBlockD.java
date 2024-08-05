@@ -23,13 +23,11 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.play.in.blockdig.WrappedPacketInBlockDig;
 import io.github.retrooper.packetevents.packetwrappers.play.in.blockplace.WrappedPacketInBlockPlace;
 import io.github.retrooper.packetevents.utils.player.Direction;
-import lombok.ToString;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 
-@ToString
 @CheckInfo(name = "AutoBlock (D)", type = CheckType.AUTOBLOCK,
         description = "Detects sending invalid ReleaseUseItem packets.")
 public class AutoBlockD extends Check {

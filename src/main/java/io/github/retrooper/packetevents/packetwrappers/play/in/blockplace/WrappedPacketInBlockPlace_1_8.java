@@ -39,7 +39,8 @@ final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
     }
 
     @Contract(" -> new")
-    @NotNull Vector3f getCursorPosition() {
+    @NotNull
+    Vector3f getCursorPosition() {
         return new Vector3f(readFloat(0), readFloat(1), readFloat(2));
     }
 

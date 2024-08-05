@@ -22,11 +22,9 @@ import io.github.retrooper.packetevents.event.impl.PlayerEjectEvent;
 import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
 import io.github.retrooper.packetevents.injector.modern.early.EarlyChannelInjectorModern;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-@ToString
 @NoArgsConstructor
 public class GlobalChannelInjector {
 

@@ -5,7 +5,6 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
-import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumSet;
@@ -104,7 +103,6 @@ public class WrappedPacketInSettings extends WrappedPacket {
         HIDDEN
     }
 
-    @ToString
     public enum DisplayedSkinPart {
         CAPE(0x01),
         JACKET(0x02),

@@ -18,13 +18,11 @@
 package io.github.retrooper.packetevents.utils.immutableset;
 
 import com.google.common.collect.ImmutableSet;
-import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-@ToString
 class ImmutableSet_8<T> extends ImmutableSetAbstract<T> {
 
     private ImmutableSet<T> immutableSet;

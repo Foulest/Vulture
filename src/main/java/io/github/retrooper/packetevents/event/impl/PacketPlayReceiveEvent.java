@@ -21,7 +21,6 @@ import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import lombok.ToString;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,7 +34,6 @@ import org.jetbrains.annotations.NotNull;
  * @see <a href="https://wiki.vg/Protocol#Play">https://wiki.vg/Protocol#Play</a>
  * @since 1.2.6
  */
-@ToString
 public final class PacketPlayReceiveEvent extends CancellableNMSPacketEvent implements PlayerEvent {
 
     private final Player player;

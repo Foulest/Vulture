@@ -29,7 +29,6 @@ import io.netty.channel.*;
 import io.netty.channel.epoll.EpollSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.jetbrains.annotations.NotNull;
@@ -38,7 +37,6 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Field;
 import java.util.*;
 
-@ToString
 @NoArgsConstructor
 public class EarlyChannelInjectorModern implements EarlyInjector {
 

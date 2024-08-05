@@ -17,11 +17,8 @@
  */
 package io.github.retrooper.packetevents.utils.immutableset;
 
-import lombok.ToString;
-
 import java.util.List;
 
-@ToString
 public class ImmutableSetCustom<T> {
 
     private final ImmutableSetAbstract<T> immutableSetAbstract;

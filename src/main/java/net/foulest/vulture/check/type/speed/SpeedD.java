@@ -17,7 +17,6 @@
  */
 package net.foulest.vulture.check.type.speed;
 
-import lombok.ToString;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
@@ -29,7 +28,6 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-@ToString
 @CheckInfo(name = "Speed (D)", type = CheckType.SPEED,
         description = "Prevents players from moving with an open inventory.")
 public class SpeedD extends Check {

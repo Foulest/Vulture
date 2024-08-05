@@ -6,7 +6,6 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import lombok.ToString;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.jetbrains.annotations.Nullable;
@@ -15,7 +14,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
 
-@ToString
 public final class WrappedPacketOutChat extends WrappedPacket implements SendableWrapper {
 
     private static Constructor<?> chatClassConstructor;

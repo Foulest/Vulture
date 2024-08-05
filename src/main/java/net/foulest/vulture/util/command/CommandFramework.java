@@ -19,7 +19,6 @@ package net.foulest.vulture.util.command;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import net.foulest.vulture.util.ConstantUtil;
 import net.foulest.vulture.util.MessageUtil;
 import org.bukkit.command.CommandExecutor;
@@ -46,7 +45,6 @@ import java.util.logging.Level;
  */
 @Getter
 @Setter
-@ToString
 public class CommandFramework implements CommandExecutor {
 
     private final Map<String, Map.Entry<Method, Object>> commandMap = new HashMap<>();

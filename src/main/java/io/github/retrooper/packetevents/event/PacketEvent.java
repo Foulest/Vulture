@@ -22,7 +22,6 @@ import io.github.retrooper.packetevents.event.eventtypes.CallableEvent;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -33,7 +32,6 @@ import org.jetbrains.annotations.NotNull;
  */
 @Setter
 @Getter
-@ToString
 @NoArgsConstructor
 public abstract class PacketEvent implements CallableEvent {
 

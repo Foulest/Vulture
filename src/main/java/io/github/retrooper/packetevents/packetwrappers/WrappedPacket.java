@@ -10,7 +10,6 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
-import lombok.ToString;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.World;
@@ -26,7 +25,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
-@ToString
 public class WrappedPacket implements WrapperPacketReader, WrapperPacketWriter {
 
     private static final Map<Class<? extends WrappedPacket>, Boolean> LOADED_WRAPPERS = new ConcurrentHashMap<>();

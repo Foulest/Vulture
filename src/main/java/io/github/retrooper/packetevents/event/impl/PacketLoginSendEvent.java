@@ -21,7 +21,6 @@ import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
 import io.github.retrooper.packetevents.event.eventtypes.PostTaskEvent;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -33,7 +32,6 @@ import org.jetbrains.annotations.NotNull;
  * @see <a href="https://wiki.vg/Protocol#Login">https://wiki.vg/Protocol#Login</a>
  * @since 1.8
  */
-@ToString
 public class PacketLoginSendEvent extends CancellableNMSPacketEvent implements PostTaskEvent {
 
     private Runnable postTask;
