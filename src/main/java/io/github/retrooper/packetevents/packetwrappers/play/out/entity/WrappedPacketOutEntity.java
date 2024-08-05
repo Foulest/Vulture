@@ -5,14 +5,17 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
+import lombok.ToString;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
 import java.util.Optional;
 
+@ToString
 public class WrappedPacketOutEntity extends WrappedPacketEntityAbstraction implements SendableWrapper {
 
     // Byte = 1.7.10->1.8.8, Int = 1.9->1.15.x, Short = 1.16.x
@@ -20,7 +23,7 @@ public class WrappedPacketOutEntity extends WrappedPacketEntityAbstraction imple
 
     private static double dXYZDivisor;
     private static final float ROTATION_FACTOR = 256.0F / 360.0F;
-    private static int yawByteIndex = 0;
+    private static int yawByteIndex;
     private static int pitchByteIndex = 1;
     private static Constructor<?> entityPacketConstructor;
     private static Constructor<?> entityRelMovePacketConstructor;
@@ -34,12 +37,12 @@ public class WrappedPacketOutEntity extends WrappedPacketEntityAbstraction imple
     private boolean onGround;
     private boolean rotating;
 
-    public WrappedPacketOutEntity(NMSPacket packet) {
+    WrappedPacketOutEntity(NMSPacket packet) {
         super(packet);
     }
 
-    public WrappedPacketOutEntity(int entityID, double deltaX, double deltaY, double deltaZ,
-                                  float yaw, float pitch, boolean onGround, boolean rotating) {
+    WrappedPacketOutEntity(int entityID, double deltaX, double deltaY, double deltaZ,
+                           float yaw, float pitch, boolean onGround, boolean rotating) {
         this.entityID = entityID;
         this.deltaX = deltaX;
         this.deltaY = deltaY;
@@ -93,38 +96,38 @@ public class WrappedPacketOutEntity extends WrappedPacketEntityAbstraction imple
         }
     }
 
-    public float getPitch() {
-        if (packet != null) {
+    float getPitch() {
+        if (nmsPacket != null) {
             return readByte(pitchByteIndex) / ROTATION_FACTOR;
         } else {
             return pitch;
         }
     }
 
-    public void setPitch(float pitch) {
-        if (packet != null) {
+    void setPitch(float pitch) {
+        if (nmsPacket != null) {
             writeByte(pitchByteIndex, (byte) (pitch * ROTATION_FACTOR));
         } else {
             this.pitch = pitch;
         }
     }
 
-    public float getYaw() {
-        if (packet != null) {
+    float getYaw() {
+        if (nmsPacket != null) {
             return readByte(yawByteIndex) / ROTATION_FACTOR;
         } else {
             return yaw;
         }
     }
 
-    public void setYaw(float yaw) {
-        if (packet != null) {
+    void setYaw(float yaw) {
+        if (nmsPacket != null) {
             writeByte(yawByteIndex, (byte) (yaw * ROTATION_FACTOR));
         }
     }
 
     public double getDeltaX() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             switch (mode) {
                 case 0:
                     return readByte(0) / dXYZDivisor;
@@ -140,8 +143,8 @@ public class WrappedPacketOutEntity extends WrappedPacketEntityAbstraction imple
         }
     }
 
-    public void setDeltaX(double deltaX) {
-        if (packet != null) {
+    void setDeltaX(double deltaX) {
+        if (nmsPacket != null) {
             int dx = (int) (deltaX * dXYZDivisor);
 
             switch (mode) {
@@ -163,7 +166,7 @@ public class WrappedPacketOutEntity extends WrappedPacketEntityAbstraction imple
     }
 
     public double getDeltaY() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             switch (mode) {
                 case 0:
                     return readByte(1) / dXYZDivisor;
@@ -179,8 +182,8 @@ public class WrappedPacketOutEntity extends WrappedPacketEntityAbstraction imple
         }
     }
 
-    public void setDeltaY(double deltaY) {
-        if (packet != null) {
+    void setDeltaY(double deltaY) {
+        if (nmsPacket != null) {
             int dy = (int) (deltaY * dXYZDivisor);
 
             switch (mode) {
@@ -202,7 +205,7 @@ public class WrappedPacketOutEntity extends WrappedPacketEntityAbstraction imple
     }
 
     public double getDeltaZ() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             switch (mode) {
                 case 0:
                     return readByte(2) / dXYZDivisor;
@@ -218,8 +221,8 @@ public class WrappedPacketOutEntity extends WrappedPacketEntityAbstraction imple
         }
     }
 
-    public void setDeltaZ(double deltaZ) {
-        if (packet != null) {
+    void setDeltaZ(double deltaZ) {
+        if (nmsPacket != null) {
             int dz = (int) (deltaZ * dXYZDivisor);
 
             switch (mode) {
@@ -240,32 +243,32 @@ public class WrappedPacketOutEntity extends WrappedPacketEntityAbstraction imple
         }
     }
 
-    public boolean isOnGround() {
-        if (packet != null) {
+    boolean isOnGround() {
+        if (nmsPacket != null) {
             return readBoolean(0);
         } else {
             return onGround;
         }
     }
 
-    public void setOnGround(boolean onGround) {
-        if (packet != null) {
+    void setOnGround(boolean onGround) {
+        if (nmsPacket != null) {
             writeBoolean(0, onGround);
         } else {
             this.onGround = onGround;
         }
     }
 
-    public Optional<Boolean> isRotating() {
-        if (packet != null) {
+    private @NotNull Optional<Boolean> isRotating() {
+        if (nmsPacket != null) {
             return Optional.of(readBoolean(1));
         } else {
             return Optional.of(rotating);
         }
     }
 
-    public void setRotating(boolean rotating) {
-        if (packet != null) {
+    void setRotating(boolean rotating) {
+        if (nmsPacket != null) {
             writeBoolean(1, rotating);
         } else {
             this.rotating = rotating;
@@ -273,7 +276,7 @@ public class WrappedPacketOutEntity extends WrappedPacketEntityAbstraction imple
     }
 
     @Override
-    public Object asNMSPacket() throws Exception {
+    public Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
         Object packetInstance = entityPacketConstructor.newInstance(getEntityId());
         WrappedPacketOutEntity wrapper = new WrappedPacketOutEntity(new NMSPacket(packetInstance));
         wrapper.setDeltaX(getDeltaX());
@@ -282,13 +285,16 @@ public class WrappedPacketOutEntity extends WrappedPacketEntityAbstraction imple
         wrapper.setYaw(getYaw());
         wrapper.setPitch(getPitch());
         wrapper.setOnGround(isOnGround());
-        wrapper.setRotating(isRotating().get());
+
+        if (isRotating().isPresent()) {
+            wrapper.setRotating(isRotating().get());
+        }
         return packetInstance;
     }
 
     public static class WrappedPacketOutEntityLook extends WrappedPacketOutEntity {
 
-        public WrappedPacketOutEntityLook(NMSPacket packet) {
+        WrappedPacketOutEntityLook(NMSPacket packet) {
             super(packet);
         }
 
@@ -308,7 +314,7 @@ public class WrappedPacketOutEntity extends WrappedPacketEntityAbstraction imple
         }
 
         @Override
-        public Object asNMSPacket() throws Exception {
+        public Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
             Object packetInstance = entityLookConstructor.newInstance();
             WrappedPacketOutEntityLook wrapper = new WrappedPacketOutEntityLook(new NMSPacket(packetInstance));
             wrapper.setEntityId(getEntityId());
@@ -342,7 +348,7 @@ public class WrappedPacketOutEntity extends WrappedPacketEntityAbstraction imple
         }
 
         @Override
-        public Object asNMSPacket() throws Exception {
+        public Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
             Object packetInstance = entityRelMovePacketConstructor.newInstance();
             WrappedPacketOutRelEntityMove wrapper = new WrappedPacketOutRelEntityMove(new NMSPacket(packetInstance));
             wrapper.setEntityId(getEntityId());
@@ -377,7 +383,7 @@ public class WrappedPacketOutEntity extends WrappedPacketEntityAbstraction imple
         }
 
         @Override
-        public Object asNMSPacket() throws Exception {
+        public Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
             Object packetInstance = entityRelMoveLookConstructor.newInstance();
             WrappedPacketOutRelEntityMoveLook wrapper = new WrappedPacketOutRelEntityMoveLook(new NMSPacket(packetInstance));
             wrapper.setEntityId(getEntityId());

@@ -28,5 +28,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PEEventManager implements EventManager {
 
-    public static final EventManagerModern EVENT_MANAGER_MODERN = new EventManagerModern();
+    static final EventManagerModern EVENT_MANAGER_MODERN = new EventManagerModern();
 }

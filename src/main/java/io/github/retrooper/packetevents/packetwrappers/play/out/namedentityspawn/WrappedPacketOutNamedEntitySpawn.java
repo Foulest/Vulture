@@ -7,13 +7,16 @@ import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketE
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
+import lombok.ToString;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
 
+@ToString
 public class WrappedPacketOutNamedEntitySpawn extends WrappedPacketEntityAbstraction implements SendableWrapper {
 
     private static final float ROTATION_DIVIDEND = 256.0F / 360.0F;
@@ -95,16 +98,16 @@ public class WrappedPacketOutNamedEntitySpawn extends WrappedPacketEntityAbstrac
         }
     }
 
-    public UUID getUUID() {
-        if (packet != null) {
+    private UUID getUUID() {
+        if (nmsPacket != null) {
             return readObject(0, UUID.class);
         } else {
             return uuid;
         }
     }
 
-    public void setUUID(UUID uuid) {
-        if (packet != null) {
+    private void setUUID(UUID uuid) {
+        if (nmsPacket != null) {
             write(UUID.class, 0, uuid);
         } else {
             this.uuid = uuid;
@@ -112,7 +115,7 @@ public class WrappedPacketOutNamedEntitySpawn extends WrappedPacketEntityAbstrac
     }
 
     public Vector3d getPosition() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             double x;
             double y;
             double z;
@@ -132,8 +135,8 @@ public class WrappedPacketOutNamedEntitySpawn extends WrappedPacketEntityAbstrac
         }
     }
 
-    public void setPosition(Vector3d position) {
-        if (packet != null) {
+    private void setPosition(Vector3d position) {
+        if (nmsPacket != null) {
             if (doublesPresent) {
                 writeDouble(0, position.x);
                 writeDouble(1, position.y);
@@ -151,32 +154,32 @@ public class WrappedPacketOutNamedEntitySpawn extends WrappedPacketEntityAbstrac
         }
     }
 
-    public float getYaw() {
-        if (packet != null) {
+    private float getYaw() {
+        if (nmsPacket != null) {
             return readByte(0) / ROTATION_DIVIDEND;
         } else {
             return yaw;
         }
     }
 
-    public void setYaw(float yaw) {
-        if (packet != null) {
+    private void setYaw(float yaw) {
+        if (nmsPacket != null) {
             writeByte(0, (byte) (yaw * ROTATION_DIVIDEND));
         } else {
             this.yaw = yaw;
         }
     }
 
-    public float getPitch() {
-        if (packet != null) {
+    private float getPitch() {
+        if (nmsPacket != null) {
             return readByte(1) / ROTATION_DIVIDEND;
         } else {
             return pitch;
         }
     }
 
-    public void setPitch(float pitch) {
-        if (packet != null) {
+    private void setPitch(float pitch) {
+        if (nmsPacket != null) {
             writeByte(1, (byte) (pitch * ROTATION_DIVIDEND));
         } else {
             this.pitch = pitch;
@@ -184,7 +187,7 @@ public class WrappedPacketOutNamedEntitySpawn extends WrappedPacketEntityAbstrac
     }
 
     @Override
-    public Object asNMSPacket() throws Exception {
+    public Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
         Object packetInstance = packetConstructor.newInstance();
         WrappedPacketOutNamedEntitySpawn wrappedPacketOutNamedEntitySpawn = new WrappedPacketOutNamedEntitySpawn(new NMSPacket(packetInstance));
         wrappedPacketOutNamedEntitySpawn.setEntityId(getEntityId());

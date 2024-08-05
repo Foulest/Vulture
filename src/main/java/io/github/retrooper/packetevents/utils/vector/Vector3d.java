@@ -135,7 +135,7 @@ public class Vector3d {
      */
     @Override
     public Vector3d clone() {
-        return new Vector3d(getX(), getY(), getZ());
+        return new Vector3d(x, y, z);
     }
 
     public Vector3d add(@NotNull Vector3d target) {

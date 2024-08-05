@@ -21,9 +21,13 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PlayerEjectEvent;
 import io.github.retrooper.packetevents.event.impl.PlayerInjectEvent;
 import io.github.retrooper.packetevents.injector.modern.early.EarlyChannelInjectorModern;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+@ToString
+@NoArgsConstructor
 public class GlobalChannelInjector {
 
     private ChannelInjector injector;
@@ -39,8 +43,9 @@ public class GlobalChannelInjector {
     public void inject() {
         try {
             injector.inject();
-        } catch (Exception ex) {
-            PacketEvents.get().getPlugin().getLogger().warning("[packetevents] Failed to inject into the server. The server will now shutdown.");
+        } catch (RuntimeException ex) {
+            ex.printStackTrace();
+            PacketEvents.getPlugin().getLogger().warning("[packetevents] Failed to inject into the server. The server will now shutdown.");
             Bukkit.getServer().shutdown();
         }
     }
@@ -51,7 +56,7 @@ public class GlobalChannelInjector {
 
     public void injectPlayer(Player player) {
         PlayerInjectEvent injectEvent = new PlayerInjectEvent(player);
-        PacketEvents.get().callEvent(injectEvent);
+        PacketEvents.getInstance().callEvent(injectEvent);
 
         if (!injectEvent.isCancelled()) {
             injector.injectPlayer(player);
@@ -60,7 +65,7 @@ public class GlobalChannelInjector {
 
     public void ejectPlayer(Player player) {
         PlayerEjectEvent ejectEvent = new PlayerEjectEvent(player);
-        PacketEvents.get().callEvent(ejectEvent);
+        PacketEvents.getInstance().callEvent(ejectEvent);
 
         if (!ejectEvent.isCancelled()) {
             injector.ejectPlayer(player);

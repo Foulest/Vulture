@@ -5,9 +5,12 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import lombok.AllArgsConstructor;
+import lombok.ToString;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
+@ToString
 @AllArgsConstructor
 public class WrappedPacketOutResourcePackSend extends WrappedPacket implements SendableWrapper {
 
@@ -29,29 +32,29 @@ public class WrappedPacketOutResourcePackSend extends WrappedPacket implements S
     }
 
     public String getUrl() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             return readString(0);
         }
         return url;
     }
 
     public void setUrl(String url) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeString(0, url);
         } else {
             this.url = url;
         }
     }
 
-    public String getHash() {
-        if (packet != null) {
+    private String getHash() {
+        if (nmsPacket != null) {
             return readString(1);
         }
         return hash;
     }
 
     public void setHash(String hash) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeString(1, hash);
         } else {
             this.hash = hash;
@@ -59,7 +62,7 @@ public class WrappedPacketOutResourcePackSend extends WrappedPacket implements S
     }
 
     @Override
-    public Object asNMSPacket() throws Exception {
+    public Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
         return packetConstructor.newInstance(getUrl(), getHash());
     }
 }

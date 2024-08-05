@@ -49,7 +49,7 @@ public class RayTraceResult {
         this(hitPosition, null, null, null);
     }
 
-    public RayTraceResult(@NotNull Vector hitPosition, @Nullable BlockFace hitBlockFace) {
+    RayTraceResult(@NotNull Vector hitPosition, @Nullable BlockFace hitBlockFace) {
         this(hitPosition, null, hitBlockFace, null);
     }
 
@@ -89,7 +89,7 @@ public class RayTraceResult {
                 return false;
             } else if (!Objects.equals(hitBlock, other.hitBlock)) {
                 return false;
-            } else if (!Objects.equals(hitBlockFace, other.hitBlockFace)) {
+            } else if (hitBlockFace != other.hitBlockFace) {
                 return false;
             } else {
                 return Objects.equals(hitEntity, other.hitEntity);

@@ -23,9 +23,12 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import lombok.AllArgsConstructor;
+import lombok.ToString;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
+@ToString
 @AllArgsConstructor
 public class WrappedPacketLoginOutDisconnect extends WrappedPacket implements SendableWrapper {
 
@@ -40,13 +43,13 @@ public class WrappedPacketLoginOutDisconnect extends WrappedPacket implements Se
     protected void load() {
         try {
             packetConstructor = PacketTypeClasses.Login.Server.DISCONNECT.getConstructor(NMSUtils.iChatBaseComponentClass);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+        } catch (NoSuchMethodException ex) {
+            ex.printStackTrace();
         }
     }
 
-    public String getReason() {
-        if (packet != null) {
+    private String getReason() {
+        if (nmsPacket != null) {
             return readIChatBaseComponent(0);
         } else {
             return reason;
@@ -54,15 +57,15 @@ public class WrappedPacketLoginOutDisconnect extends WrappedPacket implements Se
     }
 
     public void setReason(String reason) {
-        if (packet != null) {
-            writeIChatBaseComponent(0, reason);
+        if (nmsPacket != null) {
+            writeIChatBaseComponent(reason);
         } else {
             this.reason = reason;
         }
     }
 
     @Override
-    public Object asNMSPacket() throws Exception {
+    public Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
         return packetConstructor.newInstance(NMSUtils.generateIChatBaseComponent(getReason()));
     }
 }

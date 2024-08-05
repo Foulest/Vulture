@@ -20,7 +20,6 @@ package net.foulest.vulture.util;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.data.PlayerDataManager;
@@ -31,16 +30,15 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class SetbackUtil {
+final class SetbackUtil {
 
     /**
      * Sets the player back to their last on ground location.
      *
      * @param player The player to set back.
      */
-    public static void setback(Player player) {
+    static void setback(Player player) {
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
         playerData.setTimestamp(ActionType.SETBACK);
 
@@ -57,7 +55,7 @@ public class SetbackUtil {
      * @param player   The player to set back.
      * @param location The location to set the player back to.
      */
-    public static void setback(@NotNull Player player, Location location) {
+    private static void setback(@NotNull Player player, Location location) {
         if (player.isInsideVehicle()) {
             return;
         }

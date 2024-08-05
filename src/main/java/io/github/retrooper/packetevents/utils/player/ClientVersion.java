@@ -18,6 +18,7 @@
 package io.github.retrooper.packetevents.utils.player;
 
 import lombok.Getter;
+import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,6 +38,7 @@ import java.util.Map;
  * @since 1.6.9
  */
 @Getter
+@ToString
 public enum ClientVersion {
     v_1_8(47, "1.8 - 1.8.9"),
 
@@ -126,7 +128,7 @@ public enum ClientVersion {
      */
     public static ClientVersion getClientVersion(int protocolVersion) {
         if (protocolVersion == -1) {
-            return ClientVersion.TEMP_UNRESOLVED;
+            return TEMP_UNRESOLVED;
 
         } else if (protocolVersion < LOWEST_SUPPORTED_PROTOCOL_VERSION) {
             return LOWER_THAN_SUPPORTED_VERSIONS;
@@ -190,7 +192,7 @@ public enum ClientVersion {
      * @return Is this client version older than the compared client version.
      */
     @Contract(pure = true)
-    public boolean isOlderThan(@NotNull ClientVersion target) {
+    private boolean isOlderThan(@NotNull ClientVersion target) {
         return protocolVersion < target.protocolVersion
                 && (target != TEMP_UNRESOLVED && this != TEMP_UNRESOLVED);
     }

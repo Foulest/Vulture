@@ -3,7 +3,10 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.mapchunk;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.WrapperPacketReader;
+import io.github.retrooper.packetevents.packetwrappers.api.WrapperPacketWriter;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
@@ -11,6 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.BitSet;
 import java.util.Optional;
 
+@ToString
 public class WrappedPacketOutMapChunk extends WrappedPacket {
 
     private static Class<?> chunkMapClass;
@@ -26,7 +30,9 @@ public class WrappedPacketOutMapChunk extends WrappedPacket {
         chunkMapClass = SubclassUtil.getSubClass(PacketTypeClasses.Play.Server.MAP_CHUNK, 0);
 
         try {
-            chunkMapConstructor = chunkMapClass.getConstructor();
+            if (chunkMapClass != null) {
+                chunkMapConstructor = chunkMapClass.getConstructor();
+            }
         } catch (NoSuchMethodException ex) {
             ex.printStackTrace();
         }
@@ -53,7 +59,7 @@ public class WrappedPacketOutMapChunk extends WrappedPacket {
             nmsChunkMap = readObject(0, chunkMapClass);
         }
 
-        WrappedPacket nmsChunkMapWrapper = new WrappedPacket(new NMSPacket(nmsChunkMap));
+        WrapperPacketReader nmsChunkMapWrapper = new WrappedPacket(new NMSPacket(nmsChunkMap));
         return Optional.of(BitSet.valueOf(new long[]{nmsChunkMapWrapper.readInt(0)}));
     }
 
@@ -61,13 +67,7 @@ public class WrappedPacketOutMapChunk extends WrappedPacket {
         setPrimaryBitMask((int) bitSet.toLongArray()[0]);
     }
 
-    /**
-     * @param primaryBitMask Integer that determines which chunk sections the server is sending
-     * @deprecated Possible lossy conversion on 1.17 servers that could result in the client only reading 32
-     * out of the total possible 127 chunk sections. Safe to use on 1.16 and below servers
-     */
-    @Deprecated
-    public void setPrimaryBitMask(int primaryBitMask) {
+    private void setPrimaryBitMask(int primaryBitMask) {
         if (nmsChunkMap == null) {
             try {
                 nmsChunkMap = chunkMapConstructor.newInstance();
@@ -76,7 +76,7 @@ public class WrappedPacketOutMapChunk extends WrappedPacket {
             }
         }
 
-        WrappedPacket nmsChunkMapWrapper = new WrappedPacket(new NMSPacket(nmsChunkMap));
+        WrapperPacketWriter nmsChunkMapWrapper = new WrappedPacket(new NMSPacket(nmsChunkMap));
         nmsChunkMapWrapper.writeInt(0, primaryBitMask);
         write(chunkMapClass, 0, nmsChunkMap);
     }
@@ -100,7 +100,7 @@ public class WrappedPacketOutMapChunk extends WrappedPacket {
             nmsChunkMap = readObject(0, chunkMapClass);
         }
 
-        WrappedPacket nmsChunkMapWrapper = new WrappedPacket(new NMSPacket(nmsChunkMap));
+        WrapperPacketReader nmsChunkMapWrapper = new WrappedPacket(new NMSPacket(nmsChunkMap));
         return nmsChunkMapWrapper.readByteArray(0);
     }
 
@@ -108,12 +108,12 @@ public class WrappedPacketOutMapChunk extends WrappedPacket {
         if (nmsChunkMap == null) {
             try {
                 nmsChunkMap = chunkMapConstructor.newInstance();
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException ex) {
+                ex.printStackTrace();
             }
         }
 
-        WrappedPacket nmsChunkMapWrapper = new WrappedPacket(new NMSPacket(nmsChunkMap));
+        WrapperPacketWriter nmsChunkMapWrapper = new WrappedPacket(new NMSPacket(nmsChunkMap));
         nmsChunkMapWrapper.writeByteArray(0, data);
         write(chunkMapClass, 0, nmsChunkMap);
     }

@@ -6,13 +6,16 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import lombok.AllArgsConstructor;
+import lombok.ToString;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@ToString
 @AllArgsConstructor
 public class WrappedPacketOutWindowItems extends WrappedPacket implements SendableWrapper {
 
@@ -22,7 +25,7 @@ public class WrappedPacketOutWindowItems extends WrappedPacket implements Sendab
     private List<ItemStack> slotData;
     private ItemStack heldItem;
 
-    public WrappedPacketOutWindowItems(NMSPacket packet) {
+    private WrappedPacketOutWindowItems(NMSPacket packet) {
         super(packet);
     }
 
@@ -35,16 +38,16 @@ public class WrappedPacketOutWindowItems extends WrappedPacket implements Sendab
         }
     }
 
-    public int getWindowId() {
-        if (packet != null) {
+    private int getWindowId() {
+        if (nmsPacket != null) {
             return readInt(0);
         } else {
             return windowID;
         }
     }
 
-    public void setWindowId(int windowID) {
-        if (packet != null) {
+    private void setWindowId(int windowID) {
+        if (nmsPacket != null) {
             writeInt(0, windowID);
         } else {
             this.windowID = windowID;
@@ -52,7 +55,7 @@ public class WrappedPacketOutWindowItems extends WrappedPacket implements Sendab
     }
 
     public int getStateId() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             return readInt(1);
         } else {
             return stateID;
@@ -60,15 +63,15 @@ public class WrappedPacketOutWindowItems extends WrappedPacket implements Sendab
     }
 
     public void setStateId(int stateID) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeInt(1, stateID);
         } else {
             this.stateID = stateID;
         }
     }
 
-    public List<ItemStack> getSlots() {
-        if (packet != null) {
+    private List<ItemStack> getSlots() {
+        if (nmsPacket != null) {
             List<ItemStack> slots = new ArrayList<>();
             Object[] nmsItemStacks = (Object[]) readAnyObject(1);
 
@@ -81,8 +84,8 @@ public class WrappedPacketOutWindowItems extends WrappedPacket implements Sendab
         }
     }
 
-    public void setSlots(List<ItemStack> slots) {
-        if (packet != null) {
+    private void setSlots(List<ItemStack> slots) {
+        if (nmsPacket != null) {
             Object[] nmsItemStacks = new Object[slots.size()];
 
             for (int i = 0; i < slots.size(); i++) {
@@ -95,12 +98,12 @@ public class WrappedPacketOutWindowItems extends WrappedPacket implements Sendab
         }
     }
 
-    public Optional<ItemStack> getHeldItem() {
+    public static Optional<ItemStack> getHeldItem() {
         return Optional.empty();
     }
 
     public void setHeldItem(ItemStack heldItem) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeObject(0, NMSUtils.toNMSItemStack(heldItem));
         } else {
             this.heldItem = heldItem;
@@ -108,7 +111,7 @@ public class WrappedPacketOutWindowItems extends WrappedPacket implements Sendab
     }
 
     @Override
-    public Object asNMSPacket() throws Exception {
+    public Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
         Object packetInstance = packetConstructor.newInstance();
         WrappedPacketOutWindowItems wrappedPacketOutWindowItems = new WrappedPacketOutWindowItems(new NMSPacket(packetInstance));
         wrappedPacketOutWindowItems.setWindowId(getWindowId());

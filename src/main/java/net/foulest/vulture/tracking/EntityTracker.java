@@ -17,7 +17,9 @@
  */
 package net.foulest.vulture.tracking;
 
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -27,6 +29,8 @@ import java.util.Optional;
  * Manages entity movement tracking from packet data received by the client for a single player.
  */
 @Setter
+@ToString
+@NoArgsConstructor
 public class EntityTracker {
 
     private final Map<Integer, EntityTrackerEntry> entries = new LinkedHashMap<>();

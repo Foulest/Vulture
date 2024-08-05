@@ -5,12 +5,15 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
+import lombok.ToString;
 import net.foulest.vulture.util.MathUtil;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
+@ToString
 public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstraction implements SendableWrapper {
 
     private static final float ROTATION_FACTOR = 256.0F / 360.0F;
@@ -58,8 +61,8 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
         }
     }
 
-    public EntityType getEntityType() {
-        if (packet != null) {
+    private EntityType getEntityType() {
+        if (nmsPacket != null) {
             int entityTypeID = readInt(1);
             return EntityType.fromId(entityTypeID);
         } else {
@@ -67,8 +70,8 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
         }
     }
 
-    public void setEntityType(EntityType entityType) {
-        if (packet != null) {
+    private void setEntityType(EntityType entityType) {
+        if (nmsPacket != null) {
             writeInt(1, entityType.getTypeId());
         } else {
             this.entityType = entityType;
@@ -76,7 +79,7 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
     }
 
     public Vector3d getPosition() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             double x = readInt(2) / 32.0;
             double y = readInt(3) / 32.0;
             double z = readInt(4) / 32.0;
@@ -86,8 +89,8 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
         }
     }
 
-    public void setPosition(Vector3d position) {
-        if (packet != null) {
+    private void setPosition(Vector3d position) {
+        if (nmsPacket != null) {
             writeInt(2, MathUtil.floorDouble(position.x * 32.0));
             writeInt(3, MathUtil.floorDouble(position.y * 32.0));
             writeInt(4, MathUtil.floorDouble(position.z * 32.0));
@@ -96,8 +99,8 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
         }
     }
 
-    public Vector3d getVelocity() {
-        if (packet != null) {
+    private Vector3d getVelocity() {
+        if (nmsPacket != null) {
             int factoredVelX = readInt(5);
             int factoredVelY = readInt(6);
             int factoredVelZ = readInt(7);
@@ -109,8 +112,8 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
         }
     }
 
-    public void setVelocity(Vector3d velocity) {
-        if (packet != null) {
+    private void setVelocity(Vector3d velocity) {
+        if (nmsPacket != null) {
             int factoredVelX = (int) (velocity.x * VELOCITY_FACTOR);
             int factoredVelY = (int) (velocity.y * VELOCITY_FACTOR);
             int factoredVelZ = (int) (velocity.z * VELOCITY_FACTOR);
@@ -123,8 +126,8 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
         }
     }
 
-    public float getYaw() {
-        if (packet != null) {
+    private float getYaw() {
+        if (nmsPacket != null) {
             byte factoredYaw = readByte(0);
             return factoredYaw / ROTATION_FACTOR;
         } else {
@@ -132,16 +135,16 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
         }
     }
 
-    public void setYaw(float yaw) {
-        if (packet != null) {
+    private void setYaw(float yaw) {
+        if (nmsPacket != null) {
             writeByte(0, (byte) ((int) (yaw * ROTATION_FACTOR)));
         } else {
             this.yaw = yaw;
         }
     }
 
-    public float getPitch() {
-        if (packet != null) {
+    private float getPitch() {
+        if (nmsPacket != null) {
             byte factoredPitch = readByte(1);
             return factoredPitch / ROTATION_FACTOR;
         } else {
@@ -149,16 +152,16 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
         }
     }
 
-    public void setPitch(float pitch) {
-        if (packet != null) {
+    private void setPitch(float pitch) {
+        if (nmsPacket != null) {
             writeByte(1, (byte) ((int) (pitch * ROTATION_FACTOR)));
         } else {
             this.pitch = pitch;
         }
     }
 
-    public float getHeadPitch() {
-        if (packet != null) {
+    private float getHeadPitch() {
+        if (nmsPacket != null) {
             byte factoredHeadPitch = readByte(2);
             return factoredHeadPitch / ROTATION_FACTOR;
         } else {
@@ -166,8 +169,8 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
         }
     }
 
-    public void setHeadPitch(float headPitch) {
-        if (packet != null) {
+    private void setHeadPitch(float headPitch) {
+        if (nmsPacket != null) {
             writeByte(2, (byte) ((int) (headPitch * ROTATION_FACTOR)));
         } else {
             this.headPitch = headPitch;
@@ -175,7 +178,7 @@ public class WrappedPacketOutSpawnEntityLiving extends WrappedPacketEntityAbstra
     }
 
     @Override
-    public Object asNMSPacket() throws Exception {
+    public Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
         Object packetInstance = packetConstructor.newInstance();
         WrappedPacketOutSpawnEntityLiving wrappedPacketOutSpawnEntityLiving = new WrappedPacketOutSpawnEntityLiving(new NMSPacket(packetInstance));
         wrappedPacketOutSpawnEntityLiving.setEntityId(getEntityId());

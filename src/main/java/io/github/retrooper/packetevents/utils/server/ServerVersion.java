@@ -33,22 +33,18 @@ import org.jetbrains.annotations.NotNull;
  * @since 1.6.9
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class ServerVersion {
+public final class ServerVersion {
 
     private static final String NMS_VERSION_SUFFIX = Bukkit.getServer().getClass().getPackage().getName()
             .replace(".", ",").split(",")[3];
 
-    public static String getNMSSuffix() {
-        return NMS_VERSION_SUFFIX;
-    }
-
     @Contract(pure = true)
     public static @NotNull String getNMSDirectory() {
-        return "net.minecraft.server." + getNMSSuffix();
+        return "net.minecraft.server." + NMS_VERSION_SUFFIX;
     }
 
     @Contract(pure = true)
     public static @NotNull String getOBCDirectory() {
-        return "org.bukkit.craftbukkit." + (getNMSSuffix());
+        return "org.bukkit.craftbukkit." + (NMS_VERSION_SUFFIX);
     }
 }

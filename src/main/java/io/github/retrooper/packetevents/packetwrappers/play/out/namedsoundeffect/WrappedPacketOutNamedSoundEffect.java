@@ -6,10 +6,12 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
+import lombok.ToString;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
+@ToString
 public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements SendableWrapper {
 
     private static Constructor<?> packetConstructor;
@@ -22,7 +24,7 @@ public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements S
     private float volume;
     private float pitch;
 
-    public WrappedPacketOutNamedSoundEffect(NMSPacket packet) {
+    private WrappedPacketOutNamedSoundEffect(NMSPacket packet) {
         super(packet);
     }
 
@@ -63,8 +65,8 @@ public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements S
         }
     }
 
-    public String getSoundEffectName() {
-        if (packet != null) {
+    private String getSoundEffectName() {
+        if (nmsPacket != null) {
             if (soundEffectVarExists) {
                 Object soundEffect = readObject(0, NMSUtils.soundEffectClass);
                 WrappedPacket soundEffectWrapper = new WrappedPacket(new NMSPacket(soundEffect));
@@ -77,8 +79,8 @@ public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements S
         }
     }
 
-    public void setSoundEffectName(String name) {
-        if (packet != null) {
+    private void setSoundEffectName(String name) {
+        if (nmsPacket != null) {
             if (soundEffectVarExists) {
                 Object minecraftKey = NMSUtils.generateMinecraftKeyNew(name);
                 Object soundEffect = null;
@@ -98,8 +100,8 @@ public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements S
         }
     }
 
-    public Vector3d getEffectPosition() {
-        if (packet != null) {
+    private Vector3d getEffectPosition() {
+        if (nmsPacket != null) {
             double x = readInt(0) / 8.0D;
             double y = readInt(1) / 8.0D;
             double z = readInt(2) / 8.0D;
@@ -109,8 +111,8 @@ public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements S
         }
     }
 
-    public void setEffectPosition(Vector3d effectPosition) {
-        if (packet != null) {
+    private void setEffectPosition(Vector3d effectPosition) {
+        if (nmsPacket != null) {
             writeInt(0, (int) (effectPosition.x / 8.0D));
             writeInt(1, (int) (effectPosition.y / 8.0D));
             writeInt(2, (int) (effectPosition.z / 8.0D));
@@ -120,32 +122,32 @@ public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements S
     }
 
     // Might be more than 1.0 on some older versions. 1 is 100%
-    public float getVolume() {
-        if (packet != null) {
+    private float getVolume() {
+        if (nmsPacket != null) {
             return readFloat(0);
         } else {
             return volume;
         }
     }
 
-    public void setVolume(float volume) {
-        if (packet != null) {
+    private void setVolume(float volume) {
+        if (nmsPacket != null) {
             writeFloat(0, volume);
         } else {
             this.volume = volume;
         }
     }
 
-    public float getPitch() {
-        if (packet != null) {
+    private float getPitch() {
+        if (nmsPacket != null) {
             return readInt(3) / pitchMultiplier;
         } else {
             return pitch;
         }
     }
 
-    public void setPitch(float pitch) {
-        if (packet != null) {
+    private void setPitch(float pitch) {
+        if (nmsPacket != null) {
             writeInt(1, (int) (pitch * pitchMultiplier));
         } else {
             this.pitch = pitch;
@@ -153,7 +155,7 @@ public class WrappedPacketOutNamedSoundEffect extends WrappedPacket implements S
     }
 
     @Override
-    public Object asNMSPacket() throws Exception {
+    public Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
         Object packetInstance = packetConstructor.newInstance();
         WrappedPacketOutNamedSoundEffect wrappedPacketOutNamedSoundEffect = new WrappedPacketOutNamedSoundEffect(new NMSPacket(packetInstance));
         wrappedPacketOutNamedSoundEffect.setSoundEffectName(getSoundEffectName());

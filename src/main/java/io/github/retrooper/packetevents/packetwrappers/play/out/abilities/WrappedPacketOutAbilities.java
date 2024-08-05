@@ -4,12 +4,15 @@ import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
+import io.github.retrooper.packetevents.packetwrappers.api.WrapperPacketWriter;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
+@ToString
 public final class WrappedPacketOutAbilities extends WrappedPacket implements SendableWrapper {
 
     private static Constructor<?> packetConstructor;
@@ -61,7 +64,7 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
     }
 
     public boolean isVulnerable() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             return readBoolean(0);
         } else {
             return vulnerable;
@@ -69,7 +72,7 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
     }
 
     public void setVulnerable(boolean isVulnerable) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeBoolean(0, isVulnerable);
         } else {
             vulnerable = isVulnerable;
@@ -77,7 +80,7 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
     }
 
     public boolean isFlying() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             return readBoolean(1);
         } else {
             return flying;
@@ -85,7 +88,7 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
     }
 
     public void setFlying(boolean isFlying) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeBoolean(1, isFlying);
         } else {
             flying = isFlying;
@@ -93,7 +96,7 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
     }
 
     public boolean isFlightAllowed() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             return readBoolean(2);
         } else {
             return allowFlight;
@@ -101,7 +104,7 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
     }
 
     public void setFlightAllowed(boolean isFlightAllowed) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeBoolean(2, isFlightAllowed);
         } else {
             allowFlight = isFlightAllowed;
@@ -109,7 +112,7 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
     }
 
     public boolean canBuildInstantly() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             return readBoolean(3);
         } else {
             return instantBuild;
@@ -117,15 +120,15 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
     }
 
     public void setCanBuildInstantly(boolean canBuildInstantly) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeBoolean(3, canBuildInstantly);
         } else {
             instantBuild = canBuildInstantly;
         }
     }
 
-    public float getFlySpeed() {
-        if (packet != null) {
+    private float getFlySpeed() {
+        if (nmsPacket != null) {
             return readFloat(0);
         } else {
             return flySpeed;
@@ -133,15 +136,15 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
     }
 
     public void setFlySpeed(float flySpeed) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeFloat(0, flySpeed);
         } else {
             this.flySpeed = flySpeed;
         }
     }
 
-    public float getWalkSpeed() {
-        if (packet != null) {
+    private float getWalkSpeed() {
+        if (nmsPacket != null) {
             return readFloat(1);
         } else {
             return walkSpeed;
@@ -149,15 +152,15 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
     }
 
     public void setWalkSpeed(float walkSpeed) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeFloat(1, walkSpeed);
         } else {
             this.walkSpeed = walkSpeed;
         }
     }
 
-    private Object getPlayerAbilities(boolean vulnerable, boolean flying, boolean flightAllowed,
-                                      boolean canBuildInstantly, float flySpeed, float walkSpeed) {
+    private static Object getPlayerAbilities(boolean vulnerable, boolean flying, boolean flightAllowed,
+                                             boolean canBuildInstantly, float flySpeed, float walkSpeed) {
         Object instance = null;
 
         try {
@@ -166,7 +169,7 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
             e.printStackTrace();
         }
 
-        WrappedPacket wrapper = new WrappedPacket(new NMSPacket(instance));
+        WrapperPacketWriter wrapper = new WrappedPacket(new NMSPacket(instance));
         wrapper.writeBoolean(0, vulnerable);
         wrapper.writeBoolean(1, flying);
         wrapper.writeBoolean(2, flightAllowed);
@@ -177,7 +180,7 @@ public final class WrappedPacketOutAbilities extends WrappedPacket implements Se
     }
 
     @Override
-    public @NotNull Object asNMSPacket() throws Exception {
+    public @NotNull Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
         return packetConstructor.newInstance(getPlayerAbilities(isVulnerable(), isFlying(),
                 isFlightAllowed(), canBuildInstantly(), getFlySpeed(), getWalkSpeed()));
     }

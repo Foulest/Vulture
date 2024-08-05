@@ -19,6 +19,7 @@ package net.foulest.vulture.check.type.speed;
 
 import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
+import lombok.ToString;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
@@ -29,6 +30,7 @@ import net.foulest.vulture.util.MovementUtil;
 import org.bukkit.GameMode;
 import org.bukkit.potion.PotionEffectType;
 
+@ToString
 @CheckInfo(name = "Speed (E)", type = CheckType.SPEED,
         description = "Prevents players from using NoSlowdown.")
 public class SpeedE extends Check {
@@ -45,8 +47,8 @@ public class SpeedE extends Check {
         // Checks the player for exemptions.
         if (player.isFlying()
                 || player.getAllowFlight()
-                || player.getGameMode().equals(GameMode.CREATIVE)
-                || player.getGameMode().equals(GameMode.SPECTATOR)
+                || player.getGameMode() == GameMode.CREATIVE
+                || player.getGameMode() == GameMode.SPECTATOR
                 || event.isTeleport(playerData)) {
             return;
         }
@@ -81,7 +83,9 @@ public class SpeedE extends Check {
         // Detects standard no-slowdown.
         if (blocking) {
             if (deltaXZ > maxSpeed) {
-                if (++bufferStandard >= 3) {
+                ++bufferStandard;
+
+                if (bufferStandard >= 3) {
                     flag(true, "Standard"
                             + " (deltaXZ=" + deltaXZ
                             + " maxSpeed=" + maxSpeed
@@ -98,7 +102,9 @@ public class SpeedE extends Check {
         // Detects rapidly blocking no-slowdown.
         if (rapidlyBlocking) {
             if (deltaXZ > maxSpeed) {
-                if (++bufferRapid >= 5) {
+                ++bufferRapid;
+
+                if (bufferRapid >= 5) {
                     flag(true, "Rapidly blocking"
                             + " (deltaXZ=" + deltaXZ
                             + " maxSpeed=" + maxSpeed

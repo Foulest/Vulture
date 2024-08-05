@@ -18,6 +18,7 @@
 package net.foulest.vulture.check.type.flight;
 
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
+import lombok.ToString;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
@@ -30,6 +31,7 @@ import net.foulest.vulture.util.MovementUtil;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 
+@ToString
 @CheckInfo(name = "Flight (A)", type = CheckType.FLIGHT,
         description = "Checks for invalid y-axis movement when falling.")
 public class FlightA extends Check {
@@ -80,9 +82,9 @@ public class FlightA extends Check {
         boolean nearStairs = playerData.isNearStairs();
 
         nearGroundTicks = nearGround ? nearGroundTicks + 1 : 0;
-        notNearGroundTicks = !nearGround ? notNearGroundTicks + 1 : 0;
+        notNearGroundTicks = nearGround ? 0 : notNearGroundTicks + 1;
         onGroundTicks = onGround ? onGroundTicks + 1 : 0;
-        notOnGroundTicks = !onGround ? notOnGroundTicks + 1 : 0;
+        notOnGroundTicks = onGround ? 0 : notOnGroundTicks + 1;
         flatDeltaYTicks = deltaY == 0.0 ? flatDeltaYTicks + 1 : 0;
 
         double toY = event.getTo().getPosition().getY();
@@ -161,7 +163,7 @@ public class FlightA extends Check {
 
                     if (velocity == ON_GROUND_VELOCITY) {
                         MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (Slime #6) (Y=" + deltaY + ")");
-                        setLastValues(deltaY, velocity);
+                        setLastValues(deltaY, ON_GROUND_VELOCITY);
                         return;
                     }
                 }
@@ -241,8 +243,8 @@ public class FlightA extends Check {
 
             // Ignores players who are on stairs.
             if (nearStairs && deltaY == 0.5) {
-                MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (Stairs) (Y=" + deltaY + ")");
-                setLastValues(deltaY, velocity);
+                MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (Stairs) (Y=" + 0.5 + ")");
+                setLastValues(0.5, velocity);
                 return;
             }
 
@@ -328,8 +330,9 @@ public class FlightA extends Check {
 
             // Ignores weird after teleport behavior.
             if (deltaY == -0.07840000152587834 && diffYLastV < threshold && notOnGroundTicks == 1) {
-                MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (D2) (Y=" + deltaY + ")");
-                setLastValues(deltaY, velocity);
+                MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (D2)"
+                        + " (Y=" + -0.07840000152587834 + ")");
+                setLastValues(-0.07840000152587834, velocity);
                 return;
             }
 
@@ -352,9 +355,10 @@ public class FlightA extends Check {
             if (deltaY == -0.09800000190735147
                     && (playerData.getTicksSince(ActionType.IN_UNLOADED_CHUNK) < 30
                     || playerData.getTicksSince(ActionType.TELEPORT) < 15)) {
-                MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (G1) (Y=" + deltaY + ")"
+                MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (G1)"
+                        + " (Y=" + -0.09800000190735147 + ")"
                         + " (T=" + playerData.getTicksSince(ActionType.IN_UNLOADED_CHUNK) + ")");
-                setLastValues(deltaY, velocity);
+                setLastValues(-0.09800000190735147, velocity);
                 return;
             }
 
@@ -402,7 +406,7 @@ public class FlightA extends Check {
 
                     if (velocity == ON_GROUND_VELOCITY) {
                         MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (H5) (Y=" + deltaY + ")");
-                        setLastValues(deltaY, velocity);
+                        setLastValues(deltaY, ON_GROUND_VELOCITY);
                         return;
                     }
                 }
@@ -416,8 +420,8 @@ public class FlightA extends Check {
                 }
 
                 if (deltaY == 0.5 && onGround && (playerData.isNearStairs() || playerData.isNearSlab())) {
-                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (H7) (Y=" + deltaY + ")");
-                    setLastValues(deltaY, velocity);
+                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (H7) (Y=" + 0.5 + ")");
+                    setLastValues(0.5, velocity);
                     return;
                 }
 
@@ -468,8 +472,9 @@ public class FlightA extends Check {
                 }
 
                 if (onGround && toY % 0.5 == 0.0 && deltaY == 0.4641593749554431) {
-                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (I6) (Y=" + deltaY + ")");
-                    setLastValues(deltaY, velocity);
+                    MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (I6)"
+                            + " (Y=" + 0.4641593749554431 + ")");
+                    setLastValues(0.4641593749554431, velocity);
                     return;
                 }
             }
@@ -633,7 +638,7 @@ public class FlightA extends Check {
                 if ((toY - (int) toY) - jumpY < threshold && deltaY > 0.0 && lastDeltaY < 0.0
                         && velocity == ON_GROUND_VELOCITY && diffVLastV == 0.0) {
                     MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (K8) (Y=" + deltaY + ")");
-                    setLastValues(deltaY, velocity);
+                    setLastValues(deltaY, ON_GROUND_VELOCITY);
                     return;
                 }
 
@@ -738,7 +743,7 @@ public class FlightA extends Check {
         setLastValues(deltaY, velocity);
     }
 
-    public void setLastValues(double lastDeltaY, double lastVelocity) {
+    private void setLastValues(double lastDeltaY, double lastVelocity) {
         this.lastDeltaY = lastDeltaY;
         this.lastVelocity = lastVelocity;
     }

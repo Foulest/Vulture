@@ -17,10 +17,12 @@
  */
 package net.foulest.vulture.check.type.clientbrand;
 
+import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.play.in.custompayload.WrappedPacketInCustomPayload;
+import lombok.ToString;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
@@ -37,6 +39,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
+@ToString
 @CheckInfo(name = "ClientBrand", type = CheckType.CLIENTBRAND,
         punishable = false, description = "Checks for modified client brands.")
 public class ClientBrand extends Check {
@@ -936,7 +939,7 @@ public class ClientBrand extends Check {
      * @param data  The data sent by the player.
      * @param event The event to cancel.
      */
-    private void handleBrandData(@NotNull String data, CancellableNMSPacketEvent event) {
+    private void handleBrandData(@NotNull String data, CancellableEvent event) {
         // Kicks players sending the Log4J Exploit through their brand.
         if (data.contains("jndi") || data.contains("ldap")
                 || data.contains("://") || data.contains("${")
@@ -981,7 +984,7 @@ public class ClientBrand extends Check {
      * @param data  The data sent by the player.
      * @param event The event to cancel.
      */
-    private void handleRegisterData(@NotNull String data, CancellableNMSPacketEvent event) {
+    private void handleRegisterData(@NotNull String data, CancellableEvent event) {
         // Kicks players that register empty data.
         if (data.isEmpty()) {
             KickUtil.kickPlayer(player, event, "Empty Data");
@@ -1005,7 +1008,7 @@ public class ClientBrand extends Check {
      *
      * @param event The event to cancel.
      */
-    private void checkForBlockedMods(CancellableNMSPacketEvent event) {
+    private void checkForBlockedMods(CancellableEvent event) {
         // If the payload is blocked, kick the player.
         for (PayloadType payloadType : playerData.getPayloads()) {
             if (Settings.blockedPayloads.contains(payloadType.name)) {
@@ -1023,10 +1026,8 @@ public class ClientBrand extends Check {
      * @param event           The event to cancel.
      * @param data            The data to check.
      */
-    private void validateAndProcessPayload(@NotNull List<PayloadType> payloadTypeList,
-                                           CancellableNMSPacketEvent event,
-                                           String data,
-                                           DataType dataType) {
+    private void validateAndProcessPayload(@NotNull Iterable<PayloadType> payloadTypeList,
+                                           CancellableEvent event, String data, DataType dataType) {
         // Checks if the data is present in the payload type list.
         for (PayloadType payloadType : payloadTypeList) {
             if (payloadType.data.equals(data)) {

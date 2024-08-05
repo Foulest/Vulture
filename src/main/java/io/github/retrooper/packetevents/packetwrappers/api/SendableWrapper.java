@@ -22,6 +22,7 @@ package io.github.retrooper.packetevents.packetwrappers.api;
  *
  * @author retrooper
  */
+@FunctionalInterface
 public interface SendableWrapper {
 
     Object asNMSPacket() throws Exception;

@@ -20,7 +20,6 @@ package net.foulest.vulture.util;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.data.PlayerDataManager;
 import net.foulest.vulture.util.data.ConcurrentStream;
@@ -38,10 +37,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 @Getter
-@Setter
 @SuppressWarnings("unused")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class BlockUtil {
+public final class BlockUtil {
 
     public static boolean isPlayerInUnloadedChunk(@NotNull Player player) {
         return !player.getLocation().getWorld().isChunkLoaded(player.getLocation().getBlockX() >> 4,
@@ -52,22 +50,22 @@ public class BlockUtil {
         return !location.getWorld().isChunkLoaded(location.getBlockX() >> 4, location.getBlockZ() >> 4);
     }
 
-    public static BoundingBox getPlayerFeetBoundingBox(Player player) {
+    private static BoundingBox getPlayerFeetBoundingBox(Player player) {
         return new BoundingBox(player)
                 .expand(0.0, 0.0, 0.0)
                 .expandMin(0.0, 1.3, 0.0)
                 .expandMax(0.0, -1.0, 0.0);
     }
 
-    public static BoundingBox getPlayerNearBoundingBox(Player player) {
+    private static BoundingBox getPlayerNearBoundingBox(Player player) {
         return new BoundingBox(player)
                 .expand(1.0, 0.0, 1.0)
                 .expandMin(0.0, 1.2, 0.0)
                 .expandMax(0.0, 1.0, 0.0);
     }
 
-    public static BoundingBox getPlayerCustomBoundingBox(Player player, double expandXZ,
-                                                         double expandMin, double expandMax) {
+    private static BoundingBox getPlayerCustomBoundingBox(Player player, double expandXZ,
+                                                          double expandMin, double expandMax) {
         return new BoundingBox(player)
                 .expand(expandXZ, 0.0, expandXZ)
                 .expandMin(0.0, expandMin, 0.0)
@@ -75,7 +73,7 @@ public class BlockUtil {
     }
 
     @Contract("_, _ -> new")
-    public static @NotNull ConcurrentStream<Block> getCollidingBlocks(Player player, @NotNull BoundingBox boundingBox) {
+    private static @NotNull ConcurrentStream<Block> getCollidingBlocks(Player player, @NotNull BoundingBox boundingBox) {
         return new ConcurrentStream<>(boundingBox.getCollidingBlocks(player), false);
     }
 
@@ -562,8 +560,8 @@ public class BlockUtil {
         return collidingBlocks.any(block -> block.getType() == Material.SLIME_BLOCK);
     }
 
-    public static void visualizeBoundingBox(@NotNull Player player,
-                                            @NotNull BoundingBox boundingBox) {
+    private static void visualizeBoundingBox(@NotNull Player player,
+                                             @NotNull BoundingBox boundingBox) {
         World world = player.getWorld();
         Effect effect = Effect.COLOURED_DUST;
 

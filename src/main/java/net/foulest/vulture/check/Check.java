@@ -23,6 +23,7 @@ import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.event.MovementEvent;
 import net.foulest.vulture.event.RotationEvent;
@@ -40,6 +41,7 @@ import org.jetbrains.annotations.NotNull;
  */
 @Getter
 @Setter
+@ToString
 @SuppressWarnings("unused")
 public class Check implements Listener {
 
@@ -104,7 +106,7 @@ public class Check implements Listener {
      * @param event   the event to cancel
      * @param verbose the optional data to include in the flag
      */
-    protected final void flag(boolean setback, @NotNull CancellableEvent event, String... verbose) {
+    protected void flag(boolean setback, @NotNull CancellableEvent event, String... verbose) {
         PunishUtil.flag(playerData, checkInfoData, setback, event, verbose);
     }
 
@@ -115,7 +117,7 @@ public class Check implements Listener {
      *
      * @param verbose the optional data to include in the flag
      */
-    protected final void flag(boolean setback, String... verbose) {
+    protected void flag(boolean setback, String... verbose) {
         PunishUtil.flag(playerData, checkInfoData, setback, verbose);
     }
 

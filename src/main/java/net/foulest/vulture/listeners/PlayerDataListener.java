@@ -45,7 +45,7 @@ public class PlayerDataListener implements Listener {
      * Handles player login events.
      */
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onLogin(@NotNull PlayerLoginEvent event) {
+    public static void onLogin(@NotNull PlayerLoginEvent event) {
         Player player = event.getPlayer();
 
         // Checks if the player's IP matches the whitelist.
@@ -68,10 +68,10 @@ public class PlayerDataListener implements Listener {
      * @param event PlayerJoinEvent
      */
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onJoin(@NotNull PlayerJoinEvent event) {
+    public static void onJoin(@NotNull PlayerJoinEvent event) {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
-        ClientVersion clientVersion = PacketEvents.get().getPlayerUtils().getClientVersion(player);
+        ClientVersion clientVersion = PacketEvents.getInstance().getPlayerUtils().getClientVersion(player);
 
         // Returns if the player's data is null.
         if (playerData == null) {
@@ -93,7 +93,7 @@ public class PlayerDataListener implements Listener {
      * @param event PlayerQuitEvent
      */
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onQuit(@NotNull PlayerQuitEvent event) {
+    public static void onQuit(@NotNull PlayerQuitEvent event) {
         Player player = event.getPlayer();
         PlayerDataManager.removePlayerData(player);
     }
@@ -104,7 +104,7 @@ public class PlayerDataListener implements Listener {
      * @param event BlockBreakEvent
      */
     @EventHandler
-    public void onBlockBreak(@NotNull BlockBreakEvent event) {
+    public static void onBlockBreak(@NotNull BlockBreakEvent event) {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
@@ -118,7 +118,7 @@ public class PlayerDataListener implements Listener {
      * @param event PlayerItemConsumeEvent
      */
     @EventHandler
-    public void onPlayerItemConsume(@NotNull PlayerItemConsumeEvent event) {
+    public static void onPlayerItemConsume(@NotNull PlayerItemConsumeEvent event) {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
@@ -133,7 +133,7 @@ public class PlayerDataListener implements Listener {
      * @param event PlayerBedEnterEvent
      */
     @EventHandler
-    public void onBedEnterEvent(@NotNull PlayerBedEnterEvent event) {
+    public static void onBedEnterEvent(@NotNull PlayerBedEnterEvent event) {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
@@ -147,7 +147,7 @@ public class PlayerDataListener implements Listener {
      * @param event PlayerBedLeaveEvent
      */
     @EventHandler
-    public void onBedLeaveEvent(@NotNull PlayerBedLeaveEvent event) {
+    public static void onBedLeaveEvent(@NotNull PlayerBedLeaveEvent event) {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
@@ -161,7 +161,7 @@ public class PlayerDataListener implements Listener {
      * @param event PlayerRespawnEvent
      */
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPlayerRespawn(@NotNull PlayerRespawnEvent event) {
+    public static void onPlayerRespawn(@NotNull PlayerRespawnEvent event) {
         Player player = event.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
@@ -176,7 +176,7 @@ public class PlayerDataListener implements Listener {
      * @param event EntityDamageEvent
      */
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onDamage(@NotNull EntityDamageEvent event) {
+    public static void onDamage(@NotNull EntityDamageEvent event) {
         // Returns if the entity is not a player.
         if (!(event.getEntity() instanceof Player)) {
             return;

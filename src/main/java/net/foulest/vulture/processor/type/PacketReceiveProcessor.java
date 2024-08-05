@@ -17,6 +17,7 @@
  */
 package net.foulest.vulture.processor.type;
 
+import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
 import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
@@ -45,6 +46,7 @@ import io.github.retrooper.packetevents.utils.player.Direction;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import io.github.retrooper.packetevents.utils.vector.Vector3f;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
+import lombok.NoArgsConstructor;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.data.PlayerData;
@@ -58,8 +60,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Beacon;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.*;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
@@ -70,9 +72,7 @@ import org.joml.Vector2f;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-
-import static net.foulest.vulture.util.MessageUtil.debug;
+import java.util.Locale;
 
 /**
  * Handles all incoming packets after they are decoded.
@@ -80,6 +80,7 @@ import static net.foulest.vulture.util.MessageUtil.debug;
  * @author Foulest
  * @project Vulture
  */
+@NoArgsConstructor
 public class PacketReceiveProcessor extends Processor {
 
     /**
@@ -333,9 +334,9 @@ public class PacketReceiveProcessor extends Processor {
                 WrappedPacketInBlockPlace blockPlace = new WrappedPacketInBlockPlace(event.getNMSPacket());
                 Vector3i placeBlockPosition = blockPlace.getBlockPosition();
                 Direction placeDirection = blockPlace.getDirection();
-                double placeXPos = placeBlockPosition.getX();
-                double placeYPos = placeBlockPosition.getY();
-                double placeZPos = placeBlockPosition.getZ();
+                int placeXPos = placeBlockPosition.getX();
+                int placeYPos = placeBlockPosition.getY();
+                int placeZPos = placeBlockPosition.getZ();
 
                 if (playerData.isInventoryOpen()) {
                     KickUtil.kickPlayer(player, event, Settings.blockPlaceInvalidConditions,
@@ -402,7 +403,7 @@ public class PacketReceiveProcessor extends Processor {
                 }
 
                 if (placeDirection == Direction.OTHER
-                        && placeXPos != -1.0 && placeYPos != -1.0 && placeZPos != -1.0) {
+                        && placeXPos != -1 && placeYPos != -1 && placeZPos != -1) {
                     KickUtil.kickPlayer(player, event, Settings.blockPlaceInvalidOtherBlockPosition,
                             "Sent BlockPlace packet with invalid OTHER block position"
                                     + " (x=" + placeXPos
@@ -621,7 +622,7 @@ public class PacketReceiveProcessor extends Processor {
                 }
 
                 // Checks for invalid item name payloads.
-                if (channelName.equals("MC|ItemName")) {
+                if ("MC|ItemName".equals(channelName)) {
                     if (payloadSize > (playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8) ? 31 : 32)) {
                         KickUtil.kickPlayer(player, event, Settings.itemNameInvalidSize,
                                 "Sent ItemName payload with invalid size"
@@ -630,21 +631,37 @@ public class PacketReceiveProcessor extends Processor {
                         return;
                     }
 
-                    if (!data.startsWith("\b") && !data.startsWith("\t") && !data.startsWith("\n")
-                            && !data.startsWith("\u0000") && !data.startsWith("\u0001")
-                            && !data.startsWith("\u0002") && !data.startsWith("\u0003")
-                            && !data.startsWith("\u0004") && !data.startsWith("\u0005")
-                            && !data.startsWith("\u0006") && !data.startsWith("\u0007")
-                            && !data.startsWith("\u000B") && !data.startsWith("\f")
-                            && !data.startsWith("\r") && !data.startsWith("\u000E")
-                            && !data.startsWith("\u000F") && !data.startsWith("\u0010")
-                            && !data.startsWith("\u0011") && !data.startsWith("\u0012")
-                            && !data.startsWith("\u0013") && !data.startsWith("\u0014")
-                            && !data.startsWith("\u0015") && !data.startsWith("\u0016")
-                            && !data.startsWith("\u0017") && !data.startsWith("\u0018")
-                            && !data.startsWith("\u0019") && !data.startsWith("\u001A")
-                            && !data.startsWith("\u001B") && !data.startsWith("\u001C")
-                            && !data.startsWith("\u001D") && !data.startsWith("\u001E")) {
+                    if (!(!data.isEmpty() && data.charAt(0) == '\b')
+                            && !(!data.isEmpty() && data.charAt(0) == '\t')
+                            && !(!data.isEmpty() && data.charAt(0) == '\n')
+                            && !(!data.isEmpty() && data.charAt(0) == '\u0000')
+                            && !(!data.isEmpty() && data.charAt(0) == '\u0001')
+                            && !(!data.isEmpty() && data.charAt(0) == '\u0002')
+                            && !(!data.isEmpty() && data.charAt(0) == '\u0003')
+                            && !(!data.isEmpty() && data.charAt(0) == '\u0004')
+                            && !(!data.isEmpty() && data.charAt(0) == '\u0005')
+                            && !(!data.isEmpty() && data.charAt(0) == '\u0006')
+                            && !(!data.isEmpty() && data.charAt(0) == '\u0007')
+                            && !(!data.isEmpty() && data.charAt(0) == '\u000B')
+                            && !(!data.isEmpty() && data.charAt(0) == '\f')
+                            && !(!data.isEmpty() && data.charAt(0) == '\r')
+                            && !(!data.isEmpty() && data.charAt(0) == '\u000E')
+                            && !(!data.isEmpty() && data.charAt(0) == '\u000F')
+                            && !(!data.isEmpty() && data.charAt(0) == '\u0010')
+                            && !(!data.isEmpty() && data.charAt(0) == '\u0011')
+                            && !(!data.isEmpty() && data.charAt(0) == '\u0012')
+                            && !(!data.isEmpty() && data.charAt(0) == '\u0013')
+                            && !(!data.isEmpty() && data.charAt(0) == '\u0014')
+                            && !(!data.isEmpty() && data.charAt(0) == '\u0015')
+                            && !(!data.isEmpty() && data.charAt(0) == '\u0016')
+                            && !(!data.isEmpty() && data.charAt(0) == '\u0017')
+                            && !(!data.isEmpty() && data.charAt(0) == '\u0018')
+                            && !(!data.isEmpty() && data.charAt(0) == '\u0019')
+                            && !(!data.isEmpty() && data.charAt(0) == '\u001A')
+                            && !(!data.isEmpty() && data.charAt(0) == '\u001B')
+                            && !(!data.isEmpty() && data.charAt(0) == '\u001C')
+                            && !(!data.isEmpty() && data.charAt(0) == '\u001D')
+                            && !(!data.isEmpty() && data.charAt(0) == '\u001E')) {
                         KickUtil.kickPlayer(player, event, Settings.itemNameInvalidData,
                                 "Sent ItemName payload with invalid data"
                                         + " (data=" + data + ")"
@@ -657,10 +674,10 @@ public class PacketReceiveProcessor extends Processor {
                 }
 
                 // Checks for invalid trade select payloads.
-                if (channelName.equals("MC|TrSel")
-                        && !data.equals("\u0000\u0000\u0000\u0000")
-                        && !data.equals("\u0000\u0000\u0000\u0001")
-                        && !data.equals("\u0000\u0000\u0000\u0002")) {
+                if ("MC|TrSel".equals(channelName)
+                        && !"\u0000\u0000\u0000\u0000".equals(data)
+                        && !"\u0000\u0000\u0000\u0001".equals(data)
+                        && !"\u0000\u0000\u0000\u0002".equals(data)) {
                     KickUtil.kickPlayer(player, event, Settings.tradeSelectInvalidData,
                             "Sent TradeSelect payload with invalid data"
                                     + " (data=" + data + ")"
@@ -669,13 +686,13 @@ public class PacketReceiveProcessor extends Processor {
                 }
 
                 // Checks for invalid pick item payloads.
-                if (channelName.equals("MC|PickItem") && !data.equals("\t")) {
+                if ("MC|PickItem".equals(channelName) && !"\t".equals(data)) {
                     // TODO: Remove this in production.
                     FileUtil.printDataToFile(data, "pick-item-data.txt");
                 }
 
                 // Checks for invalid beacon payloads.
-                if (channelName.equals("MC|Beacon")) {
+                if ("MC|Beacon".equals(channelName)) {
                     if (player.getOpenInventory().getType() != InventoryType.BEACON) {
                         KickUtil.kickPlayer(player, event, Settings.beaconInvalidConditions,
                                 "Sent Beacon payload with invalid conditions"
@@ -684,7 +701,7 @@ public class PacketReceiveProcessor extends Processor {
                         return;
                     }
 
-                    Beacon beacon = (Beacon) player.getOpenInventory().getTopInventory().getHolder();
+                    BlockState beacon = (BlockState) player.getOpenInventory().getTopInventory().getHolder();
                     int tier = BeaconUtil.getTier(beacon.getLocation());
 
                     if (data.charAt(0) == '\u0000'
@@ -751,14 +768,14 @@ public class PacketReceiveProcessor extends Processor {
                 }
 
                 // Checks for invalid book-related payloads.
-                if (channelName.equals("MC|BOpen")
-                        || channelName.equals("MC|BEdit")
-                        || channelName.equals("MC|BSign")) {
+                if ("MC|BOpen".equals(channelName)
+                        || "MC|BEdit".equals(channelName)
+                        || "MC|BSign".equals(channelName)) {
                     ItemStack itemInHand = playerData.getPlayer().getInventory().getItemInHand();
 
                     // Checks for invalid book open payloads.
                     // (The client doesn't send this payload; the server does)
-                    if (channelName.equals("MC|BOpen")) {
+                    if ("MC|BOpen".equals(channelName)) {
                         KickUtil.kickPlayer(player, event, Settings.bookOpenInvalidConditions,
                                 "Sent BookOpen payload with invalid conditions"
                         );
@@ -766,8 +783,8 @@ public class PacketReceiveProcessor extends Processor {
                     }
 
                     // Checks for invalid book edit payloads.
-                    if (channelName.equals("MC|BEdit")) {
-                        if (itemInHand == null || !itemInHand.getType().toString().toLowerCase().contains("book")) {
+                    if ("MC|BEdit".equals(channelName)) {
+                        if (itemInHand == null || !itemInHand.getType().toString().toLowerCase(Locale.ROOT).contains("book")) {
                             KickUtil.kickPlayer(player, event, Settings.bookEditInvalidConditions,
                                     "Sent BookEdit payload with invalid conditions"
                                             + " (itemInHand=" + itemInHand + ")"
@@ -776,7 +793,8 @@ public class PacketReceiveProcessor extends Processor {
                         }
 
                         if (!data.startsWith("\u0001ï¿½\u0001\u0000\u0000\n\u0000\u0000\t"
-                                + "\u0000\u0005pages\b\u0000\u0000\u0000\u0001\u0000\f") && !data.endsWith("\u0000")) {
+                                + "\u0000\u0005pages\b\u0000\u0000\u0000\u0001\u0000\f")
+                                && !(!data.isEmpty() && data.charAt(data.length() - 1) == '\u0000')) {
                             KickUtil.kickPlayer(player, event, Settings.bookEditInvalidData,
                                     "Sent BookEdit payload with invalid data"
                                             + " (" + data + ")"
@@ -786,8 +804,8 @@ public class PacketReceiveProcessor extends Processor {
                     }
 
                     // Checks for invalid book sign payloads.
-                    if (channelName.equals("MC|BSign")) {
-                        if (itemInHand == null || !itemInHand.getType().toString().toLowerCase().contains("book")) {
+                    if ("MC|BSign".equals(channelName)) {
+                        if (itemInHand == null || !itemInHand.getType().toString().toLowerCase(Locale.ROOT).contains("book")) {
                             KickUtil.kickPlayer(player, event, Settings.bookSignInvalidConditions,
                                     "Sent BookSign payload with invalid conditions"
                                             + " (itemInHand=" + itemInHand + ")"
@@ -797,7 +815,8 @@ public class PacketReceiveProcessor extends Processor {
 
                         if (!data.startsWith("\u0001ï¿½\u0001\u0000\u0000\n\u0000\u0000\t"
                                 + "\u0000\u0005pages\b\u0000\u0000\u0000\u0001\u0000\f")
-                                && !data.endsWith("\u0000") && !data.contains("\b\u0000\u0006author\u0000\u0007")
+                                && !(!data.isEmpty() && data.charAt(data.length() - 1) == '\u0000')
+                                && !data.contains("\b\u0000\u0006author\u0000\u0007")
                                 && !data.contains("\b\u0000\u0005title\u0000\u0004")) {
                             KickUtil.kickPlayer(player, event, Settings.bookSignInvalidData,
                                     "Sent BookSign payload with invalid data"
@@ -808,7 +827,7 @@ public class PacketReceiveProcessor extends Processor {
                     }
                 }
 
-                if ((channelName.equals("MC|AdvCdm") || channelName.equals("MC|AutoCmd")) && !player.isOp()) {
+                if (("MC|AdvCdm".equals(channelName) || "MC|AutoCmd".equals(channelName)) && !player.isOp()) {
                     KickUtil.kickPlayer(player, event, Settings.commandBlockInvalidConditions,
                             "Sent CommandBlock payload with invalid conditions"
                                     + " (op=" + player.isOp() + ")"
@@ -1099,7 +1118,7 @@ public class PacketReceiveProcessor extends Processor {
                     if (player.isInsideVehicle() && playerData.getTicksSince(ActionType.ENTER_VEHICLE) > 2) {
                         event.setCancelled(true);
                         player.getVehicle().eject();
-                        debug("Flying packet ignored for " + player.getName() + " (inside vehicle) "
+                        MessageUtil.debug("Flying packet ignored for " + player.getName() + " (inside vehicle) "
                                 + playerData.getTicksSince(ActionType.ENTER_VEHICLE));
                     }
 
@@ -1344,8 +1363,8 @@ public class PacketReceiveProcessor extends Processor {
 
                     KickUtil.kickPlayer(player, event, Settings.steerVehicleInvalidConditions,
                             "Sent SteerVehicle packet with invalid conditions"
-                                    + " (sidewaysValue=" + sidewaysValue
-                                    + " forwardValue=" + forwardValue
+                                    + " (sidewaysValue=" + 0.0f
+                                    + " forwardValue=" + 0.0f
                                     + " jump=" + steerVehicle.isJump()
                                     + " insideVehicle=" + player.isInsideVehicle() + ")"
                     );
@@ -1353,7 +1372,7 @@ public class PacketReceiveProcessor extends Processor {
 
                 } else if (!player.isInsideVehicle()) {
                     event.setCancelled(true);
-                    debug("SteerVehicle packet ignored for " + player.getName() + " (not inside vehicle)");
+                    MessageUtil.debug("SteerVehicle packet ignored for " + player.getName() + " (not inside vehicle)");
                     return;
                 }
 
@@ -1617,7 +1636,7 @@ public class PacketReceiveProcessor extends Processor {
                 break;
 
             default:
-                debug("Unhandled packet: " + event.getPacketId());
+                MessageUtil.debug("Unhandled packet: " + event.getPacketId());
                 break;
         }
 
@@ -1669,14 +1688,14 @@ public class PacketReceiveProcessor extends Processor {
      * @param playerData The player data.
      * @param event      The packet event.
      */
-    private void handlePacketChecks(@NotNull PlayerData playerData,
-                                    @NotNull CancellableNMSPacketEvent event) {
+    private static void handlePacketChecks(@NotNull PlayerData playerData,
+                                           @NotNull CancellableNMSPacketEvent event) {
         long timestamp = System.currentTimeMillis();
         NMSPacket nmsPacket = event.getNMSPacket();
 
         // Create a copy of the checks list to avoid ConcurrentModificationException
         if (playerData.getChecks() != null) {
-            List<Check> checksCopy = new ArrayList<>(playerData.getChecks());
+            Iterable<Check> checksCopy = new ArrayList<>(playerData.getChecks());
 
             for (Check check : checksCopy) {
                 check.handle(event, event.getPacketId(), nmsPacket, nmsPacket.getRawNMSPacket(), timestamp);
@@ -1690,12 +1709,12 @@ public class PacketReceiveProcessor extends Processor {
      * @param playerData The player data.
      * @param event      The rotation event.
      */
-    private void handleRotationChecks(@NotNull PlayerData playerData, RotationEvent event) {
+    private static void handleRotationChecks(@NotNull PlayerData playerData, RotationEvent event) {
         long timestamp = System.currentTimeMillis();
 
         // Create a copy of the checks list to avoid ConcurrentModificationException
         if (playerData.getChecks() != null) {
-            List<Check> checksCopy = new ArrayList<>(playerData.getChecks());
+            Iterable<Check> checksCopy = new ArrayList<>(playerData.getChecks());
 
             for (Check check : checksCopy) {
                 check.handle(event, timestamp);
@@ -1709,12 +1728,12 @@ public class PacketReceiveProcessor extends Processor {
      * @param playerData The player data.
      * @param event      The movement event.
      */
-    private void handleMovementChecks(@NotNull PlayerData playerData, MovementEvent event) {
+    private static void handleMovementChecks(@NotNull PlayerData playerData, MovementEvent event) {
         long timestamp = System.currentTimeMillis();
 
         // Create a copy of the checks list to avoid ConcurrentModificationException
         if (playerData.getChecks() != null) {
-            List<Check> checksCopy = new ArrayList<>(playerData.getChecks());
+            Iterable<Check> checksCopy = new ArrayList<>(playerData.getChecks());
 
             for (Check check : checksCopy) {
                 if (check.getCheckInfo().enabled()) {
@@ -1732,8 +1751,8 @@ public class PacketReceiveProcessor extends Processor {
      * @param steerVehicle The SteerVehicle packet.
      * @param value        The value to check.
      */
-    private void steerVehicleCheck(Player player, PacketPlayReceiveEvent event,
-                                   WrappedPacketInSteerVehicle steerVehicle, float value) {
+    private static void steerVehicleCheck(Player player, CancellableEvent event,
+                                          WrappedPacketInSteerVehicle steerVehicle, float value) {
         if (Math.abs(value) == 0.98f) {
             if (steerVehicle.isDismount()) {
                 KickUtil.kickPlayer(player, event, Settings.steerVehicleInvalidDismountValue,

@@ -18,6 +18,8 @@
 package net.foulest.vulture.ping;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayDeque;
@@ -27,6 +29,8 @@ import java.util.Queue;
  * Utility that schedules tasks to be executed on a client response to server tick pings.
  */
 @Getter
+@ToString
+@NoArgsConstructor
 public class PingTaskScheduler {
 
     private final Queue<Queue<PingTask>> scheduledTasks = new ArrayDeque<>();

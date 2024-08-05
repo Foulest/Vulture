@@ -4,9 +4,11 @@ import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
+import io.github.retrooper.packetevents.packetwrappers.api.WrapperPacketWriter;
 import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 public class WrappedPacketOutCamera extends WrappedPacketEntityAbstraction implements SendableWrapper {
 
@@ -30,9 +32,9 @@ public class WrappedPacketOutCamera extends WrappedPacketEntityAbstraction imple
     }
 
     @Override
-    public Object asNMSPacket() throws Exception {
+    public Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
         Object packetInstance = packetConstructor.newInstance();
-        WrappedPacket packetWrapper = new WrappedPacket(new NMSPacket(packetInstance));
+        WrapperPacketWriter packetWrapper = new WrappedPacket(new NMSPacket(packetInstance));
         packetWrapper.writeInt(0, getEntityId());
         return packetInstance;
     }

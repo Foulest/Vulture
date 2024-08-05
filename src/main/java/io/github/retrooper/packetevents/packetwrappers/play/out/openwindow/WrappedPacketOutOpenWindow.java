@@ -4,13 +4,15 @@ import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
+import lombok.ToString;
 
 import java.util.Optional;
 
+@ToString
 public class WrappedPacketOutOpenWindow extends WrappedPacket {
 
-    private static boolean legacyMode = false;
-    private static boolean ultraLegacyMode = false;
+    private static boolean legacyMode;
+    private static boolean ultraLegacyMode;
     private int windowID;
     private int windowTypeID;
 
@@ -32,14 +34,14 @@ public class WrappedPacketOutOpenWindow extends WrappedPacket {
     }
 
     public int getWindowId() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             return readInt(0);
         }
         return windowID;
     }
 
     public void setWindowId(int windowID) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeInt(0, windowID);
         } else {
             this.windowID = windowID;
@@ -47,7 +49,7 @@ public class WrappedPacketOutOpenWindow extends WrappedPacket {
     }
 
     public Optional<Integer> getInventoryTypeId() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             if (legacyMode && !ultraLegacyMode) {
                 return Optional.empty();
             }
@@ -58,10 +60,11 @@ public class WrappedPacketOutOpenWindow extends WrappedPacket {
     }
 
     public void setInventoryTypeId(int inventoryTypeID) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             if (legacyMode && !ultraLegacyMode) {
                 return;
             }
+
             writeInt(1, inventoryTypeID);
         } else {
             windowTypeID = inventoryTypeID;
@@ -69,7 +72,7 @@ public class WrappedPacketOutOpenWindow extends WrappedPacket {
     }
 
     public Optional<String> getInventoryType() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             if (!legacyMode || ultraLegacyMode) {
                 return Optional.empty();
             }
@@ -81,7 +84,7 @@ public class WrappedPacketOutOpenWindow extends WrappedPacket {
     }
 
     public String getWindowTitle() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             if (ultraLegacyMode) {
                 return readString(0);
             }
@@ -91,11 +94,11 @@ public class WrappedPacketOutOpenWindow extends WrappedPacket {
     }
 
     public void setWindowTitle(String title) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             if (ultraLegacyMode) {
                 writeString(0, title);
             } else {
-                writeIChatBaseComponent(0, title);
+                writeIChatBaseComponent(title);
             }
         }
     }

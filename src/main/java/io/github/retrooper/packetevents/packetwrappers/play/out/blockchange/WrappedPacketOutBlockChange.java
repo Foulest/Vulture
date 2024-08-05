@@ -4,9 +4,11 @@ import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
+import io.github.retrooper.packetevents.packetwrappers.api.WrapperPacketReader;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
+import lombok.ToString;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -15,26 +17,27 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+@ToString
 public class WrappedPacketOutBlockChange extends WrappedPacket implements SendableWrapper {
 
     private static Constructor<?> packetConstructor;
-    private static Method getNMSBlockMethodCache = null;
-    private static Method getNMSWorldTypeMethodCache = null;
+    private static Method getNMSBlockMethodCache;
+    private static Method getNMSWorldTypeMethodCache;
 
     private Vector3i blockPos;
     private World world;
     private Material blockType;
 
-    public WrappedPacketOutBlockChange(NMSPacket packet) {
+    private WrappedPacketOutBlockChange(NMSPacket packet) {
         super(packet);
     }
 
-    public WrappedPacketOutBlockChange(World world, Vector3i blockPos) {
+    private WrappedPacketOutBlockChange(World world, Vector3i blockPos) {
         this.blockPos = blockPos;
         this.world = world;
     }
 
-    public WrappedPacketOutBlockChange(Location location) {
+    private WrappedPacketOutBlockChange(Location location) {
         blockPos = new Vector3i(location);
         world = location.getWorld();
     }
@@ -72,24 +75,24 @@ public class WrappedPacketOutBlockChange extends WrappedPacket implements Sendab
         }
     }
 
-    public Vector3i getBlockPosition() {
-        if (packet != null) {
+    private Vector3i getBlockPosition() {
+        if (nmsPacket != null) {
             return readBlockPosition(0);
         } else {
             return blockPos;
         }
     }
 
-    public void setBlockPosition(Vector3i blockPos) {
-        if (packet != null) {
+    private void setBlockPosition(Vector3i blockPos) {
+        if (nmsPacket != null) {
             writeBlockPosition(0, blockPos);
         } else {
             this.blockPos = blockPos;
         }
     }
 
-    public Material getBlockType() {
-        if (packet != null) {
+    private Material getBlockType() {
+        if (nmsPacket != null) {
             Object nmsBlock = null;
             Object iBlockDataObj = readObject(0, NMSUtils.iBlockDataClass);
 
@@ -104,10 +107,10 @@ public class WrappedPacketOutBlockChange extends WrappedPacket implements Sendab
         }
     }
 
-    public void setBlockType(Material blockType) {
-        if (packet != null) {
+    private void setBlockType(Material blockType) {
+        if (nmsPacket != null) {
             Object nmsBlock = NMSUtils.getNMSBlockFromMaterial(blockType);
-            WrappedPacket nmsBlockWrapper = new WrappedPacket(new NMSPacket(nmsBlock), NMSUtils.blockClass);
+            WrapperPacketReader nmsBlockWrapper = new WrappedPacket(new NMSPacket(nmsBlock), NMSUtils.blockClass);
             Object iBlockData = nmsBlockWrapper.readObject(0, NMSUtils.iBlockDataClass);
             write(NMSUtils.iBlockDataClass, 0, iBlockData);
         } else {
@@ -116,7 +119,7 @@ public class WrappedPacketOutBlockChange extends WrappedPacket implements Sendab
     }
 
     @Override
-    public Object asNMSPacket() throws Exception {
+    public Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
         Object packetPlayOutBlockChangeInstance = packetConstructor.newInstance();
         WrappedPacketOutBlockChange blockChange = new WrappedPacketOutBlockChange(new NMSPacket(packetPlayOutBlockChangeInstance));
         Vector3i blockPosition = getBlockPosition();

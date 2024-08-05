@@ -27,6 +27,7 @@ import org.bukkit.entity.Player;
  * @see PacketPlayReceiveEvent
  * @since 1.6.9
  */
+@FunctionalInterface
 public interface PlayerEvent {
 
     /**

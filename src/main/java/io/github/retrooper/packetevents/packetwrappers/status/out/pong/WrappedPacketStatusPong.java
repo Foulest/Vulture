@@ -5,9 +5,12 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import lombok.AllArgsConstructor;
+import lombok.ToString;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
+@ToString
 @AllArgsConstructor
 public class WrappedPacketStatusPong extends WrappedPacket implements SendableWrapper {
 
@@ -27,8 +30,8 @@ public class WrappedPacketStatusPong extends WrappedPacket implements SendableWr
         }
     }
 
-    public long getPayload() {
-        if (packet != null) {
+    private long getPayload() {
+        if (nmsPacket != null) {
             return readLong(0);
         } else {
             return payload;
@@ -36,7 +39,7 @@ public class WrappedPacketStatusPong extends WrappedPacket implements SendableWr
     }
 
     public void setPayload(long payload) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeLong(0, payload);
         } else {
             this.payload = payload;
@@ -44,7 +47,7 @@ public class WrappedPacketStatusPong extends WrappedPacket implements SendableWr
     }
 
     @Override
-    public Object asNMSPacket() throws Exception {
+    public Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
         return packetConstructor.newInstance(getPayload());
     }
 }

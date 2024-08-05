@@ -37,10 +37,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 
 /**
@@ -52,7 +49,7 @@ import java.util.logging.Level;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class Settings {
+public final class Settings {
 
     // File settings
     public static File file;
@@ -178,6 +175,7 @@ public class Settings {
     /**
      * Initializes the configuration file and loads defaults.
      */
+    @SuppressWarnings("OverlyBroadCatchBlock")
     private static void loadConfigFile() {
         try {
             // First, attempt to load the default configuration as a stream to check if it exists in the plugin JAR
@@ -226,7 +224,7 @@ public class Settings {
     /**
      * Loads configuration values into the relevant static fields.
      */
-    public static void loadConfigValues() {
+    private static void loadConfigValues() {
         // General settings
         prefix = config.getString("vulture.general.prefix");
         banMessage = config.getStringList("vulture.general.banMessage");
@@ -457,7 +455,7 @@ public class Settings {
         CheckInfo checkInfo = check.getAnnotation(CheckInfo.class);
         String name = checkInfo.name().replace(" ", "")
                 .replace("(", ".")
-                .replace(")", "").toLowerCase().trim();
+                .replace(")", "").toLowerCase(Locale.ROOT).trim();
 
         if (name.contains(".")) {
             char[] charArray = name.toCharArray();
@@ -476,8 +474,8 @@ public class Settings {
      * @param newValue   The new value.
      */
     @SuppressWarnings("unchecked")
-    public static void changeAnnotationValue(Annotation annotation,
-                                             String key, Object newValue) {
+    private static void changeAnnotationValue(Annotation annotation,
+                                              String key, Object newValue) {
         Object handler = Proxy.getInvocationHandler(annotation);
         Field field;
 

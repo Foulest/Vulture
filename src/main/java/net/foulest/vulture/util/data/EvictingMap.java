@@ -20,8 +20,12 @@ package net.foulest.vulture.util.data;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.*;
 
 /**
@@ -32,9 +36,11 @@ import java.util.*;
  */
 @Getter
 @Setter
+@ToString
 @AllArgsConstructor
 public final class EvictingMap<K, V> extends HashMap<K, V> {
 
+    private static final long serialVersionUID = -4377528753798215948L;
     private final int mapSize;
     private final Deque<K> storedKeys = new LinkedList<>();
 
@@ -99,14 +105,25 @@ public final class EvictingMap<K, V> extends HashMap<K, V> {
             return false;
         }
 
-        EvictingMap<?, ?> that = (EvictingMap<?, ?>) o;
-        return mapSize == that.mapSize
-                && storedKeys.equals(that.storedKeys)
-                && super.equals(that);
+        EvictingMap<?, ?> map = (EvictingMap<?, ?>) o;
+        return mapSize == map.mapSize && storedKeys.equals(map.storedKeys) && super.equals(map);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), mapSize, storedKeys);
+    }
+
+    private void readObject(ObjectInputStream in) throws ClassNotFoundException, NotSerializableException {
+        throw new NotSerializableException("net.foulest.vulture.util.data.EvictingMap");
+    }
+
+    private void writeObject(ObjectOutputStream out) throws NotSerializableException {
+        throw new NotSerializableException("net.foulest.vulture.util.data.EvictingMap");
+    }
+
+    @Override
+    public EvictingMap<K, V> clone() throws AssertionError {
+        throw new AssertionError();
     }
 }

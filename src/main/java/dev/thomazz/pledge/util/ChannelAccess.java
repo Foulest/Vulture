@@ -34,7 +34,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @UtilityClass
-public final class ChannelAccess {
+public class ChannelAccess {
 
     private final Class<?> NETWORK_MANAGER_CLASS = MinecraftReflection.getMinecraftClass(
             "network.NetworkManager",
@@ -58,8 +58,8 @@ public final class ChannelAccess {
             UUID playerId = player.getUniqueId();
             Object handle = player.getClass().getDeclaredMethod("getHandle").invoke(player);
 
-            Field playerConnectionField = ReflectionUtil.getFieldByType(handle.getClass(), ChannelAccess.PLAYER_CONNECTION_CLASS);
-            Field channelField = ReflectionUtil.getFieldByType(ChannelAccess.NETWORK_MANAGER_CLASS, Channel.class);
+            Field playerConnectionField = ReflectionUtil.getFieldByType(handle.getClass(), PLAYER_CONNECTION_CLASS);
+            Field channelField = ReflectionUtil.getFieldByType(NETWORK_MANAGER_CLASS, Channel.class);
 
             // Try the easy way first
             Object playerConnection = playerConnectionField.get(handle);
@@ -73,7 +73,7 @@ public final class ChannelAccess {
             }
 
             // Try to match all network managers after from game profile
-            List<Object> networkManagers = ChannelAccess.getNetworkManagers();
+            List<Object> networkManagers = getNetworkManagers();
 
             for (Object networkManager : networkManagers) {
                 Object packetListener = ReflectionUtil.getNonNullFieldByType(networkManager, PACKET_LISTENER_CLASS);

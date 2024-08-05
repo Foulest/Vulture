@@ -34,6 +34,7 @@ import io.github.retrooper.packetevents.packetwrappers.play.out.resourcepacksend
 import io.github.retrooper.packetevents.packetwrappers.play.out.spawnentityliving.WrappedPacketOutSpawnEntityLiving;
 import io.github.retrooper.packetevents.packetwrappers.play.out.transaction.WrappedPacketOutTransaction;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
+import lombok.NoArgsConstructor;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.data.PlayerData;
@@ -41,6 +42,7 @@ import net.foulest.vulture.data.PlayerDataManager;
 import net.foulest.vulture.ping.PingTask;
 import net.foulest.vulture.processor.Processor;
 import net.foulest.vulture.util.BlockUtil;
+import net.foulest.vulture.util.MessageUtil;
 import net.foulest.vulture.util.data.CustomLocation;
 import net.foulest.vulture.util.data.Pair;
 import org.bukkit.Location;
@@ -54,9 +56,6 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-
-import static net.foulest.vulture.util.MessageUtil.debug;
 
 /**
  * Handles all outgoing packets before they are encoded.
@@ -64,6 +63,7 @@ import static net.foulest.vulture.util.MessageUtil.debug;
  * @author Foulest
  * @project Vulture
  */
+@NoArgsConstructor
 public class PacketSendProcessor extends Processor {
 
     /**
@@ -138,7 +138,7 @@ public class PacketSendProcessor extends Processor {
                     playerData.setLastVelocityXZ(playerData.getVelocityXZ());
 
                     playerData.setVelocityY(new Pair<>(totalTicks, velocity.getY()));
-                    playerData.setVelocityXZ(new Pair<>(totalTicks, Math.hypot(velocity.getX(), velocity.getZ())));
+                    playerData.setVelocityXZ(new Pair<>(totalTicks, StrictMath.hypot(velocity.getX(), velocity.getZ())));
 
                     playerData.setVelocityTicks(totalTicks);
                     playerData.setTimestamp(ActionType.VELOCITY_GIVEN);
@@ -152,13 +152,13 @@ public class PacketSendProcessor extends Processor {
 
                 if (scheme == null) {
                     event.setCancelled(true);
-                    debug("ResourcePackSend packet cancelled; contained null URI scheme");
+                    MessageUtil.debug("ResourcePackSend packet cancelled; contained null URI scheme");
                     break;
                 }
 
                 if (!scheme.equals("https") && !scheme.equals("http") && !scheme.equals("level")) {
                     event.setCancelled(true);
-                    debug("ResourcePackSend packet cancelled; contained invalid URI scheme");
+                    MessageUtil.debug("ResourcePackSend packet cancelled; contained invalid URI scheme");
                     break;
                 }
 
@@ -166,13 +166,13 @@ public class PacketSendProcessor extends Processor {
                     url = URLDecoder.decode(url.substring("level://".length()), StandardCharsets.UTF_8.toString());
                 } catch (UnsupportedEncodingException ignored) {
                     event.setCancelled(true);
-                    debug("ResourcePackSend packet cancelled; could not decode URL");
+                    MessageUtil.debug("ResourcePackSend packet cancelled; could not decode URL");
                     break;
                 }
 
                 if (scheme.equals("level") && (url.contains("..") || !url.endsWith("/resources.zip"))) {
                     event.setCancelled(true);
-                    debug("ResourcePackSend packet cancelled; contained invalid level URL");
+                    MessageUtil.debug("ResourcePackSend packet cancelled; contained invalid level URL");
                     break;
                 }
                 break;
@@ -301,14 +301,14 @@ public class PacketSendProcessor extends Processor {
      * @param playerData The player data.
      * @param event      The packet event.
      */
-    private void handlePacketChecks(@NotNull PlayerData playerData,
-                                    @NotNull CancellableNMSPacketEvent event) {
+    private static void handlePacketChecks(@NotNull PlayerData playerData,
+                                           @NotNull CancellableNMSPacketEvent event) {
         long timestamp = System.currentTimeMillis();
         NMSPacket nmsPacket = event.getNMSPacket();
 
         // Create a copy of the checks list to avoid ConcurrentModificationException
         if (playerData.getChecks() != null) {
-            List<Check> checksCopy = new ArrayList<>(playerData.getChecks());
+            Iterable<Check> checksCopy = new ArrayList<>(playerData.getChecks());
 
             for (Check check : checksCopy) {
                 if (check.getCheckInfo().acceptsServerPackets()) {

@@ -17,6 +17,7 @@
  */
 package net.foulest.vulture.util.data;
 
+@FunctionalInterface
 public interface IStringSerializable {
 
     String getName();

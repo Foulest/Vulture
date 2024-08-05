@@ -17,13 +17,15 @@
  */
 package io.github.retrooper.packetevents.utils.server;
 
-import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.WrapperPacketReader;
 import io.github.retrooper.packetevents.utils.boundingbox.BoundingBox;
 import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.npc.NPCManager;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
@@ -33,6 +35,8 @@ import org.spigotmc.SpigotConfig;
 import java.util.List;
 import java.util.Map;
 
+@ToString
+@NoArgsConstructor
 public final class ServerUtils {
 
     private static Class<?> geyserClass;
@@ -47,7 +51,7 @@ public final class ServerUtils {
      *
      * @return Get Recent TPS
      */
-    public double[] getRecentTPS() {
+    private static double[] getRecentTPS() {
         return NMSUtils.recentTPS();
     }
 
@@ -56,17 +60,8 @@ public final class ServerUtils {
      *
      * @return Get Current TPS
      */
-    public double getTPS() {
+    public static double getTPS() {
         return getRecentTPS()[0];
-    }
-
-    /**
-     * Get the operating system of the local machine
-     *
-     * @return Get Operating System
-     */
-    public SystemOS getOS() {
-        return SystemOS.getOS();
     }
 
     /**
@@ -78,14 +73,14 @@ public final class ServerUtils {
         return npcManager;
     }
 
-    public boolean isBungeeCordEnabled() {
+    public static boolean isBungeeCordEnabled() {
         return SpigotConfig.bungee;
     }
 
-    public @NotNull BoundingBox getEntityBoundingBox(Entity entity) {
+    public static @NotNull BoundingBox getEntityBoundingBox(Entity entity) {
         Object nmsEntity = NMSUtils.getNMSEntity(entity);
         Object aabb = NMSUtils.getNMSAxisAlignedBoundingBox(nmsEntity);
-        WrappedPacket wrappedBoundingBox = new WrappedPacket(new NMSPacket(aabb));
+        WrapperPacketReader wrappedBoundingBox = new WrappedPacket(new NMSPacket(aabb));
         double minX = wrappedBoundingBox.readDouble(0);
         double minY = wrappedBoundingBox.readDouble(1);
         double minZ = wrappedBoundingBox.readDouble(2);
@@ -96,7 +91,7 @@ public final class ServerUtils {
     }
 
     private @Nullable Entity getEntityByIdIterateWorld(@NotNull World world, int entityID) {
-        for (Entity entity : PacketEvents.get().getServerUtils().getEntityList(world)) {
+        for (Entity entity : ServerUtils.getEntityList(world)) {
             if (entity.getEntityId() == entityID) {
                 entityCache.putIfAbsent(entity.getEntityId(), entity);
                 return entity;
@@ -118,7 +113,7 @@ public final class ServerUtils {
         return getEntityById(null, entityID);
     }
 
-    public List<Entity> getEntityList(@NotNull World world) {
+    private static List<Entity> getEntityList(@NotNull World world) {
         return world.getEntities();
     }
 

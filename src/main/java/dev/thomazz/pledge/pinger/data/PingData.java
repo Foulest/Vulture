@@ -24,6 +24,7 @@ package dev.thomazz.pledge.pinger.data;
 
 import dev.thomazz.pledge.pinger.ClientPingerImpl;
 import lombok.Getter;
+import lombok.ToString;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,6 +33,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Getter
+@ToString
 public class PingData {
 
     private final Queue<Ping> expectingIds = new ConcurrentLinkedQueue<>();

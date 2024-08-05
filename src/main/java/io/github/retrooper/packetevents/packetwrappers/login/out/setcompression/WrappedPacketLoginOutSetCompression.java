@@ -22,9 +22,12 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import lombok.AllArgsConstructor;
+import lombok.ToString;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
+@ToString
 @AllArgsConstructor
 public class WrappedPacketLoginOutSetCompression extends WrappedPacket implements SendableWrapper {
 
@@ -49,17 +52,17 @@ public class WrappedPacketLoginOutSetCompression extends WrappedPacket implement
     /**
      * Maximum size of a packet before it can be compressed.
      *
-     * @return threshold Threshold
+     * @return threshold Packet compression threshold
      */
-    public int getThreshold() {
-        if (packet != null) {
+    private int getThreshold() {
+        if (nmsPacket != null) {
             return readInt(0);
         }
         return threshold;
     }
 
     public void setThreshold(int threshold) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeInt(0, threshold);
         } else {
             this.threshold = threshold;
@@ -67,7 +70,7 @@ public class WrappedPacketLoginOutSetCompression extends WrappedPacket implement
     }
 
     @Override
-    public Object asNMSPacket() throws Exception {
+    public Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
         return constructor.newInstance(getThreshold());
     }
 }

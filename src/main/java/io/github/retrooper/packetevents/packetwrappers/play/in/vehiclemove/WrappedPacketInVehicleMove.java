@@ -5,9 +5,9 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import org.jetbrains.annotations.NotNull;
 
-public class WrappedPacketInVehicleMove extends WrappedPacket {
+class WrappedPacketInVehicleMove extends WrappedPacket {
 
-    public WrappedPacketInVehicleMove(NMSPacket packet) {
+    WrappedPacketInVehicleMove(NMSPacket packet) {
         super(packet);
     }
 

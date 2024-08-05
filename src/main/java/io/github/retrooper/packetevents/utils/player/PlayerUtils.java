@@ -24,6 +24,8 @@ import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.geyser.GeyserUtils;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,6 +40,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author retrooper
  * @since 1.6.8
  */
+@ToString
+@NoArgsConstructor
 public final class PlayerUtils {
 
     public final Map<UUID, Long> loginTime = new ConcurrentHashMap<>();
@@ -160,7 +164,7 @@ public final class PlayerUtils {
                 try {
                     version = ClientVersion.getClientVersion(VersionLookupUtils.getProtocolVersion(player));
                     clientVersionsMap.put(player.getAddress(), version);
-                } catch (Exception ex) {
+                } catch (RuntimeException ex) {
                     // Try ask the dependency again the next time, for now it is temporarily unresolved...
                     // Temporary unresolved means there is still hope, an exception was thrown on the dependency's end.
                     return ClientVersion.TEMP_UNRESOLVED;
@@ -183,7 +187,7 @@ public final class PlayerUtils {
     public void writePacket(Player player, SendableWrapper wrapper) {
         try {
             Object nmsPacket = wrapper.asNMSPacket();
-            PacketEvents.get().getInjector().writePacket(getChannel(player), nmsPacket);
+            PacketEvents.getInstance().getInjector().writePacket(getChannel(player), nmsPacket);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -191,8 +195,8 @@ public final class PlayerUtils {
 
     public void flushPackets(Player player) {
         try {
-            PacketEvents.get().getInjector().flushPackets(getChannel(player));
-        } catch (Exception ex) {
+            PacketEvents.getInstance().getInjector().flushPackets(getChannel(player));
+        } catch (RuntimeException ex) {
             ex.printStackTrace();
         }
     }
@@ -206,7 +210,7 @@ public final class PlayerUtils {
     public void sendPacket(Player player, SendableWrapper wrapper) {
         try {
             Object nmsPacket = wrapper.asNMSPacket();
-            PacketEvents.get().getInjector().sendPacket(getChannel(player), nmsPacket);
+            PacketEvents.getInstance().getInjector().sendPacket(getChannel(player), nmsPacket);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -219,34 +223,34 @@ public final class PlayerUtils {
      * @param packet Client-bound raw NMS packet.
      */
     public void sendNMSPacket(Player player, Object packet) {
-        PacketEvents.get().getInjector().sendPacket(getChannel(player), packet);
+        PacketEvents.getInstance().getInjector().sendPacket(getChannel(player), packet);
     }
 
-    public @NotNull WrappedGameProfile getGameProfile(@NotNull Player player) {
+    public static @NotNull WrappedGameProfile getGameProfile(@NotNull Player player) {
         Object gameProfile = GameProfileUtil.getGameProfile(player.getUniqueId(), player.getName());
         return GameProfileUtil.getWrappedGameProfile(gameProfile);
     }
 
-    public boolean isGeyserPlayer(Player player) {
-        if (!PacketEvents.get().getServerUtils().isGeyserAvailable()) {
+    public static boolean isGeyserPlayer(Player player) {
+        if (!PacketEvents.getInstance().getServerUtils().isGeyserAvailable()) {
             return false;
         }
         return GeyserUtils.isGeyserPlayer(player.getUniqueId());
     }
 
-    public boolean isGeyserPlayer(UUID uuid) {
-        if (!PacketEvents.get().getServerUtils().isGeyserAvailable()) {
+    public static boolean isGeyserPlayer(UUID uuid) {
+        if (!PacketEvents.getInstance().getServerUtils().isGeyserAvailable()) {
             return false;
         }
         return GeyserUtils.isGeyserPlayer(uuid);
     }
 
-    public void changeSkinProperty(Player player, Skin skin) {
+    public static void changeSkinProperty(Player player, Skin skin) {
         Object gameProfile = NMSUtils.getGameProfile(player);
         GameProfileUtil.setGameProfileSkin(gameProfile, skin);
     }
 
-    public @NotNull Skin getSkin(Player player) {
+    public static @NotNull Skin getSkin(Player player) {
         Object gameProfile = NMSUtils.getGameProfile(player);
         return GameProfileUtil.getGameProfileSkin(gameProfile);
     }

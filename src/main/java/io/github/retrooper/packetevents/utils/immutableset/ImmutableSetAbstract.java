@@ -17,6 +17,9 @@
  */
 package io.github.retrooper.packetevents.utils.immutableset;
 
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
 abstract class ImmutableSetAbstract<T> {
 
     public abstract boolean contains(T element);

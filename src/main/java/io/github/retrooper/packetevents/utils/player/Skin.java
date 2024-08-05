@@ -20,9 +20,11 @@ package io.github.retrooper.packetevents.utils.player;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Setter
 @Getter
+@ToString
 @AllArgsConstructor
 public class Skin {
 

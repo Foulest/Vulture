@@ -21,11 +21,13 @@ import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPac
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import net.foulest.vulture.data.PlayerData;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
 @Setter
+@ToString
 @AllArgsConstructor
 public class RotationEvent {
 

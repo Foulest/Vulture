@@ -8,9 +8,12 @@ import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import lombok.AllArgsConstructor;
+import lombok.ToString;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
+@ToString
 @AllArgsConstructor
 public class WrappedPacketOutTitle extends WrappedPacket implements SendableWrapper {
 
@@ -39,8 +42,8 @@ public class WrappedPacketOutTitle extends WrappedPacket implements SendableWrap
         }
     }
 
-    public TitleAction getAction() {
-        if (packet != null) {
+    private TitleAction getAction() {
+        if (nmsPacket != null) {
             Enum<?> enumConst = readEnumConstant(0, enumTitleActionClass);
             return TitleAction.values()[enumConst.ordinal()];
         } else {
@@ -49,7 +52,7 @@ public class WrappedPacketOutTitle extends WrappedPacket implements SendableWrap
     }
 
     public void setAction(TitleAction action) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             Enum<?> enumConst = EnumUtil.valueByIndex(enumTitleActionClass.asSubclass(Enum.class), action.ordinal());
             writeEnumConstant(0, enumConst);
         } else {
@@ -57,8 +60,8 @@ public class WrappedPacketOutTitle extends WrappedPacket implements SendableWrap
         }
     }
 
-    public String getText() {
-        if (packet != null) {
+    private String getText() {
+        if (nmsPacket != null) {
             return readIChatBaseComponent(0);
         } else {
             return text;
@@ -66,15 +69,15 @@ public class WrappedPacketOutTitle extends WrappedPacket implements SendableWrap
     }
 
     public void setText(String text) {
-        if (packet != null) {
-            writeIChatBaseComponent(0, text);
+        if (nmsPacket != null) {
+            writeIChatBaseComponent(text);
         } else {
             this.text = text;
         }
     }
 
-    public int getFadeInTicks() {
-        if (packet != null) {
+    private int getFadeInTicks() {
+        if (nmsPacket != null) {
             return readInt(0);
         } else {
             return fadeInTicks;
@@ -82,14 +85,14 @@ public class WrappedPacketOutTitle extends WrappedPacket implements SendableWrap
     }
 
     public void setFadeInTicks(int fadeInTicks) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeInt(0, fadeInTicks);
         }
         this.fadeInTicks = fadeInTicks;
     }
 
-    public int getStayTicks() {
-        if (packet != null) {
+    private int getStayTicks() {
+        if (nmsPacket != null) {
             return readInt(1);
         } else {
             return stayTicks;
@@ -97,15 +100,15 @@ public class WrappedPacketOutTitle extends WrappedPacket implements SendableWrap
     }
 
     public void setStayTicks(int stayTicks) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeInt(1, stayTicks);
         } else {
             this.stayTicks = stayTicks;
         }
     }
 
-    public int getFadeOutTicks() {
-        if (packet != null) {
+    private int getFadeOutTicks() {
+        if (nmsPacket != null) {
             return readInt(2);
         } else {
             return fadeOutTicks;
@@ -113,7 +116,7 @@ public class WrappedPacketOutTitle extends WrappedPacket implements SendableWrap
     }
 
     public void setFadeOutTicks(int fadeOutTicks) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeInt(2, fadeOutTicks);
         } else {
             this.fadeOutTicks = fadeOutTicks;
@@ -121,7 +124,7 @@ public class WrappedPacketOutTitle extends WrappedPacket implements SendableWrap
     }
 
     @Override
-    public Object asNMSPacket() throws Exception {
+    public Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
         Enum<?> enumConst = EnumUtil.valueByIndex(enumTitleActionClass.asSubclass(Enum.class), getAction().ordinal());
         return packetConstructor.newInstance(enumConst, NMSUtils.generateIChatBaseComponent(getText()),
                 getFadeInTicks(), getStayTicks(), getFadeOutTicks());

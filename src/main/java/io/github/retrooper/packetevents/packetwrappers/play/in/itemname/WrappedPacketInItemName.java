@@ -3,9 +3,9 @@ package io.github.retrooper.packetevents.packetwrappers.play.in.itemname;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
-public class WrappedPacketInItemName extends WrappedPacket {
+class WrappedPacketInItemName extends WrappedPacket {
 
-    public WrappedPacketInItemName(NMSPacket packet) {
+    WrappedPacketInItemName(NMSPacket packet) {
         super(packet);
     }
 

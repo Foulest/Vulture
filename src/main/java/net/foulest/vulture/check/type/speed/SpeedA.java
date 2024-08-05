@@ -18,6 +18,7 @@
 package net.foulest.vulture.check.type.speed;
 
 import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
+import lombok.ToString;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
@@ -29,6 +30,7 @@ import org.bukkit.GameMode;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 
+@ToString
 @CheckInfo(name = "Speed (A)", type = CheckType.SPEED)
 public class SpeedA extends Check {
 
@@ -46,8 +48,8 @@ public class SpeedA extends Check {
         // Checks the player for exemptions.
         if (player.isFlying()
                 || player.getAllowFlight()
-                || player.getGameMode().equals(GameMode.CREATIVE)
-                || player.getGameMode().equals(GameMode.SPECTATOR)
+                || player.getGameMode() == GameMode.CREATIVE
+                || player.getGameMode() == GameMode.SPECTATOR
                 || playerData.getTicksSince(ActionType.STEER_VEHICLE) < 10
                 || player.isInsideVehicle()
                 || event.isTeleport(playerData)) {
@@ -96,7 +98,9 @@ public class SpeedA extends Check {
 
         if (deltaXZ > maxSpeed) {
             if (inWeb || onSoulSand) {
-                if (++terrainBuffer > 2) {
+                ++terrainBuffer;
+
+                if (terrainBuffer > 2) {
                     flag(true, "(Terrain)"
                             + " deltaXZ=" + deltaXZ
                             + " maxSpeed=" + maxSpeed

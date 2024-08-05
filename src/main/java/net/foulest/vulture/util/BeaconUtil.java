@@ -28,7 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class BeaconUtil {
+public final class BeaconUtil {
 
     private static final List<Material> beaconTierBlocks = Arrays.asList(
             Material.IRON_BLOCK, Material.GOLD_BLOCK, Material.DIAMOND_BLOCK, Material.EMERALD_BLOCK);

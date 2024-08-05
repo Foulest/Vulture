@@ -28,9 +28,11 @@ import dev.thomazz.pledge.packet.PingPacketProvider;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+@ToString
 @RequiredArgsConstructor
 public class NetworkPongListener extends ChannelInboundHandlerAdapter {
 
@@ -38,6 +40,7 @@ public class NetworkPongListener extends ChannelInboundHandlerAdapter {
     private final Player player;
 
     @Override
+    @SuppressWarnings("ProhibitedExceptionDeclared")
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         PingPacketProvider packetProvider = clientPing.getPacketProvider();
 

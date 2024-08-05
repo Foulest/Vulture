@@ -34,7 +34,7 @@ import org.bukkit.event.Listener;
 @Setter
 public class Processor extends PacketListenerAbstract implements Listener {
 
-    public Processor() {
+    protected Processor() {
         // Register the processor as a packet listener and bukkit event listener.
         Vulture.instance.getPacketEvents().getEventManager().registerListener(this);
         Bukkit.getPluginManager().registerEvents(this, Vulture.instance);

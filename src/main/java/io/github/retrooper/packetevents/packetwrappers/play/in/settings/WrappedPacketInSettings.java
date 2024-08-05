@@ -5,9 +5,10 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.Set;
 
 public class WrappedPacketInSettings extends WrappedPacket {
@@ -67,16 +68,16 @@ public class WrappedPacketInSettings extends WrappedPacket {
         writeBoolean(0, chatColors);
     }
 
-    public byte getDisplaySkinPartsMask() {
+    private byte getDisplaySkinPartsMask() {
         return (byte) readInt(1);
     }
 
-    public void setDisplaySkinPartsMask(byte mask) {
+    private void setDisplaySkinPartsMask(byte mask) {
         writeInt(1, mask);
     }
 
     public Set<DisplayedSkinPart> getDisplayedSkinParts() {
-        Set<DisplayedSkinPart> displayedSkinParts = new HashSet<>();
+        Set<DisplayedSkinPart> displayedSkinParts = EnumSet.noneOf(DisplayedSkinPart.class);
         byte mask = getDisplaySkinPartsMask();
 
         for (DisplayedSkinPart part : DisplayedSkinPart.values()) {
@@ -87,7 +88,7 @@ public class WrappedPacketInSettings extends WrappedPacket {
         return displayedSkinParts;
     }
 
-    public void setDisplayedSkinParts(@NotNull Set<DisplayedSkinPart> displayedSkinParts) {
+    public void setDisplayedSkinParts(@NotNull Iterable<DisplayedSkinPart> displayedSkinParts) {
         byte mask = 0;
 
         for (DisplayedSkinPart part : displayedSkinParts) {
@@ -103,6 +104,7 @@ public class WrappedPacketInSettings extends WrappedPacket {
         HIDDEN
     }
 
+    @ToString
     public enum DisplayedSkinPart {
         CAPE(0x01),
         JACKET(0x02),

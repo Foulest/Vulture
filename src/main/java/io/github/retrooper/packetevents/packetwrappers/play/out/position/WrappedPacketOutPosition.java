@@ -7,12 +7,17 @@ import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
+@ToString
 public final class WrappedPacketOutPosition extends WrappedPacket implements SendableWrapper {
 
     private static Constructor<?> packetConstructor;
@@ -25,7 +30,7 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
 
     public WrappedPacketOutPosition(NMSPacket packet) {
         super(packet);
-        relativeFlags = new HashSet<>();
+        relativeFlags = EnumSet.noneOf(PlayerTeleportFlags.class);
     }
 
     public WrappedPacketOutPosition(double x, double y, double z, float yaw, float pitch,
@@ -66,8 +71,8 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
     }
 
     public void setRelativeFlagsMask(byte mask) {
-        if (packet != null) {
-            Set<Enum<?>> nmsRelativeFlags = new HashSet<>();
+        if (nmsPacket != null) {
+            Collection<Enum<?>> nmsRelativeFlags = new HashSet<>();
 
             for (PlayerTeleportFlags flag : PlayerTeleportFlags.values()) {
                 if ((mask & flag.maskFlag) == flag.maskFlag) {
@@ -87,23 +92,24 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
         }
     }
 
-    public Set<PlayerTeleportFlags> getRelativeFlags() {
-        if (packet != null) {
-            Set<PlayerTeleportFlags> relativeFlags = new HashSet<>();
+    @SuppressWarnings("unchecked")
+    private Set<PlayerTeleportFlags> getRelativeFlags() {
+        if (nmsPacket != null) {
+            Set<PlayerTeleportFlags> teleportFlags = EnumSet.noneOf(PlayerTeleportFlags.class);
             Set<Enum<?>> set = readObject(0, Set.class);
 
             for (Enum<?> e : set) {
-                relativeFlags.add(PlayerTeleportFlags.valueOf(e.name()));
+                teleportFlags.add(PlayerTeleportFlags.valueOf(e.name()));
             }
-            return relativeFlags;
+            return teleportFlags;
         } else {
             return relativeFlags;
         }
     }
 
     public void setRelativeFlags(Set<PlayerTeleportFlags> flags) {
-        if (packet != null) {
-            Set<Enum<?>> nmsRelativeFlags = new HashSet<>();
+        if (nmsPacket != null) {
+            Collection<Enum<?>> nmsRelativeFlags = new HashSet<>();
 
             for (PlayerTeleportFlags flag : flags) {
                 nmsRelativeFlags.add(EnumUtil.valueOf(enumPlayerTeleportFlagsClass.asSubclass(Enum.class), flag.name()));
@@ -116,7 +122,7 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
     }
 
     public Vector3d getPosition() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             double x = readDouble(0);
             double y = readDouble(1);
             double z = readDouble(2);
@@ -127,7 +133,7 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
     }
 
     public void setPosition(Vector3d position) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeDouble(0, position.x);
             writeDouble(1, position.y);
             writeDouble(2, position.z);
@@ -137,7 +143,7 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
     }
 
     public float getYaw() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             return readFloat(0);
         } else {
             return yaw;
@@ -145,7 +151,7 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
     }
 
     public void setYaw(float yaw) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeFloat(0, yaw);
         } else {
             this.yaw = yaw;
@@ -153,7 +159,7 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
     }
 
     public float getPitch() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             return readFloat(1);
         } else {
             return pitch;
@@ -161,7 +167,7 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
     }
 
     public void setPitch(float pitch) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeFloat(1, pitch);
         } else {
             this.pitch = pitch;
@@ -169,17 +175,18 @@ public final class WrappedPacketOutPosition extends WrappedPacket implements Sen
     }
 
     @Override
-    public @NotNull Object asNMSPacket() throws Exception {
+    public @NotNull Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
         Set<Object> nmsRelativeFlags = new HashSet<>();
 
         for (PlayerTeleportFlags flag : getRelativeFlags()) {
             nmsRelativeFlags.add(EnumUtil.valueOf(enumPlayerTeleportFlagsClass.asSubclass(Enum.class), flag.name()));
         }
 
-        Vector3d position = getPosition();
-        return packetConstructor.newInstance(position.x, position.y, position.z, getYaw(), getPitch(), nmsRelativeFlags);
+        Vector3d pos = getPosition();
+        return packetConstructor.newInstance(pos.x, pos.y, pos.z, getYaw(), getPitch(), nmsRelativeFlags);
     }
 
+    @ToString
     public enum PlayerTeleportFlags {
         X(0x01),
         Y(0x02),

@@ -46,26 +46,26 @@ import java.util.regex.Pattern;
 public class CommandListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onServerCommand(ServerCommandEvent event) {
+    public static void onServerCommand(ServerCommandEvent event) {
         processCommand(event, event.getCommand(), event.getSender());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPlayerCommand(PlayerCommandPreprocessEvent event) {
+    public static void onPlayerCommand(PlayerCommandPreprocessEvent event) {
         processCommand(event, event.getMessage(), event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onRemoteServerCommand(RemoteServerCommandEvent event) {
+    public static void onRemoteServerCommand(RemoteServerCommandEvent event) {
         processCommand(event, event.getCommand(), event.getSender());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onTabComplete(@NotNull PlayerChatTabCompleteEvent event) {
+    public static void onTabComplete(@NotNull PlayerChatTabCompleteEvent event) {
         if (!event.getPlayer().hasPermission("vulture.blocked.commands.bypass")) {
             event.getTabCompletions().removeIf(completion -> {
-                for (String string : Settings.blockedCommands) {
-                    if (Pattern.compile(string).matcher(completion).find()) {
+                for (String command : Settings.blockedCommands) {
+                    if (Pattern.compile(command).matcher(completion).find()) {
                         return true;
                     }
                 }
@@ -81,12 +81,10 @@ public class CommandListener implements Listener {
      * @param command The command.
      * @param sender  The sender.
      */
-    private void processCommand(Cancellable event,
-                                String command,
-                                CommandSender sender) {
+    private static void processCommand(Cancellable event, CharSequence command, CommandSender sender) {
         // Check if the command is blocked.
-        for (String string : Settings.blockedCommands) {
-            Pattern pattern = Pattern.compile(string);
+        for (String line : Settings.blockedCommands) {
+            Pattern pattern = Pattern.compile(line);
 
             // If the command matches the pattern, cancel it.
             if (pattern.matcher(command).find()) {

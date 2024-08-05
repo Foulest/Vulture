@@ -22,13 +22,15 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import org.jetbrains.annotations.Nullable;
 
 import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.security.spec.EncodedKeySpec;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
-public class WrappedPacketLoginOutEncryptionBegin extends WrappedPacket {
+class WrappedPacketLoginOutEncryptionBegin extends WrappedPacket {
 
-    public WrappedPacketLoginOutEncryptionBegin(NMSPacket packet) {
+    WrappedPacketLoginOutEncryptionBegin(NMSPacket packet) {
         super(packet);
     }
 
@@ -56,12 +58,12 @@ public class WrappedPacketLoginOutEncryptionBegin extends WrappedPacket {
         writeByteArray(0, verifyToken);
     }
 
-    private @Nullable PublicKey encrypt(byte[] bytes) {
+    private static @Nullable PublicKey encrypt(byte[] bytes) {
         try {
-            EncodedKeySpec encodedKeySpec = new X509EncodedKeySpec(bytes);
+            KeySpec encodedKeySpec = new X509EncodedKeySpec(bytes);
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             return keyFactory.generatePublic(encodedKeySpec);
-        } catch (Exception ex) {
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
             ex.printStackTrace();
             return null;
         }

@@ -27,11 +27,13 @@ package io.github.retrooper.packetevents.exceptions;
  */
 public class PacketEventsLoadFailureException extends RuntimeException {
 
-    public PacketEventsLoadFailureException(String message) {
+    private static final long serialVersionUID = -3740781881127764470L;
+
+    private PacketEventsLoadFailureException(String message) {
         super(message);
     }
 
-    public PacketEventsLoadFailureException(String message, Throwable cause) {
+    private PacketEventsLoadFailureException(String message, Throwable cause) {
         super(message, cause);
     }
 

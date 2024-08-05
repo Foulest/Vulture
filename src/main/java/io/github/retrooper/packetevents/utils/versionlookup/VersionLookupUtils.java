@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 import org.bukkit.entity.Player;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class VersionLookupUtils {
+public final class VersionLookupUtils {
 
     public static boolean isDependencyAvailable() {
         return ViaVersionLookupUtils.isAvailable();

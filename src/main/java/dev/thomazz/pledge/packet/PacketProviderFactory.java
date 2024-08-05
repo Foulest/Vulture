@@ -40,7 +40,7 @@ public class PacketProviderFactory {
     );
 
     public PingPacketProvider buildPingProvider() {
-        return PacketProviderFactory.suppliers.stream()
+        return suppliers.stream()
                 .map(PacketProviderFactory::buildProvider)
                 .flatMap(optional -> optional.map(Stream::of).orElseGet(Stream::empty))
                 .findFirst()
@@ -55,6 +55,7 @@ public class PacketProviderFactory {
         }
     }
 
+    @FunctionalInterface
     private interface ThrowingSupplier<T> {
 
         T get() throws Exception;

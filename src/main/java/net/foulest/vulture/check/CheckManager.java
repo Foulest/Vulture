@@ -54,7 +54,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class CheckManager {
+public final class CheckManager {
 
     /**
      * A {@link List} of registered check classes

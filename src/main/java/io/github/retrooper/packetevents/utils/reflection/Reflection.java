@@ -34,18 +34,19 @@ public final class Reflection {
 
     // FIELDS
 
-    public static Field @NotNull [] getFields(@NotNull Class<?> cls) {
+    private static Field @NotNull [] getFields(@NotNull Class<?> cls) {
         Field[] declaredFields = cls.getDeclaredFields();
-        for (Field f : declaredFields) {
-            f.setAccessible(true);
+
+        for (Field field : declaredFields) {
+            field.setAccessible(true);
         }
         return declaredFields;
     }
 
     public static @Nullable Field getField(Class<?> cls, String name) {
-        for (Field f : getFields(cls)) {
-            if (f.getName().equals(name)) {
-                return f;
+        for (Field field : getFields(cls)) {
+            if (field.getName().equals(name)) {
+                return field;
             }
         }
 
@@ -55,16 +56,20 @@ public final class Reflection {
         return null;
     }
 
-    public static Field getField(Class<?> cls, Class<?> dataType, int index) {
+    public static @Nullable Field getField(Class<?> cls, Class<?> dataType, int index) {
         if (dataType == null || cls == null) {
             return null;
         }
 
         int currentIndex = 0;
 
-        for (Field f : getFields(cls)) {
-            if (dataType.isAssignableFrom(f.getType()) && currentIndex++ == index) {
-                return f;
+        for (Field field : getFields(cls)) {
+            if (dataType.isAssignableFrom(field.getType())) {
+                if (currentIndex == index) {
+                    return field;
+                }
+
+                currentIndex++;
             }
         }
 
@@ -74,18 +79,21 @@ public final class Reflection {
         return null;
     }
 
-    public static Field getField(Class<?> cls, Class<?> dataType, int index, boolean ignoreStatic) {
+    public static @Nullable Field getField(Class<?> cls, Class<?> dataType, int index, boolean ignoreStatic) {
         if (dataType == null || cls == null) {
             return null;
         }
 
         int currentIndex = 0;
 
-        for (Field f : getFields(cls)) {
-            if (dataType.isAssignableFrom(f.getType())
-                    && (!ignoreStatic || !Modifier.isStatic(f.getModifiers()))
-                    && currentIndex++ == index) {
-                return f;
+        for (Field field : getFields(cls)) {
+            if (dataType.isAssignableFrom(field.getType())
+                    && (!ignoreStatic || !Modifier.isStatic(field.getModifiers()))) {
+                if (currentIndex == index) {
+                    return field;
+                }
+
+                currentIndex++;
             }
         }
 
@@ -98,7 +106,7 @@ public final class Reflection {
     public static @Nullable Field getField(Class<?> cls, int index) {
         try {
             return getFields(cls)[index];
-        } catch (Exception ex) {
+        } catch (RuntimeException ex) {
             if (cls.getSuperclass() != null) {
                 return getFields(cls.getSuperclass())[index];
             }
@@ -111,10 +119,11 @@ public final class Reflection {
     public static @NotNull List<Method> getMethods(@NotNull Class<?> cls, String name, Class<?>... params) {
         List<Method> methods = new ArrayList<>();
 
-        for (Method m : cls.getDeclaredMethods()) {
-            if ((params == null || Arrays.equals(m.getParameterTypes(), params)) && name.equals(m.getName())) {
-                m.setAccessible(true);
-                methods.add(m);
+        for (Method method : cls.getDeclaredMethods()) {
+            if ((params == null || Arrays.equals(method.getParameterTypes(), params))
+                    && name.equals(method.getName())) {
+                method.setAccessible(true);
+                methods.add(method);
             }
         }
         return methods;
@@ -123,10 +132,14 @@ public final class Reflection {
     public static @Nullable Method getMethod(@NotNull Class<?> cls, int index, Class<?>... params) {
         int currentIndex = 0;
 
-        for (Method m : cls.getDeclaredMethods()) {
-            if ((params == null || Arrays.equals(m.getParameterTypes(), params)) && index == currentIndex++) {
-                m.setAccessible(true);
-                return m;
+        for (Method method : cls.getDeclaredMethods()) {
+            if ((params == null || Arrays.equals(method.getParameterTypes(), params))) {
+                if (index == currentIndex) {
+                    method.setAccessible(true);
+                    return method;
+                }
+
+                currentIndex++;
             }
         }
 
@@ -136,15 +149,18 @@ public final class Reflection {
         return null;
     }
 
-    public static @Nullable Method getMethod(@NotNull Class<?> cls, Class<?> returning, int index, Class<?>... params) {
+    private static @Nullable Method getMethod(@NotNull Class<?> cls, Class<?> returning, int index, Class<?>... params) {
         int currentIndex = 0;
 
-        for (Method m : cls.getDeclaredMethods()) {
-            if (Arrays.equals(m.getParameterTypes(), params)
-                    && (returning == null || m.getReturnType().equals(returning))
-                    && index == currentIndex++) {
-                m.setAccessible(true);
-                return m;
+        for (Method method : cls.getDeclaredMethods()) {
+            if (Arrays.equals(method.getParameterTypes(), params)
+                    && (returning == null || method.getReturnType().equals(returning))) {
+                if (index == currentIndex) {
+                    method.setAccessible(true);
+                    return method;
+                }
+
+                currentIndex++;
             }
         }
 
@@ -155,12 +171,12 @@ public final class Reflection {
     }
 
     public static @Nullable Method getMethod(@NotNull Class<?> cls, String name, Class<?> returning, Class<?>... params) {
-        for (Method m : cls.getDeclaredMethods()) {
-            if (m.getName().equals(name)
-                    && Arrays.equals(m.getParameterTypes(), params) &&
-                    (returning == null || m.getReturnType().equals(returning))) {
-                m.setAccessible(true);
-                return m;
+        for (Method method : cls.getDeclaredMethods()) {
+            if (method.getName().equals(name)
+                    && Arrays.equals(method.getParameterTypes(), params)
+                    && (returning == null || method.getReturnType().equals(returning))) {
+                method.setAccessible(true);
+                return method;
             }
         }
 
@@ -170,17 +186,21 @@ public final class Reflection {
         return null;
     }
 
-    public static Method getMethod(Class<?> cls, String name, int index) {
+    public static @Nullable Method getMethod(Class<?> cls, String name, int index) {
         if (cls == null) {
             return null;
         }
 
         int currentIndex = 0;
 
-        for (Method m : cls.getDeclaredMethods()) {
-            if (m.getName().equals(name) && index == currentIndex++) {
-                m.setAccessible(true);
-                return m;
+        for (Method method : cls.getDeclaredMethods()) {
+            if (method.getName().equals(name)) {
+                if (index == currentIndex) {
+                    method.setAccessible(true);
+                    return method;
+                }
+
+                currentIndex++;
             }
         }
 
@@ -190,17 +210,21 @@ public final class Reflection {
         return null;
     }
 
-    public static Method getMethod(Class<?> cls, Class<?> returning, int index) {
+    public static @Nullable Method getMethod(Class<?> cls, Class<?> returning, int index) {
         if (cls == null) {
             return null;
         }
 
         int currentIndex = 0;
 
-        for (Method m : cls.getDeclaredMethods()) {
-            if ((returning == null || m.getReturnType().equals(returning)) && index == currentIndex++) {
-                m.setAccessible(true);
-                return m;
+        for (Method method : cls.getDeclaredMethods()) {
+            if ((returning == null || method.getReturnType().equals(returning))) {
+                if (index == currentIndex) {
+                    method.setAccessible(true);
+                    return method;
+                }
+
+                currentIndex++;
             }
         }
 
@@ -210,15 +234,16 @@ public final class Reflection {
         return null;
     }
 
-    public static Method getMethodCheckContainsString(Class<?> cls, String nameContainsThisStr, Class<?> returning) {
+    public static @Nullable Method getMethodCheckContainsString(Class<?> cls, String nameContainsThisStr, Class<?> returning) {
         if (cls == null) {
             return null;
         }
 
-        for (Method m : cls.getDeclaredMethods()) {
-            if (m.getName().contains(nameContainsThisStr) && (returning == null || m.getReturnType().equals(returning))) {
-                m.setAccessible(true);
-                return m;
+        for (Method method : cls.getDeclaredMethods()) {
+            if (method.getName().contains(nameContainsThisStr)
+                    && (returning == null || method.getReturnType().equals(returning))) {
+                method.setAccessible(true);
+                return method;
             }
         }
 
@@ -228,16 +253,15 @@ public final class Reflection {
         return null;
     }
 
-    public static Method getMethod(Class<?> cls, String name, Class<?> returning) {
+    public static @Nullable Method getMethod(Class<?> cls, String name, Class<?> returning) {
         if (cls == null) {
             return null;
         }
 
-        for (Method m : cls.getDeclaredMethods()) {
-            if (m.getName().equals(name)
-                    && (returning == null || m.getReturnType().equals(returning))) {
-                m.setAccessible(true);
-                return m;
+        for (Method method : cls.getDeclaredMethods()) {
+            if (method.getName().equals(name) && (returning == null || method.getReturnType().equals(returning))) {
+                method.setAccessible(true);
+                return method;
             }
         }
 

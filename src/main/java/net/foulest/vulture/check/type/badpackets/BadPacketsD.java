@@ -21,6 +21,7 @@ import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEve
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
+import lombok.ToString;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
@@ -28,6 +29,7 @@ import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.util.KickUtil;
 
+@ToString
 @CheckInfo(name = "BadPackets (D)", type = CheckType.BADPACKETS, punishable = false,
         description = "Detects ignoring the mandatory Position packet.")
 public class BadPacketsD extends Check {
@@ -59,7 +61,7 @@ public class BadPacketsD extends Check {
         }
     }
 
-    public void checkDifference() {
+    private void checkDifference() {
         // Checks the player for exemptions.
         if (player.isDead()
                 || playerData.getTicksSince(ActionType.STEER_VEHICLE) < 100

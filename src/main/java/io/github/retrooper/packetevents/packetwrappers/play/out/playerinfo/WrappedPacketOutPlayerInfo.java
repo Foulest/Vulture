@@ -12,6 +12,7 @@ import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.bukkit.GameMode;
 
 import java.lang.reflect.Constructor;
@@ -19,16 +20,18 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
+@ToString
 public class WrappedPacketOutPlayerInfo extends WrappedPacket implements SendableWrapper {
 
     private static Class<? extends Enum<?>> enumPlayerInfoActionClass;
     private static Constructor<?> packetConstructor;
     private static Constructor<?> playerInfoDataConstructor;
-    private static byte constructorMode = 0;
+    private static byte constructorMode;
+
     private PlayerInfoAction action;
     private PlayerInfo[] playerInfoArray = new PlayerInfo[0];
 
-    public WrappedPacketOutPlayerInfo(NMSPacket packet) {
+    private WrappedPacketOutPlayerInfo(NMSPacket packet) {
         super(packet);
     }
 
@@ -64,8 +67,8 @@ public class WrappedPacketOutPlayerInfo extends WrappedPacket implements Sendabl
         }
     }
 
-    public PlayerInfoAction getAction() {
-        if (packet != null) {
+    private PlayerInfoAction getAction() {
+        if (nmsPacket != null) {
             int index;
             Enum<?> enumConst = readEnumConstant(0, enumPlayerInfoActionClass);
             index = enumConst.ordinal();
@@ -75,8 +78,8 @@ public class WrappedPacketOutPlayerInfo extends WrappedPacket implements Sendabl
         }
     }
 
-    public void setAction(PlayerInfoAction action) {
-        if (packet != null) {
+    private void setAction(PlayerInfoAction action) {
+        if (nmsPacket != null) {
             Enum<?> enumConst = EnumUtil.valueByIndex(enumPlayerInfoActionClass.asSubclass(Enum.class), action.ordinal());
             writeEnumConstant(0, enumConst);
         } else {
@@ -84,10 +87,10 @@ public class WrappedPacketOutPlayerInfo extends WrappedPacket implements Sendabl
         }
     }
 
-    public PlayerInfo[] getPlayerInfo() {
-        if (packet != null) {
-            PlayerInfo[] playerInfoArray = new PlayerInfo[1];
-            List<Object> nmsPlayerInfoDataList = readList(0);
+    private PlayerInfo[] getPlayerInfo() {
+        if (nmsPacket != null) {
+            PlayerInfo[] playerInfos = new PlayerInfo[1];
+            List<Object> nmsPlayerInfoDataList = readList();
 
             for (int i = 0; i < nmsPlayerInfoDataList.size(); i++) {
                 Object nmsPlayerInfoData = nmsPlayerInfoDataList.get(i);
@@ -97,16 +100,16 @@ public class WrappedPacketOutPlayerInfo extends WrappedPacket implements Sendabl
                 WrappedGameProfile gameProfile = GameProfileUtil.getWrappedGameProfile(mojangGameProfile);
                 GameMode gameMode = nmsPlayerInfoDataWrapper.readGameMode(0);
                 int ping = nmsPlayerInfoDataWrapper.readInt(0);
-                playerInfoArray[i] = new PlayerInfo(username, gameProfile, gameMode, ping);
+                playerInfos[i] = new PlayerInfo(username, gameProfile, gameMode, ping);
             }
-            return playerInfoArray;
+            return playerInfos;
         } else {
             return playerInfoArray;
         }
     }
 
-    public void setPlayerInfo(PlayerInfo... playerInfoArray) throws UnsupportedOperationException {
-        if (packet != null) {
+    private void setPlayerInfo(PlayerInfo... playerInfoArray) {
+        if (nmsPacket != null) {
             List<Object> nmsPlayerInfoList = new ArrayList<>();
 
             for (PlayerInfo playerInfo : playerInfoArray) {
@@ -126,14 +129,14 @@ public class WrappedPacketOutPlayerInfo extends WrappedPacket implements Sendabl
                 }
             }
 
-            writeList(0, nmsPlayerInfoList);
+            writeList(nmsPlayerInfoList);
         } else {
             this.playerInfoArray = playerInfoArray;
         }
     }
 
     @Override
-    public Object asNMSPacket() throws Exception {
+    public Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
         Object packetInstance = packetConstructor.newInstance();
         WrappedPacketOutPlayerInfo playerInfoWrapper = new WrappedPacketOutPlayerInfo(new NMSPacket(packetInstance));
         PlayerInfo[] playerInfos = getPlayerInfo();
@@ -156,6 +159,7 @@ public class WrappedPacketOutPlayerInfo extends WrappedPacket implements Sendabl
 
     @Getter
     @Setter
+    @ToString
     @AllArgsConstructor
     public static class PlayerInfo {
 

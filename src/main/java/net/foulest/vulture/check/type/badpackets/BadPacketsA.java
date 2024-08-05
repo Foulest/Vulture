@@ -22,6 +22,7 @@ import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.play.in.setcreativeslot.WrappedPacketInSetCreativeSlot;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
+import lombok.ToString;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
@@ -33,6 +34,7 @@ import org.bukkit.Material;
 
 import java.util.Map;
 
+@ToString
 @CheckInfo(name = "BadPackets (A)", type = CheckType.BADPACKETS, punishable = false,
         description = "Detects sending too many packets in the same tick.")
 public class BadPacketsA extends Check {

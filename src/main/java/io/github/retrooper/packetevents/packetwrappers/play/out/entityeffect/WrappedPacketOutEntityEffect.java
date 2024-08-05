@@ -4,14 +4,17 @@ import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
+import lombok.ToString;
 import org.bukkit.Effect;
 import org.bukkit.entity.Entity;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
 
+@ToString
 public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction implements SendableWrapper {
 
     private static Constructor<?> packetConstructor;
@@ -19,13 +22,13 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
     private int amplifier;
     private int duration;
     private byte byteMask;
-    private boolean byteMaskInitialized = false;
+    private boolean byteMaskInitialized;
 
-    public WrappedPacketOutEntityEffect(NMSPacket packet) {
+    private WrappedPacketOutEntityEffect(NMSPacket packet) {
         super(packet, 0);
     }
 
-    public WrappedPacketOutEntityEffect(@NotNull Entity entity, int effectID, int amplifier, int duration) {
+    private WrappedPacketOutEntityEffect(@NotNull Entity entity, int effectID, int amplifier, int duration) {
         super(0);
         entityID = entity.getEntityId();
         this.entity = entity;
@@ -35,7 +38,7 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
         byteMaskInitialized = true;
     }
 
-    public WrappedPacketOutEntityEffect(int entityID, int effectID, int amplifier, int duration, boolean hideParticles) {
+    private WrappedPacketOutEntityEffect(int entityID, int effectID, int amplifier, int duration, boolean hideParticles) {
         super(0);
         this.entityID = entityID;
         this.effectID = effectID;
@@ -70,48 +73,48 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
         }
     }
 
-    public int getEffectId() {
-        if (packet != null) {
+    private int getEffectId() {
+        if (nmsPacket != null) {
             return readByte(0);
         } else {
             return effectID;
         }
     }
 
-    public void setEffectId(int effectID) {
-        if (packet != null) {
+    private void setEffectId(int effectID) {
+        if (nmsPacket != null) {
             writeByte(0, (byte) effectID);
         } else {
             this.effectID = effectID;
         }
     }
 
-    public int getAmplifier() {
-        if (packet != null) {
+    private int getAmplifier() {
+        if (nmsPacket != null) {
             return readByte(1);
         } else {
             return amplifier;
         }
     }
 
-    public void setAmplifier(int amplifier) {
-        if (packet != null) {
+    private void setAmplifier(int amplifier) {
+        if (nmsPacket != null) {
             writeByte(1, (byte) amplifier);
         } else {
             this.amplifier = amplifier;
         }
     }
 
-    public int getDuration() {
-        if (packet != null) {
+    private int getDuration() {
+        if (nmsPacket != null) {
             return readInt(1);
         } else {
             return duration;
         }
     }
 
-    public void setDuration(int duration) {
-        if (packet != null) {
+    private void setDuration(int duration) {
+        if (nmsPacket != null) {
             this.duration = duration;
             writeInt(1, duration);
         } else {
@@ -120,7 +123,7 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
     }
 
     private @NotNull Optional<Byte> getByteMask() {
-        if (packet != null && !byteMaskInitialized) {
+        if (nmsPacket != null && !byteMaskInitialized) {
             byteMask = readByte(2);
         }
         return Optional.of(byteMask);
@@ -129,43 +132,43 @@ public class WrappedPacketOutEntityEffect extends WrappedPacketEntityAbstraction
     private void setByteMask(byte byteMask) {
         this.byteMask = byteMask;
 
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeByte(2, byteMask);
         }
     }
 
-    public Optional<Boolean> shouldHideParticles() {
+    private Optional<Boolean> shouldHideParticles() {
         Optional<Byte> byteMaskOptional = getByteMask();
 
         if (!byteMaskOptional.isPresent()) {
             return Optional.empty();
         }
 
-        byte byteMask = byteMaskOptional.get();
-        return Optional.of(byteMask == 1);
+        byte mask = byteMaskOptional.get();
+        return Optional.of(mask == 1);
     }
 
     public void setShouldHideParticles(boolean hideParticles) {
         Optional<Byte> byteMaskOptional = getByteMask();
 
         if (byteMaskOptional.isPresent()) {
-            byte byteMask = byteMaskOptional.get();
-            boolean currentHideParticles = shouldHideParticles().get();
+            byte mask = byteMaskOptional.get();
 
             if (hideParticles) {
-                byteMask |= 2;
+                mask |= 2;
             } else {
-                if (currentHideParticles) {
-                    byteMask -= 2;
+                if (shouldHideParticles().isPresent()
+                        && shouldHideParticles().get()) {
+                    mask -= 2;
                 }
             }
 
-            setByteMask(byteMask);
+            setByteMask(mask);
         }
     }
 
     @Override
-    public Object asNMSPacket() throws Exception {
+    public Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
         Object packetInstance = packetConstructor.newInstance();
         WrappedPacketOutEntityEffect wrappedPacketOutEntityEffect = new WrappedPacketOutEntityEffect(new NMSPacket(packetInstance));
         wrappedPacketOutEntityEffect.setEntityId(getEntityId());

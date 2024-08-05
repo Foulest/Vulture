@@ -4,9 +4,14 @@ import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
+import lombok.AllArgsConstructor;
+import lombok.ToString;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
+@ToString
+@AllArgsConstructor
 public class WrappedPacketOutExperience extends WrappedPacket implements SendableWrapper {
 
     private static Constructor<?> packetConstructor;
@@ -18,25 +23,17 @@ public class WrappedPacketOutExperience extends WrappedPacket implements Sendabl
         super(packet);
     }
 
-    public WrappedPacketOutExperience(float experienceBar, int experienceLevel,
-                                      int totalExperience) {
-        this.experienceBar = experienceBar;
-        this.experienceLevel = experienceLevel;
-        this.totalExperience = totalExperience;
-    }
-
     @Override
     protected void load() {
         try {
-            packetConstructor = PacketTypeClasses.Play.Server.EXPERIENCE.getConstructor(float.class,
-                    int.class, int.class);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            packetConstructor = PacketTypeClasses.Play.Server.EXPERIENCE.getConstructor(float.class, int.class, int.class);
+        } catch (NoSuchMethodException ex) {
+            ex.printStackTrace();
         }
     }
 
-    public float getExperienceBar() {
-        if (packet != null) {
+    private float getExperienceBar() {
+        if (nmsPacket != null) {
             return readFloat(0);
         } else {
             return experienceBar;
@@ -44,15 +41,15 @@ public class WrappedPacketOutExperience extends WrappedPacket implements Sendabl
     }
 
     public void setExperienceBar(float experienceBar) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeFloat(0, experienceBar);
         } else {
             this.experienceBar = experienceBar;
         }
     }
 
-    public int getExperienceLevel() {
-        if (packet != null) {
+    private int getExperienceLevel() {
+        if (nmsPacket != null) {
             return readInt(0);
         } else {
             return experienceLevel;
@@ -60,15 +57,15 @@ public class WrappedPacketOutExperience extends WrappedPacket implements Sendabl
     }
 
     public void setExperienceLevel(int experienceLevel) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeInt(0, experienceLevel);
         } else {
             this.experienceLevel = experienceLevel;
         }
     }
 
-    public int getTotalExperience() {
-        if (packet != null) {
+    private int getTotalExperience() {
+        if (nmsPacket != null) {
             return readInt(1);
         } else {
             return totalExperience;
@@ -76,7 +73,7 @@ public class WrappedPacketOutExperience extends WrappedPacket implements Sendabl
     }
 
     public void setTotalExperience(int totalExperience) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeInt(1, totalExperience);
         } else {
             this.totalExperience = totalExperience;
@@ -84,7 +81,7 @@ public class WrappedPacketOutExperience extends WrappedPacket implements Sendabl
     }
 
     @Override
-    public Object asNMSPacket() throws Exception {
+    public Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
         return packetConstructor.newInstance(getExperienceBar(), getExperienceLevel(), getTotalExperience());
     }
 }

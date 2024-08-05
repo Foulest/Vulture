@@ -3,9 +3,9 @@ package io.github.retrooper.packetevents.packetwrappers.play.in.teleportaccept;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
-public class WrappedPacketInTeleportAccept extends WrappedPacket {
+class WrappedPacketInTeleportAccept extends WrappedPacket {
 
-    public WrappedPacketInTeleportAccept(NMSPacket packet) {
+    WrappedPacketInTeleportAccept(NMSPacket packet) {
         super(packet);
     }
 

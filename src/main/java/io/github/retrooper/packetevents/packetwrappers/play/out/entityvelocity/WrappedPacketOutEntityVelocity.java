@@ -6,12 +6,15 @@ import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
+import lombok.ToString;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
+@ToString
 public final class WrappedPacketOutEntityVelocity extends WrappedPacketEntityAbstraction implements SendableWrapper {
 
     private static Constructor<?> velocityConstructor;
@@ -59,7 +62,7 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacketEntityAbs
 
     @Contract(" -> new")
     public @NotNull Vector3d getVelocity() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             double velX = readInt(1) / 8000.0;
             double velY = readInt(2) / 8000.0;
             double velZ = readInt(3) / 8000.0;
@@ -70,7 +73,7 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacketEntityAbs
     }
 
     public void setVelocity(Vector3d velocity) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeInt(1, (int) (velocity.x * 8000.0));
             writeInt(2, (int) (velocity.y * 8000.0));
             writeInt(3, (int) (velocity.z * 8000.0));
@@ -82,11 +85,11 @@ public final class WrappedPacketOutEntityVelocity extends WrappedPacketEntityAbs
     }
 
     @Override
-    public @NotNull Object asNMSPacket() throws Exception {
-        if (!isVec3dPresent) {
-            return velocityConstructor.newInstance(getEntityId(), velocityX, velocityY, velocityZ);
-        } else {
+    public @NotNull Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
+        if (isVec3dPresent) {
             return velocityConstructor.newInstance(getEntityId(), NMSUtils.generateVec3D(velocityX, velocityY, velocityZ));
+        } else {
+            return velocityConstructor.newInstance(getEntityId(), velocityX, velocityY, velocityZ);
         }
     }
 }

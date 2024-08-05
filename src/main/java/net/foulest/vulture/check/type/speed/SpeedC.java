@@ -18,6 +18,7 @@
 package net.foulest.vulture.check.type.speed;
 
 import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
+import lombok.ToString;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
@@ -30,6 +31,7 @@ import org.bukkit.GameMode;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 
+@ToString
 @CheckInfo(name = "Speed (C)", type = CheckType.SPEED)
 public class SpeedC extends Check {
 
@@ -58,8 +60,8 @@ public class SpeedC extends Check {
                 || playerData.isOnClimbable()
                 || player.isInsideVehicle()
                 || playerData.getTicksSince(ActionType.STEER_VEHICLE) <= 2
-                || player.getGameMode().equals(GameMode.CREATIVE)
-                || player.getGameMode().equals(GameMode.SPECTATOR)
+                || player.getGameMode() == GameMode.CREATIVE
+                || player.getGameMode() == GameMode.SPECTATOR
                 || event.isTeleport(playerData)) {
             lastDeltaXZ = deltaXZ * friction;
             return;
@@ -126,7 +128,9 @@ public class SpeedC extends Check {
         double speedup = diff - movementSpeed;
 
         if (speedup > 0.1 && deltaXZ > 0.25) {
-            if (++buffer >= 3) {
+            ++buffer;
+
+            if (buffer >= 3) {
                 flag(true, "speedup=" + speedup
                         + " buffer=" + buffer
                         + " deltaXZ=" + deltaXZ

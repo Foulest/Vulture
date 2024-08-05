@@ -18,6 +18,8 @@
 package net.foulest.vulture.util.yaml;
 
 import lombok.Cleanup;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
@@ -37,6 +39,8 @@ import java.util.regex.Pattern;
  * @author Foulest
  * @project Vulture
  */
+@ToString
+@NoArgsConstructor
 public class CustomYamlConfiguration extends YamlConfiguration {
 
     // Map to store the path of the YAML keys and their associated comments
@@ -56,10 +60,10 @@ public class CustomYamlConfiguration extends YamlConfiguration {
     @Override
     public String saveToString() {
         // Strip all comments from the original data
-        String dataWithoutComments = super.saveToString().trim();
+        String dataTrimmed = super.saveToString().trim();
 
         // Use a pattern to match YAML comments and remove them
-        String dataStrippedOfComments = dataWithoutComments.replaceAll("(?m)^\\s*#.*$", "").trim();
+        String dataWithoutComments = dataTrimmed.replaceAll("(?m)^\\s*#.*$", "").trim();
 
         StringBuilder dataWithComments = new StringBuilder();
 
@@ -72,7 +76,7 @@ public class CustomYamlConfiguration extends YamlConfiguration {
         }
 
         // Iterate through each line of the stripped YAML data to reinsert comments
-        String[] lines = dataStrippedOfComments.split("\n");
+        String[] lines = dataWithoutComments.split("\n");
 
         for (String line : lines) {
             // Attempt to extract a key from the current line
@@ -165,7 +169,7 @@ public class CustomYamlConfiguration extends YamlConfiguration {
      * @param line The line of YAML to extract the key from.
      * @return The key if the line contains a key-value pair, otherwise null.
      */
-    private @Nullable String getKeyFromLine(String line) {
+    private static @Nullable String getKeyFromLine(CharSequence line) {
         Matcher matcher = Pattern.compile("^\\s*([\\w\\-]+):").matcher(line);
         return matcher.find() ? matcher.group(1) : null;
     }
@@ -185,7 +189,7 @@ public class CustomYamlConfiguration extends YamlConfiguration {
         Pattern keyPattern = Pattern.compile("^\\s*([\\w\\-]+):.*");
 
         for (String line : lines) {
-            if (line.trim().startsWith("#")) {
+            if (!line.trim().isEmpty() && line.trim().charAt(0) == '#') {
                 if (commentBuilder.length() > 0) {
                     commentBuilder.append("\n");
                 }

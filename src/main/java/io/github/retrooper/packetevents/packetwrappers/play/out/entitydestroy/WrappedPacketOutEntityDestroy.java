@@ -4,10 +4,13 @@ import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
+import lombok.ToString;
 import org.bukkit.entity.Entity;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
+@ToString
 public class WrappedPacketOutEntityDestroy extends WrappedPacketEntityAbstraction implements SendableWrapper {
 
     private static Constructor<?> packetConstructor;
@@ -36,7 +39,7 @@ public class WrappedPacketOutEntityDestroy extends WrappedPacketEntityAbstractio
 
     @Override
     public int getEntityId() {
-        if (entityID == -1 && entityIds.length == 0 && packet != null) {
+        if (entityID == -1 && entityIds.length == 0 && nmsPacket != null) {
             entityIds = readIntArray(0);
         }
         return entityIds[0];
@@ -44,7 +47,7 @@ public class WrappedPacketOutEntityDestroy extends WrappedPacketEntityAbstractio
 
     @Override
     public void setEntityId(int entityID) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             entityIds = new int[]{entityID};
             writeIntArray(0, new int[]{entityIds[0]});
         } else {
@@ -55,7 +58,7 @@ public class WrappedPacketOutEntityDestroy extends WrappedPacketEntityAbstractio
     }
 
     public int[] getEntityIds() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             return readIntArray(0);
         } else {
             return entityIds;
@@ -63,7 +66,7 @@ public class WrappedPacketOutEntityDestroy extends WrappedPacketEntityAbstractio
     }
 
     public void setEntityIds(int... entityIds) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeIntArray(0, entityIds);
         } else {
             this.entityIds = entityIds;
@@ -71,7 +74,7 @@ public class WrappedPacketOutEntityDestroy extends WrappedPacketEntityAbstractio
     }
 
     @Override
-    public Object asNMSPacket() throws Exception {
+    public Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
         return packetConstructor.newInstance(getEntityIds());
     }
 }

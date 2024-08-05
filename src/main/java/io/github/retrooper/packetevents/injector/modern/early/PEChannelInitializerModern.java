@@ -22,33 +22,37 @@ import io.github.retrooper.packetevents.injector.modern.PlayerChannelHandlerMode
 import io.github.retrooper.packetevents.injector.modern.PlayerDecodeHandlerModern;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.epoll.EpollSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.Getter;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 @Getter
-public class PEChannelInitializerModern extends ChannelInitializer<Channel> {
+@ToString
+class PEChannelInitializerModern extends ChannelInitializer<Channel> {
 
     private final ChannelInitializer<?> oldChannelInitializer;
     private Method initChannelMethod;
 
-    public PEChannelInitializerModern(ChannelInitializer<?> oldChannelInitializer) {
+    PEChannelInitializerModern(ChannelInitializer<?> oldChannelInitializer) {
         this.oldChannelInitializer = oldChannelInitializer;
         load();
     }
 
-    public static void postInitChannel(@NotNull Channel channel) {
+    private static void postInitChannel(@NotNull Channel channel) {
         if (channel.getClass().equals(NioSocketChannel.class)
                 || channel.getClass().equals(EpollSocketChannel.class)) {
-            PlayerChannelHandlerModern channelHandler = new PlayerChannelHandlerModern();
-            PlayerDecodeHandlerModern decodeHandler = new PlayerDecodeHandlerModern();
+            ChannelHandler channelHandler = new PlayerChannelHandlerModern();
+            ChannelHandler decodeHandler = new PlayerDecodeHandlerModern();
 
             if (channel.pipeline().get("packet_handler") != null) {
-                String handlerName = PacketEvents.get().getHandlerName();
+                String handlerName = PacketEvents.getInstance().getHandlerName();
 
                 if (channel.pipeline().get(handlerName) == null) {
                     channel.pipeline().addBefore("packet_handler", handlerName, channelHandler);
@@ -56,7 +60,7 @@ public class PEChannelInitializerModern extends ChannelInitializer<Channel> {
             }
 
             if (channel.pipeline().get("splitter") != null) {
-                String handlerName = PacketEvents.get().getHandlerName() + "-decoder";
+                String handlerName = PacketEvents.getInstance().getHandlerName() + "-decoder";
 
                 if (channel.pipeline().get(handlerName) == null) {
                     channel.pipeline().addAfter("splitter", handlerName, decodeHandler);
@@ -70,7 +74,7 @@ public class PEChannelInitializerModern extends ChannelInitializer<Channel> {
     }
 
     @Override
-    protected void initChannel(Channel channel) throws Exception {
+    protected void initChannel(Channel channel) throws InvocationTargetException, IllegalAccessException {
         initChannelMethod.invoke(oldChannelInitializer, channel);
         postInitChannel(channel);
     }

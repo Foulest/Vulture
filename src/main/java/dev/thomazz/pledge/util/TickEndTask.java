@@ -24,30 +24,34 @@ package dev.thomazz.pledge.util;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+@ToString
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @SuppressWarnings("unchecked")
 public final class TickEndTask {
 
-    private static List<Object> runnables;
-    private static Class<?> runnableClass;
+    private static final List<Object> runnables;
+    private static final Class<?> runnableClass;
 
     static {
         try {
             Server server = Bukkit.getServer();
             Object mcServer = server.getClass().getMethod("getServer").invoke(server);
             Field field = ReflectionUtil.getFieldByType(mcServer.getClass().getSuperclass(), List.class);
-            TickEndTask.runnables = (List<Object>) field.get(mcServer);
-            TickEndTask.runnableClass = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
-        } catch (Exception ex) {
+            runnables = (List<Object>) field.get(mcServer);
+            runnableClass = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+        } catch (NoSuchMethodException | NoSuchFieldException
+                 | InvocationTargetException | IllegalAccessException ex) {
             throw new RuntimeException("Could not set up tick end runnable!", ex);
         }
     }
@@ -62,13 +66,13 @@ public final class TickEndTask {
 
         // Hack to add runnable to tickables
         Object newObject;
-        if (!Runnable.class.isAssignableFrom(TickEndTask.runnableClass)) {
+
+        if (Runnable.class.isAssignableFrom(runnableClass)) {
+            newObject = runnable;
+        } else {
             Object handle = new Object();
 
-            newObject = Proxy.newProxyInstance(
-                    TickEndTask.runnableClass.getClassLoader(),
-                    new Class[]{TickEndTask.runnableClass},
-
+            newObject = Proxy.newProxyInstance(runnableClass.getClassLoader(), new Class[]{runnableClass},
                     (proxy, method, args) -> {
                         Class<?> declaring = method.getDeclaringClass();
 
@@ -80,25 +84,24 @@ public final class TickEndTask {
                         }
                     }
             );
-        } else {
-            newObject = runnable;
         }
 
         if (!registeredObject.compareAndSet(null, newObject)) {
             throw new IllegalStateException("Already registered!");
         }
 
-        TickEndTask.runnables.add(registeredObject.get());
+        runnables.add(registeredObject.get());
         return this;
     }
 
     public void cancel() {
         Object currentObject = registeredObject.getAndSet(null);
+
         if (currentObject == null) {
             throw new IllegalStateException("Not registered yet!");
         }
 
-        TickEndTask.runnables.remove(currentObject);
+        runnables.remove(currentObject);
     }
 
     public static TickEndTask create(Runnable runnable) {

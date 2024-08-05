@@ -27,13 +27,16 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
+@ToString
 @RequiredArgsConstructor
 public class MessageQueuePrimer extends ChannelOutboundHandlerAdapter {
 
     private final MessageQueueHandler queueHandler;
 
     @Override
+    @SuppressWarnings("ProhibitedExceptionDeclared")
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
         // Set queue handler to add last after login
         if (PacketFiltering.isLoginPacket(msg)) {

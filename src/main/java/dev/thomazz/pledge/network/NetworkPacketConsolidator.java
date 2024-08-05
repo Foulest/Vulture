@@ -26,18 +26,23 @@ import dev.thomazz.pledge.packet.PacketFiltering;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
 
 // Prevents asynchronously sent packets to land outside the start and end ping interval
+@ToString
+@NoArgsConstructor
 public class NetworkPacketConsolidator extends ChannelOutboundHandlerAdapter {
 
     private final Queue<NetworkMessage> messageQueue = new ArrayDeque<>();
-    private boolean started = false;
+    private boolean started;
     private boolean open = true;
 
     @Override
+    @SuppressWarnings("ProhibitedExceptionDeclared")
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
         // Start with login packet in game state
         if (PacketFiltering.isLoginPacket(msg)) {

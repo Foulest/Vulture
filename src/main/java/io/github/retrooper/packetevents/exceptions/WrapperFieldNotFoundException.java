@@ -31,6 +31,8 @@ import org.jetbrains.annotations.NotNull;
  */
 public class WrapperFieldNotFoundException extends RuntimeException {
 
+    private static final long serialVersionUID = 4872909960607964761L;
+
     public WrapperFieldNotFoundException(String message) {
         super(message);
     }

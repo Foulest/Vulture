@@ -18,7 +18,7 @@
 package net.foulest.vulture.timing;
 
 import lombok.RequiredArgsConstructor;
-import net.foulest.vulture.Vulture;
+import lombok.ToString;
 import net.foulest.vulture.util.ConstantUtil;
 import net.foulest.vulture.util.KickUtil;
 import org.bukkit.entity.Player;
@@ -28,6 +28,7 @@ import org.bukkit.event.Listener;
  * Estimates player client time by synchronizing timestamps between server and client.
  * We assume that the server time follows the correct speed and the client should never be able to run faster.
  */
+@ToString
 @RequiredArgsConstructor
 public class Timing implements Listener {
 
@@ -42,7 +43,7 @@ public class Timing implements Listener {
         long maxCatchupTime = ConstantUtil.MAX_CATCHUP_TICKS * ConstantUtil.TICK_MILLIS;
         long lowerBound = Math.max(pingTimePassed - maxCatchupTime, 0L);
 
-        long currentServerTime = Vulture.getInstance().getCurrentServerTime();
+        long currentServerTime = getCurrentServerTime();
 
         // Upper bound is the current server time minus the time the player has logged in
         long upperBound = currentServerTime - loginTime;
@@ -63,5 +64,14 @@ public class Timing implements Listener {
     // Server time synchronization with client
     public void ping(long time) {
         pingTimePassed = time - loginTime;
+    }
+
+    /**
+     * Gets the current server time.
+     *
+     * @return Current server time
+     */
+    private static long getCurrentServerTime() {
+        return System.currentTimeMillis(); // Same as current system time
     }
 }

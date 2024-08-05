@@ -32,7 +32,7 @@ import java.util.List;
 @Setter
 @SuppressWarnings("unused")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class TaskUtil {
+public final class TaskUtil {
 
     public static void runTask(Runnable runnable) {
         Bukkit.getScheduler().runTask(Vulture.instance, runnable);

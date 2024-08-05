@@ -23,12 +23,14 @@ import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPac
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import net.foulest.vulture.data.PlayerData;
 import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
 @Setter
+@ToString
 @AllArgsConstructor
 public class MovementEvent implements CancellableEvent {
 
@@ -52,7 +54,7 @@ public class MovementEvent implements CancellableEvent {
      *
      * @return The change in X.
      */
-    public double getDeltaX() {
+    private double getDeltaX() {
         return to.getPosition().getX() - from.getPosition().getX();
     }
 
@@ -70,7 +72,7 @@ public class MovementEvent implements CancellableEvent {
      *
      * @return The change in Z.
      */
-    public double getDeltaZ() {
+    private double getDeltaZ() {
         return to.getPosition().getZ() - from.getPosition().getZ();
     }
 

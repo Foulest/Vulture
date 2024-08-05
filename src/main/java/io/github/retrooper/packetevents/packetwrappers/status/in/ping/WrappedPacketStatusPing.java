@@ -3,9 +3,9 @@ package io.github.retrooper.packetevents.packetwrappers.status.in.ping;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
-public class WrappedPacketStatusPing extends WrappedPacket {
+class WrappedPacketStatusPing extends WrappedPacket {
 
-    public WrappedPacketStatusPing(NMSPacket packet) {
+    WrappedPacketStatusPing(NMSPacket packet) {
         super(packet);
     }
 

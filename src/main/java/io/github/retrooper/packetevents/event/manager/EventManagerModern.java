@@ -21,14 +21,21 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.PacketEvent;
 import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.PacketListenerPriority;
+import io.github.retrooper.packetevents.event.eventtypes.CallableEvent;
+import lombok.NoArgsConstructor;
+import lombok.Synchronized;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
-public class EventManagerModern {
+@ToString
+@NoArgsConstructor
+class EventManagerModern {
 
     private final Map<Byte, HashSet<PacketListenerAbstract>> listenersMap = new ConcurrentHashMap<>();
 
@@ -40,17 +47,17 @@ public class EventManagerModern {
      *
      * @param event {@link PacketEvent}
      */
-    public void callEvent(PacketEvent event) {
+    void callEvent(CallableEvent event) {
         for (byte priority = PacketListenerPriority.LOWEST.getId();
              priority <= PacketListenerPriority.MONITOR.getId(); priority++) {
-            HashSet<PacketListenerAbstract> listeners = listenersMap.get(priority);
+            Iterable<PacketListenerAbstract> listeners = listenersMap.get(priority);
 
             if (listeners != null) {
                 for (PacketListenerAbstract listener : listeners) {
                     try {
                         event.call(listener);
-                    } catch (Exception ex) {
-                        PacketEvents.get().getPlugin().getLogger()
+                    } catch (RuntimeException ex) {
+                        PacketEvents.getPlugin().getLogger()
                                 .log(Level.SEVERE, "PacketEvents found an exception while calling a packet listener.", ex);
                     }
                 }
@@ -63,7 +70,8 @@ public class EventManagerModern {
      *
      * @param listener {@link PacketListenerAbstract}
      */
-    public synchronized void registerListener(@NotNull PacketListenerAbstract listener) {
+    @Synchronized
+    void registerListener(@NotNull PacketListenerAbstract listener) {
         byte priority = listener.getPriority().getId();
         HashSet<PacketListenerAbstract> listenerSet = listenersMap.get(priority);
 
@@ -80,7 +88,8 @@ public class EventManagerModern {
      *
      * @param listeners {@link PacketListenerAbstract}
      */
-    public synchronized void registerListeners(PacketListenerAbstract @NotNull ... listeners) {
+    @Synchronized
+    void registerListeners(PacketListenerAbstract @NotNull ... listeners) {
         for (PacketListenerAbstract listener : listeners) {
             registerListener(listener);
         }
@@ -91,9 +100,10 @@ public class EventManagerModern {
      *
      * @param listener {@link PacketListenerAbstract}
      */
-    public synchronized void unregisterListener(@NotNull PacketListenerAbstract listener) {
+    @Synchronized
+    void unregisterListener(@NotNull PacketListenerAbstract listener) {
         byte priority = listener.getPriority().getId();
-        HashSet<PacketListenerAbstract> listenerSet = listenersMap.get(priority);
+        Set<PacketListenerAbstract> listenerSet = listenersMap.get(priority);
 
         if (listenerSet != null) {
             listenerSet.remove(listener);
@@ -105,7 +115,8 @@ public class EventManagerModern {
      *
      * @param listeners {@link PacketListenerAbstract}
      */
-    public synchronized void unregisterListeners(PacketListenerAbstract @NotNull ... listeners) {
+    @Synchronized
+    void unregisterListeners(PacketListenerAbstract @NotNull ... listeners) {
         for (PacketListenerAbstract listener : listeners) {
             unregisterListener(listener);
         }
@@ -114,7 +125,8 @@ public class EventManagerModern {
     /**
      * Unregister all dynamic packet event listeners.
      */
-    public synchronized void unregisterAllListeners() {
+    @Synchronized
+    void unregisterAllListeners() {
         listenersMap.clear();
     }
 }

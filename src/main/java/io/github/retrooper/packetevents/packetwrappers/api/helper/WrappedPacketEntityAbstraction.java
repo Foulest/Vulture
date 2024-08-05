@@ -20,15 +20,17 @@ package io.github.retrooper.packetevents.packetwrappers.api.helper;
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import lombok.ToString;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+@ToString
 public abstract class WrappedPacketEntityAbstraction extends WrappedPacket {
 
     private final int entityIDFieldIndex;
-    protected Entity entity;
+    protected @Nullable Entity entity;
     protected int entityID = -1;
 
     protected WrappedPacketEntityAbstraction(NMSPacket packet, int entityIDFieldIndex) {
@@ -50,7 +52,7 @@ public abstract class WrappedPacketEntityAbstraction extends WrappedPacket {
     }
 
     public int getEntityId() {
-        if (entityID != -1 || packet == null) {
+        if (entityID != -1 || nmsPacket == null) {
             return entityID;
         }
 
@@ -59,7 +61,7 @@ public abstract class WrappedPacketEntityAbstraction extends WrappedPacket {
     }
 
     public void setEntityId(int entityID) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             this.entityID = entityID;
             writeInt(entityIDFieldIndex, this.entityID);
         } else {
@@ -73,17 +75,17 @@ public abstract class WrappedPacketEntityAbstraction extends WrappedPacket {
         if (entity != null) {
             return entity;
         }
-        return PacketEvents.get().getServerUtils().getEntityById(world, getEntityId());
+        return PacketEvents.getInstance().getServerUtils().getEntityById(world, getEntityId());
     }
 
     public Entity getEntity() {
         if (entity != null) {
             return entity;
         }
-        return PacketEvents.get().getServerUtils().getEntityById(getEntityId());
+        return PacketEvents.getInstance().getServerUtils().getEntityById(getEntityId());
     }
 
-    public void setEntity(@NotNull Entity entity) {
+    protected void setEntity(@NotNull Entity entity) {
         setEntityId(entity.getEntityId());
         this.entity = entity;
     }

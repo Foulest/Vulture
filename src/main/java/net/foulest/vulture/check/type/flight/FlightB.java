@@ -18,6 +18,7 @@
 package net.foulest.vulture.check.type.flight;
 
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
+import lombok.ToString;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
@@ -30,6 +31,7 @@ import org.bukkit.GameMode;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 
+@ToString
 @CheckInfo(name = "Flight (B)", type = CheckType.FLIGHT,
         description = "Checks for invalid y-axis movement when in water.")
 public class FlightB extends Check {
@@ -84,7 +86,7 @@ public class FlightB extends Check {
      * @param deltaY   The change in y-axis.
      * @param velocity The player's velocity.
      */
-    public void checkForInvalidY(double deltaY, double velocity) {
+    private void checkForInvalidY(double deltaY, double velocity) {
         int jumpBoostLevel = MovementUtil.getPotionEffectLevel(player, PotionEffectType.JUMP);
         double maxDeltaY = 0.461 + jumpBoostLevel * 0.1;
 
@@ -105,7 +107,7 @@ public class FlightB extends Check {
      * @param deltaY   The change in y-axis.
      * @param velocity The player's velocity.
      */
-    public void checkForCombined(double deltaY, double velocity) {
+    private void checkForCombined(double deltaY, double velocity) {
         if (playerData.getVersion().isNewerThan(ClientVersion.v_1_8)) {
             return;
         }
@@ -121,7 +123,9 @@ public class FlightB extends Check {
         int ticksAboveThreshold = (nearGround ? 4 : 2);
 
         if (combinedDiff >= combinedThreshold) {
-            if (++ticksAboveCombined >= ticksAboveThreshold && altDiff > 0.001) {
+            ++ticksAboveCombined;
+
+            if (ticksAboveCombined >= ticksAboveThreshold && altDiff > 0.001) {
                 flag(true, "deltaY=" + deltaY
                         + " velocity=" + velocity + " |"
                         + " deltaYDiff=" + deltaYDiff

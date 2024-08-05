@@ -34,10 +34,10 @@ public class CheckInfoData {
     private boolean punishable = true;
     private String banCommand = "vulture kick %player% %check%";
     private int maxViolations = 10;
-    private boolean experimental = false;
-    private boolean acceptsServerPackets = false;
+    private boolean experimental;
+    private boolean acceptsServerPackets;
 
-    public CheckInfoData(@NotNull CheckInfo checkInfo) {
+    CheckInfoData(@NotNull CheckInfo checkInfo) {
         name = checkInfo.name();
         type = checkInfo.type();
         description = checkInfo.description();

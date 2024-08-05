@@ -19,9 +19,11 @@ package net.foulest.vulture.util.command;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Represents the arguments provided to a command handler method.
@@ -33,6 +35,7 @@ import org.jetbrains.annotations.NotNull;
  */
 @Getter
 @Setter
+@ToString
 public class CommandArgs {
 
     private final CommandSender sender;
@@ -49,8 +52,8 @@ public class CommandArgs {
      * @param args       The arguments provided to the command.
      * @param subCommand The number of sub-commands in the command.
      */
-    protected CommandArgs(CommandSender sender, org.bukkit.command.Command command,
-                          String label, String @NotNull [] args, int subCommand) {
+    CommandArgs(CommandSender sender, org.bukkit.command.Command command,
+                String label, String @NotNull [] args, int subCommand) {
         String[] modArgs = new String[args.length - subCommand];
 
         if (args.length - subCommand >= 0) {
@@ -76,7 +79,7 @@ public class CommandArgs {
      *
      * @return The formatted command label.
      */
-    public String getLabel() {
+    String getLabel() {
         return label.replace(".", " ");
     }
 
@@ -104,7 +107,7 @@ public class CommandArgs {
      *
      * @return true if the sender is a player, false otherwise.
      */
-    public boolean isPlayer() {
+    private boolean isPlayer() {
         return sender instanceof Player;
     }
 
@@ -113,7 +116,7 @@ public class CommandArgs {
      *
      * @return The sender as a Player or null if the sender is not a player.
      */
-    public Player getPlayer() {
+    public @Nullable Player getPlayer() {
         return isPlayer() ? ((Player) sender) : null;
     }
 }

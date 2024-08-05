@@ -42,7 +42,7 @@ public class Area {
         this(0, 0, 0);
     }
 
-    public Area(double x, double y, double z) {
+    private Area(double x, double y, double z) {
         set(x, y, z);
     }
 
@@ -57,7 +57,7 @@ public class Area {
                 other.max.getX(), other.max.getY(), other.max.getZ());
     }
 
-    public Area contain(double x0, double y0, double z0, double x1, double y1, double z1) {
+    private Area contain(double x0, double y0, double z0, double x1, double y1, double z1) {
         min = new Vector(Math.min(x0, min.getX()), Math.min(y0, min.getY()), Math.min(z0, min.getZ()));
         max = new Vector(Math.max(x1, max.getX()), Math.max(y1, max.getY()), Math.max(z1, max.getZ()));
         return this;
@@ -89,7 +89,7 @@ public class Area {
         add(x, y, z, x, y, z);
     }
 
-    public void add(double x0, double y0, double z0, double x1, double y1, double z1) {
+    private void add(double x0, double y0, double z0, double x1, double y1, double z1) {
         min = new Vector(min.getX() + x0, min.getY() + y0, min.getZ() + z0);
         max = new Vector(max.getX() + x1, max.getY() + y1, max.getZ() + z1);
     }
@@ -145,7 +145,7 @@ public class Area {
         return x > min.getX() && x < max.getX() && y > min.getY() && y < max.getY() && z > min.getZ() && z < max.getZ();
     }
 
-    private double interpolate(double value, double destination, int interpolation) {
+    private static double interpolate(double value, double destination, int interpolation) {
         return value + (destination - value) / interpolation;
     }
 }

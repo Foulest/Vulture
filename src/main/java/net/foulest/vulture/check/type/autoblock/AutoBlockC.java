@@ -21,11 +21,13 @@ import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEve
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.play.in.blockdig.WrappedPacketInBlockDig;
+import lombok.ToString;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 
+@ToString
 @CheckInfo(name = "AutoBlock (C)", type = CheckType.AUTOBLOCK,
         description = "Detects sending invalid BlockPlace and ReleaseUseItem order.")
 public class AutoBlockC extends Check {
@@ -53,8 +55,12 @@ public class AutoBlockC extends Check {
             WrappedPacketInBlockDig blockDig = new WrappedPacketInBlockDig(nmsPacket);
             WrappedPacketInBlockDig.PlayerDigType digType = blockDig.getDigType();
 
-            if (digType == WrappedPacketInBlockDig.PlayerDigType.RELEASE_USE_ITEM && ++buffer > 1) {
-                flag(false);
+            if (digType == WrappedPacketInBlockDig.PlayerDigType.RELEASE_USE_ITEM) {
+                ++buffer;
+
+                if (buffer > 1) {
+                    flag(false);
+                }
             }
         }
     }

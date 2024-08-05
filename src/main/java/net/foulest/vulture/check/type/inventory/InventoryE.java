@@ -22,11 +22,13 @@ import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.play.in.blockplace.WrappedPacketInBlockPlace;
 import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
+import lombok.ToString;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 
+@ToString
 @CheckInfo(name = "Inventory (E)", type = CheckType.INVENTORY,
         description = "Detects this Inventory pattern: BlockPlace w/ Item, BlockPlace, HeldItemSlot")
 public class InventoryE extends Check {

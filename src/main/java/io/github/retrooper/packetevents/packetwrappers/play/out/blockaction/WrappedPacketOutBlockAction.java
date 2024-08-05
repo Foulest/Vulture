@@ -6,15 +6,18 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
+import lombok.ToString;
 import org.bukkit.Material;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * This packet is used for a number of actions and animations performed by blocks, usually non-persistent.
  *
  * @author Tecnio
  */
+@ToString
 public class WrappedPacketOutBlockAction extends WrappedPacket implements SendableWrapper {
 
     private static Constructor<?> packetConstructor;
@@ -44,8 +47,8 @@ public class WrappedPacketOutBlockAction extends WrappedPacket implements Sendab
         }
     }
 
-    public Vector3i getBlockPosition() {
-        if (packet != null) {
+    private Vector3i getBlockPosition() {
+        if (nmsPacket != null) {
             return readBlockPosition(0);
         } else {
             return blockPos;
@@ -53,15 +56,15 @@ public class WrappedPacketOutBlockAction extends WrappedPacket implements Sendab
     }
 
     public void setBlockPosition(Vector3i blockPos) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeBlockPosition(0, blockPos);
         } else {
             this.blockPos = blockPos;
         }
     }
 
-    public int getActionId() {
-        if (packet != null) {
+    private int getActionId() {
+        if (nmsPacket != null) {
             return readInt(0);
         } else {
             return actionID;
@@ -69,15 +72,15 @@ public class WrappedPacketOutBlockAction extends WrappedPacket implements Sendab
     }
 
     public void setActionId(int actionID) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeInt(0, actionID);
         } else {
             this.actionID = actionID;
         }
     }
 
-    public int getActionData() {
-        if (packet != null) {
+    private int getActionData() {
+        if (nmsPacket != null) {
             return readInt(1);
         } else {
             return actionData;
@@ -85,15 +88,15 @@ public class WrappedPacketOutBlockAction extends WrappedPacket implements Sendab
     }
 
     public void setActionData(int actionData) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeInt(1, actionData);
         } else {
             this.actionData = actionData;
         }
     }
 
-    public Material getBlockType() {
-        if (packet != null) {
+    private Material getBlockType() {
+        if (nmsPacket != null) {
             return NMSUtils.getMaterialFromNMSBlock(readObject(0, NMSUtils.blockClass));
         } else {
             return blockType;
@@ -101,7 +104,7 @@ public class WrappedPacketOutBlockAction extends WrappedPacket implements Sendab
     }
 
     public void setBlockType(Material blockType) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             Object nmsBlock = NMSUtils.getNMSBlockFromMaterial(blockType);
             write(NMSUtils.blockClass, 0, nmsBlock);
         } else {
@@ -110,7 +113,7 @@ public class WrappedPacketOutBlockAction extends WrappedPacket implements Sendab
     }
 
     @Override
-    public Object asNMSPacket() throws Exception {
+    public Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
         Object nmsBlockPos = NMSUtils.generateNMSBlockPos(getBlockPosition());
         Object nmsBlock = NMSUtils.getNMSBlockFromMaterial(getBlockType());
         return packetConstructor.newInstance(nmsBlockPos, nmsBlock, getActionId(), getActionData());

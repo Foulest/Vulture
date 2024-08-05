@@ -30,10 +30,10 @@ import org.jetbrains.annotations.NotNull;
 public class ChannelUtils {
 
     public void runInEventLoop(@NotNull Channel channel, Runnable runnable) {
-        if (!channel.eventLoop().inEventLoop()) {
-            channel.eventLoop().execute(runnable);
-        } else {
+        if (channel.eventLoop().inEventLoop()) {
             runnable.run();
+        } else {
+            channel.eventLoop().execute(runnable);
         }
     }
 }

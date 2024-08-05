@@ -19,6 +19,7 @@ package net.foulest.vulture.tracking;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import net.foulest.vulture.util.ConstantUtil;
 import net.foulest.vulture.util.data.Area;
 
@@ -28,6 +29,7 @@ import net.foulest.vulture.util.data.Area;
  */
 @Getter
 @Setter
+@ToString
 public class EntityTrackerEntry {
 
     private final Area rootBase = new Area(); // First ping interpolation target area when still uncertain
@@ -37,13 +39,13 @@ public class EntityTrackerEntry {
     private int interpolation; // Interpolation ticks
     private boolean certain; // If certain the client has received the interpolation target
 
-    public EntityTrackerEntry(double x, double y, double z) {
+    EntityTrackerEntry(double x, double y, double z) {
         rootBase.set(x, y, z);
         base.set(x, y, z);
         position.set(x, y, z);
     }
 
-    public void move(double dx, double dy, double dz) {
+    void move(double dx, double dy, double dz) {
         rootBase.add(dx, dy, dz);
         base.addCoord(dx, dy, dz);
 
@@ -69,13 +71,13 @@ public class EntityTrackerEntry {
     }
 
     // Marks the interpolation target as certainly received by the client
-    public void markCertain() {
+    void markCertain() {
         certain = true;
         base.set(rootBase);
     }
 
     // Client-side interpolation
-    public void interpolate() {
+    void interpolate() {
         /*
         If uncertain we need to assume all cases for interpolation or no interpolation.
         By including the interpolation target in the position all scenarios from 3 to 0 interpolation ticks are handled.
@@ -87,7 +89,8 @@ public class EntityTrackerEntry {
         }
 
         if (interpolation > 0) {
-            position.interpolate(base, interpolation--);
+            position.interpolate(base, interpolation);
+            interpolation--;
         }
     }
 }

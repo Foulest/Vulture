@@ -20,11 +20,13 @@ package net.foulest.vulture.check.type.badpackets;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
+import lombok.ToString;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 
+@ToString
 @CheckInfo(name = "BadPackets (F)", type = CheckType.BADPACKETS, acceptsServerPackets = true,
         description = "Detects sending invalid UpdateSign packets.")
 public class BadPacketsF extends Check {

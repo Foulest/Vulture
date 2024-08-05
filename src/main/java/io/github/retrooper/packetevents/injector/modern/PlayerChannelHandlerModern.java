@@ -24,11 +24,15 @@ import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+@ToString
+@NoArgsConstructor
 @ChannelHandler.Sharable
 public class PlayerChannelHandlerModern extends ChannelDuplexHandler {
 
@@ -39,17 +43,19 @@ public class PlayerChannelHandlerModern extends ChannelDuplexHandler {
     public final AtomicReference<Player> player = new AtomicReference<>();
 
     @Override
+    @SuppressWarnings("ProhibitedExceptionDeclared")
     public void channelRead(@NotNull ChannelHandlerContext ctx, Object packet) throws Exception {
         Player currentPlayer = player.get();
-        PacketProcessorInternal.PacketData data = PacketEvents.get().getInternalPacketProcessor().read(currentPlayer, ctx.channel(), packet);
+        PacketProcessorInternal.PacketData data = PacketEvents.getInstance().getInternalPacketProcessor().read(currentPlayer, ctx.channel(), packet);
 
         if (data.packet != null) {
             super.channelRead(ctx, data.packet);
-            PacketEvents.get().getInternalPacketProcessor().postRead(currentPlayer, ctx.channel(), data.packet);
+            PacketEvents.getInstance().getInternalPacketProcessor().postRead(currentPlayer, ctx.channel(), data.packet);
         }
     }
 
     @Override
+    @SuppressWarnings("ProhibitedExceptionDeclared")
     public void write(ChannelHandlerContext ctx, Object packet, ChannelPromise promise) throws Exception {
         if (packet instanceof ByteBuf) {
             // Ignore ByteBufs!
@@ -58,7 +64,7 @@ public class PlayerChannelHandlerModern extends ChannelDuplexHandler {
         }
 
         Player currentPlayer = player.get();
-        PacketProcessorInternal.PacketData data = PacketEvents.get().getInternalPacketProcessor().write(currentPlayer, ctx.channel(), packet);
+        PacketProcessorInternal.PacketData data = PacketEvents.getInstance().getInternalPacketProcessor().write(currentPlayer, ctx.channel(), packet);
 
         if (data.postAction != null) {
             promise.addListener(f -> data.postAction.run());
@@ -66,7 +72,7 @@ public class PlayerChannelHandlerModern extends ChannelDuplexHandler {
 
         if (data.packet != null) {
             super.write(ctx, data.packet, promise);
-            PacketEvents.get().getInternalPacketProcessor().postWrite(currentPlayer, ctx.channel(), data.packet);
+            PacketProcessorInternal.postWrite(currentPlayer, ctx.channel(), data.packet);
         }
     }
 }

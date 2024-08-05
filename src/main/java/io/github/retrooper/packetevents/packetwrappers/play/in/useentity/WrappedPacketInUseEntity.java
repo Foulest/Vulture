@@ -3,15 +3,18 @@ package io.github.retrooper.packetevents.packetwrappers.play.in.useentity;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.WrapperPacketReader;
 import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
 import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
+@ToString
 public final class WrappedPacketInUseEntity extends WrappedPacketEntityAbstraction {
 
     private static Class<? extends Enum<?>> enumEntityUseActionClass;
@@ -37,7 +40,7 @@ public final class WrappedPacketInUseEntity extends WrappedPacketEntityAbstracti
         }
 
         Object vec3DObj = readObject(0, NMSUtils.vec3DClass);
-        WrappedPacket vec3DWrapper = new WrappedPacket(new NMSPacket(vec3DObj));
+        WrapperPacketReader vec3DWrapper = new WrappedPacket(new NMSPacket(vec3DObj));
         return Optional.of(new Vector3d(vec3DWrapper.readDouble(0), vec3DWrapper.readDouble(1), vec3DWrapper.readDouble(2)));
     }
 

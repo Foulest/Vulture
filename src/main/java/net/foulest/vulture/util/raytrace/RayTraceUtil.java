@@ -23,7 +23,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,21 +32,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@Setter
 @SuppressWarnings("unused")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class RayTraceUtil {
+final class RayTraceUtil {
 
-    public static @Nullable Block getBlockPlayerLookingAt(@NotNull Player player, double distance) {
-        RayTrace rayTrace = new RayTrace(player.getEyeLocation().toVector(), player.getEyeLocation().getDirection());
+    public static @Nullable Block getBlockEntityLookingAt(@NotNull LivingEntity entity, double distance) {
+        RayTrace rayTrace = new RayTrace(entity.getEyeLocation().toVector(), entity.getEyeLocation().getDirection());
         List<Vector> positions = rayTrace.traverse(distance, 0.01);
 
         for (Vector vector : positions) {
-            Location position = vector.toLocation(player.getWorld());
-            Block block = player.getWorld().getBlockAt(position);
+            Location position = vector.toLocation(entity.getWorld());
+            Block block = entity.getWorld().getBlockAt(position);
 
             if (block != null && block.getType() != Material.AIR
-                    && rayTrace.intersects(new BoundingBox(block), distance, 0.01)) {
+                    && rayTrace.intersects(new BoundingBox(block), distance)) {
                 return block;
             }
         }
@@ -58,14 +57,15 @@ public class RayTraceUtil {
      * <p>
      * <a href="https://www.spigotmc.org/threads/hitboxes-and-ray-tracing.174358/">...</a>
      */
+    @ToString
     @AllArgsConstructor
-    public static class RayTrace {
+    static class RayTrace {
 
-        Vector origin;
-        Vector direction;
+        private Vector origin;
+        private Vector direction;
 
         // Gets a point on the raytrace at X blocks away
-        public Vector getPosition(double blocksAway) {
+        Vector getPosition(double blocksAway) {
             return origin.clone().add(direction.clone().multiply(blocksAway));
         }
 
@@ -77,8 +77,8 @@ public class RayTraceUtil {
         }
 
         // Get all positions on a raytrace
-        public List<Vector> traverse(double blocksAway, double accuracy) {
-            ArrayList<Vector> positions = new ArrayList<>();
+        List<Vector> traverse(double blocksAway, double accuracy) {
+            List<Vector> positions = new ArrayList<>();
 
             for (double d = 0; d <= blocksAway; d += accuracy) {
                 positions.add(getPosition(d));
@@ -87,8 +87,7 @@ public class RayTraceUtil {
         }
 
         // Intersection detection for current raytrace
-        public boolean intersects(Vector min, Vector max,
-                                  double blocksAway, double accuracy) {
+        public boolean intersects(Vector min, Vector max, double blocksAway, double accuracy) {
             List<Vector> positions = traverse(blocksAway, accuracy);
 
             for (Vector position : positions) {
@@ -100,8 +99,8 @@ public class RayTraceUtil {
         }
 
         // BoundingBox instead of Vector
-        public boolean intersects(BoundingBox boundingBox, double blocksAway, double accuracy) {
-            List<Vector> positions = traverse(blocksAway, accuracy);
+        boolean intersects(BoundingBox boundingBox, double blocksAway) {
+            List<Vector> positions = traverse(blocksAway, 0.01);
 
             for (Vector position : positions) {
                 if (intersects(position, boundingBox.min, boundingBox.max)) {
@@ -112,7 +111,7 @@ public class RayTraceUtil {
         }
 
         // General intersection detection
-        public static boolean intersects(@NotNull Vector position, @NotNull Vector min, Vector max) {
+        static boolean intersects(@NotNull Vector position, @NotNull Vector min, Vector max) {
             if (position.getX() < min.getX() || position.getX() > max.getX()) {
                 return false;
             } else if (position.getY() < min.getY() || position.getY() > max.getY()) {
@@ -123,8 +122,7 @@ public class RayTraceUtil {
         }
 
         // Intersection detection for current raytrace with return
-        public Vector positionOfIntersect(Vector min, Vector max,
-                                          double blocksAway, double accuracy) {
+        public @Nullable Vector positionOfIntersect(Vector min, Vector max, double blocksAway, double accuracy) {
             List<Vector> positions = traverse(blocksAway, accuracy);
 
             for (Vector position : positions) {
@@ -136,7 +134,7 @@ public class RayTraceUtil {
         }
 
         // BoundingBox instead of Vector
-        public Vector positionOfIntersect(BoundingBox boundingBox, double blocksAway, double accuracy) {
+        public @Nullable Vector positionOfIntersect(BoundingBox boundingBox, double blocksAway, double accuracy) {
             List<Vector> positions = traverse(blocksAway, accuracy);
 
             for (Vector position : positions) {

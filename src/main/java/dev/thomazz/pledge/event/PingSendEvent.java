@@ -24,6 +24,7 @@ package dev.thomazz.pledge.event;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -36,13 +37,13 @@ import org.jetbrains.annotations.NotNull;
  */
 @Getter
 @Setter
+@ToString
 public class PingSendEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-
     private final Player player;
     private final int id;
-    private boolean cancelled = false;
+    private boolean cancelled;
 
     public PingSendEvent(Player player, int id) {
         super(true);
@@ -53,10 +54,10 @@ public class PingSendEvent extends Event implements Cancellable {
     @NotNull
     @Override
     public HandlerList getHandlers() {
-        return PingSendEvent.handlers;
+        return handlers;
     }
 
     public static HandlerList getHandlerList() {
-        return PingSendEvent.handlers;
+        return handlers;
     }
 }

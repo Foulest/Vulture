@@ -23,6 +23,7 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.play.in.transaction.WrappedPacketInTransaction;
 import io.github.retrooper.packetevents.packetwrappers.play.out.transaction.WrappedPacketOutTransaction;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
+import lombok.ToString;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
@@ -32,6 +33,7 @@ import net.foulest.vulture.util.KickUtil;
 import net.foulest.vulture.util.data.EvictingList;
 import net.foulest.vulture.util.data.Pair;
 
+@ToString
 @CheckInfo(name = "PingSpoof (A)", type = CheckType.PINGSPOOF,
         acceptsServerPackets = true, punishable = false,
         description = "Detects clients modifying Transaction packets.")

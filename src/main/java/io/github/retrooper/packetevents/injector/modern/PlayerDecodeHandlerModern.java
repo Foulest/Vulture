@@ -23,12 +23,16 @@ import io.github.retrooper.packetevents.utils.bytebuf.ByteBufWrapper;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+@ToString
+@NoArgsConstructor
 public class PlayerDecodeHandlerModern extends ByteToMessageDecoder {
 
     /**
@@ -42,12 +46,12 @@ public class PlayerDecodeHandlerModern extends ByteToMessageDecoder {
         Player currentPlayer = player.get();
         ByteBufWrapper byteBufWrapper = new ByteBufWrapper(byteBuf);
         PacketDecodeEvent event = new PacketDecodeEvent(ctx, currentPlayer, byteBufWrapper, false);
-        PacketEvents.get().getEventManager().callEvent(event);
+        PacketEvents.getInstance().getEventManager().callEvent(event);
 
-        if (!event.isCancelled()) {
-            list.add(byteBuf.readBytes(byteBuf.readableBytes()));
-        } else {
+        if (event.isCancelled()) {
             byteBuf.skipBytes(byteBuf.readableBytes());
+        } else {
+            list.add(byteBuf.readBytes(byteBuf.readableBytes()));
         }
     }
 }

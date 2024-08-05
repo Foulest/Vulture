@@ -73,7 +73,7 @@ public class PEVersion implements Cloneable {
      * @param version Compared version
      * @return Comparing to another Version.
      */
-    public int compareTo(@NotNull PEVersion version) {
+    private int compareTo(@NotNull PEVersion version) {
         int localLength = versionIntArray.length;
         int oppositeLength = version.versionIntArray.length;
         int length = Math.max(localLength, oppositeLength);
@@ -161,7 +161,7 @@ public class PEVersion implements Cloneable {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(versionIntArray.length * 2 - 1).append(versionIntArray[0]);
+        StringBuilder sb = new StringBuilder((versionIntArray.length << 1) - 1).append(versionIntArray[0]);
 
         for (int i = 1; i < versionIntArray.length; i++) {
             sb.append(".").append(versionIntArray[i]);

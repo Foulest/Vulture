@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class EnumUtil {
+public final class EnumUtil {
 
     public static <E extends Enum<E>> @Nullable E valueOf(@NotNull Class<E> cls, String constantName) {
         for (E enumConstant : cls.getEnumConstants()) {

@@ -22,12 +22,14 @@ import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
+import lombok.ToString;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 
+@ToString
 @CheckInfo(name = "Velocity (B)", type = CheckType.VELOCITY,
         description = "Checks for incorrect horizontal velocity.", experimental = true)
 public class VelocityB extends Check {
@@ -53,7 +55,7 @@ public class VelocityB extends Check {
             WrappedPacketInFlying flying = new WrappedPacketInFlying(nmsPacket);
             Vector3d flyingPosition = flying.getPosition();
 
-            double deltaXZ = (flying.isMoving() ? Math.hypot(flyingPosition.getX() - lastPosX, flyingPosition.getZ() - lastPosZ) : 0.0);
+            double deltaXZ = (flying.isMoving() ? StrictMath.hypot(flyingPosition.getX() - lastPosX, flyingPosition.getZ() - lastPosZ) : 0.0);
             double takenXZ = playerData.getVelocityXZ().getLast();
             double diffXZ = Math.abs(deltaXZ - takenXZ);
 

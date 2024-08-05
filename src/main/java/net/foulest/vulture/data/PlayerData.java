@@ -22,6 +22,7 @@ import io.github.retrooper.packetevents.packetwrappers.play.out.position.Wrapped
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.Violation;
@@ -44,6 +45,7 @@ import java.util.*;
 
 @Getter
 @Setter
+@ToString
 public class PlayerData {
 
     // Player data
@@ -54,8 +56,8 @@ public class PlayerData {
     // Anti-cheat data
     @Getter
     private final List<Check> checks = new ArrayList<>();
-    private boolean alertsEnabled = false;
-    private boolean verboseEnabled = false;
+    private boolean alertsEnabled;
+    private boolean verboseEnabled;
     private boolean newViolationsPaused;
     private List<Violation> violations = new ArrayList<>();
     private List<PayloadType> payloads = new ArrayList<>();
@@ -220,7 +222,8 @@ public class PlayerData {
         packetCounts.clear();
 
         // Resets the packets sent per second count every second
-        if (++ticksBeforeReset >= 20) {
+        ++ticksBeforeReset;
+        if (ticksBeforeReset >= 20) {
             smoothedSentPerSecond.add(packetsSentPerSecond);
             packetsSentPerSecond = 0;
             ticksBeforeReset = 0;
@@ -362,11 +365,13 @@ public class PlayerData {
     }
 
     public int incrementPacketsSentPerTick() {
-        return ++packetsSentPerTick;
+        ++packetsSentPerTick;
+        return packetsSentPerTick;
     }
 
     public int incrementPacketsSentPerSecond() {
-        return ++packetsSentPerSecond;
+        ++packetsSentPerSecond;
+        return packetsSentPerSecond;
     }
 
     public int getSmoothedPacketsPerSecond() {

@@ -4,11 +4,14 @@ import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
+import lombok.ToString;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
+@ToString
 public final class WrappedPacketOutAnimation extends WrappedPacketEntityAbstraction implements SendableWrapper {
 
     private static Constructor<?> packetConstructor;
@@ -42,7 +45,7 @@ public final class WrappedPacketOutAnimation extends WrappedPacketEntityAbstract
     }
 
     public EntityAnimationType getAnimationType() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             byte id = (byte) readInt(1);
             return EntityAnimationType.values()[id];
         } else {
@@ -50,8 +53,8 @@ public final class WrappedPacketOutAnimation extends WrappedPacketEntityAbstract
         }
     }
 
-    public void setAnimationType(EntityAnimationType type) {
-        if (packet != null) {
+    private void setAnimationType(EntityAnimationType type) {
+        if (nmsPacket != null) {
             writeInt(1, type.ordinal());
         } else {
             this.type = type;
@@ -59,7 +62,7 @@ public final class WrappedPacketOutAnimation extends WrappedPacketEntityAbstract
     }
 
     @Override
-    public @NotNull Object asNMSPacket() throws Exception {
+    public @NotNull Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
         Object packetInstance = packetConstructor.newInstance();
         WrappedPacketOutAnimation animation = new WrappedPacketOutAnimation(new NMSPacket(packetInstance));
         animation.setEntityId(getEntityId());

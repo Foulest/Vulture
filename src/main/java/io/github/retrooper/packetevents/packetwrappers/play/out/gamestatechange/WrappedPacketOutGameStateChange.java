@@ -4,13 +4,18 @@ import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
+import io.github.retrooper.packetevents.packetwrappers.api.WrapperPacketReader;
+import io.github.retrooper.packetevents.packetwrappers.api.WrapperPacketWriter;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import lombok.AllArgsConstructor;
+import lombok.ToString;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
+@ToString
+@AllArgsConstructor
 public class WrappedPacketOutGameStateChange extends WrappedPacket implements SendableWrapper {
 
     private static Constructor<?> packetConstructor;
@@ -18,16 +23,12 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
     private static Class<?> reasonClassType;
     private static boolean reasonIntMode;
     private static boolean valueFloatMode;
+
     private int reason;
     private double value;
 
     public WrappedPacketOutGameStateChange(NMSPacket packet) {
         super(packet);
-    }
-
-    public WrappedPacketOutGameStateChange(int reason, double value) {
-        this.reason = reason;
-        this.value = value;
     }
 
     public WrappedPacketOutGameStateChange(int reason, float value) {
@@ -41,8 +42,8 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
         if (reasonClassType != null) {
             try {
                 reasonClassConstructor = reasonClassType.getConstructor(int.class);
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
+            } catch (NoSuchMethodException ex) {
+                ex.printStackTrace();
             }
         }
 
@@ -65,23 +66,19 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
             }
 
             packetConstructor = PacketTypeClasses.Play.Server.GAME_STATE_CHANGE.getConstructor(reasonClassType, valueClassType);
-
-        } catch (NullPointerException ex) {
-            Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "PacketEvents failed to find the constructor for the outbound Game state packet wrapper.");
-
         } catch (NoSuchMethodException ex) {
             ex.printStackTrace();
         }
     }
 
-    public int getReason() {
-        if (packet != null) {
+    private int getReason() {
+        if (nmsPacket != null) {
             if (reasonIntMode) {
                 return readInt(0);
             } else {
                 // this packet is obfuscated quite strongly(1.16), so we must do this
                 Object reasonObject = readObject(12, reasonClassType);
-                WrappedPacket reasonObjWrapper = new WrappedPacket(new NMSPacket(reasonObject));
+                WrapperPacketReader reasonObjWrapper = new WrappedPacket(new NMSPacket(reasonObject));
                 return reasonObjWrapper.readInt(0);
             }
         } else {
@@ -90,13 +87,13 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
     }
 
     public void setReason(int reason) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             if (reasonIntMode) {
                 writeInt(0, reason);
             } else {
                 // this packet is obfuscated quite strongly(1.16), so we must do this
                 Object reasonObj = readObject(12, reasonClassType);
-                WrappedPacket reasonObjWrapper = new WrappedPacket(new NMSPacket(reasonObj));
+                WrapperPacketWriter reasonObjWrapper = new WrappedPacket(new NMSPacket(reasonObj));
                 reasonObjWrapper.writeInt(0, reason);
             }
         } else {
@@ -104,8 +101,8 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
         }
     }
 
-    public double getValue() {
-        if (packet != null) {
+    private double getValue() {
+        if (nmsPacket != null) {
             if (valueFloatMode) {
                 return readFloat(0);
             } else {
@@ -117,7 +114,7 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
     }
 
     public void setValue(double value) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             if (valueFloatMode) {
                 writeFloat(0, (float) value);
             } else {
@@ -129,7 +126,7 @@ public class WrappedPacketOutGameStateChange extends WrappedPacket implements Se
     }
 
     @Override
-    public Object asNMSPacket() throws Exception {
+    public Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
         if (reasonIntMode) {
             if (valueFloatMode) {
                 return packetConstructor.newInstance(getReason(), (float) getValue());

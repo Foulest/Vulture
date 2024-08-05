@@ -19,6 +19,7 @@ package io.github.retrooper.packetevents.utils.nms;
 
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.WrapperPacketReader;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import io.github.retrooper.packetevents.utils.server.ServerVersion;
@@ -46,29 +47,29 @@ import java.util.concurrent.atomic.AtomicInteger;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class NMSUtils {
 
-    public static final String NMS_DIR = ServerVersion.getNMSDirectory() + ".";
-    public static final String OBC_DIR = ServerVersion.getOBCDirectory() + ".";
+    private static final String NMS_DIR = ServerVersion.getNMSDirectory() + ".";
+    private static final String OBC_DIR = ServerVersion.getOBCDirectory() + ".";
 
     private static final ThreadLocal<Random> randomThreadLocal = ThreadLocal.withInitial(Random::new);
 
-    public static Constructor<?> blockPosConstructor;
+    private static Constructor<?> blockPosConstructor;
     public static Constructor<?> minecraftKeyConstructor;
-    public static Constructor<?> vec3DConstructor;
-    public static Constructor<?> dataWatcherConstructor;
-    public static Constructor<?> packetDataSerializerConstructor;
-    public static Constructor<?> itemStackConstructor;
+    private static Constructor<?> vec3DConstructor;
+    private static Constructor<?> dataWatcherConstructor;
+    private static Constructor<?> packetDataSerializerConstructor;
+    private static Constructor<?> itemStackConstructor;
 
-    public static Class<?> mobEffectListClass;
-    public static Class<?> nmsEntityClass;
-    public static Class<?> minecraftServerClass;
+    private static Class<?> mobEffectListClass;
+    private static Class<?> nmsEntityClass;
+    private static Class<?> minecraftServerClass;
     public static Class<?> craftWorldClass;
-    public static Class<?> playerInteractManagerClass;
-    public static Class<?> entityPlayerClass;
-    public static Class<?> playerConnectionClass;
-    public static Class<?> craftServerClass;
-    public static Class<?> craftPlayerClass;
-    public static Class<?> serverConnectionClass;
-    public static Class<?> craftEntityClass;
+    private static Class<?> playerInteractManagerClass;
+    private static Class<?> entityPlayerClass;
+    private static Class<?> playerConnectionClass;
+    private static Class<?> craftServerClass;
+    private static Class<?> craftPlayerClass;
+    private static Class<?> serverConnectionClass;
+    private static Class<?> craftEntityClass;
     public static Class<?> nmsItemStackClass;
     public static Class<?> networkManagerClass;
     public static Class<?> nettyChannelClass;
@@ -77,34 +78,34 @@ public final class NMSUtils {
     public static Class<?> blockPosClass;
     public static Class<?> sectionPositionClass;
     public static Class<?> vec3DClass;
-    public static Class<?> channelFutureClass;
+    private static Class<?> channelFutureClass;
     public static Class<?> blockClass;
     public static Class<?> iBlockDataClass;
     public static Class<?> nmsWorldClass;
-    public static Class<?> craftItemStackClass;
+    private static Class<?> craftItemStackClass;
     public static Class<?> soundEffectClass;
     public static Class<?> minecraftKeyClass;
-    public static Class<?> chatSerializerClass;
-    public static Class<?> craftMagicNumbersClass;
-    public static Class<?> worldSettingsClass;
-    public static Class<?> worldServerClass;
+    private static Class<?> chatSerializerClass;
+    private static Class<?> craftMagicNumbersClass;
+    private static Class<?> worldSettingsClass;
+    private static Class<?> worldServerClass;
     public static Class<?> dataWatcherClass;
-    public static Class<?> dedicatedServerClass;
+    private static Class<?> dedicatedServerClass;
     public static Class<?> entityHumanClass;
     public static Class<?> packetDataSerializerClass;
     public static Class<?> byteBufClass;
-    public static Class<?> dimensionManagerClass;
-    public static Class<?> nmsItemClass;
-    public static Class<?> iMaterialClass;
+    private static Class<?> dimensionManagerClass;
+    private static Class<?> nmsItemClass;
+    private static Class<?> iMaterialClass;
     public static Class<?> movingObjectPositionBlockClass;
-    public static Class<?> boundingBoxClass;
-    public static Class<?> tileEntityCommandClass;
+    private static Class<?> boundingBoxClass;
+    private static Class<?> tileEntityCommandClass;
 
     public static Class<? extends Enum<?>> enumDirectionClass;
-    public static Class<? extends Enum<?>> enumHandClass;
+    private static Class<? extends Enum<?>> enumHandClass;
     public static Class<? extends Enum<?>> enumGameModeClass;
     public static Class<? extends Enum<?>> enumDifficultyClass;
-    public static Class<? extends Enum<?>> tileEntityCommandTypeClass;
+    private static Class<? extends Enum<?>> tileEntityCommandTypeClass;
 
     public static Method getBlockPosX;
     public static Method getBlockPosY;
@@ -146,7 +147,7 @@ public final class NMSUtils {
         try {
             // Test if the selected netty location is valid
             getNettyClass("channel.Channel");
-        } catch (Exception ex) {
+        } catch (ClassNotFoundException ex) {
             Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_RED + "[packetevents] Failed to locate the netty package location for your server version. Searching...");
         }
 
@@ -282,13 +283,13 @@ public final class NMSUtils {
 
         if (packetDataSerializerClass != null) {
             try {
-                packetDataSerializerConstructor = packetDataSerializerClass.getConstructor(NMSUtils.byteBufClass);
+                packetDataSerializerConstructor = packetDataSerializerClass.getConstructor(byteBufClass);
             } catch (NoSuchMethodException ex) {
                 ex.printStackTrace();
             }
         }
 
-        dimensionManagerClass = NMSUtils.getNMSClassWithoutException("DimensionManager");
+        dimensionManagerClass = getNMSClassWithoutException("DimensionManager");
         if (dimensionManagerClass == null) {
             dimensionManagerClass = getNMClassWithoutException("world.level.dimension.DimensionManager");
         }
@@ -303,24 +304,24 @@ public final class NMSUtils {
             }
         }
 
-        iChatBaseComponentClass = NMSUtils.getNMSClassWithoutException("IChatBaseComponent");
+        iChatBaseComponentClass = getNMSClassWithoutException("IChatBaseComponent");
         if (iChatBaseComponentClass == null) {
             iChatBaseComponentClass = getNMClassWithoutException("network.chat.IChatBaseComponent");
         }
 
-        tileEntityCommandClass = NMSUtils.getNMSClassWithoutException("TileEntityCommand");
+        tileEntityCommandClass = getNMSClassWithoutException("TileEntityCommand");
         if (tileEntityCommandClass == null) {
-            tileEntityCommandClass = NMSUtils.getNMClassWithoutException("world.level.block.entity.TileEntityCommand");
+            tileEntityCommandClass = getNMClassWithoutException("world.level.block.entity.TileEntityCommand");
         }
 
         tileEntityCommandTypeClass = SubclassUtil.getEnumSubClass(tileEntityCommandClass, 0);
 
-        vec3DClass = NMSUtils.getNMSClassWithoutException("Vec3D");
+        vec3DClass = getNMSClassWithoutException("Vec3D");
         if (vec3DClass == null) {
             vec3DClass = getNMClassWithoutException("world.phys.Vec3D");
         }
 
-        blockPosClass = NMSUtils.getNMSClassWithoutException("BlockPosition");
+        blockPosClass = getNMSClassWithoutException("BlockPosition");
         if (blockPosClass == null) {
             blockPosClass = getNMClassWithoutException("core.BlockPosition");
         }
@@ -337,7 +338,7 @@ public final class NMSUtils {
             }
 
             if (vec3DClass != null) {
-                vec3DConstructor = NMSUtils.vec3DClass.getDeclaredConstructor(double.class, double.class, double.class);
+                vec3DConstructor = vec3DClass.getDeclaredConstructor(double.class, double.class, double.class);
                 vec3DConstructor.setAccessible(true);
             }
 
@@ -353,13 +354,13 @@ public final class NMSUtils {
         }
 
         try {
-            getItemId = NMSUtils.nmsItemClass.getMethod("getId", NMSUtils.nmsItemClass);
-            getItemById = NMSUtils.nmsItemClass.getMethod("getById", int.class);
-        } catch (Exception ex) {
+            getItemId = nmsItemClass.getMethod("getId", nmsItemClass);
+            getItemById = nmsItemClass.getMethod("getById", int.class);
+        } catch (NoSuchMethodException ex) {
             ex.printStackTrace();
         }
 
-        enumDirectionClass = NMSUtils.getNMSEnumClassWithoutException("EnumDirection");
+        enumDirectionClass = getNMSEnumClassWithoutException("EnumDirection");
         if (enumDirectionClass == null) {
             enumDirectionClass = getNMEnumClassWithoutException("core.EnumDirection");
         }
@@ -384,21 +385,21 @@ public final class NMSUtils {
 
             // In 1.8.3+ the ChatSerializer class is declared in the IChatBaseComponent class, so we have to handle that
             try {
-                chatSerializerClass = NMSUtils.getNMSClass("ChatSerializer");
+                chatSerializerClass = getNMSClass("ChatSerializer");
             } catch (ClassNotFoundException e) {
                 // That is fine, it is probably a subclass
                 chatSerializerClass = SubclassUtil.getSubClass(iChatBaseComponentClass, "ChatSerializer");
             }
 
-            craftMagicNumbersClass = NMSUtils.getOBCClass("util.CraftMagicNumbers");
+            craftMagicNumbersClass = getOBCClass("util.CraftMagicNumbers");
             chatFromStringMethod = Reflection.getMethod(chatSerializerClass, 0, String.class);
-            getMaterialFromNMSBlock = Reflection.getMethod(craftMagicNumbersClass, "getMaterial", Material.class, NMSUtils.blockClass);
-            getNMSBlockFromMaterial = Reflection.getMethod(craftMagicNumbersClass, "getBlock", NMSUtils.blockClass, Material.class);
+            getMaterialFromNMSBlock = Reflection.getMethod(craftMagicNumbersClass, "getMaterial", Material.class, blockClass);
+            getNMSBlockFromMaterial = Reflection.getMethod(craftMagicNumbersClass, "getBlock", blockClass, Material.class);
 
             if (minecraftKeyClass != null) {
                 minecraftKeyConstructor = minecraftKeyClass.getConstructor(String.class);
             }
-        } catch (Exception ex) {
+        } catch (ClassNotFoundException | NoSuchMethodException ex) {
             ex.printStackTrace();
         }
 
@@ -407,7 +408,7 @@ public final class NMSUtils {
                 getMobEffectListId = Reflection.getMethod(mobEffectListClass, 0, mobEffectListClass);
                 getMobEffectListById = Reflection.getMethod(mobEffectListClass, 0, int.class);
             }
-        } catch (Exception ex) {
+        } catch (RuntimeException ex) {
             ex.printStackTrace();
         }
 
@@ -419,23 +420,23 @@ public final class NMSUtils {
 
         // In case its null, these methods are not needed and would cause errors
         if (blockPosClass != null) {
-            getBlockPosX = Reflection.getMethod(NMSUtils.blockPosClass, "getX", int.class);
-            getBlockPosY = Reflection.getMethod(NMSUtils.blockPosClass, "getY", int.class);
-            getBlockPosZ = Reflection.getMethod(NMSUtils.blockPosClass, "getZ", int.class);
+            getBlockPosX = Reflection.getMethod(blockPosClass, "getX", int.class);
+            getBlockPosY = Reflection.getMethod(blockPosClass, "getY", int.class);
+            getBlockPosZ = Reflection.getMethod(blockPosClass, "getZ", int.class);
 
             // Mappings changed with 1.18
             if (getBlockPosX == null) {
-                getBlockPosX = Reflection.getMethod(NMSUtils.blockPosClass, "u", int.class);
+                getBlockPosX = Reflection.getMethod(blockPosClass, "u", int.class);
             }
             if (getBlockPosY == null) {
-                getBlockPosY = Reflection.getMethod(NMSUtils.blockPosClass, "v", int.class);
+                getBlockPosY = Reflection.getMethod(blockPosClass, "v", int.class);
             }
             if (getBlockPosZ == null) {
-                getBlockPosZ = Reflection.getMethod(NMSUtils.blockPosClass, "w", int.class);
+                getBlockPosZ = Reflection.getMethod(blockPosClass, "w", int.class);
             }
         }
 
-        worldSettingsClass = NMSUtils.getNMSClassWithoutException("WorldSettings");
+        worldSettingsClass = getNMSClassWithoutException("WorldSettings");
         if (worldServerClass == null) {
             worldServerClass = getNMClassWithoutException("world.level.WorldSettings");
         }
@@ -445,12 +446,12 @@ public final class NMSUtils {
             enumHandClass = getNMEnumClassWithoutException("world.EnumHand");
         }
 
-        enumDifficultyClass = NMSUtils.getNMSEnumClassWithoutException("EnumDifficulty");
+        enumDifficultyClass = getNMSEnumClassWithoutException("EnumDifficulty");
         if (enumDifficultyClass == null) {
             enumDifficultyClass = getNMEnumClassWithoutException("world.EnumDifficulty");
         }
 
-        enumGameModeClass = NMSUtils.getNMSEnumClassWithoutException("EnumGamemode");
+        enumGameModeClass = getNMSEnumClassWithoutException("EnumGamemode");
         if (enumGameModeClass == null) {
             enumGameModeClass = SubclassUtil.getEnumSubClass(worldSettingsClass, "EnumGamemode");
         }
@@ -459,7 +460,7 @@ public final class NMSUtils {
         }
     }
 
-    public static Object getMinecraftServerInstance(Server server) {
+    private static Object getMinecraftServerInstance(Server server) {
         if (minecraftServer == null) {
             try {
                 minecraftServer = Reflection.getField(craftServerClass, minecraftServerClass, 0).get(server);
@@ -482,9 +483,8 @@ public final class NMSUtils {
     }
 
     public static double[] recentTPS() {
-        WrappedPacket minecraftServerInstanceReader = new WrappedPacket(
-                new NMSPacket(getMinecraftServerInstance(Bukkit.getServer())),
-                minecraftServerClass);
+        WrapperPacketReader minecraftServerInstanceReader = new WrappedPacket(
+                new NMSPacket(getMinecraftServerInstance(Bukkit.getServer())), minecraftServerClass);
         return minecraftServerInstanceReader.readDoubleArray(0);
     }
 
@@ -504,6 +504,7 @@ public final class NMSUtils {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public static @Nullable <E extends Enum<E>> Class<E> getNMEnumClassWithoutException(String name) {
         try {
             return (Class<E>) Class.forName("net.minecraft." + name);
@@ -512,14 +513,16 @@ public final class NMSUtils {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public static @NotNull <E extends Enum<E>> Class<E> getNMSEnumClass(String name) throws ClassNotFoundException {
         return (Class<E>) Class.forName(NMS_DIR + name);
     }
 
+    @SuppressWarnings("unchecked")
     public static @Nullable <E extends Enum<E>> Class<E> getNMSEnumClassWithoutException(String name) {
         try {
             return (Class<E>) getNMSClass(name);
-        } catch (Exception ex) {
+        } catch (ClassNotFoundException ex) {
             return null;
         }
     }
@@ -527,16 +530,16 @@ public final class NMSUtils {
     public static @Nullable Class<?> getNMSClassWithoutException(String name) {
         try {
             return getNMSClass(name);
-        } catch (Exception ex) {
+        } catch (ClassNotFoundException ex) {
             return null;
         }
     }
 
-    public static @NotNull Class<?> getOBCClass(String name) throws ClassNotFoundException {
+    private static @NotNull Class<?> getOBCClass(String name) throws ClassNotFoundException {
         return Class.forName(OBC_DIR + name);
     }
 
-    public static @NotNull Class<?> getNettyClass(String name) throws ClassNotFoundException {
+    private static @NotNull Class<?> getNettyClass(String name) throws ClassNotFoundException {
         return Class.forName(nettyPrefix + name);
     }
 
@@ -571,7 +574,7 @@ public final class NMSUtils {
         return null;
     }
 
-    public static Object getCraftPlayer(Player player) {
+    private static Object getCraftPlayer(Player player) {
         return craftPlayerClass.cast(player);
     }
 
@@ -586,24 +589,24 @@ public final class NMSUtils {
         return null;
     }
 
-    public static @Nullable Object getPlayerConnection(Player player) {
+    private static @Nullable Object getPlayerConnection(Player player) {
         Object entityPlayer = getEntityPlayer(player);
 
         if (entityPlayer == null) {
             return null;
         }
 
-        WrappedPacket wrappedEntityPlayer = new WrappedPacket(new NMSPacket(entityPlayer));
-        return wrappedEntityPlayer.readObject(0, NMSUtils.playerConnectionClass);
+        WrapperPacketReader wrappedEntityPlayer = new WrappedPacket(new NMSPacket(entityPlayer));
+        return wrappedEntityPlayer.readObject(0, playerConnectionClass);
     }
 
     public static Object getGameProfile(Player player) {
         Object entityPlayer = getEntityPlayer(player);
-        WrappedPacket entityHumanWrapper = new WrappedPacket(new NMSPacket(entityPlayer), NMSUtils.entityHumanClass);
-        return entityHumanWrapper.readObject(0, NMSUtils.gameProfileClass);
+        WrapperPacketReader entityHumanWrapper = new WrappedPacket(new NMSPacket(entityPlayer), entityHumanClass);
+        return entityHumanWrapper.readObject(0, gameProfileClass);
     }
 
-    public static @Nullable Object getNetworkManager(Player player) {
+    private static @Nullable Object getNetworkManager(Player player) {
         Object playerConnection = getPlayerConnection(player);
 
         if (playerConnection == null) {
@@ -614,12 +617,12 @@ public final class NMSUtils {
 
         try {
             return wrapper.readObject(0, networkManagerClass);
-        } catch (Exception ex) {
+        } catch (RuntimeException ex) {
             wrapper = new WrappedPacket(new NMSPacket(playerConnection));
 
             try {
                 return wrapper.readObject(0, networkManagerClass);
-            } catch (Exception ex2) {
+            } catch (RuntimeException ex2) {
                 // Support for some custom plugins.
                 playerConnection = wrapper.read(0, playerConnectionClass);
                 wrapper = new WrappedPacket(new NMSPacket(playerConnection), playerConnectionClass);
@@ -635,7 +638,7 @@ public final class NMSUtils {
             return null;
         }
 
-        WrappedPacket wrapper = new WrappedPacket(new NMSPacket(networkManager), networkManagerClass);
+        WrapperPacketReader wrapper = new WrappedPacket(new NMSPacket(networkManager), networkManagerClass);
         return wrapper.readObject(0, nettyChannelClass);
     }
 
@@ -654,6 +657,7 @@ public final class NMSUtils {
         return -1;
     }
 
+    @SuppressWarnings("unchecked")
     public static List<Object> getNetworkManagers() {
         WrappedPacket serverConnectionWrapper = new WrappedPacket(new NMSPacket(getMinecraftServerConnection()));
 
@@ -666,7 +670,7 @@ public final class NMSUtils {
                         return list;
                     }
                 }
-            } catch (Exception ex) {
+            } catch (RuntimeException ex) {
                 break;
             }
         }
@@ -693,11 +697,11 @@ public final class NMSUtils {
 
     public static @Nullable Object convertBukkitServerToNMSServer(Server server) {
         Object craftServer = craftServerClass.cast(server);
-        WrappedPacket wrapper = new WrappedPacket(new NMSPacket(craftServer));
+        WrapperPacketReader wrapper = new WrappedPacket(new NMSPacket(craftServer));
 
         try {
             return wrapper.readObject(0, minecraftServerClass);
-        } catch (Exception ex) {
+        } catch (RuntimeException ex) {
             wrapper.readObject(0, dedicatedServerClass);
         }
         return null;
@@ -714,7 +718,7 @@ public final class NMSUtils {
         return null;
     }
 
-    public static Object generateIChatBaseComponent(String text) {
+    public static @Nullable Object generateIChatBaseComponent(String text) {
         if (text == null) {
             return null;
         }
@@ -736,7 +740,7 @@ public final class NMSUtils {
         return components;
     }
 
-    public static String readIChatBaseComponent(Object iChatBaseComponent) {
+    public static @Nullable String readIChatBaseComponent(Object iChatBaseComponent) {
         if (iChatBaseComponent == null) {
             return null;
         }
@@ -758,7 +762,7 @@ public final class NMSUtils {
         return texts;
     }
 
-    public static String fromStringToJSON(String message) {
+    public static @Nullable String fromStringToJSON(String message) {
         if (message == null) {
             return null;
         }
@@ -775,12 +779,12 @@ public final class NMSUtils {
     }
 
     public static String getStringFromMinecraftKey(Object minecraftKey) {
-        WrappedPacket minecraftKeyWrapper = new WrappedPacket(new NMSPacket(minecraftKey));
+        WrapperPacketReader minecraftKeyWrapper = new WrappedPacket(new NMSPacket(minecraftKey));
         return minecraftKeyWrapper.readString(1);
     }
 
     public static String @NotNull [] splitMinecraftKey(@NotNull String var0, char var1) {
-        String[] array = new String[]{"minecraft", var0};
+        String[] array = {"minecraft", var0};
         int index = var0.indexOf(var1);
 
         if (index >= 0) {
@@ -862,13 +866,17 @@ public final class NMSUtils {
         }
 
         try {
-            if (field.getType().equals(AtomicInteger.class)) {
+            if (field != null && field.getType().equals(AtomicInteger.class)) {
                 // Newer versions
                 AtomicInteger atomicInteger = (AtomicInteger) field.get(null);
                 return atomicInteger.incrementAndGet();
             } else {
-                int id = field.getInt(null) + 1;
-                field.set(null, id);
+                int id = 0;
+
+                if (field != null) {
+                    id = field.getInt(null) + 1;
+                    field.set(null, id);
+                }
                 return id;
             }
         } catch (IllegalAccessException ex) {

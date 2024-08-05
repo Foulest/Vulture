@@ -61,10 +61,10 @@ public class WrappedPacketInWindowClick extends WrappedPacket {
      * @return Get Clicked ItemStack
      */
     public ItemStack getClickedItemStack() {
-        return readItemStack(0);
+        return readItemStack();
     }
 
     public void setClickedItemStack(ItemStack stack) {
-        writeItemStack(0, stack);
+        writeItemStack(stack);
     }
 }

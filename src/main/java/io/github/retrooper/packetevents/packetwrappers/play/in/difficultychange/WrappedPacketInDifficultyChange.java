@@ -10,17 +10,17 @@ import org.bukkit.Difficulty;
  * @author Tecnio
  * @since 1.8
  */
-public final class WrappedPacketInDifficultyChange extends WrappedPacket {
+final class WrappedPacketInDifficultyChange extends WrappedPacket {
 
-    public WrappedPacketInDifficultyChange(NMSPacket packet) {
+    WrappedPacketInDifficultyChange(NMSPacket packet) {
         super(packet);
     }
 
     public Difficulty getDifficulty() {
-        return readDifficulty(0);
+        return readDifficulty();
     }
 
     public void setDifficulty(Difficulty difficulty) {
-        writeDifficulty(0, difficulty);
+        writeDifficulty(difficulty);
     }
 }

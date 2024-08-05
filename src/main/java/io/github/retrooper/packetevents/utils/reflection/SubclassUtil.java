@@ -25,17 +25,19 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.annotation.Annotation;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class SubclassUtil {
+public final class SubclassUtil {
 
+    @SuppressWarnings("unchecked")
     public static Class<? extends Enum<?>> getEnumSubClass(Class<?> cls, String name) {
         return (Class<? extends Enum<?>>) getSubClass(cls, name);
     }
 
+    @SuppressWarnings("unchecked")
     public static Class<? extends Enum<?>> getEnumSubClass(Class<?> cls, int index) {
         return (Class<? extends Enum<?>>) getSubClass(cls, index);
     }
 
-    public static Class<?> getSubClass(Class<?> cls, String name) {
+    public static @Nullable Class<?> getSubClass(Class<?> cls, String name) {
         if (cls == null) {
             return null;
         }
@@ -48,7 +50,7 @@ public class SubclassUtil {
         return null;
     }
 
-    public static Class<?> getSubClass(Class<?> cls, int index) {
+    public static @Nullable Class<?> getSubClass(Class<?> cls, int index) {
         if (cls == null) {
             return null;
         }
@@ -56,9 +58,11 @@ public class SubclassUtil {
         int currentIndex = 0;
 
         for (Class<?> subClass : cls.getDeclaredClasses()) {
-            if (index == currentIndex++) {
+            if (index == currentIndex) {
                 return subClass;
             }
+
+            currentIndex++;
         }
         return null;
     }
@@ -67,8 +71,12 @@ public class SubclassUtil {
         int currentIndex = 0;
 
         for (Class<?> subClass : cls.getDeclaredClasses()) {
-            if (subClass.isAnnotationPresent(annotation.getClass()) && index == currentIndex++) {
-                return subClass;
+            if (subClass.isAnnotationPresent(annotation.getClass())) {
+                if (index == currentIndex) {
+                    return subClass;
+                }
+
+                currentIndex++;
             }
         }
         return null;

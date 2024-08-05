@@ -21,8 +21,8 @@ import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import net.foulest.vulture.Vulture;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.jetbrains.annotations.NotNull;
@@ -39,7 +39,6 @@ import java.util.UUID;
  * @project Vulture
  */
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class KickUtil {
 
@@ -115,9 +114,9 @@ public final class KickUtil {
      * @param player The player to be kicked.
      * @param reason The reason for kicking the player.
      */
-    public static void kick(@NotNull Player player,
-                            String debugMessage,
-                            String reason, boolean announceKick) {
+    private static void kick(@NotNull Player player,
+                             String debugMessage,
+                             String reason, boolean announceKick) {
         synchronized (currentlyKicking) {
             if (currentlyKicking.contains(player.getUniqueId())) {
                 // Already in the process of kicking this player.
@@ -149,12 +148,12 @@ public final class KickUtil {
     /**
      * Checks if the specified player is being kicked.
      *
-     * @param player The player to check.
+     * @param entity The player to check.
      * @return If the player is being kicked.
      */
-    public static boolean isPlayerBeingKicked(@NotNull Player player) {
+    public static boolean isPlayerBeingKicked(@NotNull Entity entity) {
         synchronized (currentlyKicking) {
-            return currentlyKicking.contains(player.getUniqueId());
+            return currentlyKicking.contains(entity.getUniqueId());
         }
     }
 }

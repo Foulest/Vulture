@@ -19,6 +19,7 @@ package net.foulest.vulture.check.type.groundspoof;
 
 import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
+import lombok.ToString;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
@@ -27,6 +28,7 @@ import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.event.MovementEvent;
 import net.foulest.vulture.util.MovementUtil;
 
+@ToString
 @CheckInfo(name = "GroundSpoof (A)", type = CheckType.GROUNDSPOOF,
         description = "Detects clients spoofing their ground status.")
 public class GroundSpoofA extends Check {
@@ -63,7 +65,9 @@ public class GroundSpoofA extends Check {
 
         if (!to.isOnGround() && onGround && isYLevel && velocity != 0.0
                 && !playerData.isNearClimbable() && !playerData.isNearSlimeBlock()) {
-            if (++offGroundTicks >= 2) {
+            ++offGroundTicks;
+
+            if (offGroundTicks >= 2) {
                 flag(true, "Sending Off Ground"
                         + " (Y=" + toPosition.getY()
                         + " deltaY=" + deltaY

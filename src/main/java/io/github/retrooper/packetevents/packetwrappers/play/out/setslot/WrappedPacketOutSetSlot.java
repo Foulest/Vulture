@@ -6,10 +6,13 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import lombok.AllArgsConstructor;
+import lombok.ToString;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
+@ToString
 @AllArgsConstructor
 public class WrappedPacketOutSetSlot extends WrappedPacket implements SendableWrapper {
 
@@ -31,8 +34,8 @@ public class WrappedPacketOutSetSlot extends WrappedPacket implements SendableWr
         }
     }
 
-    public int getWindowId() {
-        if (packet != null) {
+    private int getWindowId() {
+        if (nmsPacket != null) {
             return readInt(0);
         } else {
             return windowID;
@@ -40,15 +43,15 @@ public class WrappedPacketOutSetSlot extends WrappedPacket implements SendableWr
     }
 
     public void setWindowId(int windowID) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeInt(0, windowID);
         } else {
             this.windowID = windowID;
         }
     }
 
-    public int getSlot() {
-        if (packet != null) {
+    private int getSlot() {
+        if (nmsPacket != null) {
             return readInt(1);
         } else {
             return slot;
@@ -56,31 +59,31 @@ public class WrappedPacketOutSetSlot extends WrappedPacket implements SendableWr
     }
 
     public void setSlot(int slot) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeInt(1, slot);
         } else {
             this.slot = slot;
         }
     }
 
-    public ItemStack getItemStack() {
-        if (packet != null) {
-            return readItemStack(0);
+    private ItemStack getItemStack() {
+        if (nmsPacket != null) {
+            return readItemStack();
         } else {
             return itemStack;
         }
     }
 
     public void setItemStack(ItemStack itemStack) {
-        if (packet != null) {
-            writeItemStack(0, itemStack);
+        if (nmsPacket != null) {
+            writeItemStack(itemStack);
         } else {
             this.itemStack = itemStack;
         }
     }
 
     @Override
-    public Object asNMSPacket() throws Exception {
+    public Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
         return packetConstructor.newInstance(getWindowId(), getSlot(), NMSUtils.toNMSItemStack(getItemStack()));
     }
 }

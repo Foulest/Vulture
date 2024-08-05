@@ -31,7 +31,7 @@ public final class WrappedPacketInClientCommand extends WrappedPacket {
         return ClientCommand.values()[enumConst.ordinal()];
     }
 
-    public void setClientCommand(@NotNull ClientCommand command) throws UnsupportedOperationException {
+    public void setClientCommand(@NotNull ClientCommand command) {
         Enum<?> enumConst = EnumUtil.valueByIndex(enumClientCommandClass.asSubclass(Enum.class), command.ordinal());
         writeEnumConstant(0, enumConst);
     }

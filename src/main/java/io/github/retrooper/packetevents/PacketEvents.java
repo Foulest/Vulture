@@ -36,18 +36,25 @@ import io.github.retrooper.packetevents.utils.player.PlayerUtils;
 import io.github.retrooper.packetevents.utils.server.ServerUtils;
 import io.github.retrooper.packetevents.utils.version.PEVersion;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.ServicePriority;
 
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Getter
+@ToString
+@NoArgsConstructor
 public final class PacketEvents implements Listener, EventManager {
 
+    @Getter
     private static PacketEvents instance;
+    @Getter
     private static Plugin plugin;
     private final PEVersion version = new PEVersion(1, 8, 4);
     private final EventManager eventManager = new PEEventManager();
@@ -64,19 +71,19 @@ public final class PacketEvents implements Listener, EventManager {
     private boolean initialized;
     private boolean initializing;
     private boolean terminating;
-    private boolean lateBind = false;
+    private boolean lateBind;
 
     public static PacketEvents create(Plugin plugin) {
         if (Bukkit.isPrimaryThread()) {
             // We are on the main thread
-            if (!Bukkit.getServicesManager().isProvidedFor(PacketEvents.class)) {
+            if (Bukkit.getServicesManager().isProvidedFor(PacketEvents.class)) {
+                // We have already registered. Let us load what was registered.
+                instance = Bukkit.getServicesManager().load(PacketEvents.class);
+            } else {
                 // We can register in the service manager.
                 instance = new PacketEvents();
                 Bukkit.getServicesManager().register(PacketEvents.class, instance, plugin, ServicePriority.Normal);
                 PacketEvents.plugin = plugin;
-            } else {
-                // We have already registered. Let us load what was registered.
-                instance = Bukkit.getServicesManager().load(PacketEvents.class);
             }
         } else {
             // We are off thread; we cannot use the service manager.
@@ -88,14 +95,10 @@ public final class PacketEvents implements Listener, EventManager {
         return instance;
     }
 
-    public static PacketEvents get() {
-        return instance;
-    }
-
     public void load() {
         if (!loaded && !loading) {
             loading = true;
-            handlerName = "pe-" + plugin.getName().toLowerCase();
+            handlerName = "pe-" + plugin.getName().toLowerCase(Locale.ROOT);
 
             try {
                 NMSUtils.load();
@@ -103,14 +106,14 @@ public final class PacketEvents implements Listener, EventManager {
                 PacketType.load();
                 EntityFinderUtils.load();
 
-                getServerUtils().entityCache = GuavaUtils.makeMap();
+                serverUtils.entityCache = GuavaUtils.makeMap();
 
                 WrappedPacketOutEntityEquipment.EquipmentSlot.MAINHAND.id = 0;
                 WrappedPacketOutEntityEquipment.EquipmentSlot.BOOTS.id = 1;
                 WrappedPacketOutEntityEquipment.EquipmentSlot.LEGGINGS.id = 2;
                 WrappedPacketOutEntityEquipment.EquipmentSlot.CHESTPLATE.id = 3;
                 WrappedPacketOutEntityEquipment.EquipmentSlot.HELMET.id = 4;
-            } catch (Exception ex) {
+            } catch (RuntimeException ex) {
                 loading = false;
                 throw new PacketEventsLoadFailureException(ex);
             }
@@ -141,8 +144,8 @@ public final class PacketEvents implements Listener, EventManager {
         if (!initialized && !initializing) {
             initializing = true;
 
-            // Wait for the injector to be ready.
             while (!injectorReady.get()) {
+                // Wait for the injector to be ready.
             }
 
             Runnable postInjectTask = () -> {
@@ -151,8 +154,8 @@ public final class PacketEvents implements Listener, EventManager {
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     try {
                         injector.injectPlayer(player);
-                        getEventManager().callEvent(new PostPlayerInjectEvent(player, false));
-                    } catch (Exception ex) {
+                        eventManager.callEvent(new PostPlayerInjectEvent(player, false));
+                    } catch (RuntimeException ex) {
                         player.kickPlayer("Failed to inject... Please rejoin!");
                     }
                 }
@@ -182,13 +185,9 @@ public final class PacketEvents implements Listener, EventManager {
             injector.eject();
 
             // Unregister all our listeners
-            getEventManager().unregisterAllListeners();
+            eventManager.unregisterAllListeners();
             initialized = false;
             terminating = false;
         }
-    }
-
-    public Plugin getPlugin() {
-        return plugin;
     }
 }

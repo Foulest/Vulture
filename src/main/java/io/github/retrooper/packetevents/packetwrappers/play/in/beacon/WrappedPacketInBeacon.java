@@ -3,9 +3,9 @@ package io.github.retrooper.packetevents.packetwrappers.play.in.beacon;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
-public class WrappedPacketInBeacon extends WrappedPacket {
+class WrappedPacketInBeacon extends WrappedPacket {
 
-    public WrappedPacketInBeacon(NMSPacket packet) {
+    WrappedPacketInBeacon(NMSPacket packet) {
         super(packet);
     }
 

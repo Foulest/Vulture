@@ -33,13 +33,13 @@ public interface PingTask {
 
     @Contract(value = "_ -> new", pure = true)
     static @NotNull PingTask start(Runnable runnable) {
-        return PingTask.of(runnable, () -> {
+        return of(runnable, () -> {
         });
     }
 
     @Contract(value = "_ -> new", pure = true)
     static @NotNull PingTask end(Runnable runnable) {
-        return PingTask.of(() -> {
+        return of(() -> {
         }, runnable);
     }
 

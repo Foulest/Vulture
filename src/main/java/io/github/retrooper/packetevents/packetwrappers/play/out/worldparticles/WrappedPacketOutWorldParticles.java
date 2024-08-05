@@ -3,10 +3,12 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.worldparticles;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import lombok.ToString;
 
 import java.util.Optional;
 
 // TODO: finish this wrapper and test
+@ToString
 public class WrappedPacketOutWorldParticles extends WrappedPacket {
 
     private static Class<? extends Enum<?>> particleEnumClass;
@@ -35,7 +37,7 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
     }
 
     protected String getParticleName() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             Enum<?> enumConst = readEnumConstant(0, particleEnumClass);
             return enumConst.name(); // inconsistent
         } else {
@@ -44,7 +46,7 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
     }
 
     public float getX() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             return readFloat(0);
         } else {
             return x;
@@ -52,7 +54,7 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
     }
 
     public void setX(float x) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeFloat(0, x);
         } else {
             this.x = x;
@@ -60,7 +62,7 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
     }
 
     public float getY() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             return readFloat(1);
         } else {
             return y;
@@ -68,7 +70,7 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
     }
 
     public void setY(float y) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeFloat(1, y);
         } else {
             this.y = y;
@@ -76,7 +78,7 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
     }
 
     public float getZ() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             return readFloat(2);
         } else {
             return z;
@@ -84,7 +86,7 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
     }
 
     public void setZ(float z) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeFloat(2, z);
         } else {
             this.z = z;
@@ -92,7 +94,7 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
     }
 
     public float getOffsetX() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             return readFloat(3);
         } else {
             return offsetX;
@@ -100,7 +102,7 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
     }
 
     public void setOffsetX(float offsetX) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeFloat(3, offsetX);
         } else {
             this.offsetX = offsetX;
@@ -108,7 +110,7 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
     }
 
     public float getOffsetY() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             return readFloat(4);
         } else {
             return offsetY;
@@ -116,7 +118,7 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
     }
 
     public void setOffsetY(float offsetY) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeFloat(4, offsetY);
         } else {
             this.offsetY = offsetY;
@@ -124,7 +126,7 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
     }
 
     public float getOffsetZ() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             return readFloat(5);
         } else {
             return offsetZ;
@@ -132,7 +134,7 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
     }
 
     public void setOffsetZ(float offsetZ) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeFloat(5, offsetZ);
         } else {
             this.offsetZ = offsetZ;
@@ -140,7 +142,7 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
     }
 
     public float getParticleData() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             return readFloat(6);
         } else {
             return particleData;
@@ -148,7 +150,7 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
     }
 
     public void setParticleData(float particleData) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeFloat(6, particleData);
         } else {
             this.particleData = particleData;
@@ -156,7 +158,7 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
     }
 
     public int getParticleCount() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             return readInt(0);
         } else {
             return particleCount;
@@ -164,7 +166,7 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
     }
 
     public void setParticleCount(int particleCount) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeInt(0, particleCount);
         } else {
             this.particleCount = particleCount;
@@ -172,7 +174,7 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
     }
 
     public Optional<int[]> getData() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             return Optional.of(readIntArray(0));
         } else {
             return Optional.of(data);
@@ -180,7 +182,7 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
     }
 
     public void setData(int[] data) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeIntArray(0, data);
         } else {
             this.data = data;
@@ -188,7 +190,7 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
     }
 
     public Optional<Boolean> isLongDistance() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             return Optional.of(readBoolean(0));
         } else {
             return Optional.of(longDistance);
@@ -196,7 +198,7 @@ public class WrappedPacketOutWorldParticles extends WrappedPacket {
     }
 
     public void setLongDistance(boolean longDistance) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeBoolean(0, longDistance);
         } else {
             this.longDistance = longDistance;

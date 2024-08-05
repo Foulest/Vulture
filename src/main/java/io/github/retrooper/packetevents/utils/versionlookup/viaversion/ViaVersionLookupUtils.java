@@ -17,13 +17,13 @@
  */
 package io.github.retrooper.packetevents.utils.versionlookup.viaversion;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-public class ViaVersionLookupUtils {
-
-    private ViaVersionLookupUtils() {
-    }
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class ViaVersionLookupUtils {
 
     private static ViaVersionAccessor viaVersionAccessor;
 
@@ -36,7 +36,7 @@ public class ViaVersionLookupUtils {
             try {
                 Class.forName("com.viaversion.viaversion.api.Via");
                 viaVersionAccessor = new ViaVersionAccessorImpl();
-            } catch (Exception ex) {
+            } catch (ClassNotFoundException ex) {
                 viaVersionAccessor = new ViaVersionAccessorImplLegacy();
             }
         }

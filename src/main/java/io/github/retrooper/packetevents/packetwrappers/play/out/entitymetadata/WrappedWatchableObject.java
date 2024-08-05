@@ -8,11 +8,11 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
  * @author SteelPhoenix, retrooper
  * @since 1.8
  */
-public class WrappedWatchableObject extends WrappedPacket {
+class WrappedWatchableObject extends WrappedPacket {
 
     private static final int VALUE_INDEX = 2;
 
-    public WrappedWatchableObject(NMSPacket packet) {
+    WrappedWatchableObject(NMSPacket packet) {
         super(packet);
     }
 
@@ -32,7 +32,7 @@ public class WrappedWatchableObject extends WrappedPacket {
         writeBoolean(0, dirty);
     }
 
-    public Object getRawValue() {
+    private Object getRawValue() {
         return readAnyObject(VALUE_INDEX);
     }
 

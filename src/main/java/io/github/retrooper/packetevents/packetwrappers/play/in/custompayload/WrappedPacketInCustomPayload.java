@@ -4,6 +4,7 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.WrapperPacketReader;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 
@@ -42,7 +43,7 @@ public final class WrappedPacketInCustomPayload extends WrappedPacket {
         if (byteArrayPresent) {
             return readByteArray(0);
         } else {
-            return PacketEvents.get().getByteBufUtil().getBytes(getBuffer());
+            return PacketEvents.getInstance().getByteBufUtil().getBytes(getBuffer());
         }
     }
 
@@ -50,25 +51,25 @@ public final class WrappedPacketInCustomPayload extends WrappedPacket {
         if (byteArrayPresent) {
             writeByteArray(0, data);
         } else {
-            PacketEvents.get().getByteBufUtil().setBytes(getBuffer(), data);
+            PacketEvents.getInstance().getByteBufUtil().setBytes(getBuffer(), data);
         }
     }
 
     private Object getBuffer() {
         Object dataSerializer = readObject(0, NMSUtils.packetDataSerializerClass);
-        WrappedPacket dataSerializerWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
+        WrapperPacketReader dataSerializerWrapper = new WrappedPacket(new NMSPacket(dataSerializer));
         return dataSerializerWrapper.readObject(0, NMSUtils.byteBufClass);
     }
 
     public void retain() {
-        if (packet != null && !byteArrayPresent) {
-            PacketEvents.get().getByteBufUtil().retain(getBuffer());
+        if (nmsPacket != null && !byteArrayPresent) {
+            PacketEvents.getInstance().getByteBufUtil().retain(getBuffer());
         }
     }
 
     public void release() {
-        if (packet != null && !byteArrayPresent) {
-            PacketEvents.get().getByteBufUtil().release(getBuffer());
+        if (nmsPacket != null && !byteArrayPresent) {
+            PacketEvents.getInstance().getByteBufUtil().release(getBuffer());
         }
     }
 }

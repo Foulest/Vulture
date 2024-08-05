@@ -19,10 +19,10 @@ public class WrappedPacketInSetCreativeSlot extends WrappedPacket {
     }
 
     public ItemStack getClickedItem() {
-        return readItemStack(0);
+        return readItemStack();
     }
 
     public void setClickedItem(ItemStack stack) {
-        writeItemStack(0, stack);
+        writeItemStack(stack);
     }
 }

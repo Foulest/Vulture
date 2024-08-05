@@ -68,7 +68,7 @@ tasks {
     shadowJar {
         archiveFileName.set("${project.name}-${project.version}.jar")
         enableRelocation = true
-        relocationPrefix = "net.foulest.vulture.shaded"
+        relocationPrefix = 'net.foulest.vulture.shaded'
         minimize()
     }
 
@@ -96,8 +96,8 @@ tasks {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            groupId = "net.foulest.vulture"
-            artifactId = project.name
+            groupId = 'net.foulest.vulture' as Publication
+            artifactId = project.name as Publication
             version = project.version
 
             from components.java

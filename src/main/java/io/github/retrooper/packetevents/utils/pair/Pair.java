@@ -19,12 +19,14 @@ package io.github.retrooper.packetevents.utils.pair;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
 @Getter
+@ToString
 @AllArgsConstructor
 public class Pair<A, B> {
 

@@ -25,9 +25,12 @@ import io.github.retrooper.packetevents.utils.gameprofile.GameProfileUtil;
 import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import lombok.AllArgsConstructor;
+import lombok.ToString;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
+@ToString
 @AllArgsConstructor
 public class WrappedPacketLoginOutSuccess extends WrappedPacket implements SendableWrapper {
 
@@ -42,14 +45,14 @@ public class WrappedPacketLoginOutSuccess extends WrappedPacket implements Senda
     protected void load() {
         try {
             packetConstructor = PacketTypeClasses.Login.Server.SUCCESS.getConstructors()[1];
-        } catch (Exception ex) {
+        } catch (SecurityException ex) {
             ex.printStackTrace();
         }
     }
 
     // TODO: Support property reading in wrapped game profile
-    public WrappedGameProfile getGameProfile() {
-        if (packet != null) {
+    private WrappedGameProfile getGameProfile() {
+        if (nmsPacket != null) {
             return GameProfileUtil.getWrappedGameProfile(readObject(0, NMSUtils.gameProfileClass));
         } else {
             return wrappedGameProfile;
@@ -58,7 +61,7 @@ public class WrappedPacketLoginOutSuccess extends WrappedPacket implements Senda
 
     // TODO: Support writing property in wrapped game profile
     public void setGameProfile(WrappedGameProfile wrappedGameProfile) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             Object gameProfile = GameProfileUtil.getGameProfile(wrappedGameProfile.getId(), wrappedGameProfile.getName());
             write(NMSUtils.gameProfileClass, 0, gameProfile);
         } else {
@@ -67,7 +70,7 @@ public class WrappedPacketLoginOutSuccess extends WrappedPacket implements Senda
     }
 
     @Override
-    public Object asNMSPacket() throws Exception {
+    public Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
         WrappedGameProfile gp = getGameProfile();
         // TODO: Support writing property in wrapped game profile
         return packetConstructor.newInstance(GameProfileUtil.getGameProfile(gp.getId(), gp.getName()));

@@ -4,18 +4,18 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import org.bukkit.inventory.ItemStack;
 
-public class WrappedPacketInBEdit extends WrappedPacket {
+class WrappedPacketInBEdit extends WrappedPacket {
 
-    public WrappedPacketInBEdit(NMSPacket packet) {
+    WrappedPacketInBEdit(NMSPacket packet) {
         super(packet);
     }
 
     public ItemStack getItemStack() {
-        return readItemStack(0);
+        return readItemStack();
     }
 
     public void setItemStack(ItemStack itemStack) {
-        writeItemStack(0, itemStack);
+        writeItemStack(itemStack);
     }
 
     public boolean isSigning() {

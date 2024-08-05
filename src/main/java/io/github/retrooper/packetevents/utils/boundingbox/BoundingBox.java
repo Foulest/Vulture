@@ -29,6 +29,7 @@ import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -107,7 +108,7 @@ public class BoundingBox implements Cloneable, ConfigurationSerializable {
         resize(x1, y1, z1, x2, y2, z2);
     }
 
-    public BoundingBox resize(double x1, double y1, double z1, double x2, double y2, double z2) {
+    private BoundingBox resize(double x1, double y1, double z1, double x2, double y2, double z2) {
         NumberConversions.checkFinite(x1, "x1 not finite");
         NumberConversions.checkFinite(y1, "y1 not finite");
         NumberConversions.checkFinite(z1, "z1 not finite");
@@ -131,15 +132,15 @@ public class BoundingBox implements Cloneable, ConfigurationSerializable {
         return new Vector(maxX, maxY, maxZ);
     }
 
-    public double getWidthX() {
+    private double getWidthX() {
         return maxX - minX;
     }
 
-    public double getWidthZ() {
+    private double getWidthZ() {
         return maxZ - minZ;
     }
 
-    public double getHeight() {
+    private double getHeight() {
         return maxY - minY;
     }
 
@@ -147,15 +148,15 @@ public class BoundingBox implements Cloneable, ConfigurationSerializable {
         return getHeight() * getWidthX() * getWidthZ();
     }
 
-    public double getCenterX() {
+    private double getCenterX() {
         return minX + getWidthX() * 0.5D;
     }
 
-    public double getCenterY() {
+    private double getCenterY() {
         return minY + getHeight() * 0.5D;
     }
 
-    public double getCenterZ() {
+    private double getCenterZ() {
         return minZ + getWidthZ() * 0.5D;
     }
 
@@ -165,10 +166,10 @@ public class BoundingBox implements Cloneable, ConfigurationSerializable {
 
     public BoundingBox copy(@NotNull BoundingBox other) {
         Validate.notNull(other, "Other bounding box is null!");
-        return resize(other.getMinX(), other.getMinY(), other.getMinZ(), other.getMaxX(), other.getMaxY(), other.getMaxZ());
+        return resize(other.minX, other.minY, other.minZ, other.maxX, other.maxY, other.maxZ);
     }
 
-    public BoundingBox expand(double negativeX, double negativeY, double negativeZ, double positiveX, double positiveY, double positiveZ) {
+    private BoundingBox expand(double negativeX, double negativeY, double negativeZ, double positiveX, double positiveY, double positiveZ) {
         if (negativeX == 0.0D && negativeY == 0.0D && negativeZ == 0.0D && positiveX == 0.0D && positiveY == 0.0D && positiveZ == 0.0D) {
             return this;
         } else {
@@ -238,7 +239,7 @@ public class BoundingBox implements Cloneable, ConfigurationSerializable {
         return expand(expansion, expansion, expansion, expansion, expansion, expansion);
     }
 
-    public BoundingBox expand(double dirX, double dirY, double dirZ, double expansion) {
+    private BoundingBox expand(double dirX, double dirY, double dirZ, double expansion) {
         if (expansion == 0.0D) {
             return this;
         } else if (dirX == 0.0D && dirY == 0.0D && dirZ == 0.0D) {
@@ -254,13 +255,12 @@ public class BoundingBox implements Cloneable, ConfigurationSerializable {
         }
     }
 
-    public BoundingBox expand(@NotNull Vector direction, double expansion) {
+    private BoundingBox expand(@NotNull Vector direction, double expansion) {
         return expand(direction.getX(), direction.getY(), direction.getZ(), expansion);
     }
 
     public BoundingBox expand(@NotNull BlockFace blockFace, double expansion) {
-        return blockFace == BlockFace.SELF ? this : expand(
-                new Vector(blockFace.getModX(), blockFace.getModY(), blockFace.getModZ()), expansion);
+        return blockFace == BlockFace.SELF ? this : expand(new Vector(blockFace.getModX(), blockFace.getModY(), blockFace.getModZ()), expansion);
     }
 
     public BoundingBox expandDirectional(double dirX, double dirY, double dirZ) {
@@ -271,7 +271,7 @@ public class BoundingBox implements Cloneable, ConfigurationSerializable {
         return expand(direction.getX(), direction.getY(), direction.getZ(), 1.0D);
     }
 
-    public BoundingBox union(double posX, double posY, double posZ) {
+    private BoundingBox union(double posX, double posY, double posZ) {
         double newMinX = Math.min(minX, posX);
         double newMinY = Math.min(minY, posY);
         double newMinZ = Math.min(minZ, posZ);
@@ -316,7 +316,7 @@ public class BoundingBox implements Cloneable, ConfigurationSerializable {
         return resize(newMinX, newMinY, newMinZ, newMaxX, newMaxY, newMaxZ);
     }
 
-    public BoundingBox shift(double shiftX, double shiftY, double shiftZ) {
+    private BoundingBox shift(double shiftX, double shiftY, double shiftZ) {
         return shiftX == 0.0D && shiftY == 0.0D && shiftZ == 0.0D ? this
                 : resize(minX + shiftX, minY + shiftY, minZ + shiftZ,
                 maxX + shiftX, maxY + shiftY, maxZ + shiftZ);
@@ -336,7 +336,7 @@ public class BoundingBox implements Cloneable, ConfigurationSerializable {
                 && this.minZ < maxZ && this.maxZ > minZ;
     }
 
-    public boolean overlaps(@NotNull BoundingBox other) {
+    private boolean overlaps(@NotNull BoundingBox other) {
         return overlaps(other.minX, other.minY, other.minZ, other.maxX, other.maxY, other.maxZ);
     }
 
@@ -351,7 +351,7 @@ public class BoundingBox implements Cloneable, ConfigurationSerializable {
                 Math.max(x1, x2), Math.max(y1, y2), Math.max(z1, z2));
     }
 
-    public boolean contains(double x, double y, double z) {
+    private boolean contains(double x, double y, double z) {
         return x >= minX && x < maxX
                 && y >= minY && y < maxY
                 && z >= minZ && z < maxZ;
@@ -367,7 +367,7 @@ public class BoundingBox implements Cloneable, ConfigurationSerializable {
                 && this.minZ <= minZ && this.maxZ >= maxZ;
     }
 
-    public boolean contains(@NotNull BoundingBox other) {
+    private boolean contains(@NotNull BoundingBox other) {
         return contains(other.minX, other.minY, other.minZ, other.maxX, other.maxY, other.maxZ);
     }
 
@@ -382,7 +382,7 @@ public class BoundingBox implements Cloneable, ConfigurationSerializable {
                 Math.max(x1, x2), Math.max(y1, y2), Math.max(z1, z2));
     }
 
-    public RayTraceResult rayTrace(@NotNull Vector start, @NotNull Vector direction, double maxDistance) {
+    public @Nullable RayTraceResult rayTrace(@NotNull Vector start, @NotNull Vector direction, double maxDistance) {
         NumberConversions.checkFinite(start.getX(), "Start X is not finite");
         NumberConversions.checkFinite(start.getY(), "Start Y is not finite");
         NumberConversions.checkFinite(start.getZ(), "Start Z is not finite");

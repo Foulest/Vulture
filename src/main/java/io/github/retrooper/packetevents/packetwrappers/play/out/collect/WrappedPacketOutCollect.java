@@ -5,9 +5,12 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import lombok.AllArgsConstructor;
+import lombok.ToString;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
+@ToString
 @AllArgsConstructor
 public class WrappedPacketOutCollect extends WrappedPacket implements SendableWrapper {
 
@@ -23,13 +26,13 @@ public class WrappedPacketOutCollect extends WrappedPacket implements SendableWr
     protected void load() {
         try {
             packetConstructor = PacketTypeClasses.Play.Server.COLLECT.getConstructor(int.class, int.class);
-        } catch (Exception ex) {
+        } catch (NoSuchMethodException ex) {
             ex.printStackTrace();
         }
     }
 
-    public int getCollectedEntityId() {
-        if (packet != null) {
+    private int getCollectedEntityId() {
+        if (nmsPacket != null) {
             return readInt(0);
         } else {
             return collectedEntityId;
@@ -37,15 +40,15 @@ public class WrappedPacketOutCollect extends WrappedPacket implements SendableWr
     }
 
     public void setCollectedEntityId(int id) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeInt(0, id);
         } else {
             collectedEntityId = id;
         }
     }
 
-    public int getCollectorEntityId() {
-        if (packet != null) {
+    private int getCollectorEntityId() {
+        if (nmsPacket != null) {
             return readInt(1);
         } else {
             return collectorEntityId;
@@ -53,7 +56,7 @@ public class WrappedPacketOutCollect extends WrappedPacket implements SendableWr
     }
 
     public void setCollectorEntityId(int id) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeInt(1, id);
         } else {
             collectorEntityId = id;
@@ -61,7 +64,7 @@ public class WrappedPacketOutCollect extends WrappedPacket implements SendableWr
     }
 
     @Override
-    public Object asNMSPacket() throws Exception {
+    public Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
         return packetConstructor.newInstance(getCollectedEntityId(), getCollectorEntityId());
     }
 }

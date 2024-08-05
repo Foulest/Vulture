@@ -24,7 +24,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class PacketTypeClasses {
+public final class PacketTypeClasses {
 
     public static void load() {
         // STATUS
@@ -44,145 +44,145 @@ public class PacketTypeClasses {
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class Status {
+    public static final class Status {
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
-        public static class Client {
+        public static final class Client {
 
-            public static Class<?> START;
-            public static Class<?> PING;
+            static Class<?> START;
+            static Class<?> PING;
 
-            public static void load() {
+            static void load() {
                 String prefix = ServerVersion.getNMSDirectory() + ".";
-                Client.START = Reflection.getClassByNameWithoutException(prefix + "PacketStatusInStart");
-                Client.PING = Reflection.getClassByNameWithoutException(prefix + "PacketStatusInPing");
+                START = Reflection.getClassByNameWithoutException(prefix + "PacketStatusInStart");
+                PING = Reflection.getClassByNameWithoutException(prefix + "PacketStatusInPing");
             }
         }
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
-        public static class Server {
+        public static final class Server {
 
             public static Class<?> PONG;
-            public static Class<?> SERVER_INFO;
+            static Class<?> SERVER_INFO;
 
-            public static void load() {
+            static void load() {
                 String prefix = ServerVersion.getNMSDirectory() + ".";
-                Server.PONG = Reflection.getClassByNameWithoutException(prefix + "PacketStatusOutPong");
-                Server.SERVER_INFO = Reflection.getClassByNameWithoutException(prefix + "PacketStatusOutServerInfo");
+                PONG = Reflection.getClassByNameWithoutException(prefix + "PacketStatusOutPong");
+                SERVER_INFO = Reflection.getClassByNameWithoutException(prefix + "PacketStatusOutServerInfo");
             }
         }
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class Handshaking {
+    static final class Handshaking {
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
-        public static class Client {
+        static final class Client {
 
-            public static Class<?> SET_PROTOCOL;
+            static Class<?> SET_PROTOCOL;
 
-            public static void load() {
+            static void load() {
                 String prefix = ServerVersion.getNMSDirectory() + ".";
-                Handshaking.Client.SET_PROTOCOL = Reflection.getClassByNameWithoutException(prefix + "PacketHandshakingInSetProtocol");
+                SET_PROTOCOL = Reflection.getClassByNameWithoutException(prefix + "PacketHandshakingInSetProtocol");
             }
         }
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class Login {
+    public static final class Login {
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
-        public static class Client {
+        public static final class Client {
 
-            public static Class<?> START;
-            public static Class<?> ENCRYPTION_BEGIN;
+            static Class<?> START;
+            static Class<?> ENCRYPTION_BEGIN;
 
-            public static void load() {
+            static void load() {
                 String prefix = ServerVersion.getNMSDirectory() + ".";
 
-                Client.START = Reflection.getClassByNameWithoutException(prefix + "PacketLoginInStart");
-                Client.ENCRYPTION_BEGIN = Reflection.getClassByNameWithoutException(prefix + "PacketLoginInEncryptionBegin");
+                START = Reflection.getClassByNameWithoutException(prefix + "PacketLoginInStart");
+                ENCRYPTION_BEGIN = Reflection.getClassByNameWithoutException(prefix + "PacketLoginInEncryptionBegin");
             }
         }
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
-        public static class Server {
+        public static final class Server {
 
             public static Class<?> DISCONNECT;
-            public static Class<?> ENCRYPTION_BEGIN;
+            static Class<?> ENCRYPTION_BEGIN;
             public static Class<?> SUCCESS;
             public static Class<?> SET_COMPRESSION;
 
-            public static void load() {
+            static void load() {
                 String prefix = ServerVersion.getNMSDirectory() + ".";
 
-                Server.DISCONNECT = Reflection.getClassByNameWithoutException(prefix + "PacketLoginOutDisconnect");
-                Server.ENCRYPTION_BEGIN = Reflection.getClassByNameWithoutException(prefix + "PacketLoginOutEncryptionBegin");
-                Server.SUCCESS = Reflection.getClassByNameWithoutException(prefix + "PacketLoginOutSuccess");
-                Server.SET_COMPRESSION = Reflection.getClassByNameWithoutException(prefix + "PacketLoginOutSetCompression");
+                DISCONNECT = Reflection.getClassByNameWithoutException(prefix + "PacketLoginOutDisconnect");
+                ENCRYPTION_BEGIN = Reflection.getClassByNameWithoutException(prefix + "PacketLoginOutEncryptionBegin");
+                SUCCESS = Reflection.getClassByNameWithoutException(prefix + "PacketLoginOutSuccess");
+                SET_COMPRESSION = Reflection.getClassByNameWithoutException(prefix + "PacketLoginOutSetCompression");
             }
         }
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class Play {
+    public static final class Play {
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
-        public static class Client {
+        public static final class Client {
 
             public static Class<?> FLYING;
-            public static Class<?> POSITION;
-            public static Class<?> POSITION_LOOK;
-            public static Class<?> LOOK;
-            public static Class<?> GROUND;
+            static Class<?> POSITION;
+            static Class<?> POSITION_LOOK;
+            static Class<?> LOOK;
+            static Class<?> GROUND;
             public static Class<?> CLIENT_COMMAND;
-            public static Class<?> TRANSACTION;
+            static Class<?> TRANSACTION;
             public static Class<?> BLOCK_DIG;
             public static Class<?> ENTITY_ACTION;
             public static Class<?> USE_ENTITY;
             public static Class<?> WINDOW_CLICK;
             public static Class<?> STEER_VEHICLE;
             public static Class<?> CUSTOM_PAYLOAD;
-            public static Class<?> ARM_ANIMATION;
+            static Class<?> ARM_ANIMATION;
             public static Class<?> BLOCK_PLACE;
-            public static Class<?> USE_ITEM;
+            static Class<?> USE_ITEM;
             public static Class<?> ABILITIES;
-            public static Class<?> HELD_ITEM_SLOT;
-            public static Class<?> CLOSE_WINDOW;
-            public static Class<?> TAB_COMPLETE;
-            public static Class<?> CHAT;
-            public static Class<?> SET_CREATIVE_SLOT;
+            static Class<?> HELD_ITEM_SLOT;
+            static Class<?> CLOSE_WINDOW;
+            static Class<?> TAB_COMPLETE;
+            static Class<?> CHAT;
+            static Class<?> SET_CREATIVE_SLOT;
             public static Class<?> KEEP_ALIVE;
-            public static Class<?> SETTINGS;
-            public static Class<?> ENCHANT_ITEM;
-            public static Class<?> TELEPORT_ACCEPT;
-            public static Class<?> TILE_NBT_QUERY;
-            public static Class<?> DIFFICULTY_CHANGE;
-            public static Class<?> B_EDIT;
-            public static Class<?> ENTITY_NBT_QUERY;
-            public static Class<?> JIGSAW_GENERATE;
-            public static Class<?> DIFFICULTY_LOCK;
-            public static Class<?> VEHICLE_MOVE;
-            public static Class<?> BOAT_MOVE;
-            public static Class<?> PICK_ITEM;
-            public static Class<?> AUTO_RECIPE;
-            public static Class<?> RECIPE_DISPLAYED;
-            public static Class<?> ITEM_NAME;
+            static Class<?> SETTINGS;
+            static Class<?> ENCHANT_ITEM;
+            static Class<?> TELEPORT_ACCEPT;
+            static Class<?> TILE_NBT_QUERY;
+            static Class<?> DIFFICULTY_CHANGE;
+            static Class<?> B_EDIT;
+            static Class<?> ENTITY_NBT_QUERY;
+            static Class<?> JIGSAW_GENERATE;
+            static Class<?> DIFFICULTY_LOCK;
+            static Class<?> VEHICLE_MOVE;
+            static Class<?> BOAT_MOVE;
+            static Class<?> PICK_ITEM;
+            static Class<?> AUTO_RECIPE;
+            static Class<?> RECIPE_DISPLAYED;
+            static Class<?> ITEM_NAME;
             public static Class<?> RESOURCE_PACK_STATUS;
-            public static Class<?> ADVANCEMENTS;
-            public static Class<?> TR_SEL;
-            public static Class<?> BEACON;
-            public static Class<?> SET_COMMAND_BLOCK;
-            public static Class<?> SET_COMMAND_MINECART;
-            public static Class<?> SET_JIGSAW;
-            public static Class<?> STRUCT;
+            static Class<?> ADVANCEMENTS;
+            static Class<?> TR_SEL;
+            static Class<?> BEACON;
+            static Class<?> SET_COMMAND_BLOCK;
+            static Class<?> SET_COMMAND_MINECART;
+            static Class<?> SET_JIGSAW;
+            static Class<?> STRUCT;
             public static Class<?> UPDATE_SIGN;
-            public static Class<?> SPECTATE;
+            static Class<?> SPECTATE;
 
             /**
              * Initiate all server-bound play packet classes.
              */
-            public static void load() {
+            static void load() {
                 String prefix = ServerVersion.getNMSDirectory() + ".";
                 String commonPrefix = prefix + "PacketPlayIn";
 
@@ -247,122 +247,122 @@ public class PacketTypeClasses {
                     SET_JIGSAW = Reflection.getClassByNameWithoutException(commonPrefix + "SetJigsaw");
                     STRUCT = Reflection.getClassByNameWithoutException(commonPrefix + "Struct");
                     SPECTATE = Reflection.getClassByNameWithoutException(commonPrefix + "Spectate");
-                } catch (Exception ex) {
+                } catch (ClassNotFoundException ex) {
                     ex.printStackTrace();
                 }
 
                 try {
                     BLOCK_PLACE = Class.forName(commonPrefix + "BlockPlace");
                     USE_ITEM = Reflection.getClassByNameWithoutException(commonPrefix + "UseItem");
-                } catch (Exception ex) {
+                } catch (ClassNotFoundException ex) {
                     ex.printStackTrace();
                 }
             }
         }
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
-        public static class Server {
+        public static final class Server {
 
-            public static Class<?> SPAWN_ENTITY;
-            public static Class<?> SPAWN_ENTITY_EXPERIENCE_ORB;
-            public static Class<?> SPAWN_ENTITY_WEATHER;
+            static Class<?> SPAWN_ENTITY;
+            static Class<?> SPAWN_ENTITY_EXPERIENCE_ORB;
+            static Class<?> SPAWN_ENTITY_WEATHER;
             public static Class<?> SPAWN_ENTITY_LIVING;
-            public static Class<?> SPAWN_ENTITY_PAINTING;
-            public static Class<?> SPAWN_ENTITY_SPAWN;
+            static Class<?> SPAWN_ENTITY_PAINTING;
+            static Class<?> SPAWN_ENTITY_SPAWN;
             public static Class<?> ANIMATION;
-            public static Class<?> STATISTIC;
-            public static Class<?> BLOCK_BREAK;
+            static Class<?> STATISTIC;
+            static Class<?> BLOCK_BREAK;
             public static Class<?> BLOCK_BREAK_ANIMATION;
-            public static Class<?> TILE_ENTITY_DATA;
+            static Class<?> TILE_ENTITY_DATA;
             public static Class<?> BLOCK_ACTION;
             public static Class<?> BLOCK_CHANGE;
-            public static Class<?> BOSS;
-            public static Class<?> SERVER_DIFFICULTY;
+            static Class<?> BOSS;
+            static Class<?> SERVER_DIFFICULTY;
             public static Class<?> CHAT;
-            public static Class<?> MULTI_BLOCK_CHANGE;
-            public static Class<?> TAB_COMPLETE;
-            public static Class<?> COMMANDS;
+            static Class<?> MULTI_BLOCK_CHANGE;
+            static Class<?> TAB_COMPLETE;
+            static Class<?> COMMANDS;
             public static Class<?> TRANSACTION;
             public static Class<?> CLOSE_WINDOW;
             public static Class<?> WINDOW_ITEMS;
-            public static Class<?> WINDOW_DATA;
+            static Class<?> WINDOW_DATA;
             public static Class<?> SET_SLOT;
-            public static Class<?> SET_COOLDOWN;
-            public static Class<?> CUSTOM_PAYLOAD;
-            public static Class<?> CUSTOM_SOUND_EFFECT;
+            static Class<?> SET_COOLDOWN;
+            static Class<?> CUSTOM_PAYLOAD;
+            static Class<?> CUSTOM_SOUND_EFFECT;
             public static Class<?> KICK_DISCONNECT;
             public static Class<?> ENTITY_STATUS;
             public static Class<?> EXPLOSION;
-            public static Class<?> UNLOAD_CHUNK;
+            static Class<?> UNLOAD_CHUNK;
             public static Class<?> GAME_STATE_CHANGE;
-            public static Class<?> OPEN_WINDOW_HORSE;
+            static Class<?> OPEN_WINDOW_HORSE;
             public static Class<?> KEEP_ALIVE;
             public static Class<?> MAP_CHUNK;
-            public static Class<?> WORLD_EVENT;
-            public static Class<?> WORLD_PARTICLES;
-            public static Class<?> LIGHT_UPDATE;
+            static Class<?> WORLD_EVENT;
+            static Class<?> WORLD_PARTICLES;
+            static Class<?> LIGHT_UPDATE;
             public static Class<?> LOGIN;
-            public static Class<?> MAP;
-            public static Class<?> OPEN_WINDOW_MERCHANT;
+            static Class<?> MAP;
+            static Class<?> OPEN_WINDOW_MERCHANT;
             public static Class<?> REL_ENTITY_MOVE;
             public static Class<?> REL_ENTITY_MOVE_LOOK;
             public static Class<?> ENTITY_LOOK;
             public static Class<?> ENTITY;
-            public static Class<?> VEHICLE_MOVE;
-            public static Class<?> OPEN_BOOK;
+            static Class<?> VEHICLE_MOVE;
+            static Class<?> OPEN_BOOK;
             public static Class<?> OPEN_WINDOW;
-            public static Class<?> OPEN_SIGN_EDITOR;
-            public static Class<?> AUTO_RECIPE;
+            static Class<?> OPEN_SIGN_EDITOR;
+            static Class<?> AUTO_RECIPE;
             public static Class<?> ABILITIES;
-            public static Class<?> COMBAT_EVENT;
+            static Class<?> COMBAT_EVENT;
             public static Class<?> PLAYER_INFO;
-            public static Class<?> LOOK_AT;
+            static Class<?> LOOK_AT;
             public static Class<?> POSITION;
-            public static Class<?> RECIPES;
+            static Class<?> RECIPES;
             public static Class<?> ENTITY_DESTROY;
             public static Class<?> REMOVE_ENTITY_EFFECT;
             public static Class<?> RESOURCE_PACK_SEND;
-            public static Class<?> RESPAWN;
+            static Class<?> RESPAWN;
             public static Class<?> ENTITY_HEAD_ROTATION;
-            public static Class<?> SELECT_ADVANCEMENT_TAB;
-            public static Class<?> WORLD_BORDER;
+            static Class<?> SELECT_ADVANCEMENT_TAB;
+            static Class<?> WORLD_BORDER;
             public static Class<?> CAMERA;
             public static Class<?> HELD_ITEM_SLOT;
-            public static Class<?> VIEW_CENTRE;
-            public static Class<?> VIEW_DISTANCE;
-            public static Class<?> SCOREBOARD_DISPLAY_OBJECTIVE;
-            public static Class<?> ENTITY_METADATA;
-            public static Class<?> ATTACH_ENTITY;
+            static Class<?> VIEW_CENTRE;
+            static Class<?> VIEW_DISTANCE;
+            static Class<?> SCOREBOARD_DISPLAY_OBJECTIVE;
+            static Class<?> ENTITY_METADATA;
+            static Class<?> ATTACH_ENTITY;
             public static Class<?> ENTITY_VELOCITY;
             public static Class<?> ENTITY_EQUIPMENT;
             public static Class<?> EXPERIENCE;
             public static Class<?> UPDATE_HEALTH;
-            public static Class<?> SCOREBOARD_OBJECTIVE;
-            public static Class<?> MOUNT;
-            public static Class<?> SCOREBOARD_TEAM;
-            public static Class<?> SCOREBOARD_SCORE;
-            public static Class<?> SPAWN_POSITION;
+            static Class<?> SCOREBOARD_OBJECTIVE;
+            static Class<?> MOUNT;
+            static Class<?> SCOREBOARD_TEAM;
+            static Class<?> SCOREBOARD_SCORE;
+            static Class<?> SPAWN_POSITION;
             public static Class<?> UPDATE_TIME;
             public static Class<?> TITLE;
-            public static Class<?> ENTITY_SOUND;
+            static Class<?> ENTITY_SOUND;
             public static Class<?> NAMED_SOUND_EFFECT;
-            public static Class<?> STOP_SOUND;
-            public static Class<?> PLAYER_LIST_HEADER_FOOTER;
-            public static Class<?> NBT_QUERY;
+            static Class<?> STOP_SOUND;
+            static Class<?> PLAYER_LIST_HEADER_FOOTER;
+            static Class<?> NBT_QUERY;
             public static Class<?> COLLECT;
             public static Class<?> ENTITY_TELEPORT;
-            public static Class<?> ADVANCEMENTS;
+            static Class<?> ADVANCEMENTS;
             public static Class<?> UPDATE_ATTRIBUTES;
             public static Class<?> ENTITY_EFFECT;
-            public static Class<?> RECIPE_UPDATE;
-            public static Class<?> TAGS;
-            public static Class<?> MAP_CHUNK_BULK;
+            static Class<?> RECIPE_UPDATE;
+            static Class<?> TAGS;
+            static Class<?> MAP_CHUNK_BULK;
             public static Class<?> NAMED_ENTITY_SPAWN;
 
             /**
              * Initiate all client-bound packet classes.
              */
-            public static void load() {
+            static void load() {
                 String prefix = ServerVersion.getNMSDirectory() + ".";
                 String commonPrefix = prefix + "PacketPlayOut";
 

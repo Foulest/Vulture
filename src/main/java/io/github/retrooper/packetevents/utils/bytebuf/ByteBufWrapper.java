@@ -19,7 +19,10 @@ package io.github.retrooper.packetevents.utils.bytebuf;
 
 import io.netty.buffer.ByteBuf;
 import lombok.AllArgsConstructor;
+import lombok.ToString;
+import org.jetbrains.annotations.Nullable;
 
+@ToString
 @AllArgsConstructor
 public class ByteBufWrapper {
 
@@ -61,18 +64,22 @@ public class ByteBufWrapper {
         return byteBuf.readShort();
     }
 
-    public String readString() {
-        String output = null;
+    public @Nullable String readString() {
+        StringBuilder output = null;
 
         for (int i = 0; i < byteBuf.capacity(); i++) {
             if (output == null) {
-                output = "";
+                output = new StringBuilder();
             }
 
             byte b = byteBuf.getByte(i);
-            output = output.concat(String.valueOf((char) b));
+            output.append((char) b);
         }
-        return output;
+
+        if (output == null) {
+            return null;
+        }
+        return output.toString();
     }
 
     public boolean isReadable() {

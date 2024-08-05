@@ -6,11 +6,14 @@ import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
+import lombok.ToString;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
+@ToString
 public class WrappedPacketOutBlockBreakAnimation extends WrappedPacketEntityAbstraction implements SendableWrapper {
 
     private static Constructor<?> packetConstructor;
@@ -49,8 +52,8 @@ public class WrappedPacketOutBlockBreakAnimation extends WrappedPacketEntityAbst
         }
     }
 
-    public Vector3i getBlockPosition() {
-        if (packet != null) {
+    private Vector3i getBlockPosition() {
+        if (nmsPacket != null) {
             return readBlockPosition(0);
         } else {
             return blockPosition;
@@ -58,15 +61,15 @@ public class WrappedPacketOutBlockBreakAnimation extends WrappedPacketEntityAbst
     }
 
     public void setBlockPosition(Vector3i blockPosition) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeBlockPosition(0, blockPosition);
         } else {
             this.blockPosition = blockPosition;
         }
     }
 
-    public int getDestroyStage() {
-        if (packet != null) {
+    private int getDestroyStage() {
+        if (nmsPacket != null) {
             return readInt(1);
         } else {
             return destroyStage;
@@ -74,7 +77,7 @@ public class WrappedPacketOutBlockBreakAnimation extends WrappedPacketEntityAbst
     }
 
     public void setDestroyStage(int destroyStage) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeInt(1, destroyStage);
         } else {
             this.destroyStage = destroyStage;
@@ -82,9 +85,9 @@ public class WrappedPacketOutBlockBreakAnimation extends WrappedPacketEntityAbst
     }
 
     @Override
-    public Object asNMSPacket() throws Exception {
-        Vector3i blockPosition = getBlockPosition();
-        Object nmsBlockPos = NMSUtils.generateNMSBlockPos(blockPosition);
+    public Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
+        Vector3i blockPos = getBlockPosition();
+        Object nmsBlockPos = NMSUtils.generateNMSBlockPos(blockPos);
         return packetConstructor.newInstance(getEntityId(), nmsBlockPos, getDestroyStage());
     }
 }

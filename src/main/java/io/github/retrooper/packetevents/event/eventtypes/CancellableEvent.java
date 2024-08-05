@@ -21,7 +21,7 @@ import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
 
 /**
  * Every event that supports cancellation should implement this interface.
- * PacketEvents' event system lets the highest priority listener be have the highest priority
+ * PacketEvents' event system lets the highest priority listener have the highest priority
  * in deciding whether the event will cancel.
  * This means an event with a lower priority than the higher priority one would not be able to decide.
  * Cancelling the event means the action assosiated with the event will be cancelled.

@@ -18,190 +18,179 @@
 package io.github.retrooper.packetevents.utils.list;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Synchronized;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
+@Getter
+@ToString
 @AllArgsConstructor
 public abstract class ListWrapper implements List {
 
-    private final List list;
+    private final List originalList;
 
-    public abstract void processAdd(Object o);
-
-    public List getOriginalList() {
-        return list;
-    }
+    protected abstract void processAdd(Object o);
 
     @Override
+    @Synchronized
     public int size() {
-        synchronized (this) {
-            return list.size();
-        }
+        return originalList.size();
     }
 
     @Override
+    @Synchronized
     public boolean isEmpty() {
-        synchronized (this) {
-            return list.isEmpty();
-        }
+        return originalList.isEmpty();
     }
 
-
     @Override
+    @Synchronized
     public boolean contains(Object o) {
-        synchronized (this) {
-            return list.contains(o);
-        }
+        return originalList.contains(o);
     }
 
     @Override
+    @Synchronized
     public @NotNull Iterator iterator() {
-        synchronized (this) {
-            return listIterator();
-        }
+        return listIterator();
     }
 
     @Override
+    @Synchronized
     public Object @NotNull [] toArray() {
-        synchronized (this) {
-            return list.toArray();
-        }
+        return originalList.toArray();
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public boolean add(Object o) {
         processAdd(o);
 
         synchronized (this) {
-            return list.add(o);
+            return originalList.add(o);
         }
     }
 
     @Override
+    @Synchronized
     public boolean remove(Object o) {
-        synchronized (this) {
-            return list.remove(o);
-        }
+        return originalList.remove(o);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public boolean addAll(@NotNull Collection c) {
         for (Object o : c) {
             processAdd(o);
         }
 
         synchronized (this) {
-            return list.addAll(c);
+            return originalList.addAll(c);
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public boolean addAll(int index, @NotNull Collection c) {
         for (Object o : c) {
             processAdd(o);
         }
 
         synchronized (this) {
-            return list.addAll(index, c);
+            return originalList.addAll(index, c);
         }
     }
 
     @Override
+    @Synchronized
     public void clear() {
-        synchronized (this) {
-            list.clear();
-        }
+        originalList.clear();
     }
 
     @Override
+    @Synchronized
     public Object get(int index) {
-        synchronized (this) {
-            return list.get(index);
-        }
+        return originalList.get(index);
     }
 
     @Override
+    @Synchronized
+    @SuppressWarnings("unchecked")
     public Object set(int index, Object element) {
-        synchronized (this) {
-            return list.set(index, element);
-        }
+        return originalList.set(index, element);
     }
 
     @Override
+    @Synchronized
+    @SuppressWarnings("unchecked")
     public void add(int index, Object element) {
-        synchronized (this) {
-            list.add(index, element);
-        }
+        originalList.add(index, element);
     }
 
     @Override
+    @Synchronized
     public Object remove(int index) {
-        synchronized (this) {
-            return list.remove(index);
-        }
+        return originalList.remove(index);
     }
 
     @Override
+    @Synchronized
     public int indexOf(Object o) {
-        synchronized (this) {
-            return list.indexOf(o);
-        }
+        return originalList.indexOf(o);
     }
 
     @Override
+    @Synchronized
     public int lastIndexOf(Object o) {
-        synchronized (this) {
-            return list.lastIndexOf(o);
-        }
+        return originalList.lastIndexOf(o);
     }
 
     @Override
+    @Synchronized
     public @NotNull ListIterator listIterator() {
-        synchronized (this) {
-            return list.listIterator();
-        }
+        return originalList.listIterator();
     }
 
     @Override
+    @Synchronized
     public @NotNull ListIterator listIterator(int index) {
-        synchronized (this) {
-            return list.listIterator(index);
-        }
+        return originalList.listIterator(index);
     }
 
     @Override
+    @Synchronized
     public @NotNull List subList(int fromIndex, int toIndex) {
-        synchronized (this) {
-            return list.subList(fromIndex, toIndex);
-        }
+        return originalList.subList(fromIndex, toIndex);
     }
 
     @Override
+    @Synchronized
+    @SuppressWarnings("unchecked")
     public boolean retainAll(@NotNull Collection c) {
-        synchronized (this) {
-            return list.retainAll(c);
-        }
+        return originalList.retainAll(c);
     }
 
     @Override
+    @Synchronized
+    @SuppressWarnings("unchecked")
     public boolean removeAll(@NotNull Collection c) {
-        synchronized (this) {
-            return list.removeAll(c);
-        }
+        return originalList.removeAll(c);
     }
 
     @Override
+    @Synchronized
+    @SuppressWarnings("unchecked")
     public boolean containsAll(@NotNull Collection c) {
-        synchronized (this) {
-            return new HashSet<>(list).containsAll(c);
-        }
+        return new HashSet<>(originalList).containsAll(c);
     }
 
     @Override
+    @Synchronized
+    @SuppressWarnings("unchecked")
     public Object @NotNull [] toArray(Object @NotNull [] a) {
-        synchronized (this) {
-            return list.toArray(a);
-        }
+        return originalList.toArray(a);
     }
 }

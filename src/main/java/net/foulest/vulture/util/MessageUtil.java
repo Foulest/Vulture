@@ -34,7 +34,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -80,7 +79,7 @@ public final class MessageUtil {
      * @param sender  The player to send the message to.
      * @param message The message to send.
      */
-    public static void messagePlayerHoverable(CommandSender sender, List<String> hoverableText, String message) {
+    public static void messagePlayerHoverable(CommandSender sender, Iterable<String> hoverableText, String message) {
         messagePlayerClickable(sender, hoverableText, "", message);
     }
 
@@ -93,8 +92,8 @@ public final class MessageUtil {
      * @param command       The command to run when the message is clicked.
      * @param message       The message to send.
      */
-    public static void messagePlayerClickable(CommandSender sender, List<String> hoverableText,
-                                              String command, String message) {
+    private static void messagePlayerClickable(CommandSender sender, Iterable<String> hoverableText,
+                                               String command, String message) {
         // Sends a normal message if the sender is not a player.
         if (!(sender instanceof Player)) {
             sender.sendMessage(colorize(message));
@@ -102,11 +101,11 @@ public final class MessageUtil {
         }
 
         Player player = (Player) sender;
-        TextComponent textComponent = new TextComponent(MessageUtil.colorize(message));
+        TextComponent textComponent = new TextComponent(colorize(message));
 
         // Adds the hoverable text to the message.
         textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new BaseComponent[]{
-                new TextComponent(MessageUtil.colorize(String.join("\n", hoverableText)))
+                new TextComponent(colorize(String.join("\n", hoverableText)))
         }));
 
         // Adds the command to run when the message is clicked.
@@ -136,7 +135,7 @@ public final class MessageUtil {
      *
      * @param message The message to send.
      */
-    public static void broadcast(@NotNull List<String> message) {
+    static void broadcast(@NotNull Iterable<String> message) {
         for (String line : message) {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 messagePlayer(player, line);
@@ -181,7 +180,7 @@ public final class MessageUtil {
      * @param message The message to colorize.
      */
     @Contract("_ -> new")
-    public static @NotNull String colorize(String message) {
+    static @NotNull String colorize(String message) {
         return ChatColor.translateAlternateColorCodes('&', message);
     }
 

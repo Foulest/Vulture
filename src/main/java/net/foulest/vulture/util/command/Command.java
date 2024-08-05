@@ -17,12 +17,12 @@
  */
 package net.foulest.vulture.util.command;
 
+import net.foulest.vulture.util.ConstantUtil;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
-import static net.foulest.vulture.util.ConstantUtil.NO_PERMISSION;
 
 /**
  * Annotation used to define commands for the CommandFramework.
@@ -50,7 +50,7 @@ public @interface Command {
     /**
      * The message sent to the player when they do not have permission to execute it.
      */
-    String noPermission() default NO_PERMISSION;
+    String noPermission() default ConstantUtil.NO_PERMISSION;
 
     /**
      * A list of alternate names that the command is executed under.

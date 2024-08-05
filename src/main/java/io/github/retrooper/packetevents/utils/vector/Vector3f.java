@@ -139,6 +139,6 @@ public class Vector3f {
      */
     @Override
     public Vector3f clone() {
-        return new Vector3f(getX(), getY(), getZ());
+        return new Vector3f(x, y, z);
     }
 }

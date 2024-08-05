@@ -20,17 +20,15 @@ public final class WrappedPacketInKeepAlive extends WrappedPacket {
     }
 
     public long getId() {
-        if (!integerPresentInIndex0) {
-            return readLong(0);
-        } else {
+        if (integerPresentInIndex0) {
             return readInt(0);
+        } else {
+            return readLong(0);
         }
     }
 
     public void setId(long id) {
-        if (!integerPresentInIndex0) {
-            writeLong(0, id);
-        } else {
+        if (integerPresentInIndex0) {
             if (id > Integer.MAX_VALUE) {
                 id = Integer.MAX_VALUE;
             } else if (id < Integer.MIN_VALUE) {
@@ -38,6 +36,8 @@ public final class WrappedPacketInKeepAlive extends WrappedPacket {
             }
 
             writeInt(0, (int) id);
+        } else {
+            writeLong(0, id);
         }
     }
 }

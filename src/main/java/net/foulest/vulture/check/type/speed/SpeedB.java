@@ -17,6 +17,7 @@
  */
 package net.foulest.vulture.check.type.speed;
 
+import lombok.ToString;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
@@ -24,6 +25,7 @@ import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.event.MovementEvent;
 import org.jetbrains.annotations.NotNull;
 
+@ToString
 @CheckInfo(name = "Speed (B)", type = CheckType.SPEED)
 public class SpeedB extends Check {
 
@@ -59,7 +61,9 @@ public class SpeedB extends Check {
         double deltaXZDiff = deltaXZ - diff;
 
         if (deltaXZDiff > 0.0 && diff > 0.08 && deltaXZ > 0.15) {
-            if (++buffer > 8) {
+            ++buffer;
+
+            if (buffer > 8) {
                 flag(true, "deltaXZ=" + deltaXZ
                         + " diff=" + diff
                         + " buffer=" + buffer);

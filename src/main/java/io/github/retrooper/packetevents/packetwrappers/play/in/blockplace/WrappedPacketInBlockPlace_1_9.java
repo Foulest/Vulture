@@ -2,17 +2,21 @@ package io.github.retrooper.packetevents.packetwrappers.play.in.blockplace;
 
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.WrapperPacketReader;
+import io.github.retrooper.packetevents.packetwrappers.api.WrapperPacketWriter;
 import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.Direction;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
+@ToString
 final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
 
     private Object movingObjPos;
 
-    public WrappedPacketInBlockPlace_1_9(NMSPacket packet) {
+    WrappedPacketInBlockPlace_1_9(NMSPacket packet) {
         super(packet);
     }
 
@@ -52,7 +56,7 @@ final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
                 movingObjPos = readObject(0, NMSUtils.movingObjectPositionBlockClass);
             }
 
-            WrappedPacket movingObjectPosWrapper = new WrappedPacket(new NMSPacket(movingObjPos));
+            WrapperPacketReader movingObjectPosWrapper = new WrappedPacket(new NMSPacket(movingObjPos));
             enumConst = movingObjectPosWrapper.readEnumConstant(0, NMSUtils.enumDirectionClass);
         }
         return Direction.values()[enumConst.ordinal()];
@@ -68,7 +72,7 @@ final class WrappedPacketInBlockPlace_1_9 extends WrappedPacket {
                 movingObjPos = readObject(0, NMSUtils.movingObjectPositionBlockClass);
             }
 
-            WrappedPacket movingObjectPosWrapper = new WrappedPacket(new NMSPacket(movingObjPos));
+            WrapperPacketWriter movingObjectPosWrapper = new WrappedPacket(new NMSPacket(movingObjPos));
             movingObjectPosWrapper.writeEnumConstant(0, enumConst);
         }
     }

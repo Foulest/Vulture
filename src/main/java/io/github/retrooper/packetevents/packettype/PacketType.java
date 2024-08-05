@@ -34,7 +34,7 @@ import java.util.Objects;
  * @since 1.6.8
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class PacketType {
+public final class PacketType {
 
     /**
      * If a Packet Type could not be resolved, it will be set to the current value of this constant.
@@ -42,7 +42,7 @@ public class PacketType {
      */
     public static final byte INVALID = -128;
     @Getter
-    protected static final Map<Class<?>, Byte> packetIDMap = new IdentityHashMap<>();
+    private static final Map<Class<?>, Byte> packetIDMap = new IdentityHashMap<>();
 
     private static void insertPacketID(Class<?> cls, byte packetID) {
         if (cls != null) {
@@ -71,7 +71,7 @@ public class PacketType {
      * @since 1.7
      */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class Status {
+    static final class Status {
 
         /**
          * Server-bound (client-sided) Status Packet IDs.
@@ -81,14 +81,14 @@ public class PacketType {
          * @since 1.8
          */
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
-        public static class Client {
+        static final class Client {
 
-            public static final byte START = -127;
-            public static final byte PING = -126;
+            static final byte START = -127;
+            static final byte PING = -126;
 
             private static void load() {
-                insertPacketID(PacketTypeClasses.Status.Client.START, Client.START);
-                insertPacketID(PacketTypeClasses.Status.Client.PING, Client.PING);
+                insertPacketID(PacketTypeClasses.Status.Client.START, START);
+                insertPacketID(PacketTypeClasses.Status.Client.PING, PING);
             }
         }
 
@@ -100,14 +100,14 @@ public class PacketType {
          * @since 1.8
          */
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
-        public static class Server {
+        static final class Server {
 
-            public static final byte PONG = -125;
-            public static final byte SERVER_INFO = -124;
+            static final byte PONG = -125;
+            static final byte SERVER_INFO = -124;
 
             private static void load() {
-                insertPacketID(PacketTypeClasses.Status.Server.PONG, Server.PONG);
-                insertPacketID(PacketTypeClasses.Status.Server.SERVER_INFO, Server.SERVER_INFO);
+                insertPacketID(PacketTypeClasses.Status.Server.PONG, PONG);
+                insertPacketID(PacketTypeClasses.Status.Server.SERVER_INFO, SERVER_INFO);
             }
         }
     }
@@ -120,7 +120,7 @@ public class PacketType {
      * @since 1.8
      */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class Handshaking {
+    public static final class Handshaking {
 
         /**
          * Server-bound (client-sided) Handshaking Packet IDs.
@@ -129,12 +129,12 @@ public class PacketType {
          * @since 1.8
          */
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
-        public static class Client {
+        public static final class Client {
 
             public static final byte SET_PROTOCOL = -123;
 
             private static void load() {
-                insertPacketID(PacketTypeClasses.Handshaking.Client.SET_PROTOCOL, Client.SET_PROTOCOL);
+                insertPacketID(PacketTypeClasses.Handshaking.Client.SET_PROTOCOL, SET_PROTOCOL);
             }
         }
     }
@@ -147,7 +147,7 @@ public class PacketType {
      * @since 1.7
      */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class Login {
+    public static final class Login {
 
         /**
          * Server-bound (client-sided) Login Packet IDs.
@@ -157,14 +157,14 @@ public class PacketType {
          * @since 1.8
          */
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
-        public static class Client {
+        public static final class Client {
 
             public static final byte START = -121;
-            public static final byte ENCRYPTION_BEGIN = -120;
+            static final byte ENCRYPTION_BEGIN = -120;
 
             private static void load() {
-                insertPacketID(PacketTypeClasses.Login.Client.START, Client.START);
-                insertPacketID(PacketTypeClasses.Login.Client.ENCRYPTION_BEGIN, Client.ENCRYPTION_BEGIN);
+                insertPacketID(PacketTypeClasses.Login.Client.START, START);
+                insertPacketID(PacketTypeClasses.Login.Client.ENCRYPTION_BEGIN, ENCRYPTION_BEGIN);
             }
         }
 
@@ -176,18 +176,18 @@ public class PacketType {
          * @since 1.8
          */
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
-        public static class Server {
+        static final class Server {
 
-            public static final byte DISCONNECT = -118;
-            public static final byte ENCRYPTION_BEGIN = -117;
-            public static final byte SUCCESS = -116;
-            public static final byte SET_COMPRESSION = -115;
+            static final byte DISCONNECT = -118;
+            static final byte ENCRYPTION_BEGIN = -117;
+            static final byte SUCCESS = -116;
+            static final byte SET_COMPRESSION = -115;
 
             private static void load() {
-                insertPacketID(PacketTypeClasses.Login.Server.DISCONNECT, Server.DISCONNECT);
-                insertPacketID(PacketTypeClasses.Login.Server.ENCRYPTION_BEGIN, Server.ENCRYPTION_BEGIN);
-                insertPacketID(PacketTypeClasses.Login.Server.SUCCESS, Server.SUCCESS);
-                insertPacketID(PacketTypeClasses.Login.Server.SET_COMPRESSION, Server.SET_COMPRESSION);
+                insertPacketID(PacketTypeClasses.Login.Server.DISCONNECT, DISCONNECT);
+                insertPacketID(PacketTypeClasses.Login.Server.ENCRYPTION_BEGIN, ENCRYPTION_BEGIN);
+                insertPacketID(PacketTypeClasses.Login.Server.SUCCESS, SUCCESS);
+                insertPacketID(PacketTypeClasses.Login.Server.SET_COMPRESSION, SET_COMPRESSION);
             }
         }
     }
@@ -200,7 +200,7 @@ public class PacketType {
      * @since 1.8
      */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class Play {
+    public static final class Play {
 
         /**
          * Server-bound (client-sided) Play Packet IDs.
@@ -210,10 +210,10 @@ public class PacketType {
          * @since 1.8
          */
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
-        public static class Client {
+        public static final class Client {
 
-            public static final byte TELEPORT_ACCEPT = -114;
-            public static final byte TILE_NBT_QUERY = -113;
+            static final byte TELEPORT_ACCEPT = -114;
+            static final byte TILE_NBT_QUERY = -113;
             public static final byte DIFFICULTY_CHANGE = -112;
             public static final byte CHAT = -111;
             public static final byte CLIENT_COMMAND = -110;
@@ -224,40 +224,40 @@ public class PacketType {
             public static final byte WINDOW_CLICK = -105;
             public static final byte CLOSE_WINDOW = -104;
             public static final byte CUSTOM_PAYLOAD = -103;
-            public static final byte B_EDIT = -102;
-            public static final byte ENTITY_NBT_QUERY = -101;
+            static final byte B_EDIT = -102;
+            static final byte ENTITY_NBT_QUERY = -101;
             public static final byte USE_ENTITY = -100;
-            public static final byte JIGSAW_GENERATE = -99;
+            static final byte JIGSAW_GENERATE = -99;
             public static final byte KEEP_ALIVE = -98;
-            public static final byte DIFFICULTY_LOCK = -97;
+            static final byte DIFFICULTY_LOCK = -97;
             public static final byte POSITION = -96;
             public static final byte POSITION_LOOK = -95;
             public static final byte LOOK = -94;
             public static final byte FLYING = -93;
-            public static final byte VEHICLE_MOVE = -92;
-            public static final byte BOAT_MOVE = -91;
-            public static final byte PICK_ITEM = -90;
-            public static final byte AUTO_RECIPE = -89;
+            static final byte VEHICLE_MOVE = -92;
+            static final byte BOAT_MOVE = -91;
+            static final byte PICK_ITEM = -90;
+            static final byte AUTO_RECIPE = -89;
             public static final byte ABILITIES = -88;
             public static final byte BLOCK_DIG = -87;
             public static final byte ENTITY_ACTION = -86;
             public static final byte STEER_VEHICLE = -85;
-            public static final byte RECIPE_DISPLAYED = -84;
-            public static final byte ITEM_NAME = -83;
+            static final byte RECIPE_DISPLAYED = -84;
+            static final byte ITEM_NAME = -83;
             public static final byte RESOURCE_PACK_STATUS = -82;
-            public static final byte ADVANCEMENTS = -81;
-            public static final byte TR_SEL = -80;
-            public static final byte BEACON = -79;
+            static final byte ADVANCEMENTS = -81;
+            static final byte TR_SEL = -80;
+            static final byte BEACON = -79;
             public static final byte HELD_ITEM_SLOT = -78;
-            public static final byte SET_COMMAND_BLOCK = -77;
-            public static final byte SET_COMMAND_MINECART = -76;
+            static final byte SET_COMMAND_BLOCK = -77;
+            static final byte SET_COMMAND_MINECART = -76;
             public static final byte SET_CREATIVE_SLOT = -75;
-            public static final byte SET_JIGSAW = -74;
-            public static final byte STRUCT = -73;
+            static final byte SET_JIGSAW = -74;
+            static final byte STRUCT = -73;
             public static final byte UPDATE_SIGN = -72;
             public static final byte ARM_ANIMATION = -71;
             public static final byte SPECTATE = -70;
-            public static final byte USE_ITEM = -69;
+            static final byte USE_ITEM = -69;
             public static final byte BLOCK_PLACE = -68;
 
             private static void load() {
@@ -318,7 +318,7 @@ public class PacketType {
              * @since 1.8
              */
             @NoArgsConstructor(access = AccessLevel.PRIVATE)
-            public static class Util {
+            public static final class Util {
 
                 /**
                  * Is the play packet a PacketPlayInFlying, PacketPlayInPosition, PacketPlayInPositionLook
@@ -344,102 +344,102 @@ public class PacketType {
          * @since 1.8
          */
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
-        public static class Server {
+        public static final class Server {
 
-            public static final byte SPAWN_ENTITY = -67;
-            public static final byte SPAWN_ENTITY_EXPERIENCE_ORB = -66;
-            public static final byte SPAWN_ENTITY_WEATHER = -65;
+            static final byte SPAWN_ENTITY = -67;
+            static final byte SPAWN_ENTITY_EXPERIENCE_ORB = -66;
+            static final byte SPAWN_ENTITY_WEATHER = -65;
             public static final byte SPAWN_ENTITY_LIVING = -64;
-            public static final byte SPAWN_ENTITY_PAINTING = -63;
-            public static final byte SPAWN_ENTITY_SPAWN = -62;
+            static final byte SPAWN_ENTITY_PAINTING = -63;
+            static final byte SPAWN_ENTITY_SPAWN = -62;
             public static final byte ANIMATION = -61;
-            public static final byte STATISTIC = -60;
-            public static final byte BLOCK_BREAK = -59;
-            public static final byte BLOCK_BREAK_ANIMATION = -58;
-            public static final byte TILE_ENTITY_DATA = -57;
-            public static final byte BLOCK_ACTION = -56;
+            static final byte STATISTIC = -60;
+            static final byte BLOCK_BREAK = -59;
+            static final byte BLOCK_BREAK_ANIMATION = -58;
+            static final byte TILE_ENTITY_DATA = -57;
+            static final byte BLOCK_ACTION = -56;
             public static final byte BLOCK_CHANGE = -55;
-            public static final byte BOSS = -54;
-            public static final byte SERVER_DIFFICULTY = -53;
-            public static final byte CHAT = -52;
-            public static final byte MULTI_BLOCK_CHANGE = -51;
-            public static final byte TAB_COMPLETE = -50;
-            public static final byte COMMANDS = -49;
+            static final byte BOSS = -54;
+            static final byte SERVER_DIFFICULTY = -53;
+            static final byte CHAT = -52;
+            static final byte MULTI_BLOCK_CHANGE = -51;
+            static final byte TAB_COMPLETE = -50;
+            static final byte COMMANDS = -49;
             public static final byte TRANSACTION = -48;
             public static final byte CLOSE_WINDOW = -47;
-            public static final byte WINDOW_ITEMS = -46;
-            public static final byte WINDOW_DATA = -45;
-            public static final byte SET_SLOT = -44;
-            public static final byte SET_COOLDOWN = -43;
-            public static final byte CUSTOM_PAYLOAD = -42;
-            public static final byte CUSTOM_SOUND_EFFECT = -41;
-            public static final byte KICK_DISCONNECT = -40;
-            public static final byte ENTITY_STATUS = -39;
-            public static final byte EXPLOSION = -38;
-            public static final byte UNLOAD_CHUNK = -37;
-            public static final byte GAME_STATE_CHANGE = -36;
-            public static final byte OPEN_WINDOW_HORSE = -35;
+            static final byte WINDOW_ITEMS = -46;
+            static final byte WINDOW_DATA = -45;
+            static final byte SET_SLOT = -44;
+            static final byte SET_COOLDOWN = -43;
+            static final byte CUSTOM_PAYLOAD = -42;
+            static final byte CUSTOM_SOUND_EFFECT = -41;
+            static final byte KICK_DISCONNECT = -40;
+            static final byte ENTITY_STATUS = -39;
+            static final byte EXPLOSION = -38;
+            static final byte UNLOAD_CHUNK = -37;
+            static final byte GAME_STATE_CHANGE = -36;
+            static final byte OPEN_WINDOW_HORSE = -35;
             public static final byte KEEP_ALIVE = -34;
-            public static final byte MAP_CHUNK = -33;
-            public static final byte WORLD_EVENT = -32;
-            public static final byte WORLD_PARTICLES = -31;
-            public static final byte LIGHT_UPDATE = -30;
-            public static final byte LOGIN = -29;
-            public static final byte MAP = -28;
-            public static final byte OPEN_WINDOW_MERCHANT = -27;
+            static final byte MAP_CHUNK = -33;
+            static final byte WORLD_EVENT = -32;
+            static final byte WORLD_PARTICLES = -31;
+            static final byte LIGHT_UPDATE = -30;
+            static final byte LOGIN = -29;
+            static final byte MAP = -28;
+            static final byte OPEN_WINDOW_MERCHANT = -27;
             public static final byte REL_ENTITY_MOVE = -26;
             public static final byte REL_ENTITY_MOVE_LOOK = -25;
-            public static final byte ENTITY_LOOK = -24;
-            public static final byte ENTITY = -23;
-            public static final byte VEHICLE_MOVE = -22;
-            public static final byte OPEN_BOOK = -21;
+            static final byte ENTITY_LOOK = -24;
+            static final byte ENTITY = -23;
+            static final byte VEHICLE_MOVE = -22;
+            static final byte OPEN_BOOK = -21;
             public static final byte OPEN_WINDOW = -20;
             public static final byte OPEN_SIGN_EDITOR = -19;
-            public static final byte AUTO_RECIPE = -18;
+            static final byte AUTO_RECIPE = -18;
             public static final byte ABILITIES = -17;
-            public static final byte COMBAT_EVENT = -16;
-            public static final byte PLAYER_INFO = -15;
-            public static final byte LOOK_AT = -14;
+            static final byte COMBAT_EVENT = -16;
+            static final byte PLAYER_INFO = -15;
+            static final byte LOOK_AT = -14;
             public static final byte POSITION = -13;
-            public static final byte RECIPES = -12;
+            static final byte RECIPES = -12;
             public static final byte ENTITY_DESTROY = -11;
-            public static final byte REMOVE_ENTITY_EFFECT = -10;
+            static final byte REMOVE_ENTITY_EFFECT = -10;
             public static final byte RESOURCE_PACK_SEND = -9;
             public static final byte RESPAWN = -8;
-            public static final byte ENTITY_HEAD_ROTATION = -7;
-            public static final byte SELECT_ADVANCEMENT_TAB = -6;
-            public static final byte WORLD_BORDER = -5;
+            static final byte ENTITY_HEAD_ROTATION = -7;
+            static final byte SELECT_ADVANCEMENT_TAB = -6;
+            static final byte WORLD_BORDER = -5;
             public static final byte CAMERA = -4;
-            public static final byte HELD_ITEM_SLOT = -3;
-            public static final byte VIEW_CENTRE = -2;
-            public static final byte VIEW_DISTANCE = -1;
-            public static final byte SCOREBOARD_DISPLAY_OBJECTIVE = 0;
-            public static final byte ENTITY_METADATA = 1;
+            static final byte HELD_ITEM_SLOT = -3;
+            static final byte VIEW_CENTRE = -2;
+            static final byte VIEW_DISTANCE = -1;
+            static final byte SCOREBOARD_DISPLAY_OBJECTIVE = 0;
+            static final byte ENTITY_METADATA = 1;
             public static final byte ATTACH_ENTITY = 2;
             public static final byte ENTITY_VELOCITY = 3;
-            public static final byte ENTITY_EQUIPMENT = 4;
-            public static final byte EXPERIENCE = 5;
-            public static final byte UPDATE_HEALTH = 6;
-            public static final byte SCOREBOARD_OBJECTIVE = 7;
-            public static final byte MOUNT = 8;
-            public static final byte SCOREBOARD_TEAM = 9;
-            public static final byte SCOREBOARD_SCORE = 10;
-            public static final byte SPAWN_POSITION = 11;
-            public static final byte UPDATE_TIME = 12;
-            public static final byte TITLE = 13;
-            public static final byte ENTITY_SOUND = 14;
-            public static final byte NAMED_SOUND_EFFECT = 15;
-            public static final byte STOP_SOUND = 16;
-            public static final byte PLAYER_LIST_HEADER_FOOTER = 17;
-            public static final byte NBT_QUERY = 18;
-            public static final byte COLLECT = 19;
+            static final byte ENTITY_EQUIPMENT = 4;
+            static final byte EXPERIENCE = 5;
+            static final byte UPDATE_HEALTH = 6;
+            static final byte SCOREBOARD_OBJECTIVE = 7;
+            static final byte MOUNT = 8;
+            static final byte SCOREBOARD_TEAM = 9;
+            static final byte SCOREBOARD_SCORE = 10;
+            static final byte SPAWN_POSITION = 11;
+            static final byte UPDATE_TIME = 12;
+            static final byte TITLE = 13;
+            static final byte ENTITY_SOUND = 14;
+            static final byte NAMED_SOUND_EFFECT = 15;
+            static final byte STOP_SOUND = 16;
+            static final byte PLAYER_LIST_HEADER_FOOTER = 17;
+            static final byte NBT_QUERY = 18;
+            static final byte COLLECT = 19;
             public static final byte ENTITY_TELEPORT = 20;
-            public static final byte ADVANCEMENTS = 21;
-            public static final byte UPDATE_ATTRIBUTES = 22;
-            public static final byte ENTITY_EFFECT = 23;
-            public static final byte RECIPE_UPDATE = 24;
-            public static final byte TAGS = 25;
-            public static final byte MAP_CHUNK_BULK = 26;
+            static final byte ADVANCEMENTS = 21;
+            static final byte UPDATE_ATTRIBUTES = 22;
+            static final byte ENTITY_EFFECT = 23;
+            static final byte RECIPE_UPDATE = 24;
+            static final byte TAGS = 25;
+            static final byte MAP_CHUNK_BULK = 26;
             public static final byte NAMED_ENTITY_SPAWN = 27;
 
             private static void load() {
@@ -548,7 +548,7 @@ public class PacketType {
              * @since 1.8
              */
             @NoArgsConstructor(access = AccessLevel.PRIVATE)
-            public static class Util {
+            static final class Util {
 
                 /**
                  * Is the play packet a PacketPlayOutEntity, PacketPlayOutRelEntityMove, PacketPlayOutRelEntityMoveLook
@@ -574,7 +574,7 @@ public class PacketType {
      * @return The packet class.
      */
     public static Class<?> getPacketFromId(Byte packetId) {
-        return PacketType.packetIDMap.entrySet().stream()
+        return packetIDMap.entrySet().stream()
                 .filter(entry -> Objects.equals(entry.getValue(), packetId))
                 .map(Map.Entry::getKey)
                 .findFirst()

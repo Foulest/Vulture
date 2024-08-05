@@ -5,14 +5,17 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
 import io.github.retrooper.packetevents.utils.attributesnapshot.AttributeSnapshotWrapper;
+import lombok.ToString;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+@ToString
 public class WrappedPacketOutUpdateAttributes extends WrappedPacketEntityAbstraction implements SendableWrapper {
 
     private static Constructor<?> packetConstructor;
@@ -36,14 +39,14 @@ public class WrappedPacketOutUpdateAttributes extends WrappedPacketEntityAbstrac
     protected void load() {
         try {
             packetConstructor = PacketTypeClasses.Play.Server.UPDATE_ATTRIBUTES.getConstructor(int.class, Collection.class);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+        } catch (NoSuchMethodException ex) {
+            ex.printStackTrace();
         }
     }
 
-    public List<AttributeSnapshotWrapper> getProperties() {
-        if (packet != null) {
-            List<Object> list = readList(0);
+    private List<AttributeSnapshotWrapper> getProperties() {
+        if (nmsPacket != null) {
+            List<Object> list = readList();
             List<AttributeSnapshotWrapper> attributeSnapshotWrappers = new ArrayList<>(list.size());
 
             for (Object nmsAttributeSnapshot : list) {
@@ -56,26 +59,30 @@ public class WrappedPacketOutUpdateAttributes extends WrappedPacketEntityAbstrac
     }
 
     public void setProperties(List<AttributeSnapshotWrapper> properties) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             List<Object> list = new ArrayList<>(properties.size());
 
             for (AttributeSnapshotWrapper attributeSnapshotWrapper : properties) {
-                list.add(attributeSnapshotWrapper.getNMSPacket().getRawNMSPacket());
+                if (attributeSnapshotWrapper.getNMSPacket() != null) {
+                    list.add(attributeSnapshotWrapper.getNMSPacket().getRawNMSPacket());
+                }
             }
 
-            writeList(0, list);
+            writeList(list);
         } else {
             this.properties = properties;
         }
     }
 
     @Override
-    public Object asNMSPacket() throws Exception {
-        List<AttributeSnapshotWrapper> properties = getProperties();
-        List<Object> nmsProperties = new ArrayList<>(properties.size());
+    public Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
+        List<AttributeSnapshotWrapper> wrapperList = getProperties();
+        List<Object> nmsProperties = new ArrayList<>(wrapperList.size());
 
-        for (AttributeSnapshotWrapper property : properties) {
-            nmsProperties.add(property.getNMSPacket().getRawNMSPacket());
+        for (AttributeSnapshotWrapper property : wrapperList) {
+            if (property.getNMSPacket() != null) {
+                nmsProperties.add(property.getNMSPacket().getRawNMSPacket());
+            }
         }
         return packetConstructor.newInstance(getEntityId(), nmsProperties);
     }

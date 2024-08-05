@@ -32,6 +32,7 @@ import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
  * @see PacketPlayReceiveEvent
  * @since 1.8
  */
+@FunctionalInterface
 public interface CallableEvent {
 
     void call(PacketListenerAbstract listener);

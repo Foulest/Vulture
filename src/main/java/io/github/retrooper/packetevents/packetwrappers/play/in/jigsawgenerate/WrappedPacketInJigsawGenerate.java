@@ -9,9 +9,9 @@ import io.github.retrooper.packetevents.utils.vector.Vector3i;
  *
  * @author Tecnio
  */
-public class WrappedPacketInJigsawGenerate extends WrappedPacket {
+class WrappedPacketInJigsawGenerate extends WrappedPacket {
 
-    public WrappedPacketInJigsawGenerate(NMSPacket packet) {
+    WrappedPacketInJigsawGenerate(NMSPacket packet) {
         super(packet);
     }
 

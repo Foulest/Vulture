@@ -27,19 +27,24 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.Deque;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 @Setter
 @Getter
+@ToString
+@NoArgsConstructor
 public class MessageQueueHandler extends ChannelOutboundHandlerAdapter {
 
     private final Deque<NetworkMessage> messageQueue = new ConcurrentLinkedDeque<>();
     private QueueMode mode = QueueMode.PASS;
 
     @Override
+    @SuppressWarnings("ProhibitedExceptionDeclared")
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
         switch (mode) {
             case ADD_FIRST:
@@ -50,7 +55,6 @@ public class MessageQueueHandler extends ChannelOutboundHandlerAdapter {
                 messageQueue.addLast(NetworkMessage.of(msg, promise));
                 break;
 
-            case PASS:
             default:
                 super.write(ctx, msg, promise);
                 break;
@@ -58,6 +62,7 @@ public class MessageQueueHandler extends ChannelOutboundHandlerAdapter {
     }
 
     @Override
+    @SuppressWarnings("ProhibitedExceptionDeclared")
     public void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
         drain(ctx);
         super.close(ctx, promise);

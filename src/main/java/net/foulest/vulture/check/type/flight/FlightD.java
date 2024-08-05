@@ -17,12 +17,14 @@
  */
 package net.foulest.vulture.check.type.flight;
 
+import lombok.ToString;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.event.MovementEvent;
 
+@ToString
 @CheckInfo(name = "Flight (D)", type = CheckType.FLIGHT,
         description = "Detects players continually rising.")
 public class FlightD extends Check {
@@ -58,8 +60,12 @@ public class FlightD extends Check {
 
         // Checks if the player is continually rising for more than 2 ticks.
         if (deltaY > 0 && deltaY >= lastDeltaY) {
-            if (++ticksRising > 2) {
-                if (++buffer >= 2) {
+            ++ticksRising;
+
+            if (ticksRising > 2) {
+                ++buffer;
+
+                if (buffer >= 2) {
                     flag(true, "deltaY=" + deltaY
                             + " lastDeltaY=" + lastDeltaY
                             + " ticksRising=" + ticksRising);

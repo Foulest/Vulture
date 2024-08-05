@@ -2,36 +2,38 @@ package io.github.retrooper.packetevents.packetwrappers.play.out.respawn;
 
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import lombok.ToString;
 import org.bukkit.GameMode;
 import org.bukkit.World;
 
+@ToString
 class WrappedPacketOutRespawn extends WrappedPacket {
 
     private World.Environment dimension;
     private GameMode gameMode;
 
-    public WrappedPacketOutRespawn(NMSPacket packet) {
+    WrappedPacketOutRespawn(NMSPacket packet) {
         super(packet);
     }
 
     public World.Environment getDimension() {
-        if (packet != null) {
-            return readDimension(0);
+        if (nmsPacket != null) {
+            return readDimension();
         } else {
             return dimension;
         }
     }
 
     public void setDimension(World.Environment dimension) {
-        if (packet != null) {
-            writeDimension(0, dimension);
+        if (nmsPacket != null) {
+            writeDimension(dimension);
         } else {
             this.dimension = dimension;
         }
     }
 
     public GameMode getGameMode() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             return readGameMode(0);
         } else {
             return gameMode;
@@ -39,8 +41,8 @@ class WrappedPacketOutRespawn extends WrappedPacket {
     }
 
     public void setGameMode(GameMode gameMode) {
-        if (packet != null) {
-            writeGameMode(0, gameMode);
+        if (nmsPacket != null) {
+            writeGameMode(gameMode);
         } else {
             this.gameMode = gameMode;
         }

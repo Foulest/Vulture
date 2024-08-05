@@ -4,17 +4,20 @@ import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
+import lombok.ToString;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
+@ToString
 public class WrappedPacketOutEntityStatus extends WrappedPacketEntityAbstraction implements SendableWrapper {
 
     private static Constructor<?> packetConstructor;
     private byte status;
 
-    public WrappedPacketOutEntityStatus(NMSPacket packet) {
+    private WrappedPacketOutEntityStatus(NMSPacket packet) {
         super(packet);
     }
 
@@ -38,16 +41,16 @@ public class WrappedPacketOutEntityStatus extends WrappedPacketEntityAbstraction
         }
     }
 
-    public byte getEntityStatus() {
-        if (packet != null) {
+    private byte getEntityStatus() {
+        if (nmsPacket != null) {
             return readByte(0);
         } else {
             return status;
         }
     }
 
-    public void setEntityStatus(byte status) {
-        if (packet != null) {
+    private void setEntityStatus(byte status) {
+        if (nmsPacket != null) {
             writeByte(0, status);
         } else {
             this.status = status;
@@ -55,7 +58,7 @@ public class WrappedPacketOutEntityStatus extends WrappedPacketEntityAbstraction
     }
 
     @Override
-    public Object asNMSPacket() throws Exception {
+    public Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
         Object packetInstance = packetConstructor.newInstance();
         WrappedPacketOutEntityStatus entityStatus = new WrappedPacketOutEntityStatus(new NMSPacket(packetInstance));
         entityStatus.setEntityId(getEntityId());

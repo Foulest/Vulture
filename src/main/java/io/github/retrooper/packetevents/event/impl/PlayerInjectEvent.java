@@ -23,6 +23,8 @@ import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
+import lombok.Getter;
+import lombok.ToString;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,15 +39,17 @@ import java.net.InetSocketAddress;
  * @see <a href="https://github.com/retrooper/packetevents/blob/dev/src/main/java/io/github/retrooper/packetevents/handler/PacketHandlerInternal.java">https://github.com/retrooper/packetevents/blob/dev/src/main/java/io/github/retrooper/packetevents/handler/PacketHandlerInternal.java</a>
  * @since 1.6.9
  */
+@Getter
+@ToString
 public final class PlayerInjectEvent extends PacketEvent implements CancellableEvent, PlayerEvent {
 
     private final Player player;
-    private final InetSocketAddress address;
+    private final InetSocketAddress socketAddress;
     private boolean cancelled;
 
     public PlayerInjectEvent(Player player) {
         this.player = player;
-        address = ChannelUtils.getSocketAddress(PacketEvents.get().getPlayerUtils().getChannel(player));
+        socketAddress = ChannelUtils.getSocketAddress(PacketEvents.getInstance().getPlayerUtils().getChannel(player));
     }
 
     @Override
@@ -67,15 +71,6 @@ public final class PlayerInjectEvent extends PacketEvent implements CancellableE
     @Override
     public Player getPlayer() {
         return player;
-    }
-
-    /**
-     * This method returns the socket address injecting player.
-     *
-     * @return Socket address of the injecting player.
-     */
-    public InetSocketAddress getSocketAddress() {
-        return address;
     }
 
     @Override

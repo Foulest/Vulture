@@ -22,6 +22,7 @@ import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
 import lombok.Getter;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.InetSocketAddress;
@@ -35,27 +36,19 @@ import java.net.InetSocketAddress;
  * @since 1.8
  */
 @Getter
+@ToString
 public abstract class NMSPacketEvent extends PacketEvent {
 
     private final Object channel;
     private final InetSocketAddress socketAddress;
     private final byte packetId;
-    protected NMSPacket packet;
+    protected NMSPacket nmsPacket;
 
-    protected NMSPacketEvent(Object channel, @NotNull NMSPacket packet) {
+    protected NMSPacketEvent(Object channel, @NotNull NMSPacket nmsPacket) {
         this.channel = channel;
         socketAddress = ChannelUtils.getSocketAddress(channel);
-        this.packet = packet;
-        packetId = PacketType.getPacketIDMap().getOrDefault(packet.getRawNMSPacket().getClass(), PacketType.INVALID);
-    }
-
-    /**
-     * Get the associated player's socket address.
-     *
-     * @return Socket address of the associated player.
-     */
-    public final InetSocketAddress getSocketAddress() {
-        return socketAddress;
+        this.nmsPacket = nmsPacket;
+        packetId = PacketType.getPacketIDMap().getOrDefault(nmsPacket.getRawNMSPacket().getClass(), PacketType.INVALID);
     }
 
     /**
@@ -63,17 +56,17 @@ public abstract class NMSPacketEvent extends PacketEvent {
      *
      * @return Get NMS packet.
      */
-    public final NMSPacket getNMSPacket() {
-        return packet;
+    public NMSPacket getNMSPacket() {
+        return nmsPacket;
     }
 
     /**
      * Update the NMS Packet.
      *
-     * @param packet NMS Object
+     * @param nmsPacket NMS Object
      */
-    public final void setNMSPacket(NMSPacket packet) {
-        this.packet = packet;
+    public void setNMSPacket(NMSPacket nmsPacket) {
+        this.nmsPacket = nmsPacket;
     }
 
     @Override

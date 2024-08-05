@@ -27,8 +27,11 @@ import io.github.retrooper.packetevents.packetwrappers.login.in.start.WrappedPac
 import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -41,8 +44,11 @@ import java.util.UUID;
  * @see <a href="http://netty.io">http://netty.io</a>
  * @since 1.7.9
  */
+@NoArgsConstructor
 public class PacketProcessorInternal {
 
+    @ToString
+    @NoArgsConstructor
     public static class PacketData {
 
         public Object packet;
@@ -58,7 +64,7 @@ public class PacketProcessorInternal {
      * @param packet  NMS Packet.
      * @return NMS Packet, null if the event was cancelled.
      */
-    public PacketData read(Player player, Object channel, Object packet) {
+    public PacketData read(Player player, Object channel, @Nullable Object packet) {
         PacketData data = new PacketData();
         data.packet = packet;
         PacketState state = getPacketState(player, packet);
@@ -70,7 +76,7 @@ public class PacketProcessorInternal {
         switch (state) {
             case STATUS:
                 PacketStatusReceiveEvent statusEvent = new PacketStatusReceiveEvent(channel, new NMSPacket(packet));
-                PacketEvents.get().getEventManager().callEvent(statusEvent);
+                PacketEvents.getInstance().getEventManager().callEvent(statusEvent);
 
                 packet = statusEvent.getNMSPacket().getRawNMSPacket();
                 interceptStatusReceive(statusEvent);
@@ -82,7 +88,7 @@ public class PacketProcessorInternal {
 
             case HANDSHAKING:
                 PacketHandshakeReceiveEvent handshakeEvent = new PacketHandshakeReceiveEvent(channel, new NMSPacket(packet));
-                PacketEvents.get().getEventManager().callEvent(handshakeEvent);
+                PacketEvents.getInstance().getEventManager().callEvent(handshakeEvent);
 
                 packet = handshakeEvent.getNMSPacket().getRawNMSPacket();
                 interceptHandshakeReceive(handshakeEvent);
@@ -98,10 +104,10 @@ public class PacketProcessorInternal {
                 if (loginEvent.getPacketId() == PacketType.Login.Client.START) {
                     WrappedPacketLoginInStart startWrapper = new WrappedPacketLoginInStart(loginEvent.getNMSPacket());
                     WrappedGameProfile gameProfile = startWrapper.getGameProfile();
-                    PacketEvents.get().getPlayerUtils().channels.put(gameProfile.getName(), channel);
+                    PacketEvents.getInstance().getPlayerUtils().channels.put(gameProfile.getName(), channel);
                 }
 
-                PacketEvents.get().getEventManager().callEvent(loginEvent);
+                PacketEvents.getInstance().getEventManager().callEvent(loginEvent);
 
                 packet = loginEvent.getNMSPacket().getRawNMSPacket();
                 interceptLoginReceive(loginEvent);
@@ -113,7 +119,7 @@ public class PacketProcessorInternal {
 
             case PLAY:
                 PacketPlayReceiveEvent event = new PacketPlayReceiveEvent(player, channel, new NMSPacket(packet));
-                PacketEvents.get().getEventManager().callEvent(event);
+                PacketEvents.getInstance().getEventManager().callEvent(event);
 
                 packet = event.getNMSPacket().getRawNMSPacket();
                 interceptPlayReceive(event);
@@ -140,7 +146,7 @@ public class PacketProcessorInternal {
      * @param packet  NMS Packet.
      * @return NMS Packet, null if the event was cancelled.
      */
-    public PacketData write(Player player, Object channel, Object packet) {
+    public PacketData write(Player player, Object channel, @Nullable Object packet) {
         PacketData data = new PacketData();
         data.packet = packet;
         PacketState state = getPacketState(player, packet);
@@ -152,7 +158,7 @@ public class PacketProcessorInternal {
         switch (state) {
             case STATUS:
                 PacketStatusSendEvent statusEvent = new PacketStatusSendEvent(channel, new NMSPacket(packet));
-                PacketEvents.get().getEventManager().callEvent(statusEvent);
+                PacketEvents.getInstance().getEventManager().callEvent(statusEvent);
 
                 if (statusEvent.isPostTaskAvailable()) {
                     data.postAction = statusEvent.getPostTask();
@@ -168,7 +174,7 @@ public class PacketProcessorInternal {
 
             case LOGIN:
                 PacketLoginSendEvent loginEvent = new PacketLoginSendEvent(channel, new NMSPacket(packet));
-                PacketEvents.get().getEventManager().callEvent(loginEvent);
+                PacketEvents.getInstance().getEventManager().callEvent(loginEvent);
 
                 if (loginEvent.isPostTaskAvailable()) {
                     data.postAction = loginEvent.getPostTask();
@@ -184,7 +190,7 @@ public class PacketProcessorInternal {
 
             case PLAY:
                 PacketPlaySendEvent playEvent = new PacketPlaySendEvent(player, channel, new NMSPacket(packet));
-                PacketEvents.get().getEventManager().callEvent(playEvent);
+                PacketEvents.getInstance().getEventManager().callEvent(playEvent);
 
                 if (playEvent.isPostTaskAvailable()) {
                     data.postAction = playEvent.getPostTask();
@@ -217,7 +223,7 @@ public class PacketProcessorInternal {
     public void postRead(Player player, Object channel, Object packet) {
         if (getPacketState(player, packet) == PacketState.PLAY) {
             PostPacketPlayReceiveEvent event = new PostPacketPlayReceiveEvent(player, channel, new NMSPacket(packet));
-            PacketEvents.get().getEventManager().callEvent(event);
+            PacketEvents.getInstance().getEventManager().callEvent(event);
             interceptPostPlayReceive(event);
         }
     }
@@ -232,10 +238,10 @@ public class PacketProcessorInternal {
      * @param channel Netty channel of the packet receiver.
      * @param packet  NMS Packet.
      */
-    public void postWrite(Player player, Object channel, Object packet) {
+    public static void postWrite(Player player, Object channel, Object packet) {
         if (getPacketState(player, packet) == PacketState.PLAY) {
             PostPacketPlaySendEvent event = new PostPacketPlaySendEvent(player, channel, new NMSPacket(packet));
-            PacketEvents.get().getEventManager().callEvent(event);
+            PacketEvents.getInstance().getEventManager().callEvent(event);
             interceptPostPlaySend(event);
         }
     }
@@ -245,16 +251,16 @@ public class PacketProcessorInternal {
      *
      * @param event PLAY server-bound packet event.
      */
-    private void interceptPlayReceive(@NotNull PacketPlayReceiveEvent event) {
+    private static void interceptPlayReceive(@NotNull PacketPlayReceiveEvent event) {
         if (event.getPacketId() == PacketType.Play.Client.KEEP_ALIVE) {
             UUID uuid = event.getPlayer().getUniqueId();
-            long timestamp = PacketEvents.get().getPlayerUtils().keepAliveMap.getOrDefault(uuid, event.getTimestamp());
+            long timestamp = PacketEvents.getInstance().getPlayerUtils().keepAliveMap.getOrDefault(uuid, event.getTimestamp());
             long currentTime = event.getTimestamp();
             long ping = currentTime - timestamp;
-            long smoothedPing = (PacketEvents.get().getPlayerUtils().getSmoothedPing(event.getPlayer().getUniqueId()) * 3L + ping) / 4;
+            long smoothedPing = (PacketEvents.getInstance().getPlayerUtils().getSmoothedPing(event.getPlayer().getUniqueId()) * 3L + ping) / 4;
 
-            PacketEvents.get().getPlayerUtils().playerPingMap.put(uuid, (int) ping);
-            PacketEvents.get().getPlayerUtils().playerSmoothedPingMap.put(uuid, (int) smoothedPing);
+            PacketEvents.getInstance().getPlayerUtils().playerPingMap.put(uuid, (int) ping);
+            PacketEvents.getInstance().getPlayerUtils().playerSmoothedPingMap.put(uuid, (int) smoothedPing);
         }
     }
 
@@ -290,13 +296,13 @@ public class PacketProcessorInternal {
      *
      * @param event server-bound HANDSHAKE packet event.
      */
-    private void interceptHandshakeReceive(@NotNull PacketHandshakeReceiveEvent event) {
+    private static void interceptHandshakeReceive(@NotNull PacketHandshakeReceiveEvent event) {
         if (event.getPacketId() == PacketType.Handshaking.Client.SET_PROTOCOL) {
             WrappedPacketHandshakingInSetProtocol handshake = new WrappedPacketHandshakingInSetProtocol(event.getNMSPacket());
             int protocolVersion = handshake.getProtocolVersion();
             ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
 
-            PacketEvents.get().getPlayerUtils().tempClientVersionMap.put(event.getSocketAddress(), version);
+            PacketEvents.getInstance().getPlayerUtils().tempClientVersionMap.put(event.getSocketAddress(), version);
         }
     }
 
@@ -333,13 +339,13 @@ public class PacketProcessorInternal {
      *
      * @param event post client-bound play packet event.
      */
-    private void interceptPostPlaySend(@NotNull PostPacketPlaySendEvent event) {
+    private static void interceptPostPlaySend(@NotNull PostPacketPlaySendEvent event) {
         if (event.getPacketId() == PacketType.Play.Server.KEEP_ALIVE && event.getPlayer() != null) {
-            PacketEvents.get().getPlayerUtils().keepAliveMap.put(event.getPlayer().getUniqueId(), event.getTimestamp());
+            PacketEvents.getInstance().getPlayerUtils().keepAliveMap.put(event.getPlayer().getUniqueId(), event.getTimestamp());
         }
     }
 
-    private PacketState getPacketState(Player player, Object packet) {
+    private static @Nullable PacketState getPacketState(Player player, Object packet) {
         if (packet == null) {
             return null;
         }

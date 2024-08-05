@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class ClassUtil {
+public final class ClassUtil {
 
     private static final Map<Class<?>, String> CLASS_SIMPLE_NAME_CACHE = new ConcurrentHashMap<>();
 

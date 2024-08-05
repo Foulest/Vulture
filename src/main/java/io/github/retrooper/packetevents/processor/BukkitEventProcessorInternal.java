@@ -21,6 +21,7 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
+import lombok.NoArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -37,10 +38,11 @@ import org.jetbrains.annotations.NotNull;
 import java.net.InetSocketAddress;
 import java.util.UUID;
 
+@NoArgsConstructor
 public class BukkitEventProcessorInternal implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onLogin(@NotNull PlayerLoginEvent event) {
+    public static void onLogin(@NotNull PlayerLoginEvent event) {
         Player player = event.getPlayer();
         int protocolVersion = VersionLookupUtils.getProtocolVersion(player);
         ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
@@ -50,71 +52,71 @@ public class BukkitEventProcessorInternal implements Listener {
             return;
         }
 
-        PacketEvents.get().getInjector().injectPlayer(player);
+        PacketEvents.getInstance().getInjector().injectPlayer(player);
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onJoin(@NotNull PlayerJoinEvent event) {
+    public static void onJoin(@NotNull PlayerJoinEvent event) {
         Player player = event.getPlayer();
         InetSocketAddress address = player.getAddress();
-        boolean shouldInject = !(PacketEvents.get().getInjector().hasInjected(event.getPlayer()));
+        boolean shouldInject = !(PacketEvents.getInstance().getInjector().hasInjected(event.getPlayer()));
 
         // Inject now if we are using the compatibility-injector or inject if the early injector failed to inject them.
         if (shouldInject) {
-            PacketEvents.get().getInjector().injectPlayer(player);
+            PacketEvents.getInstance().getInjector().injectPlayer(player);
         }
 
         boolean dependencyAvailable = VersionLookupUtils.isDependencyAvailable();
-        PacketEvents.get().getPlayerUtils().loginTime.put(player.getUniqueId(), System.currentTimeMillis());
+        PacketEvents.getInstance().getPlayerUtils().loginTime.put(player.getUniqueId(), System.currentTimeMillis());
 
         // A supported dependency is available, we need to first ask the dependency for the client version.
         if (dependencyAvailable) {
             // We are resolving version one tick later for extra safety.
             // Some dependencies throw exceptions if we try too early.
-            Bukkit.getScheduler().runTaskLaterAsynchronously(PacketEvents.get().getPlugin(), () -> {
+            Bukkit.getScheduler().runTaskLaterAsynchronously(PacketEvents.getPlugin(), () -> {
                 try {
                     int protocolVersion = VersionLookupUtils.getProtocolVersion(player);
                     ClientVersion version = ClientVersion.getClientVersion(protocolVersion);
-                    PacketEvents.get().getPlayerUtils().clientVersionsMap.put(address, version);
-                } catch (Exception ex) {
+                    PacketEvents.getInstance().getPlayerUtils().clientVersionsMap.put(address, version);
+                } catch (RuntimeException ex) {
                     ex.printStackTrace();
                 }
 
-                PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(player, true));
+                PacketEvents.getInstance().getEventManager().callEvent(new PostPlayerInjectEvent(player, true));
             }, 1L);
         } else {
             // Dependency isn't available, we can already call the post player inject event.
-            PacketEvents.get().getEventManager().callEvent(new PostPlayerInjectEvent(event.getPlayer(), false));
+            PacketEvents.getInstance().getEventManager().callEvent(new PostPlayerInjectEvent(event.getPlayer(), false));
         }
 
-        PacketEvents.get().getServerUtils().entityCache.putIfAbsent(event.getPlayer().getEntityId(), event.getPlayer());
+        PacketEvents.getInstance().getServerUtils().entityCache.putIfAbsent(event.getPlayer().getEntityId(), event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onQuit(@NotNull PlayerQuitEvent event) {
+    public static void onQuit(@NotNull PlayerQuitEvent event) {
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
         InetSocketAddress address = player.getAddress();
 
         // Cleanup user data
-        PacketEvents.get().getPlayerUtils().loginTime.remove(uuid);
-        PacketEvents.get().getPlayerUtils().playerPingMap.remove(uuid);
-        PacketEvents.get().getPlayerUtils().playerSmoothedPingMap.remove(uuid);
-        PacketEvents.get().getPlayerUtils().clientVersionsMap.remove(address);
-        PacketEvents.get().getPlayerUtils().tempClientVersionMap.remove(address);
-        PacketEvents.get().getPlayerUtils().keepAliveMap.remove(uuid);
-        PacketEvents.get().getPlayerUtils().channels.remove(player.getName());
-        PacketEvents.get().getServerUtils().entityCache.remove(event.getPlayer().getEntityId());
+        PacketEvents.getInstance().getPlayerUtils().loginTime.remove(uuid);
+        PacketEvents.getInstance().getPlayerUtils().playerPingMap.remove(uuid);
+        PacketEvents.getInstance().getPlayerUtils().playerSmoothedPingMap.remove(uuid);
+        PacketEvents.getInstance().getPlayerUtils().clientVersionsMap.remove(address);
+        PacketEvents.getInstance().getPlayerUtils().tempClientVersionMap.remove(address);
+        PacketEvents.getInstance().getPlayerUtils().keepAliveMap.remove(uuid);
+        PacketEvents.getInstance().getPlayerUtils().channels.remove(player.getName());
+        PacketEvents.getInstance().getServerUtils().entityCache.remove(event.getPlayer().getEntityId());
     }
 
     @EventHandler
-    public void onEntitySpawn(@NotNull EntitySpawnEvent event) {
+    public static void onEntitySpawn(@NotNull EntitySpawnEvent event) {
         Entity entity = event.getEntity();
-        PacketEvents.get().getServerUtils().entityCache.putIfAbsent(entity.getEntityId(), entity);
+        PacketEvents.getInstance().getServerUtils().entityCache.putIfAbsent(entity.getEntityId(), entity);
     }
 
     @EventHandler
-    public void onEntityDeath(@NotNull EntityDeathEvent event) {
-        PacketEvents.get().getServerUtils().entityCache.remove(event.getEntity().getEntityId());
+    public static void onEntityDeath(@NotNull EntityDeathEvent event) {
+        PacketEvents.getInstance().getServerUtils().entityCache.remove(event.getEntity().getEntityId());
     }
 }

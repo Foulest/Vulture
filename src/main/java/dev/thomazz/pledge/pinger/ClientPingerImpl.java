@@ -31,6 +31,7 @@ import dev.thomazz.pledge.pinger.data.PingOrder;
 import dev.thomazz.pledge.util.ChannelUtils;
 import io.netty.channel.Channel;
 import lombok.Getter;
+import lombok.ToString;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,6 +39,7 @@ import java.util.*;
 import java.util.function.Predicate;
 
 @Getter
+@ToString
 public class ClientPingerImpl implements ClientPinger {
 
     protected final Map<Player, PingData> pingDataMap = new LinkedHashMap<>();
@@ -136,7 +138,7 @@ public class ClientPingerImpl implements ClientPinger {
         return Optional.ofNullable(pingDataMap.get(player));
     }
 
-    protected void onSend(Player player, @NotNull Ping ping) {
+    private void onSend(Player player, @NotNull Ping ping) {
         switch (ping.getOrder()) {
             case TICK_START:
                 onSendStart(player, ping.getId());
@@ -162,11 +164,11 @@ public class ClientPingerImpl implements ClientPinger {
         }
     }
 
-    protected void onSendStart(Player player, int id) {
+    private void onSendStart(Player player, int id) {
         pingListeners.forEach(listener -> listener.onPingSendStart(player, id));
     }
 
-    protected void onSendEnd(Player player, int id) {
+    private void onSendEnd(Player player, int id) {
         pingListeners.forEach(listener -> listener.onPingSendEnd(player, id));
     }
 

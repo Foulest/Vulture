@@ -32,13 +32,13 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings("BooleanMethodIsAlwaysInverted")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class MathUtil {
+public final class MathUtil {
 
     private static final float[] SIN_TABLE = new float[65536];
 
     static {
         for (int i = 0; i < SIN_TABLE.length; ++i) {
-            SIN_TABLE[i] = (float) Math.sin(i * Math.PI * 2.0D / 65536.0D);
+            SIN_TABLE[i] = (float) StrictMath.sin(i * Math.PI * 2.0D / 65536.0D);
         }
     }
 
@@ -52,11 +52,11 @@ public class MathUtil {
         return distance;
     }
 
-    public static double getStandardDeviation(Collection<? extends Number> data) {
+    public static double getStandardDeviation(Iterable<? extends Number> data) {
         return Math.sqrt(getVariance(data));
     }
 
-    public static double getVariance(@NotNull Collection<? extends Number> data) {
+    private static double getVariance(@NotNull Iterable<? extends Number> data) {
         int count = 0;
         double sum = 0.0;
         double variance = 0.0;
@@ -74,18 +74,18 @@ public class MathUtil {
         average = sum / count;
 
         for (Number number : data) {
-            variance += Math.pow(number.doubleValue() - average, 2.0);
+            variance += StrictMath.pow(number.doubleValue() - average, 2.0);
         }
         return variance;
     }
 
     @Contract(pure = true)
-    public static float sin(float value) {
+    private static float sin(float value) {
         return SIN_TABLE[(int) (value * 10430.378F) & 65535];
     }
 
     @Contract(pure = true)
-    public static float cos(float value) {
+    private static float cos(float value) {
         return SIN_TABLE[(int) (value * 10430.378F + 16384.0F) & 65535];
     }
 
@@ -113,16 +113,16 @@ public class MathUtil {
 
         double difX = to.getX() - from.getX();
         double difZ = to.getZ() - from.getZ();
-        return (float) ((Math.atan2(difZ, difX) * 180.0D / Math.PI) - 90.0F);
+        return (float) ((StrictMath.atan2(difZ, difX) * 180.0D / Math.PI) - 90.0F);
     }
 
     public static org.joml.Vector3d calculateIntercept(@NotNull Area area, org.joml.Vector3d pos, org.joml.Vector3d ray) {
-        org.joml.Vector3d vec3 = getIntermediateWithXValue(pos, ray, area.getMin().getX());
-        org.joml.Vector3d vec31 = getIntermediateWithXValue(pos, ray, area.getMax().getX());
-        org.joml.Vector3d vec32 = getIntermediateWithYValue(pos, ray, area.getMin().getY());
-        org.joml.Vector3d vec33 = getIntermediateWithYValue(pos, ray, area.getMax().getY());
-        org.joml.Vector3d vec34 = getIntermediateWithZValue(pos, ray, area.getMin().getZ());
-        org.joml.Vector3d vec35 = getIntermediateWithZValue(pos, ray, area.getMax().getZ());
+        org.joml.@Nullable Vector3d vec3 = getIntermediateWithXValue(pos, ray, area.getMin().getX());
+        org.joml.@Nullable Vector3d vec31 = getIntermediateWithXValue(pos, ray, area.getMax().getX());
+        org.joml.@Nullable Vector3d vec32 = getIntermediateWithYValue(pos, ray, area.getMin().getY());
+        org.joml.@Nullable Vector3d vec33 = getIntermediateWithYValue(pos, ray, area.getMax().getY());
+        org.joml.@Nullable Vector3d vec34 = getIntermediateWithZValue(pos, ray, area.getMin().getZ());
+        org.joml.@Nullable Vector3d vec35 = getIntermediateWithZValue(pos, ray, area.getMax().getZ());
 
         if (!isVecInYZ(area, vec3)) {
             vec3 = null;
@@ -195,8 +195,8 @@ public class MathUtil {
     }
 
     @Contract(pure = true)
-    public static org.joml.@Nullable Vector3d getIntermediateWithXValue(@NotNull org.joml.Vector3d vec1,
-                                                                        @NotNull org.joml.Vector3d vec2, double limit) {
+    private static org.joml.@Nullable Vector3d getIntermediateWithXValue(@NotNull org.joml.Vector3d vec1,
+                                                                         @NotNull org.joml.Vector3d vec2, double limit) {
         double d0 = vec2.x - vec1.x;
         double d1 = vec2.y - vec1.y;
         double d2 = vec2.z - vec1.z;
@@ -210,8 +210,8 @@ public class MathUtil {
     }
 
     @Contract(pure = true)
-    public static org.joml.@Nullable Vector3d getIntermediateWithYValue(@NotNull org.joml.Vector3d vec1,
-                                                                        @NotNull org.joml.Vector3d vec2, double limit) {
+    private static org.joml.@Nullable Vector3d getIntermediateWithYValue(@NotNull org.joml.Vector3d vec1,
+                                                                         @NotNull org.joml.Vector3d vec2, double limit) {
         double d0 = vec2.x - vec1.x;
         double d1 = vec2.y - vec1.y;
         double d2 = vec2.z - vec1.z;
@@ -225,8 +225,8 @@ public class MathUtil {
     }
 
     @Contract(pure = true)
-    public static org.joml.@Nullable Vector3d getIntermediateWithZValue(@NotNull org.joml.Vector3d vec1,
-                                                                        @NotNull org.joml.Vector3d vec2, double limit) {
+    private static org.joml.@Nullable Vector3d getIntermediateWithZValue(@NotNull org.joml.Vector3d vec1,
+                                                                         @NotNull org.joml.Vector3d vec2, double limit) {
         double d0 = vec2.x - vec1.x;
         double d1 = vec2.y - vec1.y;
         double d2 = vec2.z - vec1.z;
@@ -241,10 +241,10 @@ public class MathUtil {
 
     @Contract("_, _ -> new")
     public static org.joml.@NotNull Vector3d getLookVector(float yaw, float pitch) {
-        float f = MathUtil.cos(-yaw * 0.017453292F - (float) Math.PI);
-        float f1 = MathUtil.sin(-yaw * 0.017453292F - (float) Math.PI);
-        float f2 = -MathUtil.cos(-pitch * 0.017453292F);
-        float f3 = MathUtil.sin(-pitch * 0.017453292F);
+        float f = cos(-yaw * 0.017453292F - (float) Math.PI);
+        float f1 = sin(-yaw * 0.017453292F - (float) Math.PI);
+        float f2 = -cos(-pitch * 0.017453292F);
+        float f3 = sin(-pitch * 0.017453292F);
         return new org.joml.Vector3d(f1 * f2, f3, f * f2);
     }
 

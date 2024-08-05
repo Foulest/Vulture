@@ -22,6 +22,7 @@
  */
 package dev.thomazz.pledge.event;
 
+import lombok.NoArgsConstructor;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
@@ -29,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Called at the end of a server tick.
  */
+@NoArgsConstructor
 public class TickEndEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
@@ -36,10 +38,10 @@ public class TickEndEvent extends Event {
     @NotNull
     @Override
     public HandlerList getHandlers() {
-        return TickEndEvent.handlers;
+        return handlers;
     }
 
     public static HandlerList getHandlerList() {
-        return TickEndEvent.handlers;
+        return handlers;
     }
 }

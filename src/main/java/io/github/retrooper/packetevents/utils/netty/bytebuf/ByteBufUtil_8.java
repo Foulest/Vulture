@@ -19,8 +19,11 @@ package io.github.retrooper.packetevents.utils.netty.bytebuf;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.util.ReferenceCounted;
 import io.netty.util.internal.EmptyArrays;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 public final class ByteBufUtil_8 implements ByteBufUtil {
 
     @Override
@@ -30,47 +33,47 @@ public final class ByteBufUtil_8 implements ByteBufUtil {
 
     @Override
     public void retain(Object byteBuf) {
-        ((ByteBuf) byteBuf).retain();
+        ((ReferenceCounted) byteBuf).retain();
     }
 
     @Override
     public void release(Object byteBuf) {
-        ((ByteBuf) byteBuf).release();
+        ((ReferenceCounted) byteBuf).release();
     }
 
     @Override
     public byte[] getBytes(Object byteBuf) {
-        ByteBuf bb = (ByteBuf) byteBuf;
+        ByteBuf buf = (ByteBuf) byteBuf;
 
-        if (bb.refCnt() < 1) {
+        if (buf.refCnt() < 1) {
             return EmptyArrays.EMPTY_BYTES;
         }
 
         byte[] bytes;
 
-        if (bb.hasArray()) {
-            bytes = bb.array();
+        if (buf.hasArray()) {
+            bytes = buf.array();
         } else {
-            bytes = new byte[bb.readableBytes()];
-            bb.getBytes(bb.readerIndex(), bytes);
+            bytes = new byte[buf.readableBytes()];
+            buf.getBytes(buf.readerIndex(), bytes);
         }
         return bytes;
     }
 
     @Override
     public void setBytes(Object byteBuf, byte[] bytes) {
-        ByteBuf bb = (ByteBuf) byteBuf;
+        ByteBuf buf = (ByteBuf) byteBuf;
 
-        if (bb.refCnt() < 1) {
+        if (buf.refCnt() < 1) {
             return;
         }
 
         int bytesLength = bytes.length;
 
-        if (bb.capacity() < bytesLength) {
-            bb.capacity(bytesLength);
+        if (buf.capacity() < bytesLength) {
+            buf.capacity(bytesLength);
         }
 
-        bb.setBytes(0, bytes);
+        buf.setBytes(0, bytes);
     }
 }

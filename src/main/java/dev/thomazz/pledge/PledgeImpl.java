@@ -38,6 +38,7 @@ import dev.thomazz.pledge.util.ChannelUtils;
 import dev.thomazz.pledge.util.TickEndTask;
 import io.netty.channel.Channel;
 import lombok.Getter;
+import lombok.ToString;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -51,18 +52,21 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.logging.Logger;
 
 @Getter
+@ToString
 public class PledgeImpl implements Pledge, Listener {
 
-    static PledgeImpl instance;
+    static @Nullable PledgeImpl instance;
 
+    @SuppressWarnings("NonConstantLogger")
     private final Logger logger;
-    private final PingPacketProvider packetProvider;
 
+    private final PingPacketProvider packetProvider;
     private final BukkitTask startTask;
     private final TickEndTask endTask;
 
@@ -194,7 +198,7 @@ public class PledgeImpl implements Pledge, Listener {
 
     @Override
     public void destroy() {
-        if (!equals(PledgeImpl.instance)) {
+        if (!equals(instance)) {
             throw new IllegalStateException("API object not the same as current instance!");
         }
 
@@ -205,6 +209,6 @@ public class PledgeImpl implements Pledge, Listener {
         startTask.cancel();
         endTask.cancel();
 
-        PledgeImpl.instance = null;
+        instance = null;
     }
 }

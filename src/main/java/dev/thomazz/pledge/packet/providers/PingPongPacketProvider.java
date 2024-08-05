@@ -25,17 +25,20 @@ package dev.thomazz.pledge.packet.providers;
 import dev.thomazz.pledge.packet.PingPacketProvider;
 import dev.thomazz.pledge.util.MinecraftReflection;
 import dev.thomazz.pledge.util.ReflectionUtil;
+import lombok.ToString;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 
+@ToString
 public class PingPongPacketProvider implements PingPacketProvider {
 
     private final Class<?> pongClass;
     private final Field pongIdField;
     private final Constructor<?> pingConstructor;
 
-    public PingPongPacketProvider() throws Exception {
+    public PingPongPacketProvider() throws ClassNotFoundException, NoSuchFieldException, NoSuchMethodException {
         pongClass = MinecraftReflection.gamePacket("ServerboundPongPacket");
         pongIdField = ReflectionUtil.getFieldByType(pongClass, int.class);
 
@@ -44,12 +47,12 @@ public class PingPongPacketProvider implements PingPacketProvider {
     }
 
     @Override
-    public Object buildPacket(int id) throws Exception {
+    public Object buildPacket(int id) throws InvocationTargetException, InstantiationException, IllegalAccessException {
         return pingConstructor.newInstance(id);
     }
 
     @Override
-    public int idFromPong(Object packet) throws Exception {
+    public int idFromPong(Object packet) throws IllegalAccessException {
         return pongIdField.getInt(packet);
     }
 

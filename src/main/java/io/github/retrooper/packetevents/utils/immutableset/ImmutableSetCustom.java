@@ -17,8 +17,11 @@
  */
 package io.github.retrooper.packetevents.utils.immutableset;
 
+import lombok.ToString;
+
 import java.util.List;
 
+@ToString
 public class ImmutableSetCustom<T> {
 
     private final ImmutableSetAbstract<T> immutableSetAbstract;
@@ -45,6 +48,7 @@ public class ImmutableSetCustom<T> {
     }
 
     @SafeVarargs
+    @SuppressWarnings("FinalMethod")
     public final void addAll(T... elements) {
         immutableSetAbstract.addAll(elements);
     }

@@ -22,6 +22,7 @@ import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.play.in.keepalive.WrappedPacketInKeepAlive;
 import io.github.retrooper.packetevents.packetwrappers.play.out.keepalive.WrappedPacketOutKeepAlive;
+import lombok.ToString;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
@@ -31,6 +32,7 @@ import net.foulest.vulture.util.KickUtil;
 import net.foulest.vulture.util.data.EvictingList;
 import net.foulest.vulture.util.data.Pair;
 
+@ToString
 @CheckInfo(name = "PingSpoof (B)", type = CheckType.PINGSPOOF,
         acceptsServerPackets = true, punishable = false,
         description = "Detects clients modifying KeepAlive packets.")
@@ -106,7 +108,9 @@ public class PingSpoofB extends Check {
 
             // If the client has sent multiple negative KeepAlive packets in a row, kick them.
             if (keepAlive.getId() == -1) {
-                if (++negativeStreak >= 5) {
+                ++negativeStreak;
+
+                if (negativeStreak >= 5) {
                     KickUtil.kickPlayer(player, event, "Sent multiple negative KeepAlive packets in a row");
                     return;
                 }

@@ -47,7 +47,7 @@ public class CustomLocation {
         this(new Vector3d(x, y, z), new Vector2f(yaw, pitch));
     }
 
-    public void setPos(double x, double y, double z) {
+    private void setPos(double x, double y, double z) {
         if (pos == null) {
             pos = new Vector3d();
         }
@@ -55,7 +55,7 @@ public class CustomLocation {
         pos.set(x, y, z);
     }
 
-    public void setRot(float yaw, float pitch) {
+    private void setRot(float yaw, float pitch) {
         if (rot == null) {
             rot = new Vector2f();
         }

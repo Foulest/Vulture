@@ -19,6 +19,8 @@ package net.foulest.vulture.util.command;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
+import net.foulest.vulture.util.ConstantUtil;
 import net.foulest.vulture.util.MessageUtil;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandMap;
@@ -33,10 +35,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.logging.Level;
-
-import static net.foulest.vulture.util.ConstantUtil.UNABLE_TO_REGISTER_TAB_COMPLETER;
 
 /**
  * Command framework for Bukkit, allowing easy registration of commands and command completers.
@@ -47,9 +46,10 @@ import static net.foulest.vulture.util.ConstantUtil.UNABLE_TO_REGISTER_TAB_COMPL
  */
 @Getter
 @Setter
+@ToString
 public class CommandFramework implements CommandExecutor {
 
-    private final Map<String, Entry<Method, Object>> commandMap = new HashMap<>();
+    private final Map<String, Map.Entry<Method, Object>> commandMap = new HashMap<>();
     private final Plugin plugin;
     private CommandMap map;
 
@@ -100,16 +100,16 @@ public class CommandFramework implements CommandExecutor {
      * @param label  The label of the command.
      * @param args   The arguments provided to the command.
      */
-    public void handleCommand(CommandSender sender,
-                              org.bukkit.command.Command cmd,
-                              String label,
-                              String @NotNull [] args) {
+    private void handleCommand(CommandSender sender,
+                               org.bukkit.command.Command cmd,
+                               String label,
+                               String @NotNull [] args) {
         for (int i = args.length; i >= 0; i--) {
             StringBuilder buffer = new StringBuilder();
-            buffer.append(label.toLowerCase());
+            buffer.append(label.toLowerCase(Locale.ROOT));
 
             for (int x = 0; x < i; x++) {
-                buffer.append(".").append(args[x].toLowerCase());
+                buffer.append(".").append(args[x].toLowerCase(Locale.ROOT));
             }
 
             String cmdLabel = buffer.toString();
@@ -163,7 +163,7 @@ public class CommandFramework implements CommandExecutor {
             } else if (completer != null && (method.getParameterTypes().length != 1
                     || method.getParameterTypes()[0] != CommandArgs.class
                     || method.getReturnType() != List.class)) {
-                MessageUtil.log(Level.WARNING, UNABLE_TO_REGISTER_TAB_COMPLETER
+                MessageUtil.log(Level.WARNING, ConstantUtil.UNABLE_TO_REGISTER_TAB_COMPLETER
                         + method.getName() + "; unexpected method arguments or return type.");
                 invalidMethod = true;
             }
@@ -196,12 +196,12 @@ public class CommandFramework implements CommandExecutor {
      * @param method  The method representing the command handler.
      * @param obj     The object containing the command method.
      */
-    public void registerCommand(@NotNull Command command,
-                                @NotNull String label,
-                                Method method,
-                                Object obj) {
-        commandMap.put(label.toLowerCase(), new AbstractMap.SimpleEntry<>(method, obj));
-        commandMap.put(plugin.getName() + ':' + label.toLowerCase(), new AbstractMap.SimpleEntry<>(method, obj));
+    private void registerCommand(@NotNull Command command,
+                                 @NotNull String label,
+                                 Method method,
+                                 Object obj) {
+        commandMap.put(label.toLowerCase(Locale.ROOT), new AbstractMap.SimpleEntry<>(method, obj));
+        commandMap.put(plugin.getName() + ':' + label.toLowerCase(Locale.ROOT), new AbstractMap.SimpleEntry<>(method, obj));
 
         String cmdLabel = label.replace(".", ",").split(",")[0].toLowerCase();
 
@@ -226,10 +226,8 @@ public class CommandFramework implements CommandExecutor {
      * @param method The method representing the tab completer.
      * @param obj    The object containing the tab completer method.
      */
-    public void registerCompleter(@NotNull String label,
-                                  Method method,
-                                  Object obj) {
-        String cmdLabel = label.replace(".", ",").split(",")[0].toLowerCase();
+    private void registerCompleter(@NotNull String label, Method method, Object obj) {
+        String cmdLabel = label.replace(".", ",").split(",")[0].toLowerCase(Locale.ROOT);
 
         if (map.getCommand(cmdLabel) == null) {
             org.bukkit.command.Command command = new BukkitCommand(cmdLabel, this, plugin);
@@ -240,7 +238,7 @@ public class CommandFramework implements CommandExecutor {
             BukkitCommand command = (BukkitCommand) map.getCommand(cmdLabel);
 
             if (command == null) {
-                MessageUtil.log(Level.WARNING, UNABLE_TO_REGISTER_TAB_COMPLETER
+                MessageUtil.log(Level.WARNING, ConstantUtil.UNABLE_TO_REGISTER_TAB_COMPLETER
                         + method.getName() + "; a command with that name doesn't exist.");
                 return;
             }
@@ -256,7 +254,7 @@ public class CommandFramework implements CommandExecutor {
                 Object command = map.getCommand(cmdLabel);
 
                 if (command == null) {
-                    MessageUtil.log(Level.WARNING, UNABLE_TO_REGISTER_TAB_COMPLETER
+                    MessageUtil.log(Level.WARNING, ConstantUtil.UNABLE_TO_REGISTER_TAB_COMPLETER
                             + method.getName() + "; a command with that name doesn't exist.");
                     return;
                 }
@@ -274,7 +272,7 @@ public class CommandFramework implements CommandExecutor {
                     completer.addCompleter(label, method, obj);
 
                 } else {
-                    MessageUtil.log(Level.WARNING, UNABLE_TO_REGISTER_TAB_COMPLETER
+                    MessageUtil.log(Level.WARNING, ConstantUtil.UNABLE_TO_REGISTER_TAB_COMPLETER
                             + method.getName() + "; a tab completer is already registered for that command.");
                 }
             } catch (Exception ex) {

@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
 import java.util.concurrent.ConcurrentMap;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class GuavaUtils {
+public final class GuavaUtils {
 
     public static <T, K> ConcurrentMap<T, K> makeMap() {
         return new MapMaker().weakValues().makeMap();

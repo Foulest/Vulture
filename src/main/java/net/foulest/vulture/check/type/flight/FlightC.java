@@ -22,12 +22,14 @@ import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
+import lombok.ToString;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 
+@ToString
 @CheckInfo(name = "Flight (C)", type = CheckType.FLIGHT,
         description = "Checks for ignoring gravity completely.")
 public class FlightC extends Check {
@@ -65,7 +67,9 @@ public class FlightC extends Check {
             if (velocity != ON_GROUND_VELOCITY && !playerData.isOnGround()
                     && velocity != lastVelocity && velocity != 0.0 && deltaY == 0.0
                     && !playerData.isNearbyBoat(0.6, 0.6, 0.6)) {
-                if (++ticksInAir >= 4) {
+                ++ticksInAir;
+
+                if (ticksInAir >= 4) {
                     flag(true, "ticks=" + ticksInAir
                             + " velocity=" + velocity
                             + " lastVelocity=" + lastVelocity

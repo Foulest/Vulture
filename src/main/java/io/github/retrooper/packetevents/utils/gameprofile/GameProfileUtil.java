@@ -21,6 +21,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.WrapperPacketReader;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.player.Skin;
 import lombok.AccessLevel;
@@ -39,15 +40,15 @@ import java.util.UUID;
  * @since 1.6.8.2
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class GameProfileUtil {
+public final class GameProfileUtil {
 
     public static Object getGameProfile(UUID uuid, String username) {
         Player player = Bukkit.getPlayer(uuid);
 
         if (player != null) {
             Object entityHuman = NMSUtils.entityHumanClass.cast(NMSUtils.getEntityPlayer(player));
-            WrappedPacket wrappedEntityPlayer = new WrappedPacket(new NMSPacket(entityHuman), NMSUtils.entityHumanClass);
-            return wrappedEntityPlayer.readObject(0, GameProfile.class);
+            WrapperPacketReader packet = new WrappedPacket(new NMSPacket(entityHuman), NMSUtils.entityHumanClass);
+            return packet.readObject(0, GameProfile.class);
         } else {
             return new GameProfile(uuid, username);
         }
@@ -55,13 +56,13 @@ public class GameProfileUtil {
 
     @Contract("_ -> new")
     public static @NotNull WrappedGameProfile getWrappedGameProfile(Object gameProfile) {
-        GameProfile gp = (GameProfile) gameProfile;
-        return new WrappedGameProfile(gp.getId(), gp.getName());
+        GameProfile profile = (GameProfile) gameProfile;
+        return new WrappedGameProfile(profile.getId(), profile.getName());
     }
 
     public static void setGameProfileSkin(Object gameProfile, @NotNull Skin skin) {
-        GameProfile gp = (GameProfile) gameProfile;
-        gp.getProperties().put("textures", new Property(skin.getValue(), skin.getSignature()));
+        GameProfile profile = (GameProfile) gameProfile;
+        profile.getProperties().put("textures", new Property(skin.getValue(), skin.getSignature()));
     }
 
     public static @NotNull Skin getGameProfileSkin(Object gameProfile) {

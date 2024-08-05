@@ -31,10 +31,10 @@ import java.util.Map;
 import java.util.UUID;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class PlayerDataManager {
+public final class PlayerDataManager {
 
     // Map of player UUIDs to their stored data.
-    protected static final Map<UUID, PlayerData> playerDataMap = new HashMap<>();
+    private static final Map<UUID, PlayerData> playerDataMap = new HashMap<>();
 
     /**
      * Gets a player's data from the map.
@@ -56,7 +56,7 @@ public class PlayerDataManager {
      *
      * @param player The player to add.
      */
-    public static void addPlayerData(@NotNull Player player) {
+    private static void addPlayerData(@NotNull Player player) {
         if (!playerDataMap.containsKey(player.getUniqueId())) {
             PlayerData data = new PlayerData(player.getUniqueId(), player);
 

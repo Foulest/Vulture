@@ -19,6 +19,7 @@ package io.github.retrooper.packetevents.utils.gameprofile;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.util.UUID;
 
@@ -29,6 +30,7 @@ import java.util.UUID;
  * @since 1.7
  */
 @Getter
+@ToString
 @AllArgsConstructor
 public class WrappedGameProfile {
 

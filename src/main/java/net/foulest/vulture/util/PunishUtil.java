@@ -19,6 +19,7 @@ package net.foulest.vulture.util;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
+import io.github.retrooper.packetevents.utils.server.ServerUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.foulest.vulture.check.CheckInfoData;
@@ -33,7 +34,7 @@ import java.util.ConcurrentModificationException;
 import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class PunishUtil {
+public final class PunishUtil {
 
     /**
      * This method is used to flag the player and cancel an event.
@@ -60,7 +61,7 @@ public class PunishUtil {
         // Checks the player for exemptions.
         if (playerData.isNewViolationsPaused()
                 || KickUtil.isPlayerBeingKicked(player)
-                || PacketEvents.get().getServerUtils().getTPS() < 18
+                || ServerUtils.getTPS() < 18
                 || !checkInfo.isEnabled()
                 || !checkInfo.isPunishable()) {
             return;
@@ -106,8 +107,8 @@ public class PunishUtil {
                 verbose,
                 violations,
                 player.getLocation(),
-                PacketEvents.get().getPlayerUtils().getPing(player),
-                PacketEvents.get().getServerUtils().getTPS(),
+                PacketEvents.getInstance().getPlayerUtils().getPing(player),
+                ServerUtils.getTPS(),
                 System.currentTimeMillis()
         );
 
@@ -165,7 +166,7 @@ public class PunishUtil {
         }
     }
 
-    public static int getViolationCount(@NotNull PlayerData playerData, CheckInfoData checkInfo) {
+    private static int getViolationCount(@NotNull PlayerData playerData, CheckInfoData checkInfo) {
         int violations = 0;
 
         // Increments the violations.

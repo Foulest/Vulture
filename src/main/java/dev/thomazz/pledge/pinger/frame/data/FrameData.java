@@ -22,11 +22,16 @@
  */
 package dev.thomazz.pledge.pinger.frame.data;
 
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
 import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicReference;
 
+@ToString
+@NoArgsConstructor
 public class FrameData {
 
     private final Queue<Frame> expectingFrames = new ConcurrentLinkedQueue<>();

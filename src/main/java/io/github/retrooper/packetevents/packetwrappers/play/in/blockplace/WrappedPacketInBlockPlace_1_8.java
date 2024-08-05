@@ -14,7 +14,7 @@ final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
         super(packet);
     }
 
-    public Vector3i getBlockPosition() {
+    Vector3i getBlockPosition() {
         return readBlockPosition(1);
     }
 
@@ -22,28 +22,28 @@ final class WrappedPacketInBlockPlace_1_8 extends WrappedPacket {
         writeBlockPosition(1, blockPos);
     }
 
-    public ItemStack getItemStack() {
-        return readItemStack(0);
+    ItemStack getItemStack() {
+        return readItemStack();
     }
 
-    public void setItemStack(ItemStack stack) {
-        writeItemStack(0, stack);
+    void setItemStack(ItemStack stack) {
+        writeItemStack(stack);
     }
 
-    public int getFace() {
+    int getFace() {
         return readInt(0);
     }
 
-    public void setFace(int face) {
+    void setFace(int face) {
         writeInt(0, face);
     }
 
     @Contract(" -> new")
-    public @NotNull Vector3f getCursorPosition() {
+    @NotNull Vector3f getCursorPosition() {
         return new Vector3f(readFloat(0), readFloat(1), readFloat(2));
     }
 
-    public void setCursorPosition(@NotNull Vector3f cursorPos) {
+    void setCursorPosition(@NotNull Vector3f cursorPos) {
         writeFloat(0, cursorPos.x);
         writeFloat(1, cursorPos.y);
         writeFloat(2, cursorPos.z);

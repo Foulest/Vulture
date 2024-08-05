@@ -142,6 +142,6 @@ public class Vector3i {
      */
     @Override
     public Vector3i clone() {
-        return new Vector3i(getX(), getY(), getZ());
+        return new Vector3i(x, y, z);
     }
 }

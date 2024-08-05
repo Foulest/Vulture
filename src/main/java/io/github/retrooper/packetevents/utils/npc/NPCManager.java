@@ -17,12 +17,16 @@
  */
 package io.github.retrooper.packetevents.utils.npc;
 
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@ToString
+@NoArgsConstructor
 public class NPCManager {
 
     private final Map<Integer, NPC> npcMap = new ConcurrentHashMap<>();

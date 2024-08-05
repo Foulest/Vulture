@@ -18,26 +18,27 @@
 package io.github.retrooper.packetevents.utils.immutableset;
 
 import com.google.common.collect.ImmutableSet;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
+@ToString
 class ImmutableSet_8<T> extends ImmutableSetAbstract<T> {
 
     private ImmutableSet<T> immutableSet;
 
-    public ImmutableSet_8() {
+    ImmutableSet_8() {
         immutableSet = ImmutableSet.<T>builder().build();
     }
 
-    public ImmutableSet_8(List<T> data) {
+    ImmutableSet_8(Iterable<T> data) {
         immutableSet = ImmutableSet.<T>builder().addAll(data).build();
     }
 
     @SafeVarargs
-    public ImmutableSet_8(T @NotNull ... data) {
+    ImmutableSet_8(T @NotNull ... data) {
         ImmutableSet.Builder<T> builder = ImmutableSet.builder();
 
         for (T value : data) {
@@ -54,14 +55,15 @@ class ImmutableSet_8<T> extends ImmutableSetAbstract<T> {
 
     @Override
     public void add(T element) {
-        List<T> elements = new ArrayList<>(immutableSet);
+        Iterable<T> elements = new ArrayList<>(immutableSet);
         immutableSet = ImmutableSet.<T>builder().addAll(elements).add(element).build();
     }
 
     @SafeVarargs
     @Override
+    @SuppressWarnings("FinalMethod")
     public final void addAll(T... elements) {
-        List<T> localElements = new ArrayList<>(immutableSet);
+        Iterable<T> localElements = new ArrayList<>(immutableSet);
         immutableSet = ImmutableSet.<T>builder().addAll(localElements).addAll(Arrays.asList(elements)).build();
     }
 }

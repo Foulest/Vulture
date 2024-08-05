@@ -4,9 +4,12 @@ import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
+import lombok.ToString;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
+@ToString
 public class WrappedPacketOutHeldItemSlot extends WrappedPacket implements SendableWrapper {
 
     private static Constructor<?> packetConstructor;
@@ -30,14 +33,14 @@ public class WrappedPacketOutHeldItemSlot extends WrappedPacket implements Senda
     }
 
     public int getCurrentSelectedSlot() {
-        if (packet == null) {
+        if (nmsPacket == null) {
             return slot;
         }
         return readInt(0);
     }
 
     @Override
-    public Object asNMSPacket() throws Exception {
+    public Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
         return packetConstructor.newInstance(slot);
     }
 }

@@ -6,13 +6,16 @@ import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.enums.EnumUtil;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import lombok.ToString;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
 
+@ToString
 public final class WrappedPacketOutChat extends WrappedPacket implements SendableWrapper {
 
     private static Constructor<?> chatClassConstructor;
@@ -40,11 +43,11 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
         this(component, ChatPosition.CHAT, uuid);
     }
 
-    public WrappedPacketOutChat(BaseComponent component, ChatPosition pos, UUID uuid) {
+    private WrappedPacketOutChat(BaseComponent component, ChatPosition pos, UUID uuid) {
         this(ComponentSerializer.toString(component), pos, uuid, true);
     }
 
-    public WrappedPacketOutChat(String message, ChatPosition chatPosition, UUID uuid, boolean isJson) {
+    private WrappedPacketOutChat(String message, ChatPosition chatPosition, UUID uuid, boolean isJson) {
         this.uuid = uuid;
         this.message = isJson ? message : NMSUtils.fromStringToJSON(message);
         this.chatPosition = chatPosition;
@@ -99,7 +102,7 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
     }
 
     @Override
-    public @Nullable Object asNMSPacket() throws Exception {
+    public @Nullable Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
         byte chatPos = (byte) getChatPosition().ordinal();
         Enum<?> chatMessageTypeInstance = null;
 
@@ -128,8 +131,8 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
      *
      * @return Get String Message
      */
-    public String getMessage() {
-        if (packet != null) {
+    private String getMessage() {
+        if (nmsPacket != null) {
             return readIChatBaseComponent(0);
         } else {
             return message;
@@ -137,8 +140,8 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
     }
 
     public void setMessage(String message) {
-        if (packet != null) {
-            writeIChatBaseComponent(0, message);
+        if (nmsPacket != null) {
+            writeIChatBaseComponent(message);
         } else {
             this.message = message;
         }
@@ -152,8 +155,8 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
      *
      * @return ChatPosition
      */
-    public ChatPosition getChatPosition() {
-        if (packet != null) {
+    private ChatPosition getChatPosition() {
+        if (nmsPacket != null) {
             byte chatPositionValue;
 
             switch (constructorMode) {
@@ -185,7 +188,7 @@ public final class WrappedPacketOutChat extends WrappedPacket implements Sendabl
     }
 
     public void setChatPosition(ChatPosition chatPosition) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             switch (constructorMode) {
                 case 0:
                     writeByte(0, (byte) chatPosition.ordinal());

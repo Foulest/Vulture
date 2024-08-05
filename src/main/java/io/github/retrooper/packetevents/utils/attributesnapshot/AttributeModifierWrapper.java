@@ -37,20 +37,20 @@ public class AttributeModifierWrapper extends WrappedPacket {
     private static Class<?> attributeModifierClass;
     private static Constructor<?> attributeModifierConstructor;
 
-    public AttributeModifierWrapper(NMSPacket packet) {
+    AttributeModifierWrapper(NMSPacket packet) {
         super(packet);
     }
 
     public AttributeModifierWrapper(UUID id, String name, double amount, Operation operation) {
-        super(create(id, name, amount, operation).packet);
+        super(create(id, name, amount, operation).nmsPacket);
     }
 
-    public static @NotNull AttributeModifierWrapper create(UUID id, String name, double amount, Operation operation) {
+    private static @NotNull AttributeModifierWrapper create(UUID id, String name, double amount, Operation operation) {
         if (attributeModifierConstructor == null) {
             try {
                 attributeModifierConstructor = attributeModifierClass.getConstructor(UUID.class, String.class, double.class, operationEnumClass == null ? int.class : operationEnumClass);
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
+            } catch (NoSuchMethodException ex) {
+                ex.printStackTrace();
             }
         }
 
@@ -77,8 +77,11 @@ public class AttributeModifierWrapper extends WrappedPacket {
 
     @Override
     protected void load() {
-        supplierPresent = Reflection.getField(packet.getRawNMSPacket().getClass(), Supplier.class, 0) != null;
-        operationEnumClass = SubclassUtil.getEnumSubClass(packet.getRawNMSPacket().getClass(), "Operation");
+        if (nmsPacket != null) {
+            supplierPresent = Reflection.getField(nmsPacket.getRawNMSPacket().getClass(), Supplier.class, 0) != null;
+            operationEnumClass = SubclassUtil.getEnumSubClass(nmsPacket.getRawNMSPacket().getClass(), "Operation");
+        }
+
         attributeModifierClass = NMSUtils.getNMSClassWithoutException("AttributeModifier");
     }
 
@@ -109,6 +112,7 @@ public class AttributeModifierWrapper extends WrappedPacket {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public String getName() {
         if (supplierPresent) {
             // About 1.13 and above
@@ -137,7 +141,7 @@ public class AttributeModifierWrapper extends WrappedPacket {
     }
 
     public NMSPacket getNMSPacket() {
-        return packet;
+        return nmsPacket;
     }
 
     public enum Operation {

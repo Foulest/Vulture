@@ -24,10 +24,12 @@ import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import io.github.retrooper.packetevents.utils.bytebuf.ByteBufWrapper;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.Getter;
+import lombok.ToString;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
+@ToString
 public class PacketDecodeEvent extends PacketEvent implements CancellableEvent, PlayerEvent {
 
     private final ChannelHandlerContext channelHandlerContext;

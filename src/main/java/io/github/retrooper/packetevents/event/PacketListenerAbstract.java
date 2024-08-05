@@ -20,6 +20,8 @@ package io.github.retrooper.packetevents.event;
 import io.github.retrooper.packetevents.event.impl.*;
 import io.github.retrooper.packetevents.utils.immutableset.ImmutableSetCustom;
 import lombok.Getter;
+import lombok.ToString;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Abstract packet listener.
@@ -28,26 +30,23 @@ import lombok.Getter;
  * @since 1.8
  */
 @Getter
+@ToString
 public abstract class PacketListenerAbstract {
 
     private final PacketListenerPriority priority;
+    public @Nullable ImmutableSetCustom<Byte> serverSidedStatusAllowance;
+    public @Nullable ImmutableSetCustom<Byte> serverSidedLoginAllowance;
+    public @Nullable ImmutableSetCustom<Byte> serverSidedPlayAllowance;
+    public @Nullable ImmutableSetCustom<Byte> clientSidedStatusAllowance;
+    public @Nullable ImmutableSetCustom<Byte> clientSidedHandshakeAllowance;
+    public @Nullable ImmutableSetCustom<Byte> clientSidedLoginAllowance;
+    public @Nullable ImmutableSetCustom<Byte> clientSidedPlayAllowance;
 
-    public ImmutableSetCustom<Byte> serverSidedStatusAllowance;
-    public ImmutableSetCustom<Byte> serverSidedLoginAllowance;
-    public ImmutableSetCustom<Byte> serverSidedPlayAllowance;
-
-    public ImmutableSetCustom<Byte> clientSidedStatusAllowance;
-    public ImmutableSetCustom<Byte> clientSidedHandshakeAllowance;
-    public ImmutableSetCustom<Byte> clientSidedLoginAllowance;
-    public ImmutableSetCustom<Byte> clientSidedPlayAllowance;
-
-    protected PacketListenerAbstract(PacketListenerPriority priority) {
+    private PacketListenerAbstract(PacketListenerPriority priority) {
         this.priority = priority;
-
         serverSidedStatusAllowance = null;
         serverSidedLoginAllowance = null;
         serverSidedPlayAllowance = null;
-
         clientSidedStatusAllowance = null;
         clientSidedHandshakeAllowance = null;
         clientSidedLoginAllowance = null;
@@ -100,7 +99,7 @@ public abstract class PacketListenerAbstract {
     public void onPacketEventExternal(PacketEvent event) {
     }
 
-    public final void addServerSidedStatusFilter(Byte... statusPacketIDs) {
+    public void addServerSidedStatusFilter(Byte... statusPacketIDs) {
         if (serverSidedStatusAllowance == null) {
             serverSidedStatusAllowance = new ImmutableSetCustom<>(statusPacketIDs);
         } else {
@@ -108,7 +107,7 @@ public abstract class PacketListenerAbstract {
         }
     }
 
-    public final void addServerSidedLoginFilter(Byte... loginPacketIDs) {
+    public void addServerSidedLoginFilter(Byte... loginPacketIDs) {
         if (serverSidedLoginAllowance == null) {
             serverSidedLoginAllowance = new ImmutableSetCustom<>(loginPacketIDs);
         } else {
@@ -116,7 +115,7 @@ public abstract class PacketListenerAbstract {
         }
     }
 
-    public final void addServerSidedPlayFilter(Byte... playPacketIDs) {
+    public void addServerSidedPlayFilter(Byte... playPacketIDs) {
         if (serverSidedPlayAllowance == null) {
             serverSidedPlayAllowance = new ImmutableSetCustom<>(playPacketIDs);
         } else {
@@ -124,7 +123,7 @@ public abstract class PacketListenerAbstract {
         }
     }
 
-    public final void addClientSidedStatusFilter(Byte... statusPacketIDs) {
+    public void addClientSidedStatusFilter(Byte... statusPacketIDs) {
         if (clientSidedStatusAllowance == null) {
             clientSidedStatusAllowance = new ImmutableSetCustom<>(statusPacketIDs);
         } else {
@@ -132,7 +131,7 @@ public abstract class PacketListenerAbstract {
         }
     }
 
-    public final void addClientSidedHandshakeFilter(Byte... handshakePacketIDs) {
+    public void addClientSidedHandshakeFilter(Byte... handshakePacketIDs) {
         if (clientSidedHandshakeAllowance == null) {
             clientSidedHandshakeAllowance = new ImmutableSetCustom<>(handshakePacketIDs);
         } else {
@@ -140,7 +139,7 @@ public abstract class PacketListenerAbstract {
         }
     }
 
-    public final void addClientSidedLoginFilter(Byte... loginPacketIDs) {
+    public void addClientSidedLoginFilter(Byte... loginPacketIDs) {
         if (clientSidedLoginAllowance == null) {
             clientSidedLoginAllowance = new ImmutableSetCustom<>(loginPacketIDs);
         } else {
@@ -148,7 +147,7 @@ public abstract class PacketListenerAbstract {
         }
     }
 
-    public final void addClientSidedPlayFilter(Byte... playPacketIDs) {
+    public void addClientSidedPlayFilter(Byte... playPacketIDs) {
         if (clientSidedPlayAllowance == null) {
             clientSidedPlayAllowance = new ImmutableSetCustom<>(playPacketIDs);
         } else {
@@ -156,7 +155,7 @@ public abstract class PacketListenerAbstract {
         }
     }
 
-    public final void filterAll() {
+    public void filterAll() {
         filterServerSidedStatus();
         filterServerSidedLogin();
         filterServerSidedPlay();
@@ -167,31 +166,31 @@ public abstract class PacketListenerAbstract {
         filterClientSidedPlay();
     }
 
-    public final void filterServerSidedStatus() {
+    private void filterServerSidedStatus() {
         serverSidedStatusAllowance = new ImmutableSetCustom<>();
     }
 
-    public final void filterServerSidedLogin() {
+    private void filterServerSidedLogin() {
         serverSidedLoginAllowance = new ImmutableSetCustom<>();
     }
 
-    public final void filterServerSidedPlay() {
+    private void filterServerSidedPlay() {
         serverSidedPlayAllowance = new ImmutableSetCustom<>();
     }
 
-    public final void filterClientSidedStatus() {
+    private void filterClientSidedStatus() {
         clientSidedStatusAllowance = new ImmutableSetCustom<>();
     }
 
-    public final void filterClientSidedHandshake() {
+    private void filterClientSidedHandshake() {
         clientSidedHandshakeAllowance = new ImmutableSetCustom<>();
     }
 
-    public final void filterClientSidedLogin() {
+    private void filterClientSidedLogin() {
         clientSidedLoginAllowance = new ImmutableSetCustom<>();
     }
 
-    public final void filterClientSidedPlay() {
+    private void filterClientSidedPlay() {
         clientSidedPlayAllowance = new ImmutableSetCustom<>();
     }
 }

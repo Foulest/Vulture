@@ -27,7 +27,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class GeyserUtils {
+public final class GeyserUtils {
 
     private static Class<?> geyserClass;
     private static Class<?> geyserApiClass;

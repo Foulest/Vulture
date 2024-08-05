@@ -28,8 +28,8 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.netty.channel.*;
 import io.netty.channel.epoll.EpollSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.ByteToMessageDecoder;
-import org.apache.commons.lang3.Validate;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.jetbrains.annotations.NotNull;
@@ -38,6 +38,8 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Field;
 import java.util.*;
 
+@ToString
+@NoArgsConstructor
 public class EarlyChannelInjectorModern implements EarlyInjector {
 
     private final List<ChannelFuture> injectedFutures = new ArrayList<>();
@@ -58,7 +60,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
                 if (value instanceof List) {
                     synchronized (value) {
-                        for (Object object : (List) value) {
+                        for (Object object : (Iterable) value) {
                             if (object instanceof ChannelFuture) {
                                 return true;
                             } else {
@@ -68,7 +70,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                     }
                 }
             }
-        } catch (Exception ex) {
+        } catch (IllegalAccessException ex) {
             ex.printStackTrace();
         }
         return false;
@@ -92,14 +94,14 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                             if (object instanceof ChannelFuture) {
                                 try {
                                     injectChannelFuture((ChannelFuture) object);
-                                } catch (Exception ex) {
+                                } catch (RuntimeException ex) {
                                     ex.printStackTrace();
                                 }
                             }
                         }
                     };
 
-                    HashMap<Field, Object> map = new HashMap<>();
+                    Map<Field, Object> map = new HashMap<>();
                     map.put(field, serverConnection);
                     injectedLists.add(map);
 
@@ -116,7 +118,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                     }
                 }
             }
-        } catch (Exception ex) {
+        } catch (IllegalAccessException ex) {
             throw new IllegalStateException("PacketEvents failed to inject!", ex);
         }
 
@@ -137,28 +139,28 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                 ChannelPipeline pipeline = channel.pipeline();
 
                 // Remove the old handlers if they exist.
-                if (pipeline.get(PacketEvents.get().getHandlerName()) != null) {
-                    pipeline.remove(PacketEvents.get().getHandlerName());
+                if (pipeline.get(PacketEvents.getInstance().getHandlerName()) != null) {
+                    pipeline.remove(PacketEvents.getInstance().getHandlerName());
                 }
-                if (pipeline.get(PacketEvents.get().getHandlerName() + "-decoder") != null) {
-                    pipeline.remove(PacketEvents.get().getHandlerName() + "-decoder");
+                if (pipeline.get(PacketEvents.getInstance().getHandlerName() + "-decoder") != null) {
+                    pipeline.remove(PacketEvents.getInstance().getHandlerName() + "-decoder");
                 }
 
-                ByteToMessageDecoder decodeHandler = new PlayerDecodeHandlerModern();
-                ChannelDuplexHandler channelHandler = new PlayerChannelHandlerModern();
+                ChannelHandler decodeHandler = new PlayerDecodeHandlerModern();
+                ChannelHandler channelHandler = new PlayerChannelHandlerModern();
 
                 // Add the new handlers.
                 if (pipeline.get("splitter") != null) {
-                    pipeline.addAfter("splitter", PacketEvents.get().getHandlerName() + "-decoder", decodeHandler);
+                    pipeline.addAfter("splitter", PacketEvents.getInstance().getHandlerName() + "-decoder", decodeHandler);
                 }
                 if (pipeline.get("packet_handler") != null) {
-                    pipeline.addBefore("packet_handler", PacketEvents.get().getHandlerName(), channelHandler);
+                    pipeline.addBefore("packet_handler", PacketEvents.getInstance().getHandlerName(), channelHandler);
                 }
             }
         }
     }
 
-    private @Nullable Object getFieldValue(@NotNull Field field, Object serverConnection) {
+    private static @Nullable Object getFieldValue(@NotNull Field field, Object serverConnection) {
         try {
             return field.get(serverConnection);
         } catch (IllegalAccessException ex) {
@@ -178,21 +180,34 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
             try {
                 bootstrapAcceptorField = handler.getClass().getDeclaredField("childHandler");
                 bootstrapAcceptorField.setAccessible(true);
-                bootstrapAcceptorField.get(handler);
                 bootstrapAcceptor = handler;
-            } catch (Exception ignored) {
+                break;  // Found the field, no need to continue
+            } catch (NoSuchFieldException ex) {
+                ex.printStackTrace();
             }
         }
 
+        // Default to first handler if none with childHandler field was found
         if (bootstrapAcceptor == null) {
             bootstrapAcceptor = channelFuture.channel().pipeline().first();
+        }
+
+        // Log to check if bootstrapAcceptorField is found and accessible
+        if (bootstrapAcceptorField == null) {
+            PacketEvents.getPlugin().getLogger().severe("Failed to find the 'childHandler' field in the channel pipeline!");
+            throw new IllegalStateException("PacketEvents failed to inject: 'childHandler' field not found!");
         }
 
         ChannelInitializer<?> oldChannelInitializer;
 
         try {
-            Validate.notNull(bootstrapAcceptorField, "Failed to find the 'childHandler' field in the channel pipeline!");
             oldChannelInitializer = (ChannelInitializer<?>) bootstrapAcceptorField.get(bootstrapAcceptor);
+
+            if (oldChannelInitializer == null) {
+                PacketEvents.getPlugin().getLogger().severe("The 'childHandler' field is null in the channel pipeline!");
+                throw new IllegalStateException("PacketEvents failed to inject: 'childHandler' field is null!");
+            }
+
             ChannelInitializer<?> channelInitializer = new PEChannelInitializerModern(oldChannelInitializer);
 
             // Replace the old channel initializer with our own.
@@ -224,7 +239,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
     @Override
     public void eject() {
         // Uninject from players currently online to prevent issues with ProtocolLib.
-        for (Player player : PacketEvents.get().getPlugin().getServer().getOnlinePlayers()) {
+        for (Player player : PacketEvents.getPlugin().getServer().getOnlinePlayers()) {
             ejectPlayer(player);
         }
 
@@ -251,7 +266,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                             bootstrapAcceptor = handler;
                         }
                     }
-                } catch (Exception ignored) {
+                } catch (IllegalAccessException | NoSuchFieldException ignored) {
                 }
             }
 
@@ -268,8 +283,8 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                         childHandlerField.set(bootstrapAcceptor, ((PEChannelInitializerModern) oldInit).getOldChannelInitializer());
                     }
                 }
-            } catch (Exception e) {
-                PacketEvents.get().getPlugin().getLogger().severe("PacketEvents failed to eject the injection handler! Please reboot!");
+            } catch (IllegalAccessException ex) {
+                PacketEvents.getPlugin().getLogger().severe("PacketEvents failed to eject the injection handler! Please reboot!");
             }
         }
 
@@ -287,7 +302,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
                     }
                 }
             } catch (IllegalAccessException ex) {
-                PacketEvents.get().getPlugin().getLogger().severe("PacketEvents failed to eject the"
+                PacketEvents.getPlugin().getLogger().severe("PacketEvents failed to eject the"
                         + " injection handler! Please reboot!");
             }
         }
@@ -298,7 +313,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
     @Override
     public void injectPlayer(Player player) {
-        Object rawChannel = PacketEvents.get().getPlayerUtils().getChannel(player);
+        Object rawChannel = PacketEvents.getInstance().getPlayerUtils().getChannel(player);
 
         if (rawChannel != null) {
             updatePlayerObject(player, rawChannel);
@@ -307,22 +322,22 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
     @Override
     public void ejectPlayer(Player player) {
-        Object rawChannel = PacketEvents.get().getPlayerUtils().getChannel(player);
+        Object rawChannel = PacketEvents.getInstance().getPlayerUtils().getChannel(player);
 
         if (rawChannel != null) {
             Channel channel = (Channel) rawChannel;
 
             try {
-                channel.pipeline().remove(PacketEvents.get().getHandlerName() + "-decoder");
-                channel.pipeline().remove(PacketEvents.get().getHandlerName());
-            } catch (Exception ignored) {
+                channel.pipeline().remove(PacketEvents.getInstance().getHandlerName() + "-decoder");
+                channel.pipeline().remove(PacketEvents.getInstance().getHandlerName());
+            } catch (RuntimeException ignored) {
             }
         }
     }
 
     @Override
     public boolean hasInjected(Player player) {
-        Object rawChannel = PacketEvents.get().getPlayerUtils().getChannel(player);
+        Object rawChannel = PacketEvents.getInstance().getPlayerUtils().getChannel(player);
 
         if (rawChannel == null) {
             return false;
@@ -351,9 +366,9 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         channel.writeAndFlush(rawNMSPacket);
     }
 
-    private @Nullable PlayerDecodeHandlerModern getDecoderHandler(Object rawChannel) {
+    private static @Nullable PlayerDecodeHandlerModern getDecoderHandler(Object rawChannel) {
         Channel channel = (Channel) rawChannel;
-        ChannelHandler handler = channel.pipeline().get(PacketEvents.get().getHandlerName() + "-decoder");
+        ChannelHandler handler = channel.pipeline().get(PacketEvents.getInstance().getHandlerName() + "-decoder");
 
         if (handler instanceof PlayerDecodeHandlerModern) {
             return (PlayerDecodeHandlerModern) handler;
@@ -362,9 +377,9 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
         }
     }
 
-    private @Nullable PlayerChannelHandlerModern getHandler(Object rawChannel) {
+    private static @Nullable PlayerChannelHandlerModern getHandler(Object rawChannel) {
         Channel channel = (Channel) rawChannel;
-        ChannelHandler handler = channel.pipeline().get(PacketEvents.get().getHandlerName());
+        ChannelHandler handler = channel.pipeline().get(PacketEvents.getInstance().getHandlerName());
 
         if (handler instanceof PlayerChannelHandlerModern) {
             return (PlayerChannelHandlerModern) handler;
@@ -376,8 +391,8 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
     @Override
     public void updatePlayerObject(Player player, Object rawChannel) {
         Channel channel = (Channel) rawChannel;
-        ChannelHandler decodeHandler = channel.pipeline().get(PacketEvents.get().getHandlerName() + "-decoder");
-        ChannelHandler channelHandler = channel.pipeline().get(PacketEvents.get().getHandlerName());
+        ChannelHandler decodeHandler = channel.pipeline().get(PacketEvents.getInstance().getHandlerName() + "-decoder");
+        ChannelHandler channelHandler = channel.pipeline().get(PacketEvents.getInstance().getHandlerName());
 
         // Update the player object in the player decode handler.
         if (decodeHandler instanceof PlayerDecodeHandlerModern) {

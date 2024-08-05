@@ -21,9 +21,7 @@ import dev.thomazz.pledge.Pledge;
 import dev.thomazz.pledge.pinger.ClientPinger;
 import dev.thomazz.pledge.pinger.ClientPingerListener;
 import io.github.retrooper.packetevents.PacketEvents;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.SneakyThrows;
+import lombok.*;
 import net.foulest.vulture.cmds.VultureCmd;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.data.PlayerDataManager;
@@ -51,6 +49,8 @@ import java.util.logging.Level;
  * @project Vulture
  */
 @Getter
+@ToString
+@NoArgsConstructor
 public class Vulture extends JavaPlugin implements ClientPingerListener {
 
     @Getter
@@ -210,14 +210,5 @@ public class Vulture extends JavaPlugin implements ClientPingerListener {
         if (playerData != null) {
             playerData.onPongReceiveEnd();
         }
-    }
-
-    /**
-     * Gets the current server time.
-     *
-     * @return Current server time
-     */
-    public long getCurrentServerTime() {
-        return System.currentTimeMillis(); // Same as current system time
     }
 }

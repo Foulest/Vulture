@@ -5,10 +5,13 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
+@ToString
 public final class WrappedPacketOutKickDisconnect extends WrappedPacket implements SendableWrapper {
 
     private static Constructor<?> kickDisconnectConstructor;
@@ -31,8 +34,8 @@ public final class WrappedPacketOutKickDisconnect extends WrappedPacket implemen
         }
     }
 
-    public String getKickMessage() {
-        if (packet != null) {
+    private String getKickMessage() {
+        if (nmsPacket != null) {
             Object iChatBaseComponentObject = readObject(0, NMSUtils.iChatBaseComponentClass);
             return NMSUtils.readIChatBaseComponent(iChatBaseComponentObject);
         } else {
@@ -41,7 +44,7 @@ public final class WrappedPacketOutKickDisconnect extends WrappedPacket implemen
     }
 
     public void setKickMessage(String message) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             Object iChatBaseComponent = NMSUtils.generateIChatBaseComponent(message);
             write(NMSUtils.iChatBaseComponentClass, 0, iChatBaseComponent);
         } else {
@@ -50,7 +53,7 @@ public final class WrappedPacketOutKickDisconnect extends WrappedPacket implemen
     }
 
     @Override
-    public @NotNull Object asNMSPacket() throws Exception {
+    public @NotNull Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
         return kickDisconnectConstructor.newInstance(NMSUtils.generateIChatBaseComponent(NMSUtils.fromStringToJSON(getKickMessage())));
     }
 }

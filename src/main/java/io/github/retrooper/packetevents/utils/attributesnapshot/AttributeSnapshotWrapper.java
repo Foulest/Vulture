@@ -20,6 +20,7 @@ package io.github.retrooper.packetevents.utils.attributesnapshot;
 import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
+import io.github.retrooper.packetevents.packetwrappers.api.WrapperPacketReader;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
@@ -49,12 +50,12 @@ public class AttributeSnapshotWrapper extends WrappedPacket {
         super(packet);
     }
 
-    public AttributeSnapshotWrapper(String key, double value, List<AttributeModifierWrapper> modifiers) {
-        super(Objects.requireNonNull(create(key, value, modifiers)).packet);
+    public AttributeSnapshotWrapper(String key, double value, Collection<AttributeModifierWrapper> modifiers) {
+        super(Objects.requireNonNull(create(key, value, modifiers)).nmsPacket);
     }
 
-    public static @Nullable AttributeSnapshotWrapper create(String key, double value,
-                                                            Collection<AttributeModifierWrapper> modifiers) {
+    private static @Nullable AttributeSnapshotWrapper create(String key, double value,
+                                                             Collection<AttributeModifierWrapper> modifiers) {
         Object nmsAttributeSnapshot = null;
 
         if (attributeSnapshotClass == null) {
@@ -67,7 +68,9 @@ public class AttributeSnapshotWrapper extends WrappedPacket {
 
         if (attributeSnapshotConstructor == null) {
             try {
-                attributeSnapshotConstructor = attributeSnapshotClass.getConstructor(PacketTypeClasses.Play.Server.UPDATE_ATTRIBUTES, String.class, double.class, Collection.class);
+                if (attributeSnapshotClass != null) {
+                    attributeSnapshotConstructor = attributeSnapshotClass.getConstructor(PacketTypeClasses.Play.Server.UPDATE_ATTRIBUTES, String.class, double.class, Collection.class);
+                }
                 constructorMode = 0;
             } catch (NoSuchMethodException e) {
                 try {
@@ -108,6 +111,10 @@ public class AttributeSnapshotWrapper extends WrappedPacket {
         List<Object> nmsModifiers = new ArrayList<>(modifiers.size());
 
         for (AttributeModifierWrapper modifier : modifiers) {
+            if (modifier.getNMSPacket() == null) {
+                return null;
+            }
+
             nmsModifiers.add(modifier.getNMSPacket().getRawNMSPacket());
         }
 
@@ -139,7 +146,9 @@ public class AttributeSnapshotWrapper extends WrappedPacket {
 
     @Override
     protected void load() {
-        stringKeyPresent = Reflection.getField(packet.getRawNMSPacket().getClass(), String.class, 0) != null;
+        if (nmsPacket != null) {
+            stringKeyPresent = Reflection.getField(nmsPacket.getRawNMSPacket().getClass(), String.class, 0) != null;
+        }
 
         if (attributeBaseClass == null) {
             attributeBaseClass = NMSUtils.getNMSClassWithoutException("AttributeBase");
@@ -159,7 +168,9 @@ public class AttributeSnapshotWrapper extends WrappedPacket {
 
         if (attributeSnapshotConstructor == null) {
             try {
-                attributeSnapshotConstructor = attributeSnapshotClass.getConstructor(attributeBaseClass, double.class, Collection.class);
+                if (attributeSnapshotClass != null) {
+                    attributeSnapshotConstructor = attributeSnapshotClass.getConstructor(attributeBaseClass, double.class, Collection.class);
+                }
             } catch (NoSuchMethodException ex) {
                 ex.printStackTrace();
             }
@@ -186,7 +197,7 @@ public class AttributeSnapshotWrapper extends WrappedPacket {
             return readString(0);
         } else {
             Object attributeBase = readObject(0, attributeBaseClass);
-            WrappedPacket attributeBaseWrapper = new WrappedPacket(new NMSPacket(attributeBase), attributeBaseClass);
+            WrapperPacketReader attributeBaseWrapper = new WrappedPacket(new NMSPacket(attributeBase), attributeBaseClass);
             return attributeBaseWrapper.readString(0);
         }
     }
@@ -238,6 +249,10 @@ public class AttributeSnapshotWrapper extends WrappedPacket {
         Collection<Object> collection = new ArrayList<>(attributeModifiers.size());
 
         for (AttributeModifierWrapper modifierWrapper : attributeModifiers) {
+            if (modifierWrapper.getNMSPacket() == null) {
+                return;
+            }
+
             collection.add(modifierWrapper.getNMSPacket().getRawNMSPacket());
         }
 
@@ -245,6 +260,6 @@ public class AttributeSnapshotWrapper extends WrappedPacket {
     }
 
     public NMSPacket getNMSPacket() {
-        return packet;
+        return nmsPacket;
     }
 }

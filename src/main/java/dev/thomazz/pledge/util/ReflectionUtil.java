@@ -31,7 +31,7 @@ import java.util.Arrays;
 @UtilityClass
 public class ReflectionUtil {
 
-    public Field getFieldByClassNames(Class<?> clazz, String @NotNull ... simpleNames) throws NoSuchFieldException {
+    Field getFieldByClassNames(Class<?> clazz, String @NotNull ... simpleNames) throws NoSuchFieldException {
         for (String name : simpleNames) {
             for (Field field : clazz.getDeclaredFields()) {
                 String typeSimpleName = field.getType().getSimpleName();
@@ -61,7 +61,7 @@ public class ReflectionUtil {
                 + clazz.getName() + " with type " + type.getName());
     }
 
-    public Object getNonNullFieldByType(@NotNull Object instance, Class<?> type) throws ReflectiveOperationException {
+    Object getNonNullFieldByType(@NotNull Object instance, Class<?> type) throws ReflectiveOperationException {
         Class<?> clazz = instance.getClass();
 
         for (Field field : clazz.getDeclaredFields()) {

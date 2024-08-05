@@ -11,14 +11,14 @@ import java.util.List;
  * @since 1.8
  * TODO: Make sendable, allow modifying watchable objects, test on 1.7.10
  */
-public class WrappedPacketOutEntityMetadata extends WrappedPacketEntityAbstraction {
+class WrappedPacketOutEntityMetadata extends WrappedPacketEntityAbstraction {
 
-    public WrappedPacketOutEntityMetadata(NMSPacket packet) {
+    WrappedPacketOutEntityMetadata(NMSPacket packet) {
         super(packet);
     }
 
     public List<WrappedWatchableObject> getWatchableObjects() {
-        List<Object> nmsWatchableObjectList = readList(0);
+        List<Object> nmsWatchableObjectList = readList();
 
         // It's annotated as nullable on 1.17 NMS, so lets just handle it being null
         if (nmsWatchableObjectList == null) {

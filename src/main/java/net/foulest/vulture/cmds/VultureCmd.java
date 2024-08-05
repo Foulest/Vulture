@@ -18,11 +18,13 @@
 package net.foulest.vulture.cmds;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.foulest.vulture.Vulture;
 import net.foulest.vulture.check.type.clientbrand.type.PayloadType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.data.PlayerDataManager;
+import net.foulest.vulture.util.ConstantUtil;
 import net.foulest.vulture.util.KickUtil;
 import net.foulest.vulture.util.MessageUtil;
 import net.foulest.vulture.util.Settings;
@@ -36,8 +38,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-import static net.foulest.vulture.util.ConstantUtil.NO_PERMISSION;
-
 /**
  * Main command for Vulture.
  *
@@ -46,6 +46,7 @@ import static net.foulest.vulture.util.ConstantUtil.NO_PERMISSION;
  */
 @Getter
 @Setter
+@NoArgsConstructor
 public class VultureCmd {
 
     @Command(name = "vulture", description = "Main command for Vulture.",
@@ -61,7 +62,7 @@ public class VultureCmd {
 
         // Handle sub-commands.
         String subCommand = args.getArgs(0);
-        switch (subCommand.toLowerCase()) {
+        switch (subCommand.toLowerCase(Locale.ROOT)) {
             case "alerts": {
                 if (!(sender instanceof Player)) {
                     MessageUtil.messagePlayer(sender, "&cOnly players can use this command!");
@@ -69,7 +70,7 @@ public class VultureCmd {
                 }
 
                 if (!sender.hasPermission("vulture.alerts")) {
-                    MessageUtil.messagePlayer(sender, NO_PERMISSION);
+                    MessageUtil.messagePlayer(sender, ConstantUtil.NO_PERMISSION);
                     return;
                 }
 
@@ -79,6 +80,12 @@ public class VultureCmd {
                 }
 
                 Player player = args.getPlayer();
+
+                if (player == null) {
+                    MessageUtil.messagePlayer(sender, "&cOnly players can use this command.");
+                    return;
+                }
+
                 PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
                 playerData.setAlertsEnabled(!playerData.isAlertsEnabled());
@@ -89,7 +96,7 @@ public class VultureCmd {
 
             case "debug": {
                 if (!sender.hasPermission("vulture.debug")) {
-                    MessageUtil.messagePlayer(sender, NO_PERMISSION);
+                    MessageUtil.messagePlayer(sender, ConstantUtil.NO_PERMISSION);
                     return;
                 }
 
@@ -111,7 +118,7 @@ public class VultureCmd {
                 }
 
                 if (!sender.hasPermission("vulture.verbose")) {
-                    MessageUtil.messagePlayer(sender, NO_PERMISSION);
+                    MessageUtil.messagePlayer(sender, ConstantUtil.NO_PERMISSION);
                     return;
                 }
 
@@ -121,6 +128,12 @@ public class VultureCmd {
                 }
 
                 Player player = args.getPlayer();
+
+                if (player == null) {
+                    MessageUtil.messagePlayer(sender, "&cOnly players can use this command.");
+                    return;
+                }
+
                 PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
                 playerData.setVerboseEnabled(!playerData.isVerboseEnabled());
@@ -131,7 +144,7 @@ public class VultureCmd {
 
             case "info": {
                 if (!sender.hasPermission("vulture.info")) {
-                    MessageUtil.messagePlayer(sender, NO_PERMISSION);
+                    MessageUtil.messagePlayer(sender, ConstantUtil.NO_PERMISSION);
                     return;
                 }
 
@@ -171,7 +184,7 @@ public class VultureCmd {
 
             case "kick": {
                 if (!sender.hasPermission("vulture.kick")) {
-                    MessageUtil.messagePlayer(sender, NO_PERMISSION);
+                    MessageUtil.messagePlayer(sender, ConstantUtil.NO_PERMISSION);
                     return;
                 }
 
@@ -200,7 +213,7 @@ public class VultureCmd {
 
             case "whitelist": {
                 if (!sender.hasPermission("vulture.whitelist")) {
-                    MessageUtil.messagePlayer(sender, NO_PERMISSION);
+                    MessageUtil.messagePlayer(sender, ConstantUtil.NO_PERMISSION);
                     return;
                 }
 
@@ -333,7 +346,7 @@ public class VultureCmd {
 
             case "reload": {
                 if (!sender.hasPermission("vulture.reload")) {
-                    MessageUtil.messagePlayer(sender, NO_PERMISSION);
+                    MessageUtil.messagePlayer(sender, ConstantUtil.NO_PERMISSION);
                     return;
                 }
 
@@ -359,9 +372,10 @@ public class VultureCmd {
      * @param sender The command sender
      * @param args   The command arguments
      */
+    @SuppressWarnings("MethodMayBeStatic")
     private void handleHelp(@NotNull CommandSender sender, CommandArgs args) {
         if (!sender.hasPermission("vulture.main")) {
-            MessageUtil.messagePlayer(sender, NO_PERMISSION);
+            MessageUtil.messagePlayer(sender, ConstantUtil.NO_PERMISSION);
             return;
         }
 

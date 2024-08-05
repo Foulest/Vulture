@@ -21,6 +21,7 @@ import io.github.retrooper.packetevents.event.PacketListenerAbstract;
 import io.github.retrooper.packetevents.event.eventtypes.NMSPacketEvent;
 import io.github.retrooper.packetevents.event.eventtypes.PlayerEvent;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
+import lombok.ToString;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,6 +34,7 @@ import org.jetbrains.annotations.NotNull;
  * @see <a href="https://wiki.vg/Protocol#Clientbound_4">https://wiki.vg/Protocol#Clientbound_4</a>
  * @since 1.7
  */
+@ToString
 public class PostPacketPlaySendEvent extends NMSPacketEvent implements PlayerEvent {
 
     private final Player player;

@@ -25,7 +25,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class FileUtil {
+public final class FileUtil {
 
     /**
      * Prints data to a text file.

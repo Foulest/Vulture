@@ -105,7 +105,7 @@ public final class EntityFinderUtils {
      * @param id    Entity ID.
      * @return Bukkit Entity.
      */
-    public static Entity getEntityByIdWithWorldUnsafe(World world, int id) {
+    private static @Nullable Entity getEntityByIdWithWorldUnsafe(World world, int id) {
         if (world == null) {
             return null;
         }

@@ -5,9 +5,12 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import lombok.AllArgsConstructor;
+import lombok.ToString;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
+@ToString
 @AllArgsConstructor
 public class WrappedPacketOutTransaction extends WrappedPacket implements SendableWrapper {
 
@@ -31,8 +34,8 @@ public class WrappedPacketOutTransaction extends WrappedPacket implements Sendab
         }
     }
 
-    public int getWindowId() {
-        if (packet != null) {
+    private int getWindowId() {
+        if (nmsPacket != null) {
             return readInt(0);
         } else {
             return windowID;
@@ -40,7 +43,7 @@ public class WrappedPacketOutTransaction extends WrappedPacket implements Sendab
     }
 
     public void setWindowId(int windowID) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeInt(0, windowID);
         } else {
             this.windowID = windowID;
@@ -48,7 +51,7 @@ public class WrappedPacketOutTransaction extends WrappedPacket implements Sendab
     }
 
     public short getActionNumber() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             return readShort(0);
         } else {
             return actionNumber;
@@ -56,15 +59,15 @@ public class WrappedPacketOutTransaction extends WrappedPacket implements Sendab
     }
 
     public void setActionNumber(short actionNumber) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeShort(0, actionNumber);
         } else {
             this.actionNumber = actionNumber;
         }
     }
 
-    public boolean isAccepted() {
-        if (packet != null) {
+    private boolean isAccepted() {
+        if (nmsPacket != null) {
             return readBoolean(0);
         } else {
             return accepted;
@@ -72,7 +75,7 @@ public class WrappedPacketOutTransaction extends WrappedPacket implements Sendab
     }
 
     public void setAccepted(boolean isAccepted) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeBoolean(0, isAccepted);
         } else {
             accepted = isAccepted;
@@ -80,7 +83,7 @@ public class WrappedPacketOutTransaction extends WrappedPacket implements Sendab
     }
 
     @Override
-    public Object asNMSPacket() throws Exception {
+    public Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
         return packetConstructor.newInstance(getWindowId(), getActionNumber(), isAccepted());
     }
 }

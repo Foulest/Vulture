@@ -30,9 +30,9 @@ import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +54,7 @@ public class BoundingBox {
     public Vector max;
 
     // Gets the min and max point of a block.
-    public BoundingBox(@NotNull Block block) {
+    BoundingBox(@NotNull Block block) {
         IBlockData blockData = ((CraftWorld) block.getWorld()).getHandle().getType(new BlockPosition(block.getX(), block.getY(), block.getZ()));
         net.minecraft.server.v1_8_R3.Block blockNative = blockData.getBlock();
 
@@ -66,15 +66,15 @@ public class BoundingBox {
 
     // Gets the min and max point of an entity.
     public BoundingBox(Entity entity) {
-        AxisAlignedBB bb = ((CraftEntity) entity).getHandle().getBoundingBox();
-        min = new Vector(bb.a, bb.b, bb.c);
-        max = new Vector(bb.d, bb.e, bb.f);
+        AxisAlignedBB box = ((CraftEntity) entity).getHandle().getBoundingBox();
+        min = new Vector(box.a, box.b, box.c);
+        max = new Vector(box.d, box.e, box.f);
     }
 
     // Gets the min and max point of an AxisAlignedBB.
-    public BoundingBox(@NotNull AxisAlignedBB bb) {
-        min = new Vector(bb.a, bb.b, bb.c);
-        max = new Vector(bb.d, bb.e, bb.f);
+    public BoundingBox(@NotNull AxisAlignedBB box) {
+        min = new Vector(box.a, box.b, box.c);
+        max = new Vector(box.d, box.e, box.f);
     }
 
     // Gets the min and max point of a custom BoundingBox.
@@ -89,10 +89,10 @@ public class BoundingBox {
         return max.clone().add(min).multiply(0.5);
     }
 
-    public boolean collidesWith(@NotNull BoundingBox other) {
-        return (min.getX() <= other.max.getX() && max.getX() >= other.min.getX())
-                && (min.getY() <= other.max.getY() && max.getY() >= other.min.getY())
-                && (min.getZ() <= other.max.getZ() && max.getZ() >= other.min.getZ());
+    private boolean collidesWith(@NotNull BoundingBox box) {
+        return (min.getX() <= box.max.getX() && max.getX() >= box.min.getX())
+                && (min.getY() <= box.max.getY() && max.getY() >= box.min.getY())
+                && (min.getZ() <= box.max.getZ() && max.getZ() >= box.min.getZ());
     }
 
     public BoundingBox expand(double value) {
@@ -129,13 +129,18 @@ public class BoundingBox {
         return new BoundingBox(min, new Vector(maxX, maxY, maxZ));
     }
 
-    public List<Block> getCollidingBlocks(Player player) {
+    public List<Block> getCollidingBlocks(Entity entity) {
         List<Block> blocks = new ArrayList<>();
+        int blockX = max.getBlockX();
 
-        for (int x = min.getBlockX(); x <= max.getBlockX(); x++) {
-            for (int y = min.getBlockY(); y <= max.getBlockY(); y++) {
-                for (int z = min.getBlockZ(); z <= max.getBlockZ(); z++) {
-                    Location loc = new Location(player.getWorld(), x, y, z);
+        for (int x = min.getBlockX(); x <= blockX; x++) {
+            int blockY = max.getBlockY();
+
+            for (int y = min.getBlockY(); y <= blockY; y++) {
+                int blockZ = max.getBlockZ();
+
+                for (int z = min.getBlockZ(); z <= blockZ; z++) {
+                    Location loc = new Location(entity.getWorld(), x, y, z);
 
                     if (loc.getWorld().isChunkLoaded(loc.getBlockX() >> 4, loc.getBlockZ() >> 4)) {
                         BoundingBox boundingBox = new BoundingBox(loc.getBlock());
@@ -150,14 +155,15 @@ public class BoundingBox {
         return blocks;
     }
 
-    public double squareDistanceTo(@NotNull Vector3d origin, @NotNull Vector3d vec) {
+    public static double squareDistanceTo(@NotNull Vector3d origin, @NotNull Vector3d vec) {
         double d0 = vec.x - origin.x;
         double d1 = vec.y - origin.y;
         double d2 = vec.z - origin.z;
         return d0 * d0 + d1 * d1 + d2 * d2;
     }
 
-    public Vector3d getIntermediateWithXValue(@NotNull Vector3d origin, @NotNull Vector3d vec, double x) {
+    public static @Nullable Vector3d getIntermediateWithXValue(@NotNull Vector3d origin,
+                                                               @NotNull Vector3d vec, double x) {
         double d0 = vec.x - origin.x;
         double d1 = vec.y - origin.y;
         double d2 = vec.z - origin.z;
@@ -171,7 +177,8 @@ public class BoundingBox {
         }
     }
 
-    public Vector3d getIntermediateWithYValue(@NotNull Vector3d origin, @NotNull Vector3d vec, double y) {
+    public static @Nullable Vector3d getIntermediateWithYValue(@NotNull Vector3d origin,
+                                                               @NotNull Vector3d vec, double y) {
         double d0 = vec.x - origin.x;
         double d1 = vec.y - origin.y;
         double d2 = vec.z - origin.z;
@@ -184,7 +191,8 @@ public class BoundingBox {
         }
     }
 
-    public Vector3d getIntermediateWithZValue(@NotNull Vector3d origin, @NotNull Vector3d vec, double z) {
+    public static @Nullable Vector3d getIntermediateWithZValue(@NotNull Vector3d origin,
+                                                               @NotNull Vector3d vec, double z) {
         double d0 = vec.x - origin.x;
         double d1 = vec.y - origin.y;
         double d2 = vec.z - origin.z;

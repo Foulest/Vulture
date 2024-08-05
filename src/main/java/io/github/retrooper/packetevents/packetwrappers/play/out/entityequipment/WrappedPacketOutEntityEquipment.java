@@ -6,6 +6,7 @@ import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
 import io.github.retrooper.packetevents.utils.pair.Pair;
 import lombok.Getter;
+import lombok.ToString;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Contract;
@@ -13,9 +14,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
+@ToString
 public class WrappedPacketOutEntityEquipment extends WrappedPacketEntityAbstraction implements SendableWrapper {
 
     private static Constructor<?> packetConstructor;
@@ -23,7 +26,7 @@ public class WrappedPacketOutEntityEquipment extends WrappedPacketEntityAbstract
     private EquipmentSlot legacySlot;
     private ItemStack legacyItemStack;
 
-    public WrappedPacketOutEntityEquipment(NMSPacket packet) {
+    private WrappedPacketOutEntityEquipment(NMSPacket packet) {
         super(packet);
     }
 
@@ -71,7 +74,7 @@ public class WrappedPacketOutEntityEquipment extends WrappedPacketEntityAbstract
     // LEGACY
 
     private EquipmentSlot getSingleSlot() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             byte id = (byte) readInt(1);
             return EquipmentSlot.getById(id);
         } else {
@@ -80,7 +83,7 @@ public class WrappedPacketOutEntityEquipment extends WrappedPacketEntityAbstract
     }
 
     private void setSingleSlot(EquipmentSlot slot) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeInt(1, slot.getId());
         } else {
             legacySlot = slot;
@@ -88,23 +91,23 @@ public class WrappedPacketOutEntityEquipment extends WrappedPacketEntityAbstract
     }
 
     private ItemStack getSingleItemStack() {
-        if (packet != null) {
-            return readItemStack(0);
+        if (nmsPacket != null) {
+            return readItemStack();
         } else {
             return legacyItemStack;
         }
     }
 
     private void setSingleItemStack(ItemStack itemStack) {
-        if (packet != null) {
-            writeItemStack(0, itemStack);
+        if (nmsPacket != null) {
+            writeItemStack(itemStack);
         } else {
             legacyItemStack = itemStack;
         }
     }
 
-    public List<Pair<EquipmentSlot, ItemStack>> getEquipment() {
-        if (packet != null) {
+    private List<Pair<EquipmentSlot, ItemStack>> getEquipment() {
+        if (nmsPacket != null) {
             List<Pair<EquipmentSlot, ItemStack>> pair = new ArrayList<>(1);
             pair.add(new Pair<>(getSingleSlot(), getSingleItemStack()));
             return pair;
@@ -113,13 +116,13 @@ public class WrappedPacketOutEntityEquipment extends WrappedPacketEntityAbstract
         }
     }
 
-    public void setEquipment(@NotNull List<Pair<EquipmentSlot, ItemStack>> equipment) throws UnsupportedOperationException {
+    private void setEquipment(@NotNull List<Pair<EquipmentSlot, ItemStack>> equipment) {
         if (equipment.size() > 1) {
             throw new UnsupportedOperationException("The equipment pair list size cannot be greater than one on"
                     + " server versions older than 1.16!");
         }
 
-        if (packet != null) {
+        if (nmsPacket != null) {
             EquipmentSlot equipmentSlot = equipment.get(0).getFirst();
             ItemStack itemStack = equipment.get(0).getSecond();
             setSingleSlot(equipmentSlot);
@@ -130,7 +133,7 @@ public class WrappedPacketOutEntityEquipment extends WrappedPacketEntityAbstract
     }
 
     @Override
-    public Object asNMSPacket() throws Exception {
+    public Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
         Object packetInstance = packetConstructor.newInstance();
         WrappedPacketOutEntityEquipment wrappedPacketOutEntityEquipment = new WrappedPacketOutEntityEquipment(new NMSPacket(packetInstance));
         wrappedPacketOutEntityEquipment.setEntityId(getEntityId());
@@ -139,6 +142,7 @@ public class WrappedPacketOutEntityEquipment extends WrappedPacketEntityAbstract
     }
 
     @Getter
+    @ToString
     public enum EquipmentSlot {
         MAINHAND,
         BOOTS,
@@ -149,8 +153,8 @@ public class WrappedPacketOutEntityEquipment extends WrappedPacketEntityAbstract
         public byte id;
 
         @Contract(pure = true)
-        public static @Nullable EquipmentSlot getById(byte id) {
-            for (EquipmentSlot slot : EquipmentSlot.values()) {
+        static @Nullable EquipmentSlot getById(byte id) {
+            for (EquipmentSlot slot : values()) {
                 if (slot.id == id) {
                     return slot;
                 }

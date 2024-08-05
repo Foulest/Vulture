@@ -20,9 +20,13 @@ package net.foulest.vulture.util.data;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -34,22 +38,24 @@ import java.util.Objects;
  */
 @Getter
 @Setter
+@ToString
 @AllArgsConstructor
 @SuppressWarnings("unused")
 public final class EvictingList<T> extends LinkedList<T> {
 
+    private static final long serialVersionUID = -2926788977148580670L;
     private final int maxSize;
 
     @Override
     public boolean add(T t) {
-        if (size() >= getMaxSize()) {
+        if (size() >= maxSize) {
             removeFirst();
         }
         return super.add(t);
     }
 
     public boolean isFull() {
-        return size() >= getMaxSize();
+        return size() >= maxSize;
     }
 
     @Contract(" -> new")
@@ -71,12 +77,25 @@ public final class EvictingList<T> extends LinkedList<T> {
             return false;
         }
 
-        EvictingList<?> that = (EvictingList<?>) o;
-        return maxSize == that.maxSize && super.equals(that);
+        EvictingList<?> list = (EvictingList<?>) o;
+        return maxSize == list.maxSize && super.equals(list);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), maxSize);
+    }
+
+    private void readObject(ObjectInputStream in) throws ClassNotFoundException, NotSerializableException {
+        throw new NotSerializableException("net.foulest.vulture.util.data.EvictingList");
+    }
+
+    private void writeObject(ObjectOutputStream out) throws NotSerializableException {
+        throw new NotSerializableException("net.foulest.vulture.util.data.EvictingList");
+    }
+
+    @Override
+    public EvictingList<T> clone() throws AssertionError {
+        throw new AssertionError();
     }
 }

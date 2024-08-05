@@ -31,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
 
 @Data
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class NetworkMessage {
+public final class NetworkMessage {
 
     private final Object message;
     private final ChannelPromise promise;

@@ -34,15 +34,19 @@ import dev.thomazz.pledge.pinger.frame.data.Frame;
 import dev.thomazz.pledge.pinger.frame.data.FrameData;
 import dev.thomazz.pledge.util.ChannelUtils;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
+import lombok.Synchronized;
+import lombok.ToString;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
+@ToString
 public class FrameClientPingerImpl extends ClientPingerImpl implements FrameClientPinger {
 
     private final Map<Player, FrameData> frameDataMap = new LinkedHashMap<>();
-    private final List<FrameClientPingerListener> frameListener = new ArrayList<>();
+    private final Collection<FrameClientPingerListener> frameListener = new ArrayList<>();
 
     public FrameClientPingerImpl(PledgeImpl clientPing, int startId, int endId) {
         super(clientPing, startId, endId);
@@ -69,7 +73,7 @@ public class FrameClientPingerImpl extends ClientPingerImpl implements FrameClie
     @Override
     protected void injectPlayer(Player player) {
         MessageQueueHandler queueHandler = new MessageQueueHandler();
-        MessageQueuePrimer queuePrimer = new MessageQueuePrimer(queueHandler);
+        ChannelHandler queuePrimer = new MessageQueuePrimer(queueHandler);
 
         api.getChannel(player).ifPresent(channel ->
                 ChannelUtils.runInEventLoop(channel, () ->
@@ -128,7 +132,8 @@ public class FrameClientPingerImpl extends ClientPingerImpl implements FrameClie
     }
 
     @Override
-    public synchronized Frame getOrCreate(Player player) {
+    @Synchronized
+    public Frame getOrCreate(Player player) {
         PingData pingData = pingDataMap.get(player);
         FrameData frameData = frameDataMap.get(player);
 
@@ -167,7 +172,7 @@ public class FrameClientPingerImpl extends ClientPingerImpl implements FrameClie
 
                             handler.drain(channel.pipeline().context(handler));
                         }
-                    } catch (Exception ex) {
+                    } catch (RuntimeException ex) {
                         api.getLogger().severe("Unable to drain message queue from player: " + player.getName());
                         ex.printStackTrace();
                     }

@@ -25,6 +25,7 @@ import io.github.retrooper.packetevents.utils.netty.channel.ChannelUtils;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -40,6 +41,7 @@ import java.net.InetSocketAddress;
  * @since 1.3
  */
 @Getter
+@ToString
 @AllArgsConstructor
 public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
 
@@ -62,8 +64,8 @@ public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
      *
      * @return Netty channel of the injected player.
      */
-    public Object getChannel() {
-        return PacketEvents.get().getPlayerUtils().getChannel(player);
+    private Object getChannel() {
+        return PacketEvents.getInstance().getPlayerUtils().getChannel(player);
     }
 
     public InetSocketAddress getSocketAddress() {
@@ -77,7 +79,7 @@ public class PostPlayerInjectEvent extends PacketEvent implements PlayerEvent {
      * @see ClientVersion
      */
     public ClientVersion getClientVersion() {
-        return PacketEvents.get().getPlayerUtils().getClientVersion(player);
+        return PacketEvents.getInstance().getPlayerUtils().getClientVersion(player);
     }
 
     @Override

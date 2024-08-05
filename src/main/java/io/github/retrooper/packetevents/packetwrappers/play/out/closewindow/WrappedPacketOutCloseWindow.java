@@ -4,9 +4,12 @@ import io.github.retrooper.packetevents.packettype.PacketTypeClasses;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
+import lombok.ToString;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
+@ToString
 public class WrappedPacketOutCloseWindow extends WrappedPacket implements SendableWrapper {
 
     private static Constructor<?> constructor;
@@ -24,20 +27,20 @@ public class WrappedPacketOutCloseWindow extends WrappedPacket implements Sendab
     protected void load() {
         try {
             constructor = PacketTypeClasses.Play.Server.CLOSE_WINDOW.getConstructor(int.class);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+        } catch (NoSuchMethodException ex) {
+            ex.printStackTrace();
         }
     }
 
-    public int getWindowId() {
-        if (packet != null) {
+    private int getWindowId() {
+        if (nmsPacket != null) {
             return readInt(0);
         }
         return windowID;
     }
 
     public void setWindowId(int windowID) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeInt(0, windowID);
         } else {
             this.windowID = windowID;
@@ -45,7 +48,7 @@ public class WrappedPacketOutCloseWindow extends WrappedPacket implements Sendab
     }
 
     @Override
-    public Object asNMSPacket() throws Exception {
+    public Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
         return constructor.newInstance(getWindowId());
     }
 }

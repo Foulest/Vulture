@@ -8,6 +8,7 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.SubclassUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 import org.jetbrains.annotations.Nullable;
 
 public final class WrappedPacketInEntityAction extends WrappedPacketEntityAbstraction {
@@ -37,7 +38,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacketEntityAbstra
         }
     }
 
-    public void setAction(PlayerAction action) throws UnsupportedOperationException {
+    public void setAction(PlayerAction action) {
         if (enumPlayerActionClass == null) {
             byte animationIndex = action.actionValue;
             writeInt(1, animationIndex + 1);
@@ -69,6 +70,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacketEntityAbstra
     }
 
     @Getter
+    @ToString
     @AllArgsConstructor
     public enum PlayerAction {
         START_SNEAKING((byte) 0, "PRESS_SHIFT_KEY"),
@@ -90,7 +92,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacketEntityAbstra
             alias = "empty";
         }
 
-        public static @Nullable PlayerAction getByActionValue(byte value) {
+        static @Nullable PlayerAction getByActionValue(byte value) {
             if (value == RIDING_JUMP.actionValue) {
                 return RIDING_JUMP;
             } else {
@@ -103,7 +105,7 @@ public final class WrappedPacketInEntityAction extends WrappedPacketEntityAbstra
             return null;
         }
 
-        public static @Nullable PlayerAction getByName(String name) {
+        static @Nullable PlayerAction getByName(String name) {
             for (PlayerAction action : values()) {
                 if (action.name().equals(name) || action.alias.equals(name)) {
                     return action;

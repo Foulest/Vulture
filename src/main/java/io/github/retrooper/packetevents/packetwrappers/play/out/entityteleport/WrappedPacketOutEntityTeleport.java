@@ -5,13 +5,16 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.api.SendableWrapper;
 import io.github.retrooper.packetevents.packetwrappers.api.helper.WrappedPacketEntityAbstraction;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
+import lombok.ToString;
 import net.foulest.vulture.util.MathUtil;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
+@ToString
 public class WrappedPacketOutEntityTeleport extends WrappedPacketEntityAbstraction implements SendableWrapper {
 
     private static final float ROTATION_MULTIPLIER = 256.0F / 360.0F;
@@ -52,8 +55,8 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacketEntityAbstracti
         this.onGround = onGround;
     }
 
-    public WrappedPacketOutEntityTeleport(int entityID, double x, double y, double z,
-                                          float yaw, float pitch, boolean onGround) {
+    private WrappedPacketOutEntityTeleport(int entityID, double x, double y, double z,
+                                           float yaw, float pitch, boolean onGround) {
         this.entityID = entityID;
         position = new Vector3d(x, y, z);
         this.yaw = yaw;
@@ -61,8 +64,8 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacketEntityAbstracti
         this.onGround = onGround;
     }
 
-    public WrappedPacketOutEntityTeleport(@NotNull Entity entity, double x, double y, double z,
-                                          float yaw, float pitch, boolean onGround) {
+    private WrappedPacketOutEntityTeleport(@NotNull Entity entity, double x, double y, double z,
+                                           float yaw, float pitch, boolean onGround) {
         entityID = entity.getEntityId();
         this.entity = entity;
         position = new Vector3d(x, y, z);
@@ -88,7 +91,7 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacketEntityAbstracti
 
 
     public Vector3d getPosition() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             double x = readInt(1) / 32.0D;
             double y = readInt(2) / 32.0D;
             double z = readInt(3) / 32.0D;
@@ -99,7 +102,7 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacketEntityAbstracti
     }
 
     public void setPosition(Vector3d position) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeInt(1, floor(position.x * 32.0D));
             writeInt(2, floor(position.y * 32.0D));
             writeInt(3, floor(position.z * 32.0D));
@@ -108,8 +111,8 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacketEntityAbstracti
         }
     }
 
-    public float getYaw() {
-        if (packet != null) {
+    private float getYaw() {
+        if (nmsPacket != null) {
             return (readByte(0) / ROTATION_MULTIPLIER);
         } else {
             return yaw;
@@ -117,15 +120,15 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacketEntityAbstracti
     }
 
     public void setYaw(float yaw) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeByte(0, (byte) (yaw * ROTATION_MULTIPLIER));
         } else {
             this.yaw = yaw;
         }
     }
 
-    public float getPitch() {
-        if (packet != null) {
+    private float getPitch() {
+        if (nmsPacket != null) {
             return (readByte(1) / ROTATION_MULTIPLIER);
         } else {
             return pitch;
@@ -133,7 +136,7 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacketEntityAbstracti
     }
 
     public void setPitch(float pitch) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeByte(1, (byte) (pitch * ROTATION_MULTIPLIER));
         } else {
             this.pitch = pitch;
@@ -141,7 +144,7 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacketEntityAbstracti
     }
 
     public boolean isOnGround() {
-        if (packet != null) {
+        if (nmsPacket != null) {
             return readBoolean(0);
         } else {
             return onGround;
@@ -149,7 +152,7 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacketEntityAbstracti
     }
 
     public void setOnGround(boolean onGround) {
-        if (packet != null) {
+        if (nmsPacket != null) {
             writeBoolean(0, onGround);
         } else {
             this.onGround = onGround;
@@ -157,7 +160,7 @@ public class WrappedPacketOutEntityTeleport extends WrappedPacketEntityAbstracti
     }
 
     @Override
-    public Object asNMSPacket() throws Exception {
+    public Object asNMSPacket() throws InvocationTargetException, InstantiationException, IllegalAccessException {
         Vector3d pos = getPosition();
         return constructor.newInstance(entityID, floor(pos.x * 32.0D), floor(pos.y * 32.0D), floor(pos.z * 32.0D),
                 (byte) ((int) getYaw() * ROTATION_MULTIPLIER), (byte) (int) (getPitch() * ROTATION_MULTIPLIER), false);
