@@ -28,6 +28,7 @@ import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
+import net.foulest.vulture.util.ConstantUtil;
 
 @ToString
 @CheckInfo(name = "Velocity (B)", type = CheckType.VELOCITY,
@@ -59,6 +60,11 @@ public class VelocityB extends Check {
             double takenXZ = playerData.getVelocityXZ().getLast();
             double diffXZ = Math.abs(deltaXZ - takenXZ);
 
+            int airTicks = playerData.getAirTicks();
+            int ticksSinceAgainst = playerData.getTicksSince(ActionType.AGAINST_BLOCK);
+            int ticksSinceAgainstWide = playerData.getTicksSince(ActionType.AGAINST_BLOCK_WIDE);
+            boolean underVel = (player.getVelocity().getY() < ConstantUtil.ON_GROUND_VELOCITY);
+
             // Checks the player for exemptions.
             if (playerData.isAgainstBlock()) {
                 lastPosX = (flying.isMoving() ? flyingPosition.getX() : lastPosX);
@@ -66,22 +72,29 @@ public class VelocityB extends Check {
                 return;
             }
 
-            if (takenXZ > 0.05875) {
+            if (takenXZ > 0.1) {
                 // Check if player ever took correct velocity
                 if (diffXZ < 0.001) {
-                    // Player repeating correct velocity
-                    if (takenCorrectXZ) {
-                        flag(false, "(repeated) dXZ=" + deltaXZ + " vXZ=" + takenXZ + " diffXZ=" + diffXZ + " tDiff=" + tickDiff);
-                    }
-
                     takenCorrectXZ = true;
                     playerData.setTimestamp(ActionType.VELOCITY_TAKEN);
                 }
 
+                // Potentially fixes issues with players post-against a block.
+                if (airTicks > 0 && ticksSinceAgainstWide > 0) {
+                    lastPosX = (flying.isMoving() ? flyingPosition.getX() : lastPosX);
+                    lastPosZ = (flying.isMoving() ? flyingPosition.getZ() : lastPosZ);
+                    return;
+                }
+
                 // Velocity packet sent; flag if player never took correct velocity
-                if (lastGivenTicks != givenTicks && tickDiff > 0) {
+                // Regular tick diff range: 0-3 (max: 6)
+                if (lastGivenTicks != givenTicks && tickDiff <= 6) {
                     if (!takenCorrectXZ) {
-                        flag(false, "dXZ=" + deltaXZ + " vXZ=" + takenXZ + " diffXZ=" + diffXZ + " tDiff=" + tickDiff);
+                        flag(false, "dXZ=" + deltaXZ + " vXZ=" + takenXZ + " diffXZ=" + diffXZ
+                                + " percent=" + (deltaXZ / takenXZ) + " tDiff=" + tickDiff
+                                + " airTicks=" + airTicks + " underVel=" + underVel
+                                + " against=" + ticksSinceAgainst + " againstWide=" + ticksSinceAgainstWide
+                        );
                     }
 
                     takenCorrectXZ = false;

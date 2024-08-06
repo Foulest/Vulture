@@ -1163,28 +1163,37 @@ public class PacketReceiveProcessor extends Processor {
                     }
 
                     // Set block data
-                    playerData.setOnSlab(BlockUtil.isOnSlab(player));
-                    playerData.setOnStairs(BlockUtil.isOnStairs(player));
-                    playerData.setNearStairs(BlockUtil.isNearStairs(player));
-                    playerData.setNearSlab(BlockUtil.isNearSlab(player));
-                    playerData.setNearPiston(BlockUtil.isNearPiston(player));
-                    playerData.setNearCactus(BlockUtil.isNearCactus(player));
-                    playerData.setInWeb(BlockUtil.isInWeb(player));
                     playerData.setInLiquid(BlockUtil.isInLiquid(player));
+                    playerData.setInWeb(BlockUtil.isInWeb(player));
+                    playerData.setNearAnvil(BlockUtil.isNearAnvil(player));
+                    playerData.setNearBed(BlockUtil.isNearBed(player));
+                    playerData.setNearBrewingStand(BlockUtil.isNearBrewingStand(player));
+                    playerData.setNearCactus(BlockUtil.isNearCactus(player));
+                    playerData.setNearCarpet(BlockUtil.isNearCarpet(player));
+                    playerData.setNearChest(BlockUtil.isNearChest(player));
+                    playerData.setNearClimbable(BlockUtil.isNearClimbable(player));
+                    playerData.setNearFence(BlockUtil.isNearFence(player));
+                    playerData.setNearFenceGate(BlockUtil.isNearFenceGate(player));
+                    playerData.setNearFlowerPot(BlockUtil.isNearFlowerPot(player));
+                    playerData.setNearHopper(BlockUtil.isNearHopper(player));
+                    playerData.setNearLilyPad(BlockUtil.isNearLilyPad(player));
                     playerData.setNearLiquid(BlockUtil.isNearLiquid(player));
+                    playerData.setNearPiston(BlockUtil.isNearPiston(player));
+                    playerData.setNearPortal(BlockUtil.isNearPortal(player));
+                    playerData.setNearSlab(BlockUtil.isNearSlab(player));
+                    playerData.setNearSlimeBlock(BlockUtil.isNearSlimeBlock(player));
+                    playerData.setNearSnowLayer(BlockUtil.isNearSnowLayer(player));
+                    playerData.setNearStairs(BlockUtil.isNearStairs(player));
+                    playerData.setNearTrapdoor(BlockUtil.isNearTrapdoor(player));
                     playerData.setOnChest(BlockUtil.isOnChest(player));
                     playerData.setOnClimbable(BlockUtil.isOnClimbable(player));
-                    playerData.setNearClimbable(BlockUtil.isNearClimbable(player));
-                    playerData.setNearPortal(BlockUtil.isNearPortal(player));
-                    playerData.setOnSnowLayer(BlockUtil.isOnSnowLayer(player));
                     playerData.setOnIce(BlockUtil.isOnIce(player));
-                    playerData.setOnSoulSand(BlockUtil.isOnSoulSand(player));
-                    playerData.setNearTrapdoor(BlockUtil.isNearTrapdoor(player));
-                    playerData.setNearFenceGate(BlockUtil.isNearFenceGate(player));
                     playerData.setOnLilyPad(BlockUtil.isOnLilyPad(player));
-                    playerData.setNearLilyPad(BlockUtil.isNearLilyPad(player));
-                    playerData.setNearAnvil(BlockUtil.isNearAnvil(player));
-                    playerData.setNearSlimeBlock(BlockUtil.isNearSlimeBlock(player));
+                    playerData.setOnRepeater(BlockUtil.isOnRepeater(player));
+                    playerData.setOnSlab(BlockUtil.isOnSlab(player));
+                    playerData.setOnSnowLayer(BlockUtil.isOnSnowLayer(player));
+                    playerData.setOnSoulSand(BlockUtil.isOnSoulSand(player));
+                    playerData.setOnStairs(BlockUtil.isOnStairs(player));
 
                     if (playerData.isNearSlimeBlock() && !playerData.isOnGround()) {
                         playerData.setUnderEffectOfSlime(true);
@@ -1201,6 +1210,24 @@ public class PacketReceiveProcessor extends Processor {
                         playerData.setUnderEffectOfSlime(false);
                     }
 
+                    if (BlockUtil.isAgainstBlock(player)) {
+                        playerData.setAgainstBlockTicks(playerData.getAgainstBlockTicks() + 1);
+                        playerData.setAgainstBlock(true);
+                        playerData.setTimestamp(ActionType.AGAINST_BLOCK);
+                    } else {
+                        playerData.setAgainstBlockTicks(0);
+                        playerData.setAgainstBlock(false);
+                    }
+
+                    if (BlockUtil.isAgainstBlockWide(player)) {
+                        playerData.setAgainstBlockWideTicks(playerData.getAgainstBlockTicks() + 1);
+                        playerData.setAgainstBlockWide(true);
+                        playerData.setTimestamp(ActionType.AGAINST_BLOCK_WIDE);
+                    } else {
+                        playerData.setAgainstBlockWideTicks(0);
+                        playerData.setAgainstBlockWide(false);
+                    }
+
                     if (BlockUtil.isUnderBlock(player)) {
                         playerData.setUnderBlockTicks(playerData.getUnderBlockTicks() + 1);
                         playerData.setUnderBlock(true);
@@ -1210,8 +1237,6 @@ public class PacketReceiveProcessor extends Processor {
                         playerData.setUnderBlock(false);
                     }
 
-                    playerData.setAgainstBlock(BlockUtil.isAgainstBlock(player));
-                    playerData.setAgainstBlockWide(BlockUtil.isAgainstBlockWide(player));
                     playerData.setCollidingBlock(BlockUtil.getCollidingBlock(player));
 
                     if (playerData.isOnIce()) {
@@ -1759,14 +1784,12 @@ public class PacketReceiveProcessor extends Processor {
                         "Sent SteerVehicle packet with invalid dismount value"
                 );
             }
-
         } else if (Math.abs(value) == 0.29400003f) {
             if (!steerVehicle.isDismount()) {
                 KickUtil.kickPlayer(player, event, Settings.steerVehicleInvalidNonDismountValue,
                         "Sent SteerVehicle packet with invalid non-dismount value"
                 );
             }
-
         } else if (value != 0.0f) {
             KickUtil.kickPlayer(player, event, Settings.steerVehicleInvalidValue,
                     "Sent SteerVehicle packet with invalid value"

@@ -65,6 +65,16 @@ public class SpeedA extends Check {
         double deltaXZ = event.getDeltaXZ();
         double maxSpeed = to.isOnGround() && !nearLilyPad ? 0.3125 : 0.35855;
 
+        // Ignores if the player's delta XZ is less than their horizontal velocity taken.
+        // This is to prevent false positives with velocity.
+        // The air ticks scale with the player's velocity.
+        if ((Math.abs(playerData.getVelocityXZ().getLast() - deltaXZ) < 0.01
+                || playerData.getVelocityXZ().getLast() > deltaXZ)
+                && (playerData.getTotalTicks() - playerData.getVelocityXZ().getFirst())
+                <= (int) (playerData.getVelocityXZ().getLast() * 10)) {
+            return;
+        }
+
         int groundTicks = playerData.getGroundTicks();
         int groundTicksStrict = playerData.getGroundTicksStrict();
 
@@ -114,9 +124,10 @@ public class SpeedA extends Check {
                             + " maxSpeed=" + maxSpeed
                             + " difference=" + difference
                             + " buffer=" + buffer
-                            + " givenTicks=" + playerData.getTicksSince(ActionType.VELOCITY_GIVEN)
-                            + " takenTicks=" + playerData.getTicksSince(ActionType.VELOCITY_TAKEN)
                             + " velXZ=" + playerData.getVelocityXZ().getLast()
+                            + " velXZT=" + (playerData.getTotalTicks() - playerData.getVelocityXZ().getFirst())
+                            + " lastVelXZ=" + playerData.getLastVelocityXZ().getLast()
+                            + " lastVelXZT=" + (playerData.getTotalTicks() - playerData.getLastVelocityXZ().getFirst())
                     );
                 }
             }

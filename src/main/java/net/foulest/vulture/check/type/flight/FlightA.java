@@ -25,6 +25,7 @@ import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.event.MovementEvent;
 import net.foulest.vulture.util.BlockUtil;
+import net.foulest.vulture.util.ConstantUtil;
 import net.foulest.vulture.util.MessageUtil;
 import net.foulest.vulture.util.MovementUtil;
 import org.bukkit.potion.PotionEffectType;
@@ -36,10 +37,6 @@ public class FlightA extends Check {
 
     // TODO: Patch players moving through blocks using Phase sand modules.
     // TODO: Test slime block predictions thoroughly.
-
-    private static final double GRAVITY_DECAY = 0.08;
-    private static final double GRAVITY_MULTIPLIER = 0.9800000190735147;
-    private static final double ON_GROUND_VELOCITY = -0.0784000015258789;
 
     private double lastDeltaY;
     private double lastVelocity;
@@ -92,8 +89,8 @@ public class FlightA extends Check {
         double thresholdJump = threshold + (0.1 * MovementUtil.getPotionEffectLevel(player, PotionEffectType.JUMP));
 
         // Predictions
-        double predVelocity = (lastVelocity - GRAVITY_DECAY) * GRAVITY_MULTIPLIER;
-        double predDeltaY = (lastDeltaY - GRAVITY_DECAY) * GRAVITY_MULTIPLIER;
+        double predVelocity = (lastVelocity - ConstantUtil.GRAVITY_DECAY) * ConstantUtil.GRAVITY_MULTIPLIER;
+        double predDeltaY = (lastDeltaY - ConstantUtil.GRAVITY_DECAY) * ConstantUtil.GRAVITY_MULTIPLIER;
 
         // Y Differences
         double diffYPredY = Math.abs(deltaY - predDeltaY);
@@ -102,8 +99,8 @@ public class FlightA extends Check {
         double diffYLastV = Math.abs(deltaY - lastVelocity);
         double diffYTakenV = Math.abs(deltaY - takenVelocity);
         double diffYLastTakenV = Math.abs(deltaY - lastTakenVelocity);
-        double diffYGravity = Math.abs(deltaY - (GRAVITY_MULTIPLIER * -0.10));
-        double diffYGroundV = Math.abs(deltaY - ON_GROUND_VELOCITY);
+        double diffYGravity = Math.abs(deltaY - (ConstantUtil.GRAVITY_MULTIPLIER * -0.10));
+        double diffYGroundV = Math.abs(deltaY - ConstantUtil.ON_GROUND_VELOCITY);
 
         // Velocity Differences
         double diffVPredY = Math.abs(velocity - predDeltaY);
@@ -159,9 +156,9 @@ public class FlightA extends Check {
                         return;
                     }
 
-                    if (velocity == ON_GROUND_VELOCITY) {
+                    if (velocity == ConstantUtil.ON_GROUND_VELOCITY) {
                         MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (Slime #6) (Y=" + deltaY + ")");
-                        setLastValues(deltaY, ON_GROUND_VELOCITY);
+                        setLastValues(deltaY, ConstantUtil.ON_GROUND_VELOCITY);
                         return;
                     }
                 }
@@ -361,14 +358,14 @@ public class FlightA extends Check {
             }
 
             // Ignores players who are near beds.
-            if (BlockUtil.isNearBed(player) && Math.abs(deltaY) < 0.1) {
+            if (playerData.isNearBed() && Math.abs(deltaY) < 0.1) {
                 MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (G2) (Y=" + deltaY + ")");
                 setLastValues(deltaY, velocity);
                 return;
             }
 
             // Ignores players who are near beds.
-            if (BlockUtil.isNearBed(player) && onGroundTicks == 1 && Math.abs(deltaY) <= 0.5625) {
+            if (playerData.isNearBed() && onGroundTicks == 1 && Math.abs(deltaY) <= 0.5625) {
                 MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (G3) (Y=" + deltaY + ")");
                 setLastValues(deltaY, velocity);
                 return;
@@ -402,9 +399,9 @@ public class FlightA extends Check {
                         return;
                     }
 
-                    if (velocity == ON_GROUND_VELOCITY) {
+                    if (velocity == ConstantUtil.ON_GROUND_VELOCITY) {
                         MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (H5) (Y=" + deltaY + ")");
-                        setLastValues(deltaY, ON_GROUND_VELOCITY);
+                        setLastValues(deltaY, ConstantUtil.ON_GROUND_VELOCITY);
                         return;
                     }
                 }
@@ -499,7 +496,7 @@ public class FlightA extends Check {
                         return;
                     }
 
-                    if (BlockUtil.isNearFence(player) || BlockUtil.isNearFenceGate(player)) {
+                    if (playerData.isNearFence() || playerData.isNearFenceGate()) {
                         MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (J4) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
@@ -516,72 +513,78 @@ public class FlightA extends Check {
                         setLastValues(deltaY, velocity);
                         return;
                     }
+
+                    if (lastDeltaY == 0.0 && Math.abs(threshold - velocity) < 0.001) {
+                        MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (J6) (Y=" + deltaY + ")");
+                        setLastValues(deltaY, velocity);
+                        return;
+                    }
                 }
 
                 // Ignores players stepping on specific blocks.
-                if (velocity == ON_GROUND_VELOCITY || velocity == 0.0) {
-                    if (deltaY == 0.125 && (BlockUtil.isNearChest(player) || BlockUtil.isNearBrewingStand(player))
-                            || (BlockUtil.isNearTrapdoor(player) && BlockUtil.isNearCarpet(player))
-                            || (BlockUtil.isOnRepeater(player))
-                            || (BlockUtil.isNearSlab(player) && BlockUtil.isNearFlowerPot(player))) {
+                if (velocity == ConstantUtil.ON_GROUND_VELOCITY || velocity == 0.0) {
+                    if (deltaY == 0.125 && (playerData.isNearChest() || playerData.isNearBrewingStand())
+                            || (playerData.isNearTrapdoor() && playerData.isNearCarpet())
+                            || (playerData.isOnRepeater())
+                            || (playerData.isNearSlab() && playerData.isNearFlowerPot())) {
                         MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (J5) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
                     }
 
-                    if (deltaY % 0.125 == 0 && deltaY <= 0.5 && BlockUtil.isNearSnowLayer(player)) {
+                    if (deltaY % 0.125 == 0 && deltaY <= 0.5 && playerData.isNearSnowLayer()) {
                         MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (J6) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
                     }
 
-                    if ((Math.abs(deltaY) == 0.015625 || Math.abs(deltaY) == 0.09375) && BlockUtil.isNearLilyPad(player)) {
+                    if ((Math.abs(deltaY) == 0.015625 || Math.abs(deltaY) == 0.09375) && playerData.isNearLilyPad()) {
                         MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (J7) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
                     }
 
-                    if (Math.abs(deltaY) == 0.0625 && BlockUtil.isNearCarpet(player)) {
+                    if (Math.abs(deltaY) == 0.0625 && playerData.isNearCarpet()) {
                         MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (J8) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
                     }
 
-                    if (Math.abs(deltaY) == 0.5 && (BlockUtil.isNearSlab(player)
-                            || BlockUtil.isNearFenceGate(player) || BlockUtil.isNearFence(player))) {
+                    if (Math.abs(deltaY) == 0.5 && (playerData.isNearSlab()
+                            || playerData.isNearFenceGate() || playerData.isNearFence())) {
                         MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (J9) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
                     }
 
-                    if (Math.abs(deltaY) == 0.1875 && BlockUtil.isNearTrapdoor(player)) {
+                    if (Math.abs(deltaY) == 0.1875 && playerData.isNearTrapdoor()) {
                         MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (J10) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
                     }
 
-                    if (Math.abs(deltaY) == 0.3125 && ((BlockUtil.isNearTrapdoor(player) && BlockUtil.isNearSlab(player))
-                            || (BlockUtil.isNearCarpet(player) && BlockUtil.isNearFlowerPot(player)))) {
+                    if (Math.abs(deltaY) == 0.3125 && ((playerData.isNearTrapdoor() && playerData.isNearSlab())
+                            || (playerData.isNearCarpet() && playerData.isNearFlowerPot()))) {
                         MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (J11) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
                     }
 
                     if (Math.abs(deltaY) == 0.375
-                            && ((BlockUtil.isNearBrewingStand(player) && BlockUtil.isNearSlab(player))
-                            || BlockUtil.isNearHopper(player) || BlockUtil.isNearFlowerPot(player))) {
+                            && ((playerData.isNearBrewingStand() && playerData.isNearSlab())
+                            || playerData.isNearHopper() || playerData.isNearFlowerPot())) {
                         MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (J12) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
                     }
 
-                    if (Math.abs(deltaY) == 0.4375 && BlockUtil.isNearCarpet(player) && BlockUtil.isNearSlab(player)) {
+                    if (Math.abs(deltaY) == 0.4375 && playerData.isNearCarpet() && playerData.isNearSlab()) {
                         MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (J13) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
                     }
 
-                    if (Math.abs(deltaY) == 0.5625 && BlockUtil.isNearBed(player)) {
+                    if (Math.abs(deltaY) == 0.5625 && playerData.isNearBed()) {
                         MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (J14) (Y=" + deltaY + ")");
                         setLastValues(deltaY, velocity);
                         return;
@@ -634,9 +637,9 @@ public class FlightA extends Check {
                 }
 
                 if ((toY - (int) toY) - jumpY < threshold && deltaY > 0.0 && lastDeltaY < 0.0
-                        && velocity == ON_GROUND_VELOCITY && diffVLastV == 0.0) {
+                        && velocity == ConstantUtil.ON_GROUND_VELOCITY && diffVLastV == 0.0) {
                     MessageUtil.debug("FlightA: ignoring movement for " + player.getName() + " (K8) (Y=" + deltaY + ")");
-                    setLastValues(deltaY, ON_GROUND_VELOCITY);
+                    setLastValues(deltaY, ConstantUtil.ON_GROUND_VELOCITY);
                     return;
                 }
 
@@ -705,6 +708,7 @@ public class FlightA extends Check {
                         + " 0.3=" + BlockUtil.isOnGroundOffset(player, 0.3)
                         + " 0.4=" + BlockUtil.isOnGroundOffset(player, 0.4)
                         + " 0.5=" + BlockUtil.isOnGroundOffset(player, 0.5)
+                        + " 0.75=" + BlockUtil.isOnGroundOffset(player, 0.75)
                         + " |"
                         + " nearGround=" + nearGroundTicks
                         + " notNearGround=" + notNearGroundTicks

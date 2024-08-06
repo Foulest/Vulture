@@ -18,6 +18,8 @@
 package net.foulest.vulture.action;
 
 public enum ActionType {
+    AGAINST_BLOCK,
+    AGAINST_BLOCK_WIDE,
     ARM_ANIMATION,
     ATTACKING,
     BLOCKING,

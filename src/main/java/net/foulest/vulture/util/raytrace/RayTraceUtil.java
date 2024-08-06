@@ -52,6 +52,17 @@ final class RayTraceUtil {
         return null;
     }
 
+    public static double getDistanceFromGround(@NotNull LivingEntity entity, double distance) {
+        // Ray-trace the entity's location to the ground straight down.
+        RayTrace rayTrace = new RayTrace(entity.getLocation().toVector(), new Vector(0, -1, 0));
+        Vector position = rayTrace.positionOfIntersect(new BoundingBox(entity), distance, 0.01);
+
+        if (position == null) {
+            return -1;
+        }
+        return entity.getLocation().distance(position.toLocation(entity.getWorld()));
+    }
+
     /**
      * RayTrace class, taken from SpigotMC.
      * <p>

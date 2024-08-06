@@ -78,6 +78,8 @@ public class PlayerData {
     private int aboveBlockTicks;
     private int aboveBlockTicksStrict;
     private int underBlockTicks;
+    private int againstBlockTicks;
+    private int againstBlockWideTicks;
     private int airTicks;
     private int airTicksStrict;
     private int groundTicks;
@@ -114,39 +116,48 @@ public class PlayerData {
     private Pair<Integer, Double> lastVelocityXZ = new Pair<>(0, 0.0);
 
     // Block data
-    private boolean moving;
-    private boolean nearGround;
-    private boolean onGround;
-    private boolean onSlab;
-    private boolean onStairs;
-    private boolean nearStairs;
-    private boolean nearSlab;
-    private boolean nearPiston;
-    private boolean nearCactus;
-    private boolean inWeb;
-    private boolean inLiquid;
-    private boolean nearLiquid;
-    private boolean onChest;
-    private boolean onClimbable;
-    private boolean nearClimbable;
-    private boolean nearPortal;
-    private boolean onSnowLayer;
-    private boolean onIce;
-    private boolean onSoulSand;
-    private boolean nearTrapdoor;
-    private boolean nearFenceGate;
-    private boolean onLilyPad;
-    private boolean nearLilyPad;
-    private boolean nearAnvil;
-    private boolean nearSlimeBlock;
-    private boolean underBlock;
+    private Block collidingBlock;
     private boolean againstBlock;
     private boolean againstBlockWide;
-    private boolean isInsideBlock;
-    private Block collidingBlock;
     private boolean inCamera;
+    private boolean inLiquid;
     private boolean inUnloadedChunk;
+    private boolean inWeb;
+    private boolean isInsideBlock;
+    private boolean moving;
+    private boolean nearAnvil;
+    private boolean nearBed;
+    private boolean nearBrewingStand;
+    private boolean nearCactus;
+    private boolean nearCarpet;
+    private boolean nearChest;
+    private boolean nearClimbable;
+    private boolean nearFence;
+    private boolean nearFenceGate;
+    private boolean nearFlowerPot;
+    private boolean nearGround;
+    private boolean nearHopper;
+    private boolean nearLilyPad;
+    private boolean nearLiquid;
+    private boolean nearPiston;
+    private boolean nearPortal;
+    private boolean nearSlab;
+    private boolean nearSlimeBlock;
+    private boolean nearSnowLayer;
+    private boolean nearStairs;
+    private boolean nearTrapdoor;
+    private boolean onChest;
+    private boolean onClimbable;
+    private boolean onGround;
+    private boolean onIce;
+    private boolean onLilyPad;
+    private boolean onRepeater;
+    private boolean onSlab;
+    private boolean onSnowLayer;
+    private boolean onSoulSand;
+    private boolean onStairs;
     private boolean touchedGroundSinceLogin;
+    private boolean underBlock;
     private boolean underEffectOfSlime;
 
     // Abilities packet
@@ -356,9 +367,20 @@ public class PlayerData {
      * @return If the player is near a boat.
      */
     public boolean isNearbyBoat(double x, double y, double z) {
-        for (Entity entity : player.getNearbyEntities(x, y, z)) {
-            if (entity.getType() == EntityType.BOAT) {
-                return true;
+        List<Entity> nearbyEntities;
+
+        try {
+            nearbyEntities = player.getNearbyEntities(x, y, z);
+        } catch (RuntimeException ex) {
+            ex.printStackTrace();
+            return false;
+        }
+
+        synchronized (nearbyEntities) {
+            for (Entity entity : nearbyEntities) {
+                if (entity != null && entity.getType() == EntityType.BOAT) {
+                    return true;
+                }
             }
         }
         return false;

@@ -27,12 +27,12 @@ import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
+import net.foulest.vulture.util.ConstantUtil;
 
 @CheckInfo(name = "Flight (C)", type = CheckType.FLIGHT,
         description = "Checks for ignoring gravity completely.")
 public class FlightC extends Check {
 
-    private static final double ON_GROUND_VELOCITY = -0.0784000015258789;
     private double lastY;
     private double lastVelocity;
     private int ticksInAir;
@@ -62,7 +62,7 @@ public class FlightC extends Check {
                 return;
             }
 
-            if (velocity != ON_GROUND_VELOCITY && !playerData.isOnGround()
+            if (velocity != ConstantUtil.ON_GROUND_VELOCITY && !playerData.isOnGround()
                     && velocity != lastVelocity && velocity != 0.0 && deltaY == 0.0
                     && !playerData.isNearbyBoat(0.6, 0.6, 0.6)) {
                 ++ticksInAir;

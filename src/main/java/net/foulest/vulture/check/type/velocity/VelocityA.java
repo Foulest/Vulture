@@ -55,8 +55,13 @@ public class VelocityA extends Check {
             double takenY = playerData.getVelocityY().getLast();
             double diffY = Math.abs(deltaY - takenY);
 
+            int airTicks = playerData.getAirTicks();
+            int ticksSinceAgainst = playerData.getTicksSince(ActionType.AGAINST_BLOCK);
+            int ticksSinceAgainstWide = playerData.getTicksSince(ActionType.AGAINST_BLOCK_WIDE);
+
             // Checks the player for exemptions.
-            if (playerData.isUnderBlock()) {
+            if (playerData.isUnderBlock()
+                    || (playerData.isNearStairs() && deltaY == 0.5)) {
                 lastPosY = (flying.isMoving() ? flyingPosition.getY() : lastPosY);
                 return;
             }
@@ -64,22 +69,24 @@ public class VelocityA extends Check {
             if (takenY > 0.0) {
                 // Check if player ever took correct velocity
                 if (diffY < 0.001) {
-                    // Player repeating correct velocity
-                    if (takenCorrectY) {
-                        flag(false, "(repeated) dY=" + deltaY + " vY=" + takenY + " diffY=" + diffY + " tDiff=" + tickDiff);
-                    }
-
                     takenCorrectY = true;
                     playerData.setTimestamp(ActionType.VELOCITY_TAKEN);
                 }
 
-                // TODO: This flags:
-                //  dY=0.20312687040733124 vY=0.46075
+                // Potentially fixes issues with players post-against a block.
+                if (airTicks > 0 && ticksSinceAgainstWide > 0) {
+                    lastPosY = (flying.isMoving() ? flyingPosition.getY() : lastPosY);
+                    return;
+                }
 
                 // Velocity packet sent; flag if player never took correct velocity
                 if (lastGivenTicks != givenTicks && tickDiff > 0) {
                     if (!takenCorrectY) {
-                        flag(false, "dY=" + deltaY + " vY=" + takenY + " diffY=" + diffY + " tDiff=" + tickDiff);
+                        flag(false, "dY=" + deltaY + " vY=" + takenY + " diffY=" + diffY
+                                + " percent=" + (deltaY / takenY) + " tDiff=" + tickDiff
+                                + " airTicks=" + airTicks + " against=" + ticksSinceAgainst
+                                + " againstWide=" + ticksSinceAgainstWide
+                        );
                     }
 
                     takenCorrectY = false;

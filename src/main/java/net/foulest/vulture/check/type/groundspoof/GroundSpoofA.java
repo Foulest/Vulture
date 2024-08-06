@@ -25,6 +25,7 @@ import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.event.MovementEvent;
+import net.foulest.vulture.util.ConstantUtil;
 import net.foulest.vulture.util.MovementUtil;
 
 @CheckInfo(name = "GroundSpoof (A)", type = CheckType.GROUNDSPOOF,
@@ -85,6 +86,12 @@ public class GroundSpoofA extends Check {
             if (!onGround && !isYLevel) {
                 // Fixes a false flag when landing. (hopefully)
                 if (onGroundTicks == 1 && nearGround) {
+                    return;
+                }
+
+                // Ignores players with on ground velocity.
+                // TODO: Test this against NoFall cheats.
+                if (velocity == ConstantUtil.ON_GROUND_VELOCITY) {
                     return;
                 }
 

@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'net.foulest'
-version = '1.5.5'
+version = '1.5.6'
 description = project.name
 
 compileJava.options.encoding = 'UTF-8'
@@ -51,6 +51,7 @@ dependencies {
     compileOnly group: 'org.jetbrains', name: 'annotations', version: '24.1.0'
 
     // ViaVersion - for version checking in PacketEvents
+    // Note: Keep on version 4.10.2 for compatibility with PacketEvents
     // https://github.com/ViaVersion/ViaVersion
     compileOnly group: 'com.viaversion', name: 'viaversion-api', version: '4.10.2'
 

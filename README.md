@@ -3,6 +3,7 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![CodeQL Badge](https://github.com/Foulest/Vulture/actions/workflows/codeql.yml/badge.svg)](https://github.com/Foulest/Vulture/actions/workflows/codeql.yml)
 [![JitPack Badge](https://jitpack.io/v/Foulest/Vulture.svg)](https://jitpack.io/#Foulest/Vulture)
+[![Lines of Code](https://img.shields.io/endpoint?url=https://ghloc.vercel.app/api/Foulest/Vulture/badge?filter=.java$&style=flat&logoColor=white&label=Lines%20of%20Code)](https://ghloc.vercel.app/Foulest/Vulture?branch=main)
 
 **Vulture** is an advanced anti-cheat plugin designed for Minecraft 1.8.9 servers.
 

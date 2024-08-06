@@ -26,12 +26,11 @@ import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
+import net.foulest.vulture.util.ConstantUtil;
 
 @CheckInfo(name = "GroundSpoof (B)", type = CheckType.GROUNDSPOOF,
         description = "Detects clients sending invalid on-ground Flying packets.")
 public class GroundSpoofB extends Check {
-
-    private static final double ON_GROUND_VELOCITY = -0.0784000015258789;
 
     public GroundSpoofB(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
@@ -56,9 +55,10 @@ public class GroundSpoofB extends Check {
             }
 
             // Checks for invalid on-ground Flying packets.
+            // TODO: Test this against NoFall cheats.
             if (!flying.isMoving() && !flying.isRotating() && flying.isOnGround()
-                    && velocity != ON_GROUND_VELOCITY) {
-                flag(true, "velocity=" + velocity
+                    && velocity != ConstantUtil.ON_GROUND_VELOCITY) {
+                flag(false, "velocity=" + velocity
                         + " airTicks=" + playerData.getAirTicks()
                         + " airTicksStrict=" + playerData.getAirTicksStrict()
                 );
