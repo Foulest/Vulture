@@ -22,7 +22,7 @@
 
 - AutoBlock _(x4)_
 - Reach _(x1)_
-- Velocity _(x1)_
+- Velocity _(x2)_
 
 ### Movement Checks
 
