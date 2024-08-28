@@ -18,7 +18,6 @@
 package net.foulest.vulture.util.yaml;
 
 import lombok.Cleanup;
-import lombok.NoArgsConstructor;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
@@ -38,7 +37,6 @@ import java.util.regex.Pattern;
  * @author Foulest
  * @project Vulture
  */
-@NoArgsConstructor
 public class CustomYamlConfiguration extends YamlConfiguration {
 
     // Map to store the path of the YAML keys and their associated comments

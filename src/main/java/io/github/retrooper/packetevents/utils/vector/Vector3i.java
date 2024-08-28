@@ -41,9 +41,7 @@ import java.util.Objects;
 @Setter
 @ToString
 @AllArgsConstructor
-public class Vector3i {
-
-    public static final Vector3i INVALID = new Vector3i(-1, -1, -1);
+public class Vector3i implements Cloneable {
 
     /**
      * X (coordinate/angle/whatever you wish)

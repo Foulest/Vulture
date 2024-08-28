@@ -46,7 +46,6 @@ import io.github.retrooper.packetevents.utils.player.Direction;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import io.github.retrooper.packetevents.utils.vector.Vector3f;
 import io.github.retrooper.packetevents.utils.vector.Vector3i;
-import lombok.NoArgsConstructor;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.data.PlayerData;
@@ -80,7 +79,6 @@ import java.util.Locale;
  * @author Foulest
  * @project Vulture
  */
-@NoArgsConstructor
 public class PacketReceiveProcessor extends Processor {
 
     /**

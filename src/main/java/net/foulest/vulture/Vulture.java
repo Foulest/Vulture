@@ -22,7 +22,6 @@ import dev.thomazz.pledge.pinger.ClientPinger;
 import dev.thomazz.pledge.pinger.ClientPingerListener;
 import io.github.retrooper.packetevents.PacketEvents;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import net.foulest.vulture.cmds.VultureCmd;
@@ -52,7 +51,6 @@ import java.util.logging.Level;
  * @project Vulture
  */
 @Getter
-@NoArgsConstructor
 public class Vulture extends JavaPlugin implements ClientPingerListener {
 
     @Getter

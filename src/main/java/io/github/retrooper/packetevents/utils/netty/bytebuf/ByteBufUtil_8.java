@@ -21,9 +21,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.util.ReferenceCounted;
 import io.netty.util.internal.EmptyArrays;
-import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
 public final class ByteBufUtil_8 implements ByteBufUtil {
 
     @Override

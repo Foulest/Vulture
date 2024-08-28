@@ -18,7 +18,6 @@
 package net.foulest.vulture.util.command;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -38,7 +37,6 @@ import java.util.*;
  */
 @Getter
 @Setter
-@NoArgsConstructor
 public class BukkitCompleter implements TabCompleter {
 
     private final Map<String, Map.Entry<Method, Object>> completers = new HashMap<>();

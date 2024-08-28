@@ -17,13 +17,11 @@
  */
 package io.github.retrooper.packetevents.utils.versionlookup.viaversion;
 
-import lombok.NoArgsConstructor;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-@NoArgsConstructor
 public class ViaVersionAccessorImplLegacy implements ViaVersionAccessor {
 
     private static Class<?> viaClass;

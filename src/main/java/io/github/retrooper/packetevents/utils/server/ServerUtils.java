@@ -24,7 +24,6 @@ import io.github.retrooper.packetevents.utils.boundingbox.BoundingBox;
 import io.github.retrooper.packetevents.utils.entityfinder.EntityFinderUtils;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.npc.NPCManager;
-import lombok.NoArgsConstructor;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
@@ -34,7 +33,6 @@ import org.spigotmc.SpigotConfig;
 import java.util.List;
 import java.util.Map;
 
-@NoArgsConstructor
 public final class ServerUtils {
 
     private static Class<?> geyserClass;

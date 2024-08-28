@@ -18,11 +18,9 @@
 package io.github.retrooper.packetevents.utils.versionlookup.viaversion;
 
 import com.viaversion.viaversion.api.Via;
-import lombok.NoArgsConstructor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-@NoArgsConstructor
 public class ViaVersionAccessorImpl implements ViaVersionAccessor {
 
     @Override

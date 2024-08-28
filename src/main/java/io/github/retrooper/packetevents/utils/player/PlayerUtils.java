@@ -24,7 +24,6 @@ import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.geyser.GeyserUtils;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
-import lombok.NoArgsConstructor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -40,7 +39,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author retrooper
  * @since 1.6.8
  */
-@NoArgsConstructor
 public final class PlayerUtils {
 
     public final Map<UUID, Long> loginTime = new ConcurrentHashMap<>();

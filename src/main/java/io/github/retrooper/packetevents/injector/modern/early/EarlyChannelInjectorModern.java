@@ -28,7 +28,6 @@ import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.netty.channel.*;
 import io.netty.channel.epoll.EpollSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import lombok.NoArgsConstructor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +36,6 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Field;
 import java.util.*;
 
-@NoArgsConstructor
 public class EarlyChannelInjectorModern implements EarlyInjector {
 
     private final Collection<ChannelFuture> injectedFutures = new ArrayList<>();

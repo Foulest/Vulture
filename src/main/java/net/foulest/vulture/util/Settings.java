@@ -49,6 +49,7 @@ import java.util.logging.Level;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
+@SuppressWarnings("WeakerAccess")
 public final class Settings {
 
     // File settings

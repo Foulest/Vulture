@@ -24,13 +24,11 @@ import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
-import lombok.NoArgsConstructor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-@NoArgsConstructor
 @ChannelHandler.Sharable
 public class PlayerChannelHandlerModern extends ChannelDuplexHandler {
 

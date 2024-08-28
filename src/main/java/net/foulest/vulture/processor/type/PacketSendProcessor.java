@@ -34,7 +34,6 @@ import io.github.retrooper.packetevents.packetwrappers.play.out.resourcepacksend
 import io.github.retrooper.packetevents.packetwrappers.play.out.spawnentityliving.WrappedPacketOutSpawnEntityLiving;
 import io.github.retrooper.packetevents.packetwrappers.play.out.transaction.WrappedPacketOutTransaction;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
-import lombok.NoArgsConstructor;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.data.PlayerData;
@@ -63,7 +62,6 @@ import java.util.Arrays;
  * @author Foulest
  * @project Vulture
  */
-@NoArgsConstructor
 public class PacketSendProcessor extends Processor {
 
     /**

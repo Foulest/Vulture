@@ -21,7 +21,6 @@ import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.impl.PostPlayerInjectEvent;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.versionlookup.VersionLookupUtils;
-import lombok.NoArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -38,7 +37,6 @@ import org.jetbrains.annotations.NotNull;
 import java.net.InetSocketAddress;
 import java.util.UUID;
 
-@NoArgsConstructor
 public class BukkitEventProcessorInternal implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)

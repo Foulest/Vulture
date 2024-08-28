@@ -36,7 +36,6 @@ import io.github.retrooper.packetevents.utils.player.PlayerUtils;
 import io.github.retrooper.packetevents.utils.server.ServerUtils;
 import io.github.retrooper.packetevents.utils.version.PEVersion;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -47,7 +46,6 @@ import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Getter
-@NoArgsConstructor
 public final class PacketEvents implements Listener, EventManager {
 
     @Getter

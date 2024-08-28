@@ -18,7 +18,6 @@
 package net.foulest.vulture.cmds;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.foulest.vulture.Vulture;
 import net.foulest.vulture.check.type.clientbrand.type.PayloadType;
@@ -46,7 +45,6 @@ import java.util.*;
  */
 @Getter
 @Setter
-@NoArgsConstructor
 public class VultureCmd {
 
     @Command(name = "vulture", description = "Main command for Vulture.",

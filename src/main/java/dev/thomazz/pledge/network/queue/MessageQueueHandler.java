@@ -27,7 +27,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -37,7 +36,6 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 @Setter
 @Getter
 @ToString
-@NoArgsConstructor
 public class MessageQueueHandler extends ChannelOutboundHandlerAdapter {
 
     private final Deque<NetworkMessage> messageQueue = new ConcurrentLinkedDeque<>();

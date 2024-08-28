@@ -17,7 +17,6 @@
  */
 package net.foulest.vulture.tracking;
 
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -30,7 +29,6 @@ import java.util.Optional;
  */
 @Setter
 @ToString
-@NoArgsConstructor
 public class EntityTracker {
 
     private final Map<Integer, EntityTrackerEntry> entries = new LinkedHashMap<>();

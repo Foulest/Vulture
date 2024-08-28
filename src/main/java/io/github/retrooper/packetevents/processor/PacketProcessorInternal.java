@@ -27,7 +27,6 @@ import io.github.retrooper.packetevents.packetwrappers.login.in.start.WrappedPac
 import io.github.retrooper.packetevents.utils.gameprofile.WrappedGameProfile;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import io.github.retrooper.packetevents.utils.reflection.ClassUtil;
-import lombok.NoArgsConstructor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,10 +42,8 @@ import java.util.UUID;
  * @see <a href="http://netty.io">http://netty.io</a>
  * @since 1.7.9
  */
-@NoArgsConstructor
 public class PacketProcessorInternal {
 
-    @NoArgsConstructor
     public static class PacketData {
 
         public Object packet;

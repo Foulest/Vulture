@@ -23,7 +23,6 @@ import io.github.retrooper.packetevents.utils.bytebuf.ByteBufWrapper;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +31,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 @ToString
-@NoArgsConstructor
 public class PlayerDecodeHandlerModern extends ByteToMessageDecoder {
 
     /**

@@ -20,7 +20,6 @@ package io.github.retrooper.packetevents.event;
 
 import io.github.retrooper.packetevents.event.eventtypes.CallableEvent;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,7 +31,6 @@ import org.jetbrains.annotations.NotNull;
  */
 @Setter
 @Getter
-@NoArgsConstructor
 public abstract class PacketEvent implements CallableEvent {
 
     private long timestamp = System.currentTimeMillis();

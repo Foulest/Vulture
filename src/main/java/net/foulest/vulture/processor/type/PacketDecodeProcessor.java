@@ -18,7 +18,6 @@
 package net.foulest.vulture.processor.type;
 
 import io.github.retrooper.packetevents.event.impl.PacketDecodeEvent;
-import lombok.NoArgsConstructor;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.data.PlayerDataManager;
 import net.foulest.vulture.processor.Processor;
@@ -33,7 +32,6 @@ import org.jetbrains.annotations.NotNull;
  * @author Foulest
  * @project Vulture
  */
-@NoArgsConstructor
 public class PacketDecodeProcessor extends Processor {
 
     /**

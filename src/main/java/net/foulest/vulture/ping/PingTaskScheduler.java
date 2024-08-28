@@ -18,7 +18,6 @@
 package net.foulest.vulture.ping;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,7 +29,6 @@ import java.util.Queue;
  */
 @Getter
 @ToString
-@NoArgsConstructor
 public class PingTaskScheduler {
 
     private final Queue<Queue<PingTask>> scheduledTasks = new ArrayDeque<>();

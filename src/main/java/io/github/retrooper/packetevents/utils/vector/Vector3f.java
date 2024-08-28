@@ -38,14 +38,7 @@ import java.util.Objects;
 @Setter
 @ToString
 @AllArgsConstructor
-public class Vector3f {
-
-    /**
-     * This is the invalid vector.
-     * In wrappers, when a vector is null in the actual packet, PacketEvents will set our high level vector X,Y,Z values
-     * to -1 to avoid null pointer exceptions.
-     */
-    public static final Vector3f INVALID = new Vector3f(-1, -1, -1);
+public class Vector3f implements Cloneable {
 
     /**
      * X (coordinate/angle/whatever you wish)

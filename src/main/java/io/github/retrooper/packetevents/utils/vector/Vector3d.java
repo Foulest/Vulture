@@ -39,14 +39,7 @@ import java.util.Objects;
 @Setter
 @ToString
 @AllArgsConstructor
-public class Vector3d {
-
-    /**
-     * This is the invalid vector.
-     * In wrappers, when a vector is null in the actual packet, PacketEvents will set our high level vector X,Y,Z values
-     * to -1 to avoid null pointer exceptions.
-     */
-    public static final Vector3d INVALID = new Vector3d(-1, -1, -1);
+public class Vector3d implements Cloneable {
 
     public double x;
     public double y;

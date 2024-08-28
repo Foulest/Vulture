@@ -29,7 +29,7 @@ import org.bukkit.entity.Player;
 /**
  * Listener that can be attached to a {@link FrameClientPinger} for events regarding {@link Frame} objects.
  */
-public interface FrameClientPingerListener extends ClientPingerListener {
+interface FrameClientPingerListener extends ClientPingerListener {
 
     /**
      * Called when a {@link Frame} is created.

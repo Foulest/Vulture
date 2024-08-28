@@ -145,7 +145,7 @@ final class RayTraceUtil {
         }
 
         // BoundingBox instead of Vector
-        public @Nullable Vector positionOfIntersect(BoundingBox boundingBox, double blocksAway, double accuracy) {
+        @Nullable Vector positionOfIntersect(BoundingBox boundingBox, double blocksAway, double accuracy) {
             List<Vector> positions = traverse(blocksAway, accuracy);
 
             for (Vector position : positions) {
