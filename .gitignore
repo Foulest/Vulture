@@ -50,6 +50,7 @@ hs_err_pid*
 # Maven files
 .mvn/
 build/
+out/
 run/
 target/
 .flattened-pom.xml
@@ -68,12 +69,6 @@ release.properties
 *.msm
 *.msp
 
-# Archive files
-*.7z
-*.rar
-*.tar.gz
-*.zip
-
 # Log and temporary files
 *.ctxt
 *.lnk
@@ -82,6 +77,10 @@ release.properties
 *~
 .nfs*
 .tm_*
+
+# Node.js
+/node_modules/
+/package-lock.json
 
 # Misc
 machinet.conf

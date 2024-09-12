@@ -2,16 +2,17 @@
 name: Report a bug
 about: Create a report to help us improve.
 title: ''
-labels: bug
+labels: 'bug'
 assignees: 'Foulest'
 
 ---
 
-**Before you submit this issue, please make sure you have done the following:**
+**Before you submit this, please make sure you have done the following:**
 
-- [ ] I am using the latest version of Vulture
-- [ ] I am using Spigot 1.8.8 or a public fork of it
+- [ ] I am using the latest version of this project
+- [ ] I have checked the existing documentation for this project
 - [ ] I have searched the issue tracker for a similar issue
+- [ ] I am using Spigot 1.8.8 or a public fork of it
 
 **Describe the bug**
 A clear and concise description of what the bug is.
@@ -40,4 +41,4 @@ If applicable, add screenshots or animated GIFs to help explain your problem.
 - Other plugins: [e.g. EssentialsX, WorldEdit]
 
 **Additional context**
-Add any other context about the problem here.
+Add any other context about the issue here.

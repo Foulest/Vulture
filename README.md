@@ -1,7 +1,7 @@
 # Vulture
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![CodeQL Badge](https://github.com/Foulest/Vulture/actions/workflows/codeql.yml/badge.svg)](https://github.com/Foulest/Vulture/actions/workflows/codeql.yml)
+[![CodeQL](https://github.com/Foulest/Vulture/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/Foulest/Vulture/actions/workflows/github-code-scanning/codeql)
 [![Downloads](https://img.shields.io/github/downloads/Foulest/Vulture/total.svg)](https://github.com/Foulest/Vulture/releases)
 [![JitPack Badge](https://jitpack.io/v/Foulest/Vulture.svg)](https://jitpack.io/#Foulest/Vulture)
 
