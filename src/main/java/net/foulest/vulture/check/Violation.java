@@ -27,7 +27,6 @@ import org.bukkit.Location;
  * Data class for violations.
  *
  * @author Foulest
- * @project Vulture
  */
 @Getter
 @Setter

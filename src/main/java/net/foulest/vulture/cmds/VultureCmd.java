@@ -41,7 +41,6 @@ import java.util.*;
  * Main command for Vulture.
  *
  * @author Foulest
- * @project Vulture
  */
 @Getter
 @Setter

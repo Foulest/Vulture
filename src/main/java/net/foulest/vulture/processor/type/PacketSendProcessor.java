@@ -60,7 +60,6 @@ import java.util.Arrays;
  * Handles all outgoing packets before they are encoded.
  *
  * @author Foulest
- * @project Vulture
  */
 public class PacketSendProcessor extends Processor {
 

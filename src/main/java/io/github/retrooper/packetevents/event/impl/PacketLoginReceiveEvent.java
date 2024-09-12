@@ -23,7 +23,7 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * The {@code PacketLoginReceiveEvent} event is fired whenever the a LOGIN packet is received from a client.
+ * The {@code PacketLoginReceiveEvent} event is fired whenever the LOGIN packet is received from a client.
  * The {@code PacketLoginReceiveEvent} has no Bukkit player, the player object is null in this state.
  * Use the {@link #getSocketAddress()} to identify who sends the packet.
  *

@@ -31,7 +31,6 @@ import java.util.Objects;
  * @param <X> The type of the first object.
  * @param <Y> The type of the second object.
  * @author Foulest
- * @project Vulture
  */
 @Getter
 @Setter

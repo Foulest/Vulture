@@ -77,7 +77,6 @@ import java.util.Locale;
  * Handles all incoming packets after they are decoded.
  *
  * @author Foulest
- * @project Vulture
  */
 public class PacketReceiveProcessor extends Processor {
 

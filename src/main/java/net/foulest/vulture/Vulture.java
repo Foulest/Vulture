@@ -48,7 +48,6 @@ import java.util.logging.Level;
  * Main class for Vulture.
  *
  * @author Foulest
- * @project Vulture
  */
 @Getter
 public class Vulture extends JavaPlugin implements ClientPingerListener {

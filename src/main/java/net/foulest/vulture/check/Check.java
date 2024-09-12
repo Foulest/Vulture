@@ -37,7 +37,6 @@ import org.jetbrains.annotations.NotNull;
  * Abstract class for checks.
  *
  * @author Foulest
- * @project Vulture
  */
 @Getter
 @Setter
@@ -64,10 +63,11 @@ public class Check implements Listener {
     /**
      * This method is fired when the player sends or receives a packet.
      *
-     * @param packetId  the id of the packet
-     * @param nmsPacket the nms packet
-     * @param packet    the raw nms packet
-     * @param timestamp the timestamp the packet was handled
+     * @param nmsPacketEvent The packet event.
+     * @param packetId    The packet ID.
+     * @param nmsPacket  The NMS packet.
+     * @param packet    The packet.
+     * @param timestamp The timestamp the event was handled.
      * @see PacketType
      * @see NMSPacket
      */
@@ -103,8 +103,9 @@ public class Check implements Listener {
     /**
      * This method is used to flag the player and cancel an event.
      *
-     * @param event   the event to cancel
-     * @param verbose the optional data to include in the flag
+     * @param setback Whether to set the player back.
+     * @param event   The event to cancel.
+     * @param verbose The optional data to include in the flag.
      */
     protected void flag(boolean setback, @NotNull CancellableEvent event, String... verbose) {
         PunishUtil.flag(playerData, checkInfoData, setback, event, verbose);
@@ -115,7 +116,8 @@ public class Check implements Listener {
      * <p>
      * When a player is flagged, all online staff members are alerted with the check they flagged and the data
      *
-     * @param verbose the optional data to include in the flag
+     * @param setback Whether to set the player back.
+     * @param verbose The optional data to include in the flag.
      */
     protected void flag(boolean setback, String... verbose) {
         PunishUtil.flag(playerData, checkInfoData, setback, verbose);

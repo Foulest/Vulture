@@ -41,7 +41,6 @@ import java.util.logging.Logger;
  * Utility class for sending messages.
  *
  * @author Foulest
- * @project Vulture
  */
 @SuppressWarnings("unused")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)

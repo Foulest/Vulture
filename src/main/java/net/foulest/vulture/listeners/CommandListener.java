@@ -40,7 +40,6 @@ import java.util.regex.Pattern;
  * This prevents exploits with out-of-date plugins.
  *
  * @author Foulest
- * @project Vulture
  */
 @AllArgsConstructor
 public class CommandListener implements Listener {

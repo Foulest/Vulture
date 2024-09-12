@@ -26,7 +26,6 @@ import java.lang.annotation.Target;
  * Annotation for check information.
  *
  * @author Foulest
- * @project Vulture
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

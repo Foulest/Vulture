@@ -28,7 +28,6 @@ import org.bukkit.event.Listener;
  * Abstract class for processors.
  *
  * @author Foulest
- * @project Vulture
  */
 @Getter
 @Setter

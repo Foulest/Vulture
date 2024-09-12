@@ -35,7 +35,6 @@ import java.util.regex.Pattern;
  * that allows for comments to be stored and loaded.
  *
  * @author Foulest
- * @project Vulture
  */
 public class CustomYamlConfiguration extends YamlConfiguration {
 

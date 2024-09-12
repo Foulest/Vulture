@@ -49,7 +49,6 @@ import java.util.List;
  * Manager for handling checks.
  *
  * @author Foulest
- * @project Vulture
  */
 @Getter
 @Setter

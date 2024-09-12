@@ -36,7 +36,6 @@ import java.util.UUID;
  * Utility class for kicking players.
  *
  * @author Foulest
- * @project Vulture
  */
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)

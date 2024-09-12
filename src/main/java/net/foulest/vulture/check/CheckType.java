@@ -21,7 +21,6 @@ package net.foulest.vulture.check;
  * Enum for check types.
  *
  * @author Foulest
- * @project Vulture
  */
 public enum CheckType {
     AUTOBLOCK,

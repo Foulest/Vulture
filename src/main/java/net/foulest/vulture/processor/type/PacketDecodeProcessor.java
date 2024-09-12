@@ -30,7 +30,6 @@ import org.jetbrains.annotations.NotNull;
  * Handles all incoming packets as they are decoded.
  *
  * @author Foulest
- * @project Vulture
  */
 public class PacketDecodeProcessor extends Processor {
 

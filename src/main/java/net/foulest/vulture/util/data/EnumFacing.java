@@ -84,14 +84,20 @@ public enum EnumFacing implements IStringSerializable {
 
     /**
      * Get the opposite Facing (e.g. DOWN => UP)
+     *
+     * @return The opposite Facing
      */
     public EnumFacing getOpposite() {
         return FACINGS[opposite];
     }
 
     /**
-     * Rotate this Facing around the given axis clockwise. If this facing cannot be rotated around the given axis,
-     * returns this facing without rotating.
+     * Rotate this Facing around the given axis clockwise.
+     * <p>
+     * If this facing cannot be rotated around the given axis, returns this facing without rotating.
+     *
+     * @param axis The axis to rotate around
+     * @return The rotated Facing
      */
     public EnumFacing rotateAround(@NotNull Axis axis) {
         switch (EnumFacingUtils.AXIS_ORDINAL_MAP[axis.ordinal()]) {
@@ -120,6 +126,8 @@ public enum EnumFacing implements IStringSerializable {
 
     /**
      * Rotate this Facing around the X axis (NORTH => DOWN => SOUTH => UP => NORTH)
+     *
+     * @return The rotated Facing
      */
     private EnumFacing rotateX() {
         switch (EnumFacingUtils.FACING_ORDINAL_MAP[ordinal()]) {
@@ -138,6 +146,8 @@ public enum EnumFacing implements IStringSerializable {
 
     /**
      * Rotate this Facing around the Y axis clockwise (NORTH => EAST => SOUTH => WEST => NORTH)
+     *
+     * @return The rotated Facing
      */
     private EnumFacing rotateY() {
         switch (EnumFacingUtils.FACING_ORDINAL_MAP[ordinal()]) {
@@ -156,6 +166,8 @@ public enum EnumFacing implements IStringSerializable {
 
     /**
      * Rotate this Facing around the Z axis (EAST => DOWN => WEST => UP => EAST)
+     *
+     * @return The rotated Facing
      */
     private EnumFacing rotateZ() {
         switch (EnumFacingUtils.FACING_ORDINAL_MAP[ordinal()]) {
@@ -174,6 +186,8 @@ public enum EnumFacing implements IStringSerializable {
 
     /**
      * Rotate this Facing around the Y axis counter-clockwise (NORTH => WEST => SOUTH => EAST => NORTH)
+     *
+     * @return The rotated Facing
      */
     public EnumFacing rotateYCCW() {
         switch (EnumFacingUtils.FACING_ORDINAL_MAP[ordinal()]) {
