@@ -78,9 +78,13 @@ release.properties
 .nfs*
 .tm_*
 
+# Misc
+machinet.conf
+
 # Node.js
 /node_modules/
 /package-lock.json
 
-# Misc
-machinet.conf
+# Yarn
+/yarn.lock
+/.run/
