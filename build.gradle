@@ -52,7 +52,7 @@ dependencies {
 
     // JetBrains Annotations - for code inspection and documentation
     // https://mvnrepository.com/artifact/org.jetbrains/annotations
-    compileOnly group: 'org.jetbrains', name: 'annotations', version: '26.0.0'
+    compileOnly group: 'org.jetbrains', name: 'annotations', version: '26.0.1'
 
     // ViaVersion - for version checking in PacketEvents
     // Note: Keep on version 4.10.2 for compatibility with PacketEvents
