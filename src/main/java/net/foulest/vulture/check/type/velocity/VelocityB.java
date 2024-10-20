@@ -59,6 +59,7 @@ public class VelocityB extends Check {
             double deltaXZ = (flying.isMoving() ? StrictMath.hypot(flyingPosition.getX() - lastPosX, flyingPosition.getZ() - lastPosZ) : 0.0);
             double takenXZ = playerData.getVelocityXZ().getLast();
             double diffXZ = Math.abs(deltaXZ - takenXZ);
+            double percent = (deltaXZ / takenXZ);
 
             int airTicks = playerData.getAirTicks();
             int ticksSinceAgainst = playerData.getTicksSince(ActionType.AGAINST_BLOCK);
@@ -89,9 +90,9 @@ public class VelocityB extends Check {
                 // Velocity packet sent; flag if player never took correct velocity
                 // Regular tick diff range: 0-3 (max: 6)
                 if (lastGivenTicks != givenTicks && tickDiff <= 6) {
-                    if (!takenCorrectXZ) {
+                    if (!takenCorrectXZ && !(ticksSinceAgainst == 1 && percent > 0.546)) {
                         flag(false, "dXZ=" + deltaXZ + " vXZ=" + takenXZ + " diffXZ=" + diffXZ
-                                + " percent=" + (deltaXZ / takenXZ) + " tDiff=" + tickDiff
+                                + " percent=" + percent + " tDiff=" + tickDiff
                                 + " airTicks=" + airTicks + " underVel=" + underVel
                                 + " against=" + ticksSinceAgainst + " againstWide=" + ticksSinceAgainstWide
                         );
