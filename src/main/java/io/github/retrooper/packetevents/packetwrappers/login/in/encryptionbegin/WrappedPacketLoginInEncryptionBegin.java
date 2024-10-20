@@ -20,7 +20,7 @@ package io.github.retrooper.packetevents.packetwrappers.login.in.encryptionbegin
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.WrappedPacket;
 
-class WrappedPacketLoginInEncryptionBegin extends WrappedPacket {
+public class WrappedPacketLoginInEncryptionBegin extends WrappedPacket {
 
     WrappedPacketLoginInEncryptionBegin(NMSPacket packet) {
         super(packet);

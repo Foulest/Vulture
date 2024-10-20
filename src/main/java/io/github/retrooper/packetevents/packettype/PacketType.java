@@ -160,7 +160,7 @@ public final class PacketType {
         public static final class Client {
 
             public static final byte START = -121;
-            static final byte ENCRYPTION_BEGIN = -120;
+            public static final byte ENCRYPTION_BEGIN = -120;
 
             private static void load() {
                 insertPacketID(PacketTypeClasses.Login.Client.START, START);
