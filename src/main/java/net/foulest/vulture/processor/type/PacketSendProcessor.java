@@ -186,6 +186,10 @@ public class PacketSendProcessor extends Processor {
                 }
 
                 playerData.setInventoryOpen(true);
+                playerData.setBlocking(false);
+                playerData.setShootingBow(false);
+                playerData.setEating(false);
+                playerData.setDrinking(false);
                 playerData.setTimestamp(ActionType.INVENTORY_OPEN);
                 break;
 
