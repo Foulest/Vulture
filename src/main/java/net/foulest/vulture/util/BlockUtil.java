@@ -347,7 +347,7 @@ public final class BlockUtil {
         }
 
         // TODO: Expand the bounding box (Hexxit II)
-        BoundingBox boundingBox = getPlayerCustomBoundingBox(player, 0.6385, 0.0, 0.3);
+        BoundingBox boundingBox = getPlayerCustomBoundingBox(player, 0.6385, 0.01, 0.3);
         ConcurrentStream<Block> collidingBlocks = getCollidingBlocks(player, boundingBox);
 
         return collidingBlocks.any(block -> block.getType() == Material.LADDER
