@@ -183,7 +183,7 @@ vulture:
         cancelDistance: 3.0
     speed:
       A:
-        enabled: true
+        enabled: false
         maxViolations: 50
         banCommand: vulture kick %player% %check%
       B:
@@ -208,11 +208,11 @@ vulture:
         banCommand: vulture kick %player% %check%
     velocity:
       A:
-        enabled: true
+        enabled: false
         maxViolations: 10
         banCommand: vulture kick %player% %check%
       B:
-        enabled: true
+        enabled: false
         maxViolations: 10
         banCommand: vulture kick %player% %check%
   # -----------------------------------------------
