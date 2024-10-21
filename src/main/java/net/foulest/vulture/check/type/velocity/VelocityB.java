@@ -58,7 +58,7 @@ public class VelocityB extends Check {
 
             double deltaXZ = (flying.isMoving() ? StrictMath.hypot(flyingPosition.getX() - lastPosX, flyingPosition.getZ() - lastPosZ) : 0.0);
             double takenXZ = playerData.getVelocityXZ().getLast();
-            double diffXZ = Math.abs(deltaXZ - takenXZ);
+            double diffXZ = deltaXZ - takenXZ;
             double percent = (deltaXZ / takenXZ);
 
             int airTicks = playerData.getAirTicks();
@@ -75,7 +75,7 @@ public class VelocityB extends Check {
 
             if (takenXZ > 0.1) {
                 // Check if player ever took correct velocity
-                if (diffXZ < 0.001) {
+                if (Math.abs(diffXZ) < 0.001) {
                     takenCorrectXZ = true;
                     playerData.setTimestamp(ActionType.VELOCITY_TAKEN);
                 }
@@ -87,20 +87,44 @@ public class VelocityB extends Check {
                     return;
                 }
 
-                // Velocity packet sent; flag if player never took correct velocity
-                // Regular tick diff range: 0-3 (max: 6)
-                if (lastGivenTicks != givenTicks && tickDiff <= 6) {
-                    if (!takenCorrectXZ && !(ticksSinceAgainst == 1 && percent > 0.546)) {
-                        flag(false, "dXZ=" + deltaXZ + " vXZ=" + takenXZ + " diffXZ=" + diffXZ
-                                + " percent=" + percent + " tDiff=" + tickDiff
-                                + " airTicks=" + airTicks + " underVel=" + underVel
-                                + " against=" + ticksSinceAgainst + " againstWide=" + ticksSinceAgainstWide
-                        );
-                    }
-
-                    takenCorrectXZ = false;
-                    lastGivenTicks = givenTicks;
+                // Fixes issues with players post-against a block
+                if (ticksSinceAgainst <= 2) {
+                    lastPosX = (flying.isMoving() ? flyingPosition.getX() : lastPosX);
+                    lastPosZ = (flying.isMoving() ? flyingPosition.getZ() : lastPosZ);
+                    return;
                 }
+
+                // Returns if the player's tick diff range is irregular
+                // Regular tick diff range: 0-3 (max: 6)
+                if (!(lastGivenTicks != givenTicks && tickDiff <= 6)) {
+                    lastPosX = (flying.isMoving() ? flyingPosition.getX() : lastPosX);
+                    lastPosZ = (flying.isMoving() ? flyingPosition.getZ() : lastPosZ);
+                    return;
+                }
+
+                // Ignores random, minor spikes in increased velocity
+                if (diffXZ > 0.0 && diffXZ < 0.03) {
+                    lastPosX = (flying.isMoving() ? flyingPosition.getX() : lastPosX);
+                    lastPosZ = (flying.isMoving() ? flyingPosition.getZ() : lastPosZ);
+                    return;
+                }
+
+                // Velocity packet sent; flag if player never took correct velocity
+                if (!takenCorrectXZ) {
+                    flag(false, "dXZ=" + deltaXZ
+                            + " vXZ=" + takenXZ
+                            + " diffXZ=" + diffXZ
+                            + " percent=" + percent
+                            + " tDiff=" + tickDiff
+                            + " airTicks=" + airTicks
+                            + " underVel=" + underVel
+                            + " against=" + ticksSinceAgainst
+                            + " againstWide=" + ticksSinceAgainstWide
+                    );
+                }
+
+                takenCorrectXZ = false;
+                lastGivenTicks = givenTicks;
             }
 
             lastPosX = (flying.isMoving() ? flyingPosition.getX() : lastPosX);

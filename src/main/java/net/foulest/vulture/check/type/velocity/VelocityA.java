@@ -79,19 +79,24 @@ public class VelocityA extends Check {
                     return;
                 }
 
-                // Velocity packet sent; flag if player never took correct velocity
-                if (lastGivenTicks != givenTicks && tickDiff > 0) {
-                    if (!takenCorrectY) {
-                        flag(false, "dY=" + deltaY + " vY=" + takenY + " diffY=" + diffY
-                                + " percent=" + (deltaY / takenY) + " tDiff=" + tickDiff
-                                + " airTicks=" + airTicks + " against=" + ticksSinceAgainst
-                                + " againstWide=" + ticksSinceAgainstWide
-                        );
-                    }
-
-                    takenCorrectY = false;
-                    lastGivenTicks = givenTicks;
+                // Returns if the player's tick diff range is irregular
+                // Regular tick diff is greater than 0
+                if (!(lastGivenTicks != givenTicks && tickDiff > 0)) {
+                    lastPosY = (flying.isMoving() ? flyingPosition.getY() : lastPosY);
+                    return;
                 }
+
+                // Velocity packet sent; flag if player never took correct velocity
+                if (!takenCorrectY) {
+                    flag(false, "dY=" + deltaY + " vY=" + takenY + " diffY=" + diffY
+                            + " percent=" + (deltaY / takenY) + " tDiff=" + tickDiff
+                            + " airTicks=" + airTicks + " against=" + ticksSinceAgainst
+                            + " againstWide=" + ticksSinceAgainstWide
+                    );
+                }
+
+                takenCorrectY = false;
+                lastGivenTicks = givenTicks;
             }
 
             lastPosY = (flying.isMoving() ? flyingPosition.getY() : lastPosY);

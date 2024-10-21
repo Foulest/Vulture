@@ -288,12 +288,12 @@ public class PacketReceiveProcessor extends Processor {
                             return;
                         }
 
-                        if (!playerData.isBlocking() && !playerData.isShootingBow()
-                                && !playerData.isEating() && !playerData.isDrinking()) {
+                        if (!playerData.isShootingBow()
+                                && !playerData.isEating()
+                                && !playerData.isDrinking()) {
                             KickUtil.kickPlayer(player, event, Settings.releaseUseItemInvalidConditions,
                                     "Sent ReleaseUseItem packet with invalid conditions"
-                                            + " (blocking=" + false
-                                            + " shootingBow=" + false
+                                            + " (shootingBow=" + false
                                             + " eating=" + false
                                             + " drinking=" + false + ")"
                             );
@@ -1479,6 +1479,9 @@ public class PacketReceiveProcessor extends Processor {
                     KickUtil.kickPlayer(player, event, Settings.useEntityInvalidDistance,
                             "Sent UseEntity packet with invalid distance"
                                     + " (distance=" + distance + ")"
+                                    + " (type=" + entity.getType() + ")"
+                                    + " (entity=" + entity.getLocation() + ")"
+                                    + " (player=" + player.getLocation() + ")"
                     );
                     return;
                 }

@@ -24,7 +24,7 @@ import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * The {@code PacketLoginSendEvent} event is fired whenever the a LOGIN packet is being planned to be sent to the client.
+ * The {@code PacketLoginSendEvent} event is fired whenever a LOGIN packet is being planned to be sent to the client.
  * The {@code PacketLoginSendEvent} has no Bukkit player, the player object is null in this state.
  * Use the {@link #getSocketAddress()} to identify who sends the packet.
  *
