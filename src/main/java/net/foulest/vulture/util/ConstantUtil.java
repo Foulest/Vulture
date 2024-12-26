@@ -25,26 +25,6 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class ConstantUtil {
 
-    // Combat
-    public final double RAY_LENGTH = 6.0; // Max server reach cutoff
-    private final double MAX_RANGE = 3.0;
-    public final float COLLISION_BORDER_SIZE = 0.1F;
-
-    // Velocity
-    public final double ON_GROUND_VELOCITY = -0.0784000015258789;
-
-    // Gravity
-    public final double GRAVITY_DECAY = 0.08;
-    public final double GRAVITY_MULTIPLIER = 0.9800000190735147;
-
-    // Movement
-    public final double FAST_MATH_ERROR = MAX_RANGE / 4096.0; // Error for sin table of 4096 and max range
-    public final double MIN_MOVE_UPDATE_ROOT = 0.03;
-
-    // Entity move
-    public final double MIN_TELEPORT_HORIZONTAL = 0.03125; // See packet listener
-    public final double MIN_TELEPORT_VERTICAL = 0.015625;
-
     // Timing
     public final int MAX_CATCHUP_TICKS = 10;
     public final long TICK_MILLIS = 50L;

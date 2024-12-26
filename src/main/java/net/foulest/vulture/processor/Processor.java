@@ -18,8 +18,6 @@
 package net.foulest.vulture.processor;
 
 import io.github.retrooper.packetevents.event.PacketListenerAbstract;
-import lombok.Getter;
-import lombok.Setter;
 import net.foulest.vulture.Vulture;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
@@ -29,8 +27,6 @@ import org.bukkit.event.Listener;
  *
  * @author Foulest
  */
-@Getter
-@Setter
 public class Processor extends PacketListenerAbstract implements Listener {
 
     protected Processor() {

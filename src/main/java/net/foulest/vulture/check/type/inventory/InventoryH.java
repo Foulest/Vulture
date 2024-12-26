@@ -26,8 +26,9 @@ import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
+import net.foulest.vulture.util.KickUtil;
 
-@CheckInfo(name = "Inventory (H)", type = CheckType.INVENTORY)
+@CheckInfo(name = "Inventory (H)", type = CheckType.INVENTORY, punishable = false)
 public class InventoryH extends Check {
 
     private boolean pressed;
@@ -55,7 +56,11 @@ public class InventoryH extends Check {
 
             if (windowId != 0 && windowMode == 2) {
                 if (pressed && lastSlot != windowSlot && lastButton == windowButton) {
-                    flag(false);
+                    KickUtil.kickPlayer(player, event, "Inventory (H) | Invalid window mode slot |"
+                            + " (windowSlot=" + windowSlot
+                            + " lastSlot=" + lastSlot
+                            + " windowButton=" + windowButton
+                            + " lastButton=" + lastButton + ")");
                 }
 
                 pressed = true;

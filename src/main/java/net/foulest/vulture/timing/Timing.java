@@ -17,8 +17,8 @@
  */
 package net.foulest.vulture.timing;
 
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import net.foulest.vulture.util.ConstantUtil;
 import net.foulest.vulture.util.KickUtil;
 import org.bukkit.entity.Player;
@@ -28,7 +28,7 @@ import org.bukkit.event.Listener;
  * Estimates player client time by synchronizing timestamps between server and client.
  * We assume that the server time follows the correct speed and the client should never be able to run faster.
  */
-@ToString
+@Data
 @RequiredArgsConstructor
 public class Timing implements Listener {
 
@@ -55,7 +55,7 @@ public class Timing implements Listener {
         if (clientTimePassed > upperBound) {
             long timeOver = clientTimePassed - upperBound; // Time over the upper bound
 
-            if (timeOver >= 10) {
+            if (timeOver > 211) {
                 KickUtil.kickPlayer(player, "Modifying game speed (" + timeOver + "ms)");
             }
         }

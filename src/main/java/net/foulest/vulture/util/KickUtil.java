@@ -17,10 +17,11 @@
  */
 package net.foulest.vulture.util;
 
+import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import io.github.retrooper.packetevents.packetwrappers.play.out.kickdisconnect.WrappedPacketOutKickDisconnect;
+import io.netty.channel.Channel;
+import lombok.Data;
 import net.foulest.vulture.Vulture;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -37,9 +38,8 @@ import java.util.UUID;
  *
  * @author Foulest
  */
-@Getter
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class KickUtil {
+@Data
+public class KickUtil {
 
     private static final Set<UUID> currentlyKicking = Collections.synchronizedSet(new HashSet<>());
 
@@ -116,18 +116,23 @@ public final class KickUtil {
     private static void kick(@NotNull Player player,
                              String debugMessage,
                              String reason, boolean announceKick) {
+        UUID uniqueId = player.getUniqueId();
+
         synchronized (currentlyKicking) {
-            if (currentlyKicking.contains(player.getUniqueId())) {
+            if (currentlyKicking.contains(uniqueId)) {
                 // Already in the process of kicking this player.
                 return;
             }
 
-            currentlyKicking.add(player.getUniqueId());
+            currentlyKicking.add(uniqueId);
         }
 
         if (announceKick) {
-            MessageUtil.sendAlert("&f" + player.getName() + " &7has been kicked by Vulture."
-                    + (debugMessage.isEmpty() ? "" : " &8(" + debugMessage + "&8)"), "");
+            String playerName = player.getName();
+            boolean debugMessageEmpty = debugMessage.isEmpty();
+
+            MessageUtil.sendAlert("&f" + playerName + " &7has been kicked by Vulture."
+                    + (debugMessageEmpty ? "" : " &8(" + debugMessage + "&8)"), "");
         }
 
         // Kicks the player with a message.
@@ -137,10 +142,25 @@ public final class KickUtil {
                     player.kickPlayer(MessageUtil.colorize(reason));
                 }
 
-                currentlyKicking.remove(player.getUniqueId());
+                // If the player is still online, forcefully terminate their connection.
+                if (player.isOnline()) {
+                    // Forcefully terminate the player's connection.
+                    if (Vulture.getInstance().getPledge().getChannel(player).isPresent()) {
+                        Channel channel = Vulture.getInstance().getPledge().getChannel(player).get();
+                        channel.disconnect(); // Disconnect the player
+                        channel.close(); // Close the channel
+                    } else {
+                        // The player's pledge channel is not present... what?
+                        // Kick them using raw packets instead.
+                        PacketEvents.getInstance().getPlayerUtils().sendPacket(player, new WrappedPacketOutKickDisconnect(reason));
+                    }
+                }
+
+                // Run the task later to avoid kicking the player multiple times.
+                TaskUtil.runTaskLater(() -> currentlyKicking.remove(uniqueId), 10L);
             });
         } else {
-            currentlyKicking.remove(player.getUniqueId());
+            currentlyKicking.remove(uniqueId);
         }
     }
 
@@ -152,7 +172,8 @@ public final class KickUtil {
      */
     public static boolean isPlayerBeingKicked(@NotNull Entity entity) {
         synchronized (currentlyKicking) {
-            return currentlyKicking.contains(entity.getUniqueId());
+            UUID uniqueId = entity.getUniqueId();
+            return currentlyKicking.contains(uniqueId);
         }
     }
 }

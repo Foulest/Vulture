@@ -26,9 +26,10 @@ import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
+import net.foulest.vulture.util.KickUtil;
 import org.bukkit.inventory.ItemStack;
 
-@CheckInfo(name = "Inventory (I)", type = CheckType.INVENTORY)
+@CheckInfo(name = "Inventory (I)", type = CheckType.INVENTORY, punishable = false)
 public class InventoryI extends Check {
 
     private int stage;
@@ -58,7 +59,10 @@ public class InventoryI extends Check {
                     stage = 1;
                 } else {
                     if (stage == 1 && clickedItem == null && lastSlot == windowSlot) {
-                        flag(false);
+                        KickUtil.kickPlayer(player, event, "Inventory (I) | Invalid item clicked |"
+                                + " (windowSlot=" + windowSlot
+                                + " lastSlot=" + lastSlot + ")"
+                        );
                     }
 
                     stage = 0;
@@ -69,7 +73,6 @@ public class InventoryI extends Check {
             }
 
             lastSlot = windowSlot;
-
         } else if (PacketType.Play.Client.Util.isInstanceOfFlying(packetId)) {
             stage = 0;
         }

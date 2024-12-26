@@ -20,17 +20,16 @@ package net.foulest.vulture.event;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
 import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
+import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 import net.foulest.vulture.data.PlayerData;
 import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-@Getter
-@Setter
-@ToString
+@Data
 @AllArgsConstructor
 public class MovementEvent implements CancellableEvent {
 
@@ -93,7 +92,8 @@ public class MovementEvent implements CancellableEvent {
      * @return Whether the player is teleporting.
      */
     public boolean isTeleport(@NotNull PlayerData playerData) {
-        return playerData.isTeleporting(to.getPosition());
+        Vector3d toPosition = to.getPosition();
+        return playerData.isTeleporting(toPosition);
     }
 
     /**
@@ -102,8 +102,13 @@ public class MovementEvent implements CancellableEvent {
      * @return The player's to location.
      */
     public Location getToLocation() {
-        return new Location(playerData.getPlayer().getWorld(), to.getPosition().getX(),
-                to.getPosition().getY(), to.getPosition().getZ());
+        Player player = playerData.getPlayer();
+        World world = player.getWorld();
+        Vector3d toPosition = to.getPosition();
+        double x = toPosition.getX();
+        double y = toPosition.getY();
+        double z = toPosition.getZ();
+        return new Location(world, x, y, z);
     }
 
     /**
@@ -112,7 +117,12 @@ public class MovementEvent implements CancellableEvent {
      * @return The player's from location.
      */
     public Location getFromLocation() {
-        return new Location(playerData.getPlayer().getWorld(), from.getPosition().getX(),
-                from.getPosition().getY(), from.getPosition().getZ());
+        Player player = playerData.getPlayer();
+        World world = player.getWorld();
+        Vector3d fromPosition = from.getPosition();
+        double x = fromPosition.getX();
+        double y = fromPosition.getY();
+        double z = fromPosition.getZ();
+        return new Location(world, x, y, z);
     }
 }

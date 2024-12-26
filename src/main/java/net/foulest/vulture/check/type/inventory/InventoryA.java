@@ -28,8 +28,9 @@ import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
+import net.foulest.vulture.util.KickUtil;
 
-@CheckInfo(name = "Inventory (A)", type = CheckType.INVENTORY,
+@CheckInfo(name = "Inventory (A)", type = CheckType.INVENTORY, punishable = false,
         description = "Detects this Inventory pattern: ArmAnimation, WindowClick, UseEntity, WindowClick")
 public class InventoryA extends Check {
 
@@ -79,7 +80,7 @@ public class InventoryA extends Check {
 
         if (stage == 4) {
             stage = 0;
-            flag(false);
+            KickUtil.kickPlayer(player, event, "Inventory (A) | AutoHeal");
         }
     }
 }

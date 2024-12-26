@@ -17,14 +17,9 @@
  */
 package net.foulest.vulture.check.type.clientbrand.type;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
-@Getter
-@Setter
-@ToString
+@Data
 @AllArgsConstructor
 public class PayloadType {
 

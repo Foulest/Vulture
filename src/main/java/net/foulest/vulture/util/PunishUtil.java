@@ -19,21 +19,22 @@ package net.foulest.vulture.util;
 
 import io.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
+import io.github.retrooper.packetevents.utils.player.PlayerUtils;
 import io.github.retrooper.packetevents.utils.server.ServerUtils;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.Data;
 import net.foulest.vulture.check.CheckInfoData;
 import net.foulest.vulture.check.Violation;
 import net.foulest.vulture.data.PlayerData;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class PunishUtil {
+@Data
+public class PunishUtil {
 
     /**
      * This method is used to flag the player and cancel an event.
@@ -42,9 +43,9 @@ public final class PunishUtil {
      * @param verbose the optional data to include in the flag
      */
     public static void flag(@NotNull PlayerData playerData, CheckInfoData checkInfo,
-                            boolean setback, @NotNull CancellableEvent event, String... verbose) {
+                            @NotNull CancellableEvent event, String... verbose) {
         event.setCancelled(true);
-        flag(playerData, checkInfo, setback, verbose);
+        flag(playerData, checkInfo, verbose);
     }
 
     /**
@@ -54,7 +55,7 @@ public final class PunishUtil {
      *
      * @param verbose the optional data to include in the flag
      */
-    public static void flag(@NotNull PlayerData playerData, CheckInfoData checkInfo, boolean setback, String... verbose) {
+    public static void flag(@NotNull PlayerData playerData, CheckInfoData checkInfo, String... verbose) {
         Player player = playerData.getPlayer();
 
         // Checks the player for exemptions.
@@ -64,11 +65,6 @@ public final class PunishUtil {
                 || !checkInfo.isEnabled()
                 || !checkInfo.isPunishable()) {
             return;
-        }
-
-        // Sets the player back to their previous position.
-        if (setback) {
-            SetbackUtil.setback(player);
         }
 
         String verboseString = verbose.length == 0 ? "" : "&7[" + String.join(", ", verbose) + "]";
@@ -90,19 +86,26 @@ public final class PunishUtil {
      */
     public static void handleNewViolation(@NotNull PlayerData playerData, @NotNull CheckInfoData checkInfo, String... verbose) {
         Player player = playerData.getPlayer();
+        Location location = player.getLocation();
 
         // Removes older violations before adding new ones.
-        playerData.getViolations().removeIf(violation -> System.currentTimeMillis() - violation.getTimestamp() > Settings.resetViolations * 1000L);
+        playerData.getViolations().removeIf(violation -> {
+            long timestamp = violation.getTimestamp();
+            return System.currentTimeMillis() - timestamp > Settings.resetViolations * 1000L;
+        });
 
         int violations = getViolationCount(playerData, checkInfo) + 1;
+        PlayerUtils playerUtils = PacketEvents.getInstance().getPlayerUtils();
+        int ping = playerUtils.getPing(player);
 
         // Creates a new violation.
+
         Violation violation = new Violation(
                 checkInfo,
                 verbose,
                 violations,
-                player.getLocation(),
-                PacketEvents.getInstance().getPlayerUtils().getPing(player),
+                location,
+                ping,
                 ServerUtils.getTPS(),
                 System.currentTimeMillis()
         );
@@ -118,10 +121,12 @@ public final class PunishUtil {
      */
     public static void handleAlert(@NotNull PlayerData playerData, @NotNull CheckInfoData checkInfo, String verbose) {
         Player player = playerData.getPlayer();
+        String playerName = player.getName();
         int violations = getViolationCount(playerData, checkInfo);
+        String checkName = checkInfo.getName();
 
-        MessageUtil.sendAlert("&f" + player.getName() + " &7failed &f"
-                + checkInfo.getName() + " &c(x" + violations + ")", verbose);
+        MessageUtil.sendAlert("&f" + playerName + " &7failed &f"
+                + checkName + " &c(x" + violations + ")", verbose);
     }
 
     /**
@@ -129,35 +134,42 @@ public final class PunishUtil {
      *
      * @param verbose The verbose to add to the punishment.
      */
-    public static void handlePunishment(@NotNull PlayerData playerData, CheckInfoData checkInfo, String verbose) {
+    @SuppressWarnings("NestedMethodCall")
+    public static void handlePunishment(@NotNull PlayerData playerData,
+                                        @NotNull CheckInfoData checkInfo,
+                                        String verbose) {
         Player player = playerData.getPlayer();
+        String playerName = player.getName();
+        String banCommand = checkInfo.getBanCommand();
+        String checkName = checkInfo.getName();
         int violations = getViolationCount(playerData, checkInfo);
 
-        if (violations >= checkInfo.getMaxViolations() && !checkInfo.isExperimental()
-                && !checkInfo.getBanCommand().isEmpty()) {
+        if (violations >= checkInfo.getMaxViolations()
+                && !checkInfo.isExperimental()
+                && !banCommand.isEmpty()) {
             // Pauses any new violations from being added.
             playerData.setNewViolationsPaused(true);
 
-            boolean kicking = (checkInfo.getBanCommand().startsWith("vulture kick")
-                    || checkInfo.getBanCommand().startsWith("kick"));
+            boolean kicking = (banCommand.startsWith("vulture kick")
+                    || banCommand.startsWith("kick"));
 
             // Sends the private punishment message.
-            MessageUtil.sendAlert("&f" + player.getName() + " &7has been " + (kicking ? "kicked" : "banned")
-                    + " for failing &f" + checkInfo.getName() + " &c(x" + violations + ")", verbose);
+            MessageUtil.sendAlert("&f" + playerName + " &7has been " + (kicking ? "kicked" : "banned")
+                    + " for failing &f" + checkName + " &c(x" + violations + ")", verbose);
 
             // Sends the public punishment message, if one is set.
             // Punishment messages are not sent if the player is being kicked.
             if (!Settings.banMessage.isEmpty() && !kicking) {
                 List<String> banMessageEdited = new ArrayList<>(Settings.banMessage);
-                banMessageEdited.replaceAll(s -> s.replace("%player%", player.getName()));
-                banMessageEdited.replaceAll(s -> s.replace("%check%", checkInfo.getName()));
+                banMessageEdited.replaceAll(s -> s.replace("%player%", playerName));
+                banMessageEdited.replaceAll(s -> s.replace("%check%", checkName));
                 MessageUtil.broadcast(banMessageEdited);
             }
 
             // Executes the punishment command.
-            TaskUtil.runTask(() -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), checkInfo.getBanCommand()
-                    .replace("%player%", player.getName())
-                    .replace("%check%", checkInfo.getName())));
+            TaskUtil.runTask(() -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), banCommand
+                    .replace("%player%", playerName)
+                    .replace("%check%", checkName)));
         }
     }
 

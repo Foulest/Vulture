@@ -17,8 +17,7 @@
  */
 package net.foulest.vulture.util.command;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -35,8 +34,7 @@ import java.util.*;
  * @author minnymin3
  * @see <a href="https://github.com/mcardy/CommandFramework">CommandFramework GitHub</a>
  */
-@Getter
-@Setter
+@Data
 public class BukkitCompleter implements TabCompleter {
 
     private final Map<String, Map.Entry<Method, Object>> completers = new HashMap<>();
@@ -69,11 +67,13 @@ public class BukkitCompleter implements TabCompleter {
                                       String @NotNull [] args) {
         for (int i = args.length; i >= 0; i--) {
             StringBuilder buffer = new StringBuilder();
-            buffer.append(label.toLowerCase(Locale.ROOT));
+            String labelLower = label.toLowerCase(Locale.ROOT);
+            buffer.append(labelLower);
 
             for (int x = 0; x < i; x++) {
                 if (!args[x].isEmpty() && !(" ").equals(args[x])) {
-                    buffer.append(".").append(args[x].toLowerCase(Locale.ROOT));
+                    String argsLower = args[x].toLowerCase(Locale.ROOT);
+                    buffer.append(".").append(argsLower);
                 }
             }
 
@@ -83,8 +83,11 @@ public class BukkitCompleter implements TabCompleter {
                 Map.Entry<Method, Object> entry = completers.get(cmdLabel);
 
                 try {
-                    return (List<String>) entry.getKey().invoke(entry.getValue(),
-                            new CommandArgs(sender, command, label, args, cmdLabel.split("\\.").length - 1));
+                    Object entryValue = entry.getValue();
+                    String[] split = cmdLabel.split("\\.");
+
+                    return (List<String>) entry.getKey().invoke(entryValue,
+                            new CommandArgs(sender, command, label, args, split.length - 1));
                 } catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException ex) {
                     ex.printStackTrace();
                 }

@@ -21,48 +21,56 @@ import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEve
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
-import io.github.retrooper.packetevents.utils.vector.Vector3d;
+import lombok.ToString;
+import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
+import net.foulest.vulture.util.KickUtil;
 
-@CheckInfo(name = "BadPackets (B)", type = CheckType.BADPACKETS,
-        description = "Detects sending invalid packets while in a bed.")
+@ToString
+@CheckInfo(name = "BadPackets (B)", type = CheckType.BADPACKETS, punishable = false,
+        description = "Detects ignoring the mandatory Position packet.")
 public class BadPacketsB extends Check {
 
-    private int ticksInBed;
+    private long lastPosition;
+    private long lastTransaction;
 
     public BadPacketsB(PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
+        lastPosition = System.currentTimeMillis();
+        lastTransaction = System.currentTimeMillis();
     }
 
     @Override
     public void handle(CancellableNMSPacketEvent event, byte packetId,
                        NMSPacket nmsPacket, Object packet, long timestamp) {
-        ticksInBed = playerData.isInBed() ? ticksInBed + 1 : 0;
-
-        // Checks the player for exemptions.
-        if (ticksInBed < 10) {
-            return;
-        }
-
         if (PacketType.Play.Client.Util.isInstanceOfFlying(packetId)) {
             WrappedPacketInFlying flying = new WrappedPacketInFlying(nmsPacket);
-            Vector3d flyingPosition = flying.getPosition();
 
-            if (flying.isRotating()) {
-                flag(true, "Sent invalid Rotation packet while in bed" + " (ticks=" + ticksInBed + ")");
+            if (flying.isMoving()) {
+                lastPosition = System.currentTimeMillis();
             }
 
-            if (flying.isMoving() && playerData.isMoving() && !playerData.isTeleporting(flyingPosition)) {
-                flag(true, "Sent invalid Position packet while in bed" + " (ticks=" + ticksInBed + ")");
+        } else if (packetId == PacketType.Play.Client.TRANSACTION) {
+            lastTransaction = System.currentTimeMillis();
+
+        } else if (packetId == PacketType.Play.Client.KEEP_ALIVE) {
+            // Checks the player for exemptions.
+            if (player.isDead()
+                    || playerData.getTicksSince(ActionType.STEER_VEHICLE) < 100
+                    || playerData.getTicksSince(ActionType.LOGIN) < 200) {
+                return;
             }
 
-        } else if (packetId != PacketType.Play.Client.CHAT
-                && packetId != PacketType.Play.Client.KEEP_ALIVE) {
-            flag(false, event, "Sent invalid packet while in bed: "
-                    + PacketType.getPacketFromId(packetId).getSimpleName());
+            long timeSincePosition = System.currentTimeMillis() - lastPosition;
+            long timeSinceTransaction = System.currentTimeMillis() - lastTransaction;
+
+            // If the player hasn't sent a Position packet in the last 5 seconds, kick them.
+            if (timeSincePosition > 5000 && timeSinceTransaction < 1000) {
+                KickUtil.kickPlayer(player, "BadPackets (B) | Might be cancelling sending Position packets");
+            }
         }
     }
 }

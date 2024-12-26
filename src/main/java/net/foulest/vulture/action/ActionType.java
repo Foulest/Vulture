@@ -35,7 +35,6 @@ public enum ActionType {
     ENTER_VEHICLE,
     FLYING_PACKET,
     INVENTORY_OPEN,
-    IN_BED,
     IN_LIQUID,
     IN_UNLOADED_CHUNK,
     LAST_ON_GROUND_LOCATION_SET,
@@ -55,7 +54,5 @@ public enum ActionType {
     STEER_VEHICLE,
     TELEPORT,
     UNDER_BLOCK,
-    VELOCITY_GIVEN,
-    VELOCITY_TAKEN,
     WINDOW_CLICK
 }

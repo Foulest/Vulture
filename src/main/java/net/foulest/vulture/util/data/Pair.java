@@ -18,12 +18,9 @@
 package net.foulest.vulture.util.data;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Objects;
 
 /**
  * A pair of objects.
@@ -32,10 +29,9 @@ import java.util.Objects;
  * @param <Y> The type of the second object.
  * @author Foulest
  */
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
-public final class Pair<X, Y> {
+public class Pair<X, Y> {
 
     private final X first;
     private final Y last;
@@ -43,30 +39,5 @@ public final class Pair<X, Y> {
     @Contract("_, _ -> new")
     public static <X, Y> @NotNull Pair<X, Y> of(X x, Y y) {
         return new Pair<>(x, y);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public boolean equals(Object obj) {
-        if (!(obj instanceof Pair)) {
-            return false;
-        }
-
-        Pair<X, Y> pair = (Pair<X, Y>) obj;
-        return Objects.equals(first, pair.first) && Objects.equals(last, pair.last);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(first, last);
-    }
-
-    @Override
-    @Contract(pure = true)
-    public @NotNull String toString() {
-        return "Pair{" +
-                "first=" + first +
-                ", last=" + last +
-                '}';
     }
 }

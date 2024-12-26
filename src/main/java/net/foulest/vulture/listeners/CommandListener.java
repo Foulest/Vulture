@@ -45,18 +45,22 @@ import java.util.regex.Pattern;
 public class CommandListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public static void onServerCommand(ServerCommandEvent event) {
-        processCommand(event, event.getCommand(), event.getSender());
+    public static void onServerCommand(@NotNull ServerCommandEvent event) {
+        String command = event.getCommand();
+        CommandSender sender = event.getSender();
+        processCommand(event, command, sender);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public static void onPlayerCommand(PlayerCommandPreprocessEvent event) {
-        processCommand(event, event.getMessage(), event.getPlayer());
+    public static void onPlayerCommand(@NotNull PlayerCommandPreprocessEvent event) {
+        String message = event.getMessage();
+        Player player = event.getPlayer();
+        processCommand(event, message, player);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public static void onRemoteServerCommand(RemoteServerCommandEvent event) {
-        processCommand(event, event.getCommand(), event.getSender());
+    public static void onRemoteServerCommand(@NotNull RemoteServerCommandEvent event) {
+        onServerCommand(event);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

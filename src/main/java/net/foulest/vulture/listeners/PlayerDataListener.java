@@ -37,6 +37,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @AllArgsConstructor
 public class PlayerDataListener implements Listener {
@@ -51,7 +52,8 @@ public class PlayerDataListener implements Listener {
         // Checks if the player's IP matches the whitelist.
         if (Settings.ipWhitelistEnabled) {
             String playerIp = event.getAddress().getHostAddress();
-            List<String> whitelistedIps = Settings.ipWhitelist.getOrDefault(player.getUniqueId(), new ArrayList<>());
+            UUID uniqueId = player.getUniqueId();
+            List<String> whitelistedIps = Settings.ipWhitelist.getOrDefault(uniqueId, new ArrayList<>());
 
             // Kicks players with non-whitelisted IPs.
             if (!whitelistedIps.isEmpty() && !whitelistedIps.contains(playerIp)) {
@@ -125,34 +127,6 @@ public class PlayerDataListener implements Listener {
         // Sets eating and drinking to false.
         playerData.setEating(false);
         playerData.setDrinking(false);
-    }
-
-    /**
-     * Handles player bed enter events.
-     *
-     * @param event PlayerBedEnterEvent
-     */
-    @EventHandler
-    public static void onBedEnterEvent(@NotNull PlayerBedEnterEvent event) {
-        Player player = event.getPlayer();
-        PlayerData playerData = PlayerDataManager.getPlayerData(player);
-
-        // Sets inBed to true.
-        playerData.setInBed(true);
-    }
-
-    /**
-     * Handles player bed leave events.
-     *
-     * @param event PlayerBedLeaveEvent
-     */
-    @EventHandler
-    public static void onBedLeaveEvent(@NotNull PlayerBedLeaveEvent event) {
-        Player player = event.getPlayer();
-        PlayerData playerData = PlayerDataManager.getPlayerData(player);
-
-        // Sets inBed to false.
-        playerData.setInBed(false);
     }
 
     /**

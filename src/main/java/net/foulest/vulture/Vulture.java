@@ -89,15 +89,15 @@ public class Vulture extends JavaPlugin implements ClientPingerListener {
         MessageUtil.log(Level.INFO, "Loading PacketEvents...");
         packetEvents.init();
 
+        // Loads the plugin's settings.
+        MessageUtil.log(Level.INFO, "Loading Settings...");
+        Settings.loadSettings();
+
         // Loads the plugin's commands.
         MessageUtil.log(Level.INFO, "Loading Packet Processors...");
         decodeProcessor = new PacketDecodeProcessor();
         receiveProcessor = new PacketReceiveProcessor();
         sendProcessor = new PacketSendProcessor();
-
-        // Creates the default settings config.
-        MessageUtil.log(Level.INFO, "Loading Settings...");
-        Settings.loadSettings();
 
         // Loads the plugin's listeners.
         MessageUtil.log(Level.INFO, "Loading Listeners...");

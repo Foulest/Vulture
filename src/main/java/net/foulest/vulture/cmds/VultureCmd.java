@@ -17,9 +17,13 @@
  */
 package net.foulest.vulture.cmds;
 
-import lombok.Getter;
-import lombok.Setter;
+import io.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.utils.player.ClientVersion;
+import io.github.retrooper.packetevents.utils.player.PlayerUtils;
+import lombok.Data;
 import net.foulest.vulture.Vulture;
+import net.foulest.vulture.check.Violation;
+import net.foulest.vulture.check.type.clientbrand.type.DataType;
 import net.foulest.vulture.check.type.clientbrand.type.PayloadType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.data.PlayerDataManager;
@@ -42,10 +46,10 @@ import java.util.*;
  *
  * @author Foulest
  */
-@Getter
-@Setter
+@Data
 public class VultureCmd {
 
+    @SuppressWarnings("NestedMethodCall")
     @Command(name = "vulture", description = "Main command for Vulture.",
             permission = "vulture.main", usage = "/vulture")
     public void onCommand(@NotNull CommandArgs args) {
@@ -84,10 +88,12 @@ public class VultureCmd {
                 }
 
                 PlayerData playerData = PlayerDataManager.getPlayerData(player);
+                boolean alertsEnabled = playerData.isAlertsEnabled();
 
-                playerData.setAlertsEnabled(!playerData.isAlertsEnabled());
+                playerData.setAlertsEnabled(!alertsEnabled);
+
                 MessageUtil.messagePlayer(player, Settings.prefix + " &7Alerts have been &f"
-                        + (playerData.isAlertsEnabled() ? "enabled" : "disabled") + "&7.");
+                        + (alertsEnabled ? "enabled" : "disabled") + "&7.");
                 break;
             }
 
@@ -103,6 +109,7 @@ public class VultureCmd {
                 }
 
                 Vulture.instance.debugMode = !Vulture.instance.debugMode;
+
                 MessageUtil.messagePlayer(sender, Settings.prefix + " &7Debug mode has been &f"
                         + (Vulture.instance.debugMode ? "enabled" : "disabled") + "&7.");
                 break;
@@ -132,10 +139,12 @@ public class VultureCmd {
                 }
 
                 PlayerData playerData = PlayerDataManager.getPlayerData(player);
+                boolean verboseEnabled = playerData.isVerboseEnabled();
 
-                playerData.setVerboseEnabled(!playerData.isVerboseEnabled());
+                playerData.setVerboseEnabled(!verboseEnabled);
+
                 MessageUtil.messagePlayer(sender, Settings.prefix + " &7Verbose mode has been &f"
-                        + (playerData.isVerboseEnabled() ? "enabled" : "disabled") + "&7.");
+                        + (verboseEnabled ? "enabled" : "disabled") + "&7.");
                 break;
             }
 
@@ -157,21 +166,33 @@ public class VultureCmd {
                     return;
                 }
 
+                PacketEvents packetEvents = Vulture.instance.getPacketEvents();
+                PlayerUtils playerUtils = packetEvents.getPlayerUtils();
+
                 PlayerData targetData = PlayerDataManager.getPlayerData(target);
+                String targetName = target.getName();
+                ClientVersion targetVersion = targetData.getVersion();
+                String versionName = targetVersion.getDisplayName();
+                int targetPing = playerUtils.getPing(target);
+                List<Violation> targetVLs = targetData.getViolations();
+                int targetVLSize = targetVLs.size();
 
                 MessageUtil.messagePlayer(sender, "");
-                MessageUtil.messagePlayer(sender, "&e" + target.getName() + "'s Info");
-                MessageUtil.messagePlayer(sender, "&7* &fVersion: &e" + targetData.getVersion().getDisplayName());
-                MessageUtil.messagePlayer(sender, "&7* &fPing: &e" + Vulture.instance.getPacketEvents().getPlayerUtils().getPing(target) + "ms");
-                MessageUtil.messagePlayer(sender, "&7* &fViolations: &e" + targetData.getViolations().size());
+                MessageUtil.messagePlayer(sender, "&e" + targetName + "'s Info");
+                MessageUtil.messagePlayer(sender, "&7* &fVersion: &e" + versionName);
+                MessageUtil.messagePlayer(sender, "&7* &fPing: &e" + targetPing + "ms");
+                MessageUtil.messagePlayer(sender, "&7* &fViolations: &e" + targetVLSize);
 
                 if (!targetData.getPayloads().isEmpty()) {
                     MessageUtil.messagePlayer(sender, "");
                     MessageUtil.messagePlayer(sender, "&fPayloads:");
 
                     for (PayloadType payloadType : targetData.getPayloads()) {
-                        MessageUtil.messagePlayer(sender, "&7* &e" + payloadType.getName()
-                                + " &7(" + payloadType.getDataType().getName() + ")");
+                        String payloadName = payloadType.getName();
+                        DataType dataType = payloadType.getDataType();
+                        String dataTypeName = dataType.getName();
+
+                        MessageUtil.messagePlayer(sender, "&7* &e" + payloadName + " &7(" + dataTypeName + ")");
                     }
                 }
 
@@ -200,7 +221,8 @@ public class VultureCmd {
                 StringBuilder reasonBuilder = new StringBuilder();
 
                 for (int i = 2; i < args.length(); i++) {
-                    reasonBuilder.append(args.getArgs(i)).append(" ");
+                    String s = args.getArgs(i);
+                    reasonBuilder.append(s).append(" ");
                 }
 
                 String reason = reasonBuilder.toString().trim();
@@ -281,7 +303,8 @@ public class VultureCmd {
                         ConfigurationSection whitelistSectionAdd = Settings.config.createSection("vulture.ip-whitelist.whitelist");
                         for (Map.Entry<UUID, List<String>> entry : Settings.ipWhitelist.entrySet()) {
                             String uuidString = entry.getKey().toString();
-                            whitelistSectionAdd.set(uuidString + ".ips", entry.getValue());
+                            List<String> ipString = entry.getValue();
+                            whitelistSectionAdd.set(uuidString + ".ips", ipString);
                         }
                         Settings.saveConfig();
 
@@ -325,7 +348,8 @@ public class VultureCmd {
                         ConfigurationSection whitelistSectionRemove = Settings.config.createSection("vulture.ip-whitelist.whitelist");
                         for (Map.Entry<UUID, List<String>> entry : Settings.ipWhitelist.entrySet()) {
                             String uuidString = entry.getKey().toString();
-                            whitelistSectionRemove.set(uuidString + ".ips", entry.getValue());
+                            List<String> ipString = entry.getValue();
+                            whitelistSectionRemove.set(uuidString + ".ips", ipString);
                         }
                         Settings.saveConfig();
 
@@ -388,12 +412,14 @@ public class VultureCmd {
         );
 
         int itemsPerPage = 4;
-        int maxPages = (int) Math.ceil((double) commands.size() / itemsPerPage);
+        int sizeOfAll = commands.size();
+        int maxPages = (int) Math.ceil((double) sizeOfAll / itemsPerPage);
         int page = 1;
 
         if (args.length() > 1) {
             try {
-                page = Integer.parseInt(args.getArgs(1));
+                String pageNumber = args.getArgs(1);
+                page = Integer.parseInt(pageNumber);
             } catch (NumberFormatException ex) {
                 MessageUtil.messagePlayer(sender, "&cInvalid page number. Choose between 1 and " + maxPages + ".");
                 return;
@@ -406,13 +432,14 @@ public class VultureCmd {
         }
 
         int startIndex = (page - 1) * itemsPerPage;
-        int endIndex = Math.min(commands.size(), startIndex + itemsPerPage);
+        int endIndex = Math.min(sizeOfAll, startIndex + itemsPerPage);
 
         MessageUtil.messagePlayer(sender, "");
         MessageUtil.messagePlayer(sender, "&eVulture Help &7(Page " + page + "/" + maxPages + ")");
 
         for (int i = startIndex; i < endIndex; i++) {
-            MessageUtil.messagePlayer(sender, commands.get(i));
+            String line = commands.get(i);
+            MessageUtil.messagePlayer(sender, line);
         }
 
         MessageUtil.messagePlayer(sender, "");

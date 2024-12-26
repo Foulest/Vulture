@@ -53,6 +53,7 @@ public class ClientBrand extends Check {
             new PayloadType("\u0007fabric", "Fabric", DataType.BRAND, false),
             new PayloadType("\u0007labymod", "LabyMod", DataType.BRAND, false),
             new PayloadType("\u0007fml,forge", "Forge", DataType.BRAND, false),
+            new PayloadType("\tFML,Forge", "Forge", DataType.BRAND, false),
             new PayloadType("\u0007vanilla", "Vanilla", DataType.BRAND, false),
             new PayloadType("\u000EFeather Fabric", "Feather Client", DataType.BRAND, false),
             new PayloadType("fabric", "Fabric", DataType.BRAND, false),
@@ -60,6 +61,9 @@ public class ClientBrand extends Check {
             new PayloadType("vanilla", "Vanilla", DataType.BRAND, false),
             new PayloadType("\nminebuilders8", "Minebuilders Client", DataType.BRAND, false),
             new PayloadType("\nminebuilders9", "Minebuilders Client", DataType.BRAND, false),
+            new PayloadType("\u0007badlion", "Badlion Client", DataType.BRAND, false),
+            new PayloadType("lunar:apollo", "Lunar Client", DataType.BRAND, false),
+            new PayloadType("\u000Bemberclient", "Ember Client", DataType.BRAND, false),
 
             new PayloadType("\u0005eyser", "Geyser Spoof", DataType.BRAND, true), // TODO: Test with real Geyser
             new PayloadType("\boptifine", "OptiFine Spoof", DataType.BRAND, true),
@@ -866,6 +870,7 @@ public class ClientBrand extends Check {
             new PayloadType("wanionlib", "WanionLib", DataType.CHANNEL, false),
             new PayloadType("waystones", "Waystones", DataType.CHANNEL, false),
             new PayloadType("wonderful_enchantmen", "Wonderful Enchantments", DataType.CHANNEL, false),
+            new PayloadType("worldedit:cui", "WorldEdit CUI", DataType.CHANNEL, false),
             new PayloadType("world_id", "VoxelMap/JourneyMap", DataType.CHANNEL, false),
             new PayloadType("world_info", "VoxelMap/JourneyMap", DataType.CHANNEL, false),
             new PayloadType("xat", "Trinkets and Baubles", DataType.CHANNEL, false),
@@ -875,6 +880,7 @@ public class ClientBrand extends Check {
             new PayloadType("energycontrol", "Energy Control", DataType.CHANNEL, false),
             new PayloadType("collisiondamage", "CollisionDamage", DataType.CHANNEL, false),
             new PayloadType("spartanweaponry", "Spartan Weaponry", DataType.CHANNEL, false),
+            new PayloadType("lunar:apollo", "Lunar Client", DataType.CHANNEL, false),
 
             new PayloadType("eosclient:a", "Eos Client", DataType.CHANNEL, true),
             new PayloadType("#unbanearwax", "Vape Client", DataType.CHANNEL, true),
@@ -914,7 +920,8 @@ public class ClientBrand extends Check {
                        NMSPacket nmsPacket, Object packet, long timestamp) {
         if (packetId == PacketType.Play.Client.CUSTOM_PAYLOAD) {
             WrappedPacketInCustomPayload payload = new WrappedPacketInCustomPayload(nmsPacket);
-            String data = new String(payload.getData(), StandardCharsets.UTF_8).replace(" (Velocity)", "");
+            byte[] rawData = payload.getData();
+            String data = new String(rawData, StandardCharsets.UTF_8).replace(" (Velocity)", "");
             String channelName = payload.getChannelName();
 
             // Handles and validates the payload sent by the player.
@@ -1025,19 +1032,25 @@ public class ClientBrand extends Check {
      * @param data            The data to check.
      */
     private void validateAndProcessPayload(@NotNull Iterable<PayloadType> payloadTypeList,
-                                           CancellableEvent event, String data, DataType dataType) {
+                                           CancellableEvent event, String data, @NotNull DataType dataType) {
+        String playerName = player.getName();
+        String dataTypeName = dataType.getName();
+
         // Checks if the data is present in the payload type list.
         for (PayloadType payloadType : payloadTypeList) {
             if (payloadType.data.equals(data)) {
                 // If the payload is blocked, kick the player.
                 if (payloadType.isBlocked()) {
-                    KickUtil.kickPlayer(player, event, "Blocked "
-                            + dataType.getName() + ": " + payloadType.name);
+                    KickUtil.kickPlayer(player, event, "Blocked " + dataTypeName + ": " + payloadType.name);
                     return;
                 }
 
                 // Adds the payload type to the player's list of sent payloads.
-                if (playerData.getPayloads().stream().noneMatch(p -> p.getName().equals(payloadType.getName()))) {
+                if (playerData.getPayloads().stream().noneMatch(type -> {
+                    String name1 = type.getName();
+                    String name2 = payloadType.getName();
+                    return name1.equals(name2);
+                })) {
                     playerData.getPayloads().add(payloadType);
                 }
                 return;
@@ -1045,8 +1058,8 @@ public class ClientBrand extends Check {
         }
 
         // Payload was not found in the list; handle as unknown data.
-        MessageUtil.sendAlert("&f" + player.getName() + " &7sent unknown data to the server.",
-                "&8(Type: " + dataType.getName() + ") (Data: " + data + ")");
+        MessageUtil.sendAlert("&f" + playerName + " &7sent unknown data to the server.",
+                "&8(Type: " + dataTypeName + ") (Data: " + data + ")");
 
         // Prints the unknown data to a randomly generated text file.
         // TODO: Remove this in production.

@@ -17,8 +17,7 @@
  */
 package net.foulest.vulture.data;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.Data;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckManager;
 import org.bukkit.entity.Player;
@@ -30,8 +29,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class PlayerDataManager {
+@Data
+public class PlayerDataManager {
 
     // Map of player UUIDs to their stored data.
     private static final Map<UUID, PlayerData> playerDataMap = new HashMap<>();
@@ -43,12 +42,14 @@ public final class PlayerDataManager {
      * @return The player's data.
      */
     public static PlayerData getPlayerData(@NotNull Player player) {
-        if (playerDataMap.containsKey(player.getUniqueId())) {
-            return playerDataMap.get(player.getUniqueId());
+        UUID uniqueId = player.getUniqueId();
+
+        if (playerDataMap.containsKey(uniqueId)) {
+            return playerDataMap.get(uniqueId);
         } else {
             addPlayerData(player);
         }
-        return playerDataMap.get(player.getUniqueId());
+        return playerDataMap.get(uniqueId);
     }
 
     /**
@@ -57,24 +58,29 @@ public final class PlayerDataManager {
      * @param player The player to add.
      */
     private static void addPlayerData(@NotNull Player player) {
-        if (!playerDataMap.containsKey(player.getUniqueId())) {
-            PlayerData data = new PlayerData(player.getUniqueId(), player);
+        UUID uniqueId = player.getUniqueId();
 
-            // Initialize checks for the player.
-            for (Class<? extends Check> checkClass : CheckManager.CHECK_CLASSES) {
-                try {
-                    Constructor<? extends Check> constructor = checkClass.getConstructor(PlayerData.class);
-                    Check checkInstance = constructor.newInstance(data);
-                    data.getChecks().add(checkInstance);
-                } catch (NoSuchMethodException | IllegalAccessException | InstantiationException
-                         | InvocationTargetException ex) {
-                    ex.printStackTrace();
-                }
-            }
-
-            // Add the player's data to the map.
-            playerDataMap.put(player.getUniqueId(), data);
+        // Prevents duplicate entries.
+        if (playerDataMap.containsKey(uniqueId)) {
+            return;
         }
+
+        PlayerData data = new PlayerData(uniqueId, player);
+
+        // Initialize checks for the player.
+        for (Class<? extends Check> checkClass : CheckManager.CHECK_CLASSES) {
+            try {
+                Constructor<? extends Check> constructor = checkClass.getConstructor(PlayerData.class);
+                Check checkInstance = constructor.newInstance(data);
+                data.getChecks().add(checkInstance);
+            } catch (NoSuchMethodException | IllegalAccessException | InstantiationException
+                     | InvocationTargetException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        // Add the player's data to the map.
+        playerDataMap.put(uniqueId, data);
     }
 
     /**
@@ -83,6 +89,7 @@ public final class PlayerDataManager {
      * @param player The player to remove.
      */
     public static void removePlayerData(@NotNull Player player) {
-        playerDataMap.remove(player.getUniqueId());
+        UUID uniqueId = player.getUniqueId();
+        playerDataMap.remove(uniqueId);
     }
 }

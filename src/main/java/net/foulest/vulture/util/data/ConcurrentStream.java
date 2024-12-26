@@ -17,8 +17,7 @@
  */
 package net.foulest.vulture.util.data;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,10 +32,8 @@ import java.util.stream.Stream;
  *
  * @param <T> The type of the elements in the stream.
  */
-@Getter
-@Setter
-@SuppressWarnings("unused")
-public final class ConcurrentStream<T> {
+@Data
+public class ConcurrentStream<T> {
 
     private final Supplier<Stream<T>> supplier;
     private final Collection<T> collection;

@@ -28,7 +28,6 @@ import io.github.retrooper.packetevents.packetwrappers.play.in.blockplace.Wrappe
 import io.github.retrooper.packetevents.packetwrappers.play.in.chat.WrappedPacketInChat;
 import io.github.retrooper.packetevents.packetwrappers.play.in.clientcommand.WrappedPacketInClientCommand;
 import io.github.retrooper.packetevents.packetwrappers.play.in.custompayload.WrappedPacketInCustomPayload;
-import io.github.retrooper.packetevents.packetwrappers.play.in.enchantitem.WrappedPacketInEnchantItem;
 import io.github.retrooper.packetevents.packetwrappers.play.in.entityaction.WrappedPacketInEntityAction;
 import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
 import io.github.retrooper.packetevents.packetwrappers.play.in.helditemslot.WrappedPacketInHeldItemSlot;
@@ -55,23 +54,22 @@ import net.foulest.vulture.event.RotationEvent;
 import net.foulest.vulture.processor.Processor;
 import net.foulest.vulture.util.*;
 import net.foulest.vulture.util.data.CustomLocation;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.*;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffectType;
+import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2f;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 /**
  * Handles all incoming packets after they are decoded.
@@ -87,19 +85,28 @@ public class PacketReceiveProcessor extends Processor {
      */
     @Override
     public void onPacketPlayReceive(@NotNull PacketPlayReceiveEvent event) {
-        // Ignores invalid incoming packets.
-        if (PacketType.getPacketFromId(event.getPacketId()) == null) {
-            return;
-        }
+        byte packetId = event.getPacketId();
 
-        // Cancels incoming packets for invalid players.
-        if (Bukkit.getPlayer(event.getPlayer().getUniqueId()) == null) {
-            event.setCancelled(true);
+        // Ignores invalid incoming packets.
+        if (PacketType.getPacketFromId(packetId) == null) {
             return;
         }
 
         Player player = event.getPlayer();
-        PlayerData playerData = PlayerDataManager.getPlayerData(player);
+
+        // Cancels incoming packets for invalid players.
+        if (player == null) {
+            event.setCancelled(true);
+            return;
+        }
+
+        UUID uniqueId = player.getUniqueId();
+
+        // Cancels incoming packets for invalid players.
+        if (Bukkit.getPlayer(uniqueId) == null) {
+            event.setCancelled(true);
+            return;
+        }
 
         // Cancels incoming packets for offline players.
         if (!player.isOnline()) {
@@ -113,61 +120,85 @@ public class PacketReceiveProcessor extends Processor {
             return;
         }
 
-        switch (event.getPacketId()) {
+        NMSPacket nmsPacket = event.getNMSPacket();
+
+        String playerName = player.getName();
+        World world = player.getWorld();
+        InventoryView openInventory = player.getOpenInventory();
+        boolean insideVehicle = player.isInsideVehicle();
+        Entity vehicle = player.getVehicle();
+        GameMode gameMode = player.getGameMode();
+        Location playerLoc = player.getLocation();
+
+        PlayerData playerData = PlayerDataManager.getPlayerData(player);
+        boolean playerFlightAllowed = playerData.isFlightAllowed();
+        boolean blocking = playerData.isBlocking();
+        boolean inventoryOpen = playerData.isInventoryOpen();
+        boolean digging = playerData.isDigging();
+        boolean placingBlock = playerData.isPlacingBlock();
+
+        switch (packetId) {
             case PacketType.Play.Client.ABILITIES:
-                WrappedPacketInAbilities abilities = new WrappedPacketInAbilities(event.getNMSPacket());
+                WrappedPacketInAbilities abilities = new WrappedPacketInAbilities(nmsPacket);
+                boolean abilitiesFlying = abilities.isFlying();
 
                 if (playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8)) {
-                    if (abilities.isFlying() == playerData.isFlying()) {
+                    boolean playerFlying = playerData.isFlying();
+
+                    if (abilitiesFlying == playerFlying) {
                         KickUtil.kickPlayer(player, event, Settings.abilitiesDuplicateFlying,
                                 "Sent Abilities packet with duplicate flying values"
-                                        + " (flying=" + abilities.isFlying()
-                                        + " playerFlying=" + playerData.isFlying() + ")"
+                                        + " (flying=" + abilitiesFlying
+                                        + " playerFlying=" + playerFlying + ")"
                         );
                         return;
                     }
 
-                    if (abilities.isFlying() && !playerData.isFlightAllowed()) {
+                    if (abilitiesFlying && !playerFlightAllowed) {
                         KickUtil.kickPlayer(player, event, Settings.abilitiesInvalidFlying,
                                 "Sent Abilities packet with invalid flying values"
-                                        + " (flying=" + abilities.isFlying()
-                                        + " playerFlightAllowed=" + playerData.isFlightAllowed() + ")"
+                                        + " (flying=" + true
+                                        + " playerFlightAllowed=" + false + ")"
                         );
                         return;
                     }
 
                     abilities.isFlightAllowed().ifPresent(flightAllowed -> {
-                        if (Boolean.TRUE.equals(flightAllowed) != playerData.isFlightAllowed()) {
+                        if (Boolean.TRUE.equals(flightAllowed) != playerFlightAllowed) {
                             KickUtil.kickPlayer(player, event, Settings.abilitiesInvalidFlightAllowed,
                                     "Sent Abilities packet with invalid flight allowed values"
                                             + " (flightAllowed=" + flightAllowed
-                                            + " playerFlightAllowed=" + playerData.isFlightAllowed() + ")"
+                                            + " playerFlightAllowed=" + playerFlightAllowed + ")"
                             );
                         }
                     });
 
                     abilities.canInstantlyBuild().ifPresent(instantBuild -> {
-                        if (Boolean.TRUE.equals(instantBuild) != playerData.isInstantBuild()) {
+                        boolean playerInstantBuild = playerData.isInstantBuild();
+
+                        if (Boolean.TRUE.equals(instantBuild) != playerInstantBuild) {
                             KickUtil.kickPlayer(player, event, Settings.abilitiesInvalidInstantBuild,
                                     "Sent Abilities packet with invalid instant build values"
                                             + " (instantBuild=" + instantBuild
-                                            + " playerInstantBuild=" + playerData.isInstantBuild() + ")"
+                                            + " playerInstantBuild=" + playerInstantBuild + ")"
                             );
                         }
                     });
 
                     abilities.isVulnerable().ifPresent(vulnerable -> {
-                        if (Boolean.TRUE.equals(vulnerable) != playerData.isVulnerable()) {
+                        boolean playerVulnerable = playerData.isVulnerable();
+
+                        if (Boolean.TRUE.equals(vulnerable) != playerVulnerable) {
                             KickUtil.kickPlayer(player, event, Settings.abilitiesInvalidInvulnerable,
                                     "Sent Abilities packet with invalid invulnerable values"
                                             + " (invulnerable=" + vulnerable
-                                            + " playerInvulnerable=" + playerData.isVulnerable() + ")"
+                                            + " playerInvulnerable=" + playerVulnerable + ")"
                             );
                         }
                     });
                 }
 
-                if (abilities.isFlying()) {
+                if (abilitiesFlying) {
                     playerData.setFlying(true);
                     playerData.setTimestamp(ActionType.START_FLYING);
                 } else {
@@ -181,19 +212,11 @@ public class PacketReceiveProcessor extends Processor {
                 break;
 
             case PacketType.Play.Client.ARM_ANIMATION:
-                if (playerData.isInventoryOpen()) {
-                    KickUtil.kickPlayer(player, event, Settings.armAnimationInvalidConditions,
-                            "Sent ArmAnimation packet with invalid conditions"
-                                    + " (inventoryOpen=" + true + ")"
-                    );
-                    return;
-                }
-
                 playerData.setTimestamp(ActionType.ARM_ANIMATION);
                 break;
 
             case PacketType.Play.Client.BLOCK_DIG:
-                WrappedPacketInBlockDig blockDig = new WrappedPacketInBlockDig(event.getNMSPacket());
+                WrappedPacketInBlockDig blockDig = new WrappedPacketInBlockDig(nmsPacket);
                 Vector3i digBlockPosition = blockDig.getBlockPosition();
                 Direction digDirection = blockDig.getDirection();
                 int digXPos = digBlockPosition.getX();
@@ -204,17 +227,14 @@ public class PacketReceiveProcessor extends Processor {
                     break;
                 }
 
-                if (digXPos != 0 && digYPos != 0 && digZPos != 0
+                if (Settings.blockDigInvalidDistance
+                        && digXPos != 0 && digYPos != 0 && digZPos != 0
                         && digXPos != -1 && digYPos != -1 && digZPos != -1) {
-                    Location playerLocation = player.getLocation();
-                    Location blockLocation = new Location(player.getWorld(), digXPos, digYPos, digZPos);
-                    double distance = playerLocation.distance(blockLocation);
+                    Location blockLocation = new Location(world, digXPos, digYPos, digZPos);
+                    double distance = playerLoc.distance(blockLocation);
 
                     if (distance > 7.03) {
-                        KickUtil.kickPlayer(player, event, Settings.blockDigInvalidDistance,
-                                "Sent BlockDig packet with invalid distance"
-                                        + " (distance=" + distance + ")"
-                        );
+                        event.setCancelled(true);
                         return;
                     }
                 }
@@ -222,13 +242,13 @@ public class PacketReceiveProcessor extends Processor {
                 switch (blockDig.getDigType()) {
                     case START_DESTROY_BLOCK:
                         // Ignores players in creative mode.
-                        if (player.getGameMode() == GameMode.CREATIVE) {
+                        if (gameMode == GameMode.CREATIVE) {
                             break;
                         }
 
                         // Checks the block being dug.
                         TaskUtil.runTask(() -> {
-                            Block block = player.getWorld().getBlockAt(digXPos, digYPos, digZPos);
+                            Block block = world.getBlockAt(digXPos, digYPos, digZPos);
 
                             // Checks for and ignores instantly breakable blocks.
                             switch (block.getType()) {
@@ -288,18 +308,6 @@ public class PacketReceiveProcessor extends Processor {
                             return;
                         }
 
-                        if (!playerData.isShootingBow()
-                                && !playerData.isEating()
-                                && !playerData.isDrinking()) {
-                            KickUtil.kickPlayer(player, event, Settings.releaseUseItemInvalidConditions,
-                                    "Sent ReleaseUseItem packet with invalid conditions"
-                                            + " (shootingBow=" + false
-                                            + " eating=" + false
-                                            + " drinking=" + false + ")"
-                            );
-                            return;
-                        }
-
                         playerData.setBlocking(false);
                         playerData.setShootingBow(false);
                         playerData.setEating(false);
@@ -328,30 +336,20 @@ public class PacketReceiveProcessor extends Processor {
                 break;
 
             case PacketType.Play.Client.BLOCK_PLACE:
-                WrappedPacketInBlockPlace blockPlace = new WrappedPacketInBlockPlace(event.getNMSPacket());
+                WrappedPacketInBlockPlace blockPlace = new WrappedPacketInBlockPlace(nmsPacket);
                 Vector3i placeBlockPosition = blockPlace.getBlockPosition();
                 Direction placeDirection = blockPlace.getDirection();
                 int placeXPos = placeBlockPosition.getX();
                 int placeYPos = placeBlockPosition.getY();
                 int placeZPos = placeBlockPosition.getZ();
 
-                if (playerData.isInventoryOpen()) {
-                    KickUtil.kickPlayer(player, event, Settings.blockPlaceInvalidConditions,
-                            "Sent BlockPlace packet with invalid conditions"
-                                    + " (inventoryOpen=" + true + ")"
-                    );
-                    return;
-                }
-
-                if (placeXPos != -1 && placeYPos != -1 && placeZPos != -1) {
-                    Location blockLocation = new Location(player.getWorld(), placeXPos, placeYPos, placeZPos);
-                    double distance = player.getLocation().distance(blockLocation);
+                if (Settings.blockPlaceInvalidDistance
+                        && placeXPos != -1 && placeYPos != -1 && placeZPos != -1) {
+                    Location blockLocation = new Location(world, placeXPos, placeYPos, placeZPos);
+                    double distance = playerLoc.distance(blockLocation);
 
                     if (distance > 7.03) {
-                        KickUtil.kickPlayer(player, event, Settings.blockPlaceInvalidDistance,
-                                "Sent BlockPlace packet with invalid distance"
-                                        + " (distance=" + distance + ")"
-                        );
+                        event.setCancelled(true);
                         return;
                     }
                 }
@@ -412,22 +410,11 @@ public class PacketReceiveProcessor extends Processor {
 
                 if (blockPlace.getItemStack().isPresent()) {
                     ItemStack itemStack = blockPlace.getItemStack().get();
-
-                    if (itemStack.getType() != Material.AIR && !player.getInventory().contains(itemStack)) {
-                        if (player.getInventory().contains(itemStack.getType()) && !itemStack.hasItemMeta()) {
-                            break;
-                        }
-
-                        KickUtil.kickPlayer(player, event, Settings.blockPlaceInvalidItem,
-                                "Sent BlockPlace packet with invalid item"
-                                        + " (item=" + itemStack
-                                        + " contents=" + Arrays.toString(player.getInventory().getContents()) + ")"
-                        );
-                        return;
-                    }
+                    Material type = itemStack.getType();
+                    PlayerInventory inventory = player.getInventory();
 
                     if (blockPlace.getDirection() == Direction.OTHER) {
-                        switch (itemStack.getType()) {
+                        switch (type) {
                             case WOOD_SWORD:
                             case STONE_SWORD:
                             case IRON_SWORD:
@@ -486,7 +473,7 @@ public class PacketReceiveProcessor extends Processor {
                             default:
                                 break;
                         }
-                    } else if (itemStack.getType().isBlock() && itemStack.getType() != Material.AIR) {
+                    } else if (type.isBlock() && type != Material.AIR) {
                         playerData.setPlacingBlock(true);
                         playerData.setTimestamp(ActionType.PLACING_BLOCK);
                     }
@@ -494,31 +481,23 @@ public class PacketReceiveProcessor extends Processor {
                 break;
 
             case PacketType.Play.Client.CHAT:
-                WrappedPacketInChat chat = new WrappedPacketInChat(event.getNMSPacket());
+                WrappedPacketInChat chat = new WrappedPacketInChat(nmsPacket);
 
-                if (playerData.isBlocking()
-                        || playerData.isShootingBow()
-                        || playerData.isEating()
-                        || playerData.isDrinking()
-                        || playerData.isInventoryOpen()
-                        || playerData.isDigging()
-                        || playerData.isPlacingBlock()) {
+                if (inventoryOpen || digging || placingBlock) {
                     KickUtil.kickPlayer(player, event, Settings.chatInvalidConditions,
                             "Sent Chat packet with invalid conditions"
-                                    + " (blocking=" + playerData.isBlocking()
-                                    + " shootingBow=" + playerData.isShootingBow()
-                                    + " eating=" + playerData.isEating()
-                                    + " drinking=" + playerData.isDrinking()
-                                    + " inventoryOpen=" + playerData.isInventoryOpen()
-                                    + " digging=" + playerData.isDigging()
-                                    + " placingBlock=" + playerData.isPlacingBlock() + ")");
+                                    + " (inventoryOpen=" + inventoryOpen
+                                    + " digging=" + digging
+                                    + " placingBlock=" + placingBlock + ")");
                     return;
                 }
 
-                if (chat.getMessage().isEmpty()) {
+                String message = chat.getMessage();
+
+                if (message.isEmpty()) {
                     KickUtil.kickPlayer(player, event, Settings.chatInvalidMessage,
                             "Sent Chat packet with invalid message"
-                                    + " (message=" + chat.getMessage() + ")"
+                                    + " (message=" + message + ")"
                     );
                     return;
                 }
@@ -527,7 +506,7 @@ public class PacketReceiveProcessor extends Processor {
                 break;
 
             case PacketType.Play.Client.CLIENT_COMMAND:
-                WrappedPacketInClientCommand clientCommand = new WrappedPacketInClientCommand(event.getNMSPacket());
+                WrappedPacketInClientCommand clientCommand = new WrappedPacketInClientCommand(nmsPacket);
 
                 switch (clientCommand.getClientCommand()) {
                     case OPEN_INVENTORY_ACHIEVEMENT:
@@ -541,24 +520,15 @@ public class PacketReceiveProcessor extends Processor {
                         break;
 
                     case PERFORM_RESPAWN:
-                        if (playerData.isShootingBow()
-                                || playerData.isEating()
-                                || playerData.isDrinking()
-                                || playerData.isInventoryOpen()
-                                || playerData.isPlacingBlock()
-                                || playerData.isBlocking()
-                                || playerData.isDigging()
-                                || !player.isDead()) {
+                        boolean dead = player.isDead();
+
+                        if (inventoryOpen || placingBlock || digging || !dead) {
                             KickUtil.kickPlayer(player, event, Settings.respawnInvalidConditions,
                                     "Sent Respawn packet with invalid conditions"
-                                            + " (shootingBow=" + playerData.isShootingBow()
-                                            + " eating=" + playerData.isEating()
-                                            + " drinking=" + playerData.isDrinking()
-                                            + " inventoryOpen=" + playerData.isInventoryOpen()
-                                            + " placingBlock=" + playerData.isPlacingBlock()
-                                            + " blocking=" + playerData.isBlocking()
-                                            + " digging=" + playerData.isDigging()
-                                            + " dead=" + player.isDead() + ")"
+                                            + " (inventoryOpen=" + inventoryOpen
+                                            + " placingBlock=" + placingBlock
+                                            + " digging=" + digging
+                                            + " dead=" + dead + ")"
                             );
                             return;
                         }
@@ -572,28 +542,11 @@ public class PacketReceiveProcessor extends Processor {
                 break;
 
             case PacketType.Play.Client.CLOSE_WINDOW:
-                if (playerData.isShootingBow()
-                        || playerData.isEating()
-                        || playerData.isDrinking()
-                        || playerData.isPlacingBlock()
-                        || playerData.isBlocking()
-                        || playerData.isDigging()) {
+                if (placingBlock || digging) {
                     KickUtil.kickPlayer(player, event, Settings.closeWindowInvalidConditions,
                             "Sent CloseWindow packet with invalid conditions"
-                                    + " (shootingBow=" + playerData.isShootingBow()
-                                    + " eating=" + playerData.isEating()
-                                    + " drinking=" + playerData.isDrinking()
-                                    + " placingBlock=" + playerData.isPlacingBlock()
-                                    + " blocking=" + playerData.isBlocking()
-                                    + " digging=" + playerData.isDigging() + ")"
-                    );
-                    return;
-                }
-
-                if (!playerData.isInventoryOpen() && !playerData.getVersion().isNewerThan(ClientVersion.v_1_8)) {
-                    KickUtil.kickPlayer(player, event, Settings.closeWindowClosedInventory,
-                            "Sent CloseWindow packet with closed inventory"
-                                    + " (inventoryOpen=" + false + ")"
+                                    + " (placingBlock=" + placingBlock
+                                    + " digging=" + digging + ")"
                     );
                     return;
                 }
@@ -603,7 +556,7 @@ public class PacketReceiveProcessor extends Processor {
                 break;
 
             case PacketType.Play.Client.CUSTOM_PAYLOAD:
-                WrappedPacketInCustomPayload customPayload = new WrappedPacketInCustomPayload(event.getNMSPacket());
+                WrappedPacketInCustomPayload customPayload = new WrappedPacketInCustomPayload(nmsPacket);
                 String channelName = customPayload.getChannelName();
                 byte[] rawData = customPayload.getData();
                 int payloadSize = rawData.length;
@@ -619,7 +572,7 @@ public class PacketReceiveProcessor extends Processor {
                 }
 
                 // Checks for invalid item name payloads.
-                if ("MC|ItemName".equals(channelName)) {
+                if (channelName.equals("MC|ItemName")) {
                     if (payloadSize > (playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8) ? 31 : 32)) {
                         KickUtil.kickPlayer(player, event, Settings.itemNameInvalidSize,
                                 "Sent ItemName payload with invalid size"
@@ -671,10 +624,10 @@ public class PacketReceiveProcessor extends Processor {
                 }
 
                 // Checks for invalid trade select payloads.
-                if ("MC|TrSel".equals(channelName)
-                        && !"\u0000\u0000\u0000\u0000".equals(data)
-                        && !"\u0000\u0000\u0000\u0001".equals(data)
-                        && !"\u0000\u0000\u0000\u0002".equals(data)) {
+                if (channelName.equals("MC|TrSel")
+                        && !data.equals("\u0000\u0000\u0000\u0000")
+                        && !data.equals("\u0000\u0000\u0000\u0001")
+                        && !data.equals("\u0000\u0000\u0000\u0002")) {
                     KickUtil.kickPlayer(player, event, Settings.tradeSelectInvalidData,
                             "Sent TradeSelect payload with invalid data"
                                     + " (data=" + data + ")"
@@ -683,23 +636,26 @@ public class PacketReceiveProcessor extends Processor {
                 }
 
                 // Checks for invalid pick item payloads.
-                if ("MC|PickItem".equals(channelName) && !"\t".equals(data)) {
+                if (channelName.equals("MC|PickItem") && !data.equals("\t")) {
                     // TODO: Remove this in production.
                     FileUtil.printDataToFile(data, "pick-item-data.txt");
                 }
 
                 // Checks for invalid beacon payloads.
-                if ("MC|Beacon".equals(channelName)) {
-                    if (player.getOpenInventory().getType() != InventoryType.BEACON) {
+                if (channelName.equals("MC|Beacon")) {
+                    InventoryType type = openInventory.getType();
+
+                    if (type != InventoryType.BEACON) {
                         KickUtil.kickPlayer(player, event, Settings.beaconInvalidConditions,
                                 "Sent Beacon payload with invalid conditions"
-                                        + " (inventoryType=" + player.getOpenInventory().getType() + ")"
+                                        + " (inventoryType=" + type + ")"
                         );
                         return;
                     }
 
-                    BlockState beacon = (BlockState) player.getOpenInventory().getTopInventory().getHolder();
-                    int tier = BeaconUtil.getTier(beacon.getLocation());
+                    BlockState beacon = (BlockState) openInventory.getTopInventory().getHolder();
+                    Location beaconLoc = beacon.getLocation();
+                    int beaconTier = BeaconUtil.getTier(beaconLoc);
 
                     if (data.charAt(0) == '\u0000'
                             && data.charAt(1) == '\u0000'
@@ -710,30 +666,31 @@ public class PacketReceiveProcessor extends Processor {
                             && (data.charAt(7) == '\u0000' || data.charAt(7) == '\n' || data.charAt(7) == '\u0001'
                             || data.charAt(7) == '\u0003' || data.charAt(7) == '\u000B' || data.charAt(7) == '\u0008'
                             || data.charAt(7) == '\u0005')) {
+                        char beaconEffect = data.charAt(3);
 
                         // Checks for invalid beacon effect payloads.
-                        if (data.charAt(3) != '\u0001' // Speed
-                                && data.charAt(3) != '\u0003' // Haste
-                                && data.charAt(3) != '\u000B' // Resistance
-                                && data.charAt(3) != '\u0008' // Jump Boost
-                                && data.charAt(3) != '\u0005' // Strength
+                        if (beaconEffect != '\u0001' // Speed
+                                && beaconEffect != '\u0003' // Haste
+                                && beaconEffect != '\u000B' // Resistance
+                                && beaconEffect != '\u0008' // Jump Boost
+                                && beaconEffect != '\u0005' // Strength
                         ) {
                             KickUtil.kickPlayer(player, event, Settings.beaconInvalidEffect,
                                     "Sent Beacon payload with invalid effect"
-                                            + " (effect=" + data.charAt(3) + ")"
+                                            + " (effect=" + beaconEffect + ")"
                             );
                             return;
                         }
 
                         // Checks for players sending beacon effects that don't match the beacon tier.
-                        switch (tier) {
+                        switch (beaconTier) {
                             case 1:
-                                if (data.charAt(3) == '\u000B'
-                                        || data.charAt(3) == '\u0008'
-                                        || data.charAt(3) == '\u0005') {
+                                if (beaconEffect == '\u000B'
+                                        || beaconEffect == '\u0008'
+                                        || beaconEffect == '\u0005') {
                                     KickUtil.kickPlayer(player, event, Settings.beaconInvalidTier,
                                             "Sent Beacon payload with invalid tier"
-                                                    + " (tier=" + tier
+                                                    + " (tier=" + beaconTier
                                                     + " (data=" + data + ")"
                                     );
                                     return;
@@ -741,10 +698,10 @@ public class PacketReceiveProcessor extends Processor {
                                 break;
 
                             case 2:
-                                if (data.charAt(3) == '\u0005') {
+                                if (beaconEffect == '\u0005') {
                                     KickUtil.kickPlayer(player, event, Settings.beaconInvalidTier,
                                             "Sent Beacon payload with invalid tier"
-                                                    + " (tier=" + tier
+                                                    + " (tier=" + beaconTier
                                                     + " (data=" + data + ")"
                                     );
                                     return;
@@ -765,22 +722,24 @@ public class PacketReceiveProcessor extends Processor {
                 }
 
                 // Checks for invalid book-related payloads.
-                if ("MC|BOpen".equals(channelName)
-                        || "MC|BEdit".equals(channelName)
-                        || "MC|BSign".equals(channelName)) {
-                    ItemStack itemInHand = playerData.getPlayer().getInventory().getItemInHand();
+                if (channelName.equals("MC|BOpen")
+                        || channelName.equals("MC|BEdit")
+                        || channelName.equals("MC|BSign")) {
+                    ItemStack itemInHand = player.getInventory().getItemInHand();
 
                     // Checks for invalid book open payloads.
                     // (The client doesn't send this payload; the server does)
-                    if ("MC|BOpen".equals(channelName)) {
+                    if (channelName.equals("MC|BOpen")) {
                         KickUtil.kickPlayer(player, event, Settings.bookOpenInvalidConditions,
                                 "Sent BookOpen payload with invalid conditions"
                         );
                         return;
                     }
 
+                    int length = data.length();
+
                     // Checks for invalid book edit payloads.
-                    if ("MC|BEdit".equals(channelName)) {
+                    if (channelName.equals("MC|BEdit")) {
                         if (itemInHand == null || !itemInHand.getType().toString().toLowerCase(Locale.ROOT).contains("book")) {
                             KickUtil.kickPlayer(player, event, Settings.bookEditInvalidConditions,
                                     "Sent BookEdit payload with invalid conditions"
@@ -791,7 +750,7 @@ public class PacketReceiveProcessor extends Processor {
 
                         if (!data.startsWith("\u0001ï¿½\u0001\u0000\u0000\n\u0000\u0000\t"
                                 + "\u0000\u0005pages\b\u0000\u0000\u0000\u0001\u0000\f")
-                                && !(!data.isEmpty() && data.charAt(data.length() - 1) == '\u0000')) {
+                                && !(!data.isEmpty() && data.charAt(length - 1) == '\u0000')) {
                             KickUtil.kickPlayer(player, event, Settings.bookEditInvalidData,
                                     "Sent BookEdit payload with invalid data"
                                             + " (" + data + ")"
@@ -801,7 +760,7 @@ public class PacketReceiveProcessor extends Processor {
                     }
 
                     // Checks for invalid book sign payloads.
-                    if ("MC|BSign".equals(channelName)) {
+                    if (channelName.equals("MC|BSign")) {
                         if (itemInHand == null || !itemInHand.getType().toString().toLowerCase(Locale.ROOT).contains("book")) {
                             KickUtil.kickPlayer(player, event, Settings.bookSignInvalidConditions,
                                     "Sent BookSign payload with invalid conditions"
@@ -812,7 +771,7 @@ public class PacketReceiveProcessor extends Processor {
 
                         if (!data.startsWith("\u0001ï¿½\u0001\u0000\u0000\n\u0000\u0000\t"
                                 + "\u0000\u0005pages\b\u0000\u0000\u0000\u0001\u0000\f")
-                                && !(!data.isEmpty() && data.charAt(data.length() - 1) == '\u0000')
+                                && !(!data.isEmpty() && data.charAt(length - 1) == '\u0000')
                                 && !data.contains("\b\u0000\u0006author\u0000\u0007")
                                 && !data.contains("\b\u0000\u0005title\u0000\u0004")) {
                             KickUtil.kickPlayer(player, event, Settings.bookSignInvalidData,
@@ -824,10 +783,12 @@ public class PacketReceiveProcessor extends Processor {
                     }
                 }
 
-                if (("MC|AdvCdm".equals(channelName) || "MC|AutoCmd".equals(channelName)) && !player.isOp()) {
+                boolean playerIsOp = player.isOp();
+
+                if ((channelName.equals("MC|AdvCdm") || channelName.equals("MC|AutoCmd")) && !playerIsOp) {
                     KickUtil.kickPlayer(player, event, Settings.commandBlockInvalidConditions,
                             "Sent CommandBlock payload with invalid conditions"
-                                    + " (op=" + player.isOp() + ")"
+                                    + " (op=" + false + ")"
                     );
                     return;
                 }
@@ -840,7 +801,7 @@ public class PacketReceiveProcessor extends Processor {
                 break;
 
             case PacketType.Play.Client.ENTITY_ACTION:
-                WrappedPacketInEntityAction entityAction = new WrappedPacketInEntityAction(event.getNMSPacket());
+                WrappedPacketInEntityAction entityAction = new WrappedPacketInEntityAction(nmsPacket);
                 WrappedPacketInEntityAction.PlayerAction playerAction = entityAction.getAction();
                 int jumpBoost = entityAction.getJumpBoost();
 
@@ -850,25 +811,10 @@ public class PacketReceiveProcessor extends Processor {
                     return;
                 }
 
+                boolean sneaking = playerData.isSneaking();
+
                 switch (playerAction) {
                     case START_SPRINTING:
-                        if (!playerData.isAgainstBlock() && !playerData.isFlightAllowed()
-                                && ((playerData.isBlocking() && playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8))
-                                || playerData.isShootingBow()
-                                || playerData.isDrinking()
-                                || playerData.getPlayer().getFoodLevel() <= 6
-                                || player.hasPotionEffect(PotionEffectType.BLINDNESS))) {
-                            KickUtil.kickPlayer(player, event, Settings.startSprintingInvalidConditions,
-                                    "Sent StartSprinting packet with invalid conditions"
-                                            + " (blocking=" + playerData.isBlocking()
-                                            + " shootingBow=" + playerData.isShootingBow()
-                                            + " drinking=" + playerData.isDrinking()
-                                            + " foodLevel=" + playerData.getPlayer().getFoodLevel()
-                                            + " blindness=" + player.hasPotionEffect(PotionEffectType.BLINDNESS) + ")"
-                            );
-                            return;
-                        }
-
                         playerData.setSprinting(true);
                         playerData.setTimestamp(ActionType.START_SPRINTING);
                         break;
@@ -879,12 +825,10 @@ public class PacketReceiveProcessor extends Processor {
                         break;
 
                     case START_SNEAKING:
-                        if (playerData.isInventoryOpen()
-                                || playerData.isSneaking()) {
+                        if (sneaking) {
                             KickUtil.kickPlayer(player, event, Settings.startSneakingInvalidConditions,
                                     "Sent StartSneaking packet with invalid conditions"
-                                            + " (inventoryOpen=" + playerData.isInventoryOpen()
-                                            + " sneaking=" + playerData.isSneaking() + ")"
+                                            + " (sneaking=" + true + ")"
                             );
                             return;
                         }
@@ -894,22 +838,12 @@ public class PacketReceiveProcessor extends Processor {
                         break;
 
                     case STOP_SNEAKING:
-                        if (!playerData.isSneaking()) {
-                            KickUtil.kickPlayer(player, event, Settings.stopSneakingInvalidConditions,
-                                    "Sent StopSneaking packet with invalid conditions"
-                                            + " (sneaking=" + false + ")"
-                            );
-                            return;
-                        }
-
                         playerData.setSneaking(false);
                         playerData.setTimestamp(ActionType.SNEAKING);
                         break;
 
                     case OPEN_INVENTORY:
-                        if (player.isInsideVehicle()) {
-                            Entity vehicle = player.getVehicle();
-
+                        if (insideVehicle) {
                             if (vehicle instanceof Horse) {
                                 Horse horse = (Horse) vehicle;
 
@@ -929,31 +863,28 @@ public class PacketReceiveProcessor extends Processor {
                         break;
 
                     case STOP_SLEEPING:
-                        if (playerData.isInventoryOpen()
-                                || !playerData.isInBed()) {
+                        boolean sleeping = player.isSleeping();
+
+                        if (inventoryOpen || !sleeping) {
                             KickUtil.kickPlayer(player, event, Settings.stopSleepingInvalidConditions,
                                     "Sent StopSleeping packet with invalid conditions"
-                                            + " (inventoryOpen=" + playerData.isInventoryOpen()
-                                            + " inBed=" + playerData.isInBed() + ")"
+                                            + " (inventoryOpen=" + inventoryOpen
+                                            + " sleeping=" + sleeping + ")"
                             );
                             return;
                         }
-
-                        playerData.setInBed(false);
-                        playerData.setTimestamp(ActionType.IN_BED);
                         break;
 
                     case RIDING_JUMP:
                     case START_RIDING_JUMP:
                     case STOP_RIDING_JUMP:
-                        if (playerData.isInventoryOpen()
-                                || !player.isInsideVehicle()
-                                || player.getVehicle().getType() != EntityType.HORSE) {
+                        EntityType entityType = vehicle.getType();
+
+                        if (!insideVehicle || entityType != EntityType.HORSE) {
                             KickUtil.kickPlayer(player, event, Settings.ridingJumpInvalidConditions,
                                     "Sent RidingJump packet with invalid conditions"
-                                            + " (inventoryOpen=" + playerData.isInventoryOpen()
-                                            + " insideVehicle=" + player.isInsideVehicle()
-                                            + " vehicle=" + (player.isInsideVehicle() ? player.getVehicle().getType() : null) + ")"
+                                            + " (insideVehicle=" + insideVehicle
+                                            + " vehicle=" + (insideVehicle ? entityType : null) + ")"
                             );
                             return;
                         }
@@ -972,47 +903,17 @@ public class PacketReceiveProcessor extends Processor {
                 }
                 break;
 
-            case PacketType.Play.Client.ENCHANT_ITEM:
-                WrappedPacketInEnchantItem enchantItem = new WrappedPacketInEnchantItem(event.getNMSPacket());
-                int enchantItemWindowId = enchantItem.getWindowId();
-
-                if (enchantItemWindowId < 0 || enchantItemWindowId > 2) {
-                    KickUtil.kickPlayer(player, event, Settings.enchantItemInvalidWindowId,
-                            "Sent EnchantItem packet with invalid window ID"
-                                    + " (windowId=" + enchantItemWindowId + ")"
-                    );
-                    return;
-                }
-                break;
-
             case PacketType.Play.Client.POSITION:
             case PacketType.Play.Client.POSITION_LOOK:
             case PacketType.Play.Client.LOOK:
             case PacketType.Play.Client.FLYING:
-                WrappedPacketInFlying flying = new WrappedPacketInFlying(event.getNMSPacket());
+                WrappedPacketInFlying flying = new WrappedPacketInFlying(nmsPacket);
                 Vector3d flyingPosition = flying.getPosition();
                 double flyingXPos = flyingPosition.getX();
                 double flyingYPos = flyingPosition.getY();
                 double flyingZPos = flyingPosition.getZ();
                 float flyingYaw = flying.getYaw();
                 float flyingPitch = flying.getPitch();
-
-                // Handles teleport resets.
-                if (flying.isMoving()) {
-                    if (playerData.isTeleportReset()) {
-                        playerData.setTeleportReset(false);
-                        playerData.setLastTeleportPacket(null);
-                        playerData.setLastServerPositionTick(600);
-                    }
-
-                    if (playerData.getLastTeleportPacket() != null) {
-                        Vector3d lastTPPos = playerData.getLastTeleportPacket().getPosition();
-
-                        if (flyingPosition.distanceSquared(lastTPPos) <= 0.005 && playerData.getTotalTicks() > 100) {
-                            playerData.setTeleportReset(true);
-                        }
-                    }
-                }
 
                 // Handles invalid Y data.
                 if (Math.abs(flyingYPos) > 1.0E9) {
@@ -1049,15 +950,13 @@ public class PacketReceiveProcessor extends Processor {
                 Location currentLocation = playerData.getLocation();
 
                 if (currentLocation == null) {
-                    currentLocation = player.getLocation();
+                    currentLocation = playerLoc;
                 }
 
-                Location location = new Location(player.getWorld(), flyingXPos, flyingYPos, flyingZPos,
-                        currentLocation.getYaw(), currentLocation.getPitch());
+                float yaw = currentLocation.getYaw();
+                float pitch = currentLocation.getPitch();
+                Location location = new Location(world, flyingXPos, flyingYPos, flyingZPos, yaw, pitch);
 
-                playerData.setLastLastLastLocation(playerData.getLastLastLocation());
-                playerData.setLastLastLocation(playerData.getLastLocation());
-                playerData.setLastLocation(currentLocation);
                 playerData.setLocation(location);
 
                 // Handles player packet data (from Dusk).
@@ -1071,11 +970,11 @@ public class PacketReceiveProcessor extends Processor {
                     if (!flying.isMoving() && !flying.isRotating()) {
                         playerData.handlePlayerPacket(new CustomLocation(null, null));
                     } else if (!flying.isMoving() && flying.isRotating()) {
-                        playerData.handlePlayerPacket(new CustomLocation(null, new Vector2f(flying.getYaw(), flying.getPitch())));
+                        playerData.handlePlayerPacket(new CustomLocation(null, new Vector2f(flyingYaw, flyingPitch)));
                     } else if (flying.isMoving() && !flying.isRotating()) {
-                        playerData.handlePlayerPacket(new CustomLocation(new org.joml.Vector3d(flying.getPosition().getX(), flying.getPosition().getY(), flying.getPosition().getZ()), null));
+                        playerData.handlePlayerPacket(new CustomLocation(new org.joml.Vector3d(flyingXPos, flyingYPos, flyingZPos), null));
                     } else {
-                        playerData.handlePlayerPacket(new CustomLocation(new org.joml.Vector3d(flying.getPosition().getX(), flying.getPosition().getY(), flying.getPosition().getZ()), new Vector2f(flying.getYaw(), flying.getPitch())));
+                        playerData.handlePlayerPacket(new CustomLocation(new org.joml.Vector3d(flyingXPos, flyingYPos, flyingZPos), new Vector2f(flyingYaw, flyingPitch)));
                     }
                 }
 
@@ -1089,14 +988,17 @@ public class PacketReceiveProcessor extends Processor {
                         return;
                     }
 
-                    if (playerData.getLastRotationPacket() != null) {
-                        WrappedPacketInFlying from = playerData.getLastRotationPacket();
+                    WrappedPacketInFlying lastRotationPacket = playerData.getLastRotationPacket();
+
+                    if (lastRotationPacket != null) {
+                        float fromPitch = lastRotationPacket.getPitch();
+                        float fromYaw = lastRotationPacket.getYaw();
 
                         // Checks if the player has rotated.
-                        if (Math.abs(flyingPitch - from.getPitch()) != 0.0
-                                || Math.abs(flyingYaw - from.getYaw()) != 0.0) {
+                        if (Math.abs(flyingPitch - fromPitch) != 0.0
+                                || Math.abs(flyingYaw - fromYaw) != 0.0) {
                             // Ignores teleport packets.
-                            handleRotationChecks(playerData, new RotationEvent(flying, playerData.getLastRotationPacket()));
+                            handleRotationChecks(playerData, new RotationEvent(flying, lastRotationPacket));
                         }
                     }
 
@@ -1105,158 +1007,35 @@ public class PacketReceiveProcessor extends Processor {
 
                 // Handles player movement.
                 if (flying.isMoving()) {
-                    boolean chunkUnloaded = BlockUtil.isLocationInUnloadedChunk(location);
-                    playerData.setInUnloadedChunk(chunkUnloaded);
+                    int enterVehicleTicks = playerData.getTicksSince(ActionType.ENTER_VEHICLE);
 
-                    if (chunkUnloaded) {
-                        playerData.setTimestamp(ActionType.IN_UNLOADED_CHUNK);
-                    }
-
-                    if (player.isInsideVehicle() && playerData.getTicksSince(ActionType.ENTER_VEHICLE) > 2) {
+                    if (insideVehicle && enterVehicleTicks > 2) {
                         event.setCancelled(true);
-                        player.getVehicle().eject();
-                        MessageUtil.debug("Flying packet ignored for " + player.getName() + " (inside vehicle) "
-                                + playerData.getTicksSince(ActionType.ENTER_VEHICLE));
-                    }
-
-                    // Set ground data
-                    playerData.setOnGround(BlockUtil.isOnGroundOffset(player, 0.1));
-                    playerData.setNearGround(BlockUtil.isOnGroundOffset(player, 0.25));
-
-                    // Sets non-strict ground data.
-                    if (playerData.isNearGround()) {
-                        playerData.setAirTicks(0);
-                        playerData.setGroundTicks(playerData.getGroundTicks() + 1);
-
-                        if (playerData.getAboveBlockTicks() < 60) {
-                            playerData.setAboveBlockTicks(playerData.getAboveBlockTicks() + 1);
-                        }
-
-                    } else {
-                        playerData.setAirTicks(playerData.getAirTicks() + 1);
-                        playerData.setGroundTicks(0);
-
-                        if (playerData.getAboveBlockTicks() > 0) {
-                            playerData.setAboveBlockTicks(playerData.getAboveBlockTicks() - 1);
-                        }
-                    }
-
-                    // Sets strict ground data.
-                    if (playerData.isOnGround()) {
-                        playerData.setAirTicksStrict(0);
-                        playerData.setGroundTicksStrict(playerData.getGroundTicksStrict() + 1);
-
-                        if (playerData.getAboveBlockTicksStrict() < 60) {
-                            playerData.setAboveBlockTicksStrict(playerData.getAboveBlockTicksStrict() + 1);
-                        }
-
-                    } else {
-                        playerData.setAirTicksStrict(playerData.getAirTicksStrict() + 1);
-                        playerData.setGroundTicksStrict(0);
-
-                        if (playerData.getAboveBlockTicksStrict() > 0) {
-                            playerData.setAboveBlockTicksStrict(playerData.getAboveBlockTicksStrict() - 1);
-                        }
+                        vehicle.eject();
+                        MessageUtil.debug("Flying packet ignored for " + playerName + " (inside vehicle) " + enterVehicleTicks);
                     }
 
                     // Set block data
-                    playerData.setInLiquid(BlockUtil.isInLiquid(player));
-                    playerData.setInWeb(BlockUtil.isInWeb(player));
-                    playerData.setNearAnvil(BlockUtil.isNearAnvil(player));
-                    playerData.setNearBed(BlockUtil.isNearBed(player));
-                    playerData.setNearBrewingStand(BlockUtil.isNearBrewingStand(player));
-                    playerData.setNearCactus(BlockUtil.isNearCactus(player));
-                    playerData.setNearCarpet(BlockUtil.isNearCarpet(player));
-                    playerData.setNearChest(BlockUtil.isNearChest(player));
-                    playerData.setNearClimbable(BlockUtil.isNearClimbable(player));
-                    playerData.setNearFence(BlockUtil.isNearFence(player));
-                    playerData.setNearFenceGate(BlockUtil.isNearFenceGate(player));
-                    playerData.setNearFlowerPot(BlockUtil.isNearFlowerPot(player));
-                    playerData.setNearHopper(BlockUtil.isNearHopper(player));
-                    playerData.setNearLilyPad(BlockUtil.isNearLilyPad(player));
-                    playerData.setNearLiquid(BlockUtil.isNearLiquid(player));
-                    playerData.setNearPiston(BlockUtil.isNearPiston(player));
                     playerData.setNearPortal(BlockUtil.isNearPortal(player));
-                    playerData.setNearSlab(BlockUtil.isNearSlab(player));
-                    playerData.setNearSlimeBlock(BlockUtil.isNearSlimeBlock(player));
-                    playerData.setNearSnowLayer(BlockUtil.isNearSnowLayer(player));
-                    playerData.setNearStairs(BlockUtil.isNearStairs(player));
-                    playerData.setNearTrapdoor(BlockUtil.isNearTrapdoor(player));
-                    playerData.setOnChest(BlockUtil.isOnChest(player));
-                    playerData.setOnClimbable(BlockUtil.isOnClimbable(player));
-                    playerData.setOnIce(BlockUtil.isOnIce(player));
-                    playerData.setOnLilyPad(BlockUtil.isOnLilyPad(player));
-                    playerData.setOnRepeater(BlockUtil.isOnRepeater(player));
-                    playerData.setOnSlab(BlockUtil.isOnSlab(player));
-                    playerData.setOnSnowLayer(BlockUtil.isOnSnowLayer(player));
-                    playerData.setOnSoulSand(BlockUtil.isOnSoulSand(player));
-                    playerData.setOnStairs(BlockUtil.isOnStairs(player));
+                    playerData.setAgainstBlock(BlockUtil.isAgainstBlock(player));
 
-                    if (playerData.isNearSlimeBlock() && !playerData.isOnGround()) {
-                        playerData.setUnderEffectOfSlime(true);
-                    } else if (!playerData.isNearSlimeBlock() && playerData.isOnGround()) {
-                        playerData.setTouchedGroundSinceLogin(true);
-                        playerData.setUnderEffectOfSlime(false);
-                    } else if (playerData.isOnGround()) {
-                        playerData.setTouchedGroundSinceLogin(true);
-                    }
+                    WrappedPacketInFlying lastPositionPacket = playerData.getLastPositionPacket();
 
-                    if (playerData.isNearClimbable()
-                            || playerData.isNearLiquid()
-                            || player.isFlying()) {
-                        playerData.setUnderEffectOfSlime(false);
-                    }
-
-                    if (BlockUtil.isAgainstBlock(player)) {
-                        playerData.setAgainstBlockTicks(playerData.getAgainstBlockTicks() + 1);
-                        playerData.setAgainstBlock(true);
-                        playerData.setTimestamp(ActionType.AGAINST_BLOCK);
-                    } else {
-                        playerData.setAgainstBlockTicks(0);
-                        playerData.setAgainstBlock(false);
-                    }
-
-                    if (BlockUtil.isAgainstBlockWide(player)) {
-                        playerData.setAgainstBlockWideTicks(playerData.getAgainstBlockTicks() + 1);
-                        playerData.setAgainstBlockWide(true);
-                        playerData.setTimestamp(ActionType.AGAINST_BLOCK_WIDE);
-                    } else {
-                        playerData.setAgainstBlockWideTicks(0);
-                        playerData.setAgainstBlockWide(false);
-                    }
-
-                    if (BlockUtil.isUnderBlock(player)) {
-                        playerData.setUnderBlockTicks(playerData.getUnderBlockTicks() + 1);
-                        playerData.setUnderBlock(true);
-                        playerData.setTimestamp(ActionType.UNDER_BLOCK);
-                    } else {
-                        playerData.setUnderBlockTicks(0);
-                        playerData.setUnderBlock(false);
-                    }
-
-                    playerData.setCollidingBlock(BlockUtil.getCollidingBlock(player));
-
-                    if (playerData.isOnIce()) {
-                        playerData.setTimestamp(ActionType.ON_ICE);
-                    }
-
-                    if (playerData.isInLiquid()) {
-                        playerData.setTimestamp(ActionType.IN_LIQUID);
-                    }
-
-                    if (playerData.getLastPositionPacket() != null) {
-                        WrappedPacketInFlying from = playerData.getLastPositionPacket();
-                        Vector3d fromPosition = from.getPosition();
+                    if (lastPositionPacket != null) {
+                        Vector3d fromPosition = lastPositionPacket.getPosition();
+                        double fromXPos = fromPosition.getX();
+                        double fromYPos = fromPosition.getY();
+                        double fromZPos = fromPosition.getZ();
 
                         // Checks if the player has moved.
-                        if (Math.abs(flyingXPos - fromPosition.getX()) != 0.0
-                                || Math.abs(flyingYPos - fromPosition.getY()) != 0.0
-                                || Math.abs(flyingZPos - fromPosition.getZ()) != 0.0) {
+                        if (Math.abs(flyingXPos - fromXPos) != 0.0
+                                || Math.abs(flyingYPos - fromYPos) != 0.0
+                                || Math.abs(flyingZPos - fromZPos) != 0.0) {
 
                             // Ignores teleport packets.
                             playerData.setMoving(true);
                             handleMovementChecks(playerData, new MovementEvent(playerData,
-                                    flying, playerData.getLastPositionPacket(), event));
+                                    flying, lastPositionPacket, event));
                         } else {
                             playerData.setMoving(false);
                         }
@@ -1269,56 +1048,62 @@ public class PacketReceiveProcessor extends Processor {
                     playerData.setDigging(false);
                 }
 
+                int totalTicks = playerData.getTotalTicks();
+                int lastFlyingTicks = playerData.getLastFlyingTicks();
+                int lastDroppedPackets = playerData.getLastDroppedPackets();
+
                 playerData.setPlacingBlock(false);
-                playerData.setLastDroppedPackets(playerData.getTotalTicks() - playerData.getLastFlyingTicks() > 2
-                        ? playerData.getTotalTicks() : playerData.getLastDroppedPackets());
-                playerData.setLastFlyingTicks(playerData.getTotalTicks());
+                playerData.setLastDroppedPackets(totalTicks - lastFlyingTicks > 2 ? totalTicks : lastDroppedPackets);
+                playerData.setLastFlyingTicks(totalTicks);
                 playerData.setTimestamp(ActionType.FLYING_PACKET);
                 break;
 
             case PacketType.Play.Client.HELD_ITEM_SLOT:
-                WrappedPacketInHeldItemSlot heldItemSlot = new WrappedPacketInHeldItemSlot(event.getNMSPacket());
-                int currentSlot = heldItemSlot.getCurrentSelectedSlot();
+                WrappedPacketInHeldItemSlot heldItemSlotPacket = new WrappedPacketInHeldItemSlot(nmsPacket);
+                int heldItemSlot = heldItemSlotPacket.getCurrentSelectedSlot();
+                int inventoryOpenTicks = playerData.getTicksSince(ActionType.INVENTORY_OPEN);
 
-                if (playerData.isInventoryOpen() && playerData.getTicksSince(ActionType.INVENTORY_OPEN) > 2) {
+                if (inventoryOpen && inventoryOpenTicks > 5) {
                     KickUtil.kickPlayer(player, event, Settings.heldItemSlotInvalidConditions,
                             "Sent HeldItemSlot packet with invalid conditions"
-                                    + " (timeSinceInventoryOpen=" + playerData.getTicksSince(ActionType.INVENTORY_OPEN) + ")"
+                                    + " (timeSinceInventoryOpen=" + inventoryOpenTicks + ")"
                     );
                     return;
                 }
 
-                if (currentSlot == playerData.getCurrentSlot()
+                int currentSlot = playerData.getCurrentSlot();
+
+                if (heldItemSlot == currentSlot
                         && playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8)
                         && playerData.getTicksSince(ActionType.LOGIN) > 20) {
                     KickUtil.kickPlayer(player, event, Settings.heldItemSlotInvalidSlotChange,
                             "Sent HeldItemSlot packet with invalid slot change"
-                                    + " (slot=" + currentSlot + ")"
-                                    + " (currentSlot=" + playerData.getCurrentSlot() + ")"
+                                    + " (slot=" + heldItemSlot + ")"
+                                    + " (currentSlot=" + currentSlot + ")"
                     );
                     return;
                 }
 
-                if (currentSlot < 0 || currentSlot > 8) {
+                if (heldItemSlot < 0 || heldItemSlot > 8) {
                     KickUtil.kickPlayer(player, event, Settings.heldItemSlotInvalidSlot,
                             "Sent HeldItemSlot packet with invalid slot"
-                                    + " (slot=" + currentSlot + ")"
+                                    + " (slot=" + heldItemSlot + ")"
                     );
                     return;
                 }
 
-                playerData.setCurrentSlot(currentSlot);
+                playerData.setCurrentSlot(heldItemSlot);
                 playerData.setTimestamp(ActionType.CHANGE_SLOT);
                 break;
 
             case PacketType.Play.Client.SET_CREATIVE_SLOT:
-                WrappedPacketInSetCreativeSlot setCreativeSlot = new WrappedPacketInSetCreativeSlot(event.getNMSPacket());
+                WrappedPacketInSetCreativeSlot setCreativeSlot = new WrappedPacketInSetCreativeSlot(nmsPacket);
                 int creativeSlot = setCreativeSlot.getSlot();
 
-                if (player.getGameMode() != GameMode.CREATIVE) {
+                if (gameMode != GameMode.CREATIVE) {
                     KickUtil.kickPlayer(player, event, Settings.setCreativeSlotInvalidConditions,
                             "Sent SetCreativeSlot packet with invalid conditions"
-                                    + " (gamemode=" + player.getGameMode() + ")"
+                                    + " (gamemode=" + gameMode + ")"
                     );
                     return;
                 }
@@ -1333,7 +1118,7 @@ public class PacketReceiveProcessor extends Processor {
                 break;
 
             case PacketType.Play.Client.SETTINGS:
-                WrappedPacketInSettings settings = new WrappedPacketInSettings(event.getNMSPacket());
+                WrappedPacketInSettings settings = new WrappedPacketInSettings(nmsPacket);
                 String locale = settings.getLocale();
                 int localeLength = locale.length();
                 int viewDistance = settings.getViewDistance();
@@ -1357,27 +1142,29 @@ public class PacketReceiveProcessor extends Processor {
                 break;
 
             case PacketType.Play.Client.SPECTATE:
-                WrappedPacketInSpectate spectate = new WrappedPacketInSpectate(event.getNMSPacket());
+                WrappedPacketInSpectate spectate = new WrappedPacketInSpectate(nmsPacket);
+                UUID spectateUUID = spectate.getUUID();
+                Player spectatePlayer = Bukkit.getServer().getPlayer(spectateUUID);
 
-                if (player.getGameMode() != GameMode.SPECTATOR
-                        || Bukkit.getServer().getPlayer(spectate.getUUID()) == null) {
+                if (gameMode != GameMode.SPECTATOR
+                        || spectatePlayer == null) {
                     KickUtil.kickPlayer(player, event, Settings.spectateInvalidConditions,
                             "Sent Spectate packet with invalid conditions"
-                                    + " (gamemode=" + player.getGameMode() + ")"
-                                    + " (player=" + Bukkit.getServer().getPlayer(spectate.getUUID()) + ")"
+                                    + " (gamemode=" + gameMode + ")"
+                                    + " (player=" + spectatePlayer + ")"
                     );
                     return;
                 }
                 break;
 
             case PacketType.Play.Client.STEER_VEHICLE:
-                WrappedPacketInSteerVehicle steerVehicle = new WrappedPacketInSteerVehicle(event.getNMSPacket());
+                WrappedPacketInSteerVehicle steerVehicle = new WrappedPacketInSteerVehicle(nmsPacket);
                 float sidewaysValue = steerVehicle.getSideValue();
                 float forwardValue = steerVehicle.getForwardValue();
+                boolean jump = steerVehicle.isJump();
 
                 // Ignores vehicle dismount packets.
-                if (sidewaysValue == 0.0f && forwardValue == 0.0f
-                        && !steerVehicle.isJump() && !player.isInsideVehicle()) {
+                if (sidewaysValue == 0.0f && forwardValue == 0.0f && !jump && !insideVehicle) {
                     if (player.getNearbyEntities(3, 3, 3).stream().anyMatch(Vehicle.class::isInstance)) {
                         playerData.setTimestamp(ActionType.STEER_VEHICLE);
                         break;
@@ -1387,14 +1174,14 @@ public class PacketReceiveProcessor extends Processor {
                             "Sent SteerVehicle packet with invalid conditions"
                                     + " (sidewaysValue=" + 0.0f
                                     + " forwardValue=" + 0.0f
-                                    + " jump=" + steerVehicle.isJump()
-                                    + " insideVehicle=" + player.isInsideVehicle() + ")"
+                                    + " jump=" + false
+                                    + " insideVehicle=" + false + ")"
                     );
                     return;
 
-                } else if (!player.isInsideVehicle()) {
+                } else if (!insideVehicle) {
                     event.setCancelled(true);
-                    MessageUtil.debug("SteerVehicle packet ignored for " + player.getName() + " (not inside vehicle)");
+                    MessageUtil.debug("SteerVehicle packet ignored for " + playerName + " (not inside vehicle)");
                     return;
                 }
 
@@ -1406,19 +1193,20 @@ public class PacketReceiveProcessor extends Processor {
                 break;
 
             case PacketType.Play.Client.TAB_COMPLETE:
-                WrappedPacketInTabComplete tabComplete = new WrappedPacketInTabComplete(event.getNMSPacket());
+                WrappedPacketInTabComplete tabComplete = new WrappedPacketInTabComplete(nmsPacket);
+                String tabCompleteText = tabComplete.getText();
 
-                if (tabComplete.getText().isEmpty()) {
+                if (tabCompleteText.isEmpty()) {
                     KickUtil.kickPlayer(player, event, Settings.tabCompleteInvalidMessage,
                             "Sent TabComplete packet with invalid message"
-                                    + " (message=" + tabComplete.getText() + ")"
+                                    + " (message=" + tabCompleteText + ")"
                     );
                     return;
                 }
                 break;
 
             case PacketType.Play.Client.TRANSACTION:
-                WrappedPacketInTransaction transaction = new WrappedPacketInTransaction(event.getNMSPacket());
+                WrappedPacketInTransaction transaction = new WrappedPacketInTransaction(nmsPacket);
                 int transactionWindowId = transaction.getWindowId();
                 short transactionActionNumber = transaction.getActionNumber();
 
@@ -1431,7 +1219,7 @@ public class PacketReceiveProcessor extends Processor {
                 }
 
                 // If the client has sent a Transaction packet with an invalid window id, kick them.
-                if (transactionWindowId != 0 && !playerData.isInventoryOpen()) {
+                if (transactionWindowId != 0 && !inventoryOpen) {
                     KickUtil.kickPlayer(player, event, Settings.transactionInvalidWindowId,
                             "Sent Transaction packet with an invalid window ID"
                                     + " (windowId=" + transactionWindowId + ")"
@@ -1447,13 +1235,15 @@ public class PacketReceiveProcessor extends Processor {
                 break;
 
             case PacketType.Play.Client.UPDATE_SIGN:
-                WrappedPacketInUpdateSign updateSign = new WrappedPacketInUpdateSign(event.getNMSPacket());
+                WrappedPacketInUpdateSign updateSign = new WrappedPacketInUpdateSign(nmsPacket);
 
                 for (String line : updateSign.getTextLines()) {
-                    if (line.length() > 45) {
+                    int length = line.length();
+
+                    if (length > 45) {
                         KickUtil.kickPlayer(player, event, Settings.updateSignInvalidData,
                                 "Sent UpdateSign packet with invalid data"
-                                        + " (length=" + line.length() + ")"
+                                        + " (length=" + length + ")"
                         );
                         return;
                     }
@@ -1461,46 +1251,37 @@ public class PacketReceiveProcessor extends Processor {
                 break;
 
             case PacketType.Play.Client.USE_ENTITY:
-                WrappedPacketInUseEntity useEntity = new WrappedPacketInUseEntity(event.getNMSPacket());
+                WrappedPacketInUseEntity useEntity = new WrappedPacketInUseEntity(nmsPacket);
                 WrappedPacketInUseEntity.EntityUseAction useEntityAction = useEntity.getAction();
                 Entity entity = useEntity.getEntity();
                 int entityId = useEntity.getEntityId();
 
                 if (entity == null
                         || entity.isDead()
-                        || entity.getWorld() != player.getWorld()) {
+                        || entity.getWorld() != world) {
                     event.setCancelled(true);
                     return;
                 }
 
-                double distance = entity.getLocation().distance(player.getLocation());
+                if (Settings.useEntityInvalidDistance) {
+                    Location entityLoc = entity.getLocation();
+                    double distance = entityLoc.distance(playerLoc);
 
-                if (distance > 7.03) {
-                    KickUtil.kickPlayer(player, event, Settings.useEntityInvalidDistance,
-                            "Sent UseEntity packet with invalid distance"
-                                    + " (distance=" + distance + ")"
-                                    + " (type=" + entity.getType() + ")"
-                                    + " (entity=" + entity.getLocation() + ")"
-                                    + " (player=" + player.getLocation() + ")"
-                    );
-                    return;
+                    if (distance > 7.03) {
+                        event.setCancelled(true);
+                        return;
+                    }
                 }
 
-                if (playerData.isInventoryOpen()
-                        || playerData.isPlacingBlock()
-                        || playerData.isShootingBow()
-                        || playerData.isEating()
-                        || playerData.isDrinking()
-                        || entity.equals(player)
+                boolean entityIsPlayer = entity.equals(player);
+
+                if (placingBlock
+                        || entityIsPlayer
                         || entityId < 0) {
                     KickUtil.kickPlayer(player, event, Settings.useEntityInvalidConditions,
                             "Sent UseEntity packet with invalid conditions"
-                                    + " (inventoryOpen=" + playerData.isInventoryOpen()
-                                    + " placingBlock=" + playerData.isPlacingBlock()
-                                    + " shootingBow=" + playerData.isShootingBow()
-                                    + " eating=" + playerData.isEating()
-                                    + " drinking=" + playerData.isDrinking()
-                                    + " entityEqualsPlayer=" + (entity.equals(player))
+                                    + " (placingBlock=" + placingBlock
+                                    + " entityEqualsPlayer=" + entityIsPlayer
                                     + " entityId=" + entityId + ")"
                     );
                     return;
@@ -1508,21 +1289,6 @@ public class PacketReceiveProcessor extends Processor {
 
                 if (useEntityAction != null) {
                     switch (useEntityAction) {
-                        case ATTACK:
-                            if (playerData.isBlocking()) {
-                                KickUtil.kickPlayer(player, event, Settings.attackEntityInvalidConditions,
-                                        "Sent AttackEntity packet with invalid conditions"
-                                                + " (blocking=" + true + ")"
-                                );
-                                return;
-                            }
-
-                            playerData.setAttacking(true);
-                            playerData.setLastAttacked(entity.getEntityId());
-                            playerData.setLastAttackTick(0);
-                            playerData.setTimestamp(ActionType.ATTACKING);
-                            break;
-
                         case INTERACT:
                         case INTERACT_AT:
                             playerData.setTimestamp(ActionType.ENTITY_INTERACT);
@@ -1535,22 +1301,14 @@ public class PacketReceiveProcessor extends Processor {
                 break;
 
             case PacketType.Play.Client.WINDOW_CLICK:
-                WrappedPacketInWindowClick windowClick = new WrappedPacketInWindowClick(event.getNMSPacket());
+                WrappedPacketInWindowClick windowClick = new WrappedPacketInWindowClick(nmsPacket);
                 int windowId = windowClick.getWindowId();
                 int windowSlot = windowClick.getWindowSlot();
                 int windowMode = windowClick.getMode();
                 int windowButton = windowClick.getWindowButton();
 
                 if (windowId == 0) {
-                    if (!playerData.isInventoryOpen() && !playerData.getVersion().isNewerThan(ClientVersion.v_1_8)) {
-                        KickUtil.kickPlayer(player, event, Settings.windowClickInvalidConditions,
-                                "Sent WindowClick packet with invalid conditions"
-                                        + " (inventoryOpen=" + false + ")"
-                        );
-                        return;
-                    }
-
-                    int diff = windowSlot - (player.getOpenInventory().countSlots() - 1);
+                    int diff = windowSlot - (openInventory.countSlots() - 1);
 
                     if (windowSlot > 44 || diff > 4
                             || (windowSlot != -999 && windowSlot < -1)) {
@@ -1588,8 +1346,8 @@ public class PacketReceiveProcessor extends Processor {
                     case 2:
                         if (windowButton != 0 && windowButton != 1
                                 && windowButton != 2 && windowButton != 3
-                                && windowButton != 4 && windowButton != 8
-                                && windowButton != 40) {
+                                && windowButton != 4 && windowButton != 7
+                                && windowButton != 8 && windowButton != 40) {
                             KickUtil.kickPlayer(player, event, Settings.windowClickInvalidSwapButton,
                                     "Sent WindowClick packet with invalid Swap button"
                                             + " (button=" + windowButton + ")"
@@ -1656,55 +1414,18 @@ public class PacketReceiveProcessor extends Processor {
                 playerData.setTimestamp(ActionType.WINDOW_CLICK);
                 break;
 
+            case PacketType.Play.Client.ENCHANT_ITEM:
             case PacketType.Play.Client.KEEP_ALIVE:
-            case PacketType.Play.Client.RESOURCE_PACK_STATUS: // These packets are handled elsewhere
+            case PacketType.Play.Client.RESOURCE_PACK_STATUS: // These packets are ignored here
                 break;
 
             default:
-                MessageUtil.debug("Unhandled packet: " + event.getPacketId());
+                MessageUtil.debug("Unhandled packet: " + packetId);
                 break;
         }
 
         // Handles packet checks.
         handlePacketChecks(playerData, event);
-
-        // Sets the last on ground location for setback purposes.
-        // This has to be done after the packet checks are handled.
-        switch (event.getPacketId()) {
-            case PacketType.Play.Client.POSITION:
-            case PacketType.Play.Client.POSITION_LOOK:
-            case PacketType.Play.Client.LOOK:
-            case PacketType.Play.Client.FLYING:
-                WrappedPacketInFlying flying = new WrappedPacketInFlying(event.getNMSPacket());
-                Vector3d flyingPosition = flying.getPosition();
-                double flyingXPos = flyingPosition.getX();
-                double flyingYPos = flyingPosition.getY();
-                double flyingZPos = flyingPosition.getZ();
-
-                if (flying.isMoving()) {
-                    Location currentLocation = playerData.getLocation();
-
-                    if (currentLocation == null) {
-                        currentLocation = player.getLocation();
-                    }
-
-                    Location location = new Location(player.getWorld(), flyingXPos, flyingYPos, flyingZPos,
-                            currentLocation.getYaw(), currentLocation.getPitch());
-
-                    // Sets the last on ground location.
-                    if (playerData.isNearGround() && flyingYPos % 0.015625 == 0.0 && !playerData.isInUnloadedChunk()
-                            && !playerData.isInsideBlock() && location.getBlock().isEmpty()
-                            && playerData.getTicksSince(ActionType.SETBACK) > 1
-                            && playerData.getTicksSince(ActionType.LAST_ON_GROUND_LOCATION_SET) > 1) {
-                        playerData.setTimestamp(ActionType.LAST_ON_GROUND_LOCATION_SET);
-                        playerData.setLastOnGroundLocation(location);
-                    }
-                }
-                break;
-
-            default:
-                break;
-        }
     }
 
     /**
@@ -1717,13 +1438,19 @@ public class PacketReceiveProcessor extends Processor {
                                            @NotNull CancellableNMSPacketEvent event) {
         long timestamp = System.currentTimeMillis();
         NMSPacket nmsPacket = event.getNMSPacket();
+        List<Check> checks = playerData.getChecks();
 
         // Create a copy of the checks list to avoid ConcurrentModificationException
-        if (playerData.getChecks() != null) {
-            Iterable<Check> checksCopy = new ArrayList<>(playerData.getChecks());
+        if (checks != null) {
+            Iterable<Check> checksCopy = new ArrayList<>(checks);
 
             for (Check check : checksCopy) {
-                check.handle(event, event.getPacketId(), nmsPacket, nmsPacket.getRawNMSPacket(), timestamp);
+                if (check.getCheckInfo().enabled()) {
+                    byte packetId = event.getPacketId();
+                    Object rawNMSPacket = nmsPacket.getRawNMSPacket();
+
+                    check.handle(event, packetId, nmsPacket, rawNMSPacket, timestamp);
+                }
             }
         }
     }
@@ -1736,13 +1463,16 @@ public class PacketReceiveProcessor extends Processor {
      */
     private static void handleRotationChecks(@NotNull PlayerData playerData, RotationEvent event) {
         long timestamp = System.currentTimeMillis();
+        List<Check> checks = playerData.getChecks();
 
         // Create a copy of the checks list to avoid ConcurrentModificationException
-        if (playerData.getChecks() != null) {
-            Iterable<Check> checksCopy = new ArrayList<>(playerData.getChecks());
+        if (checks != null) {
+            Iterable<Check> checksCopy = new ArrayList<>(checks);
 
             for (Check check : checksCopy) {
-                check.handle(event, timestamp);
+                if (check.getCheckInfo().enabled()) {
+                    check.handle(event, timestamp);
+                }
             }
         }
     }
@@ -1755,10 +1485,11 @@ public class PacketReceiveProcessor extends Processor {
      */
     private static void handleMovementChecks(@NotNull PlayerData playerData, MovementEvent event) {
         long timestamp = System.currentTimeMillis();
+        List<Check> checks = playerData.getChecks();
 
         // Create a copy of the checks list to avoid ConcurrentModificationException
-        if (playerData.getChecks() != null) {
-            Iterable<Check> checksCopy = new ArrayList<>(playerData.getChecks());
+        if (checks != null) {
+            Iterable<Check> checksCopy = new ArrayList<>(checks);
 
             for (Check check : checksCopy) {
                 if (check.getCheckInfo().enabled()) {

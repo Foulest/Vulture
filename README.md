@@ -5,7 +5,7 @@
 [![Downloads](https://img.shields.io/github/downloads/Foulest/Vulture/total.svg)](https://github.com/Foulest/Vulture/releases)
 [![JitPack Badge](https://jitpack.io/v/Foulest/Vulture.svg)](https://jitpack.io/#Foulest/Vulture)
 
-**Vulture** is an advanced anti-cheat plugin designed for Minecraft 1.8.9 servers.
+**Vulture** is an exploit protection plugin designed for Minecraft 1.8.9 servers.
 
 > **Note:** This project is still in development and is not yet ready for production use.
 
@@ -17,25 +17,6 @@
   **[Rainnny7](https://github.com/Rainnny7/Anticheat-Framework)**.
 - **Exploit Protection:** Protects against in-game exploits like
   **[IllegalStack](https://github.com/dniym/IllegalStack)**.
-
-### Combat Checks
-
-- AutoBlock _(x4)_
-- Reach _(x1)_
-- Velocity _(x2)_
-
-### Movement Checks
-
-- Flight _(x4)_
-- GroundSpoof _(x2)_
-- Speed _(x5)_
-
-### Other Checks
-
-- BadPackets _(x7)_
-- ClientBrand _(x1)_
-- Inventory _(x11)_
-- PingSpoof _(x2)_
 
 ## Compiling
 

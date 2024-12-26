@@ -17,13 +17,13 @@
  */
 package net.foulest.vulture.util;
 
-import lombok.*;
+import lombok.Cleanup;
+import lombok.Data;
 import net.foulest.vulture.Vulture;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckManager;
 import net.foulest.vulture.check.type.pingspoof.PingSpoofB;
-import net.foulest.vulture.check.type.reach.ReachA;
 import net.foulest.vulture.util.yaml.CustomYamlConfiguration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -45,11 +45,9 @@ import java.util.logging.Level;
  *
  * @author Foulest
  */
-@Getter
-@Setter
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@Data
 @SuppressWarnings("WeakerAccess")
-public final class Settings {
+public class Settings {
 
     // File settings
     public static File file;
@@ -87,22 +85,16 @@ public final class Settings {
     public static int maxPacketsSmoothed;
     public static boolean abilitiesDuplicateFlying;
     public static boolean abilitiesInvalidFlightAllowed;
-    public static boolean abilitiesInvalidFlySpeed;
     public static boolean abilitiesInvalidFlying;
     public static boolean abilitiesInvalidInstantBuild;
     public static boolean abilitiesInvalidInvulnerable;
-    public static boolean abilitiesInvalidWalkSpeed;
-    public static boolean armAnimationInvalidConditions;
-    public static boolean attackEntityInvalidConditions;
     public static boolean beaconInvalidConditions;
     public static boolean beaconInvalidData;
     public static boolean beaconInvalidEffect;
     public static boolean beaconInvalidTier;
     public static boolean blockDigInvalidDistance;
-    public static boolean blockPlaceInvalidConditions;
     public static boolean blockPlaceInvalidCursorPosition;
     public static boolean blockPlaceInvalidDistance;
-    public static boolean blockPlaceInvalidItem;
     public static boolean blockPlaceInvalidOtherBlockPosition;
     public static boolean blockPlaceInvalidOtherCursorPosition;
     public static boolean blockPlaceInvalidUpBlockPosition;
@@ -113,11 +105,9 @@ public final class Settings {
     public static boolean bookSignInvalidData;
     public static boolean chatInvalidConditions;
     public static boolean chatInvalidMessage;
-    public static boolean closeWindowClosedInventory;
     public static boolean closeWindowInvalidConditions;
     public static boolean commandBlockInvalidConditions;
     public static boolean customPayloadInvalidSize;
-    public static boolean enchantItemInvalidWindowId;
     public static boolean entityActionInvalidJumpBoost;
     public static boolean flyingInvalidPitch;
     public static boolean flyingInvalidPositionData;
@@ -129,7 +119,6 @@ public final class Settings {
     public static boolean itemDropInvalidData;
     public static boolean itemNameInvalidData;
     public static boolean itemNameInvalidSize;
-    public static boolean releaseUseItemInvalidConditions;
     public static boolean releaseUseItemInvalidData;
     public static boolean respawnInvalidConditions;
     public static boolean ridingJumpInvalidConditions;
@@ -140,13 +129,11 @@ public final class Settings {
     public static boolean settingsInvalidViewDistance;
     public static boolean spectateInvalidConditions;
     public static boolean startSneakingInvalidConditions;
-    public static boolean startSprintingInvalidConditions;
     public static boolean steerVehicleInvalidConditions;
     public static boolean steerVehicleInvalidDismountValue;
     public static boolean steerVehicleInvalidNonDismountValue;
     public static boolean steerVehicleInvalidValue;
     public static boolean stopSleepingInvalidConditions;
-    public static boolean stopSneakingInvalidConditions;
     public static boolean tabCompleteInvalidMessage;
     public static boolean tradeSelectInvalidData;
     public static boolean transactionInvalidWindowId;
@@ -155,7 +142,6 @@ public final class Settings {
     public static boolean useEntityInvalidConditions;
     public static boolean useEntityInvalidDistance;
     public static boolean windowClickInvalidCloneButton;
-    public static boolean windowClickInvalidConditions;
     public static boolean windowClickInvalidPickupAllButton;
     public static boolean windowClickInvalidPickupButton;
     public static boolean windowClickInvalidQuickCraftButton;
@@ -241,27 +227,24 @@ public final class Settings {
         PingSpoofB.maxAveragePing = config.getLong("vulture.checks.pingspoof.B.maxAveragePing");
         PingSpoofB.maxPingDeviation = config.getLong("vulture.checks.pingspoof.B.maxPingDeviation");
 
-        // Reach A settings
-        ReachA.cancelDistance = config.getDouble("vulture.checks.reach.A.cancelDistance");
-
         // Check settings
         for (Class<? extends Check> check : CheckManager.CHECK_CLASSES) {
             String name = getCheckName(check);
             CheckInfo checkInfo = check.getAnnotation(CheckInfo.class);
 
             if (config.contains("vulture.checks." + name + ".enabled")) {
-                changeAnnotationValue(checkInfo, "enabled",
-                        config.get("vulture.checks." + name + ".enabled"));
+                Object enabled = config.get("vulture.checks." + name + ".enabled");
+                changeAnnotationValue(checkInfo, "enabled", enabled);
             }
 
             if (config.contains("vulture.checks." + name + ".maxViolations")) {
-                changeAnnotationValue(checkInfo, "maxViolations",
-                        config.get("vulture.checks." + name + ".maxViolations"));
+                Object maxViolations = config.get("vulture.checks." + name + ".maxViolations");
+                changeAnnotationValue(checkInfo, "maxViolations", maxViolations);
             }
 
             if (config.contains("vulture.checks." + name + ".banCommand")) {
-                changeAnnotationValue(checkInfo, "banCommand",
-                        config.get("vulture.checks." + name + ".banCommand"));
+                Object banCommand = config.get("vulture.checks." + name + ".banCommand");
+                changeAnnotationValue(checkInfo, "banCommand", banCommand);
             }
         }
 
@@ -297,17 +280,9 @@ public final class Settings {
         // Packet protections; Abilities
         abilitiesDuplicateFlying = config.getBoolean("vulture.protections.packets.abilities.duplicate-flying");
         abilitiesInvalidFlightAllowed = config.getBoolean("vulture.protections.packets.abilities.invalid-flight-allowed");
-        abilitiesInvalidFlySpeed = config.getBoolean("vulture.protections.packets.abilities.invalid-fly-speed");
         abilitiesInvalidFlying = config.getBoolean("vulture.protections.packets.abilities.invalid-flying");
         abilitiesInvalidInstantBuild = config.getBoolean("vulture.protections.packets.abilities.invalid-instant-build");
         abilitiesInvalidInvulnerable = config.getBoolean("vulture.protections.packets.abilities.invalid-invulnerable");
-        abilitiesInvalidWalkSpeed = config.getBoolean("vulture.protections.packets.abilities.invalid-walk-speed");
-
-        // Packet protections; ArmAnimation
-        armAnimationInvalidConditions = config.getBoolean("vulture.protections.packets.arm-animation.invalid-conditions");
-
-        // Packet protections; AttackEntity
-        attackEntityInvalidConditions = config.getBoolean("vulture.protections.packets.attack-entity.invalid-conditions");
 
         // Packet protections; Beacon
         beaconInvalidConditions = config.getBoolean("vulture.protections.packets.beacon.invalid-conditions");
@@ -319,10 +294,8 @@ public final class Settings {
         blockDigInvalidDistance = config.getBoolean("vulture.protections.packets.block-dig.invalid-distance");
 
         // Packet protections; BlockPlace
-        blockPlaceInvalidConditions = config.getBoolean("vulture.protections.packets.block-place.invalid-conditions");
         blockPlaceInvalidCursorPosition = config.getBoolean("vulture.protections.packets.block-place.invalid-cursor-position");
         blockPlaceInvalidDistance = config.getBoolean("vulture.protections.packets.block-place.invalid-distance");
-        blockPlaceInvalidItem = config.getBoolean("vulture.protections.packets.block-place.invalid-item");
         blockPlaceInvalidOtherBlockPosition = config.getBoolean("vulture.protections.packets.block-place.invalid-other-block-position");
         blockPlaceInvalidOtherCursorPosition = config.getBoolean("vulture.protections.packets.block-place.invalid-other-cursor-position");
         blockPlaceInvalidUpBlockPosition = config.getBoolean("vulture.protections.packets.block-place.invalid-up-block-position");
@@ -343,7 +316,6 @@ public final class Settings {
         chatInvalidMessage = config.getBoolean("vulture.protections.packets.chat.invalid-message");
 
         // Packet protections; CloseWindow
-        closeWindowClosedInventory = config.getBoolean("vulture.protections.packets.close-window.closed-inventory");
         closeWindowInvalidConditions = config.getBoolean("vulture.protections.packets.close-window.invalid-conditions");
 
         // Packet protections; CommandBlock
@@ -351,9 +323,6 @@ public final class Settings {
 
         // Packet protections; CustomPayload
         customPayloadInvalidSize = config.getBoolean("vulture.protections.packets.custom-payload.invalid-size");
-
-        // Packet protections; EnchantItem
-        enchantItemInvalidWindowId = config.getBoolean("vulture.protections.packets.enchant-item.invalid-window-id");
 
         // Packet protections; EntityAction
         entityActionInvalidJumpBoost = config.getBoolean("vulture.protections.packets.entity-action.invalid-jump-boost");
@@ -377,7 +346,6 @@ public final class Settings {
         itemNameInvalidSize = config.getBoolean("vulture.protections.packets.item-name.invalid-size");
 
         // Packet protections; ReleaseUseItem
-        releaseUseItemInvalidConditions = config.getBoolean("vulture.protections.packets.release-use-item.invalid-conditions");
         releaseUseItemInvalidData = config.getBoolean("vulture.protections.packets.release-use-item.invalid-data");
 
         // Packet protections; Respawn
@@ -401,9 +369,6 @@ public final class Settings {
         // Packet protections; StartSneaking
         startSneakingInvalidConditions = config.getBoolean("vulture.protections.packets.start-sneaking.invalid-conditions");
 
-        // Packet protections; StartSprinting
-        startSprintingInvalidConditions = config.getBoolean("vulture.protections.packets.start-sprinting.invalid-conditions");
-
         // Packet protections; SteerVehicle
         steerVehicleInvalidConditions = config.getBoolean("vulture.protections.packets.steer-vehicle.invalid-conditions");
         steerVehicleInvalidDismountValue = config.getBoolean("vulture.protections.packets.steer-vehicle.invalid-dismount-value");
@@ -412,9 +377,6 @@ public final class Settings {
 
         // Packet protections; StopSleeping
         stopSleepingInvalidConditions = config.getBoolean("vulture.protections.packets.stop-sleeping.invalid-conditions");
-
-        // Packet protections; StopSneaking
-        stopSneakingInvalidConditions = config.getBoolean("vulture.protections.packets.stop-sneaking.invalid-conditions");
 
         // Packet protections; TabComplete
         tabCompleteInvalidMessage = config.getBoolean("vulture.protections.packets.tab-complete.invalid-message");
@@ -435,7 +397,6 @@ public final class Settings {
 
         // Packet protections; WindowClick
         windowClickInvalidCloneButton = config.getBoolean("vulture.protections.packets.window-click.invalid-clone-button");
-        windowClickInvalidConditions = config.getBoolean("vulture.protections.packets.window-click.invalid-conditions");
         windowClickInvalidPickupAllButton = config.getBoolean("vulture.protections.packets.window-click.invalid-pickup-all-button");
         windowClickInvalidPickupButton = config.getBoolean("vulture.protections.packets.window-click.invalid-pickup-button");
         windowClickInvalidQuickCraftButton = config.getBoolean("vulture.protections.packets.window-click.invalid-quick-craft-button");

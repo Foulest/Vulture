@@ -37,7 +37,7 @@ import net.foulest.vulture.util.data.Pair;
         description = "Detects clients modifying Transaction packets.")
 public class PingSpoofA extends Check {
 
-    private final EvictingList<Pair<Short, Long>> transactionsOut = new EvictingList<>(500);
+    private final EvictingList<Pair<Short, Long>> transactionsOut = new EvictingList<>(1000);
     private int transactionsInCount;
     private int transactionsOutCount;
 
@@ -50,7 +50,10 @@ public class PingSpoofA extends Check {
                        NMSPacket nmsPacket, Object packet, long timestamp) {
         if (packetId == PacketType.Play.Server.TRANSACTION) {
             WrappedPacketOutTransaction transaction = new WrappedPacketOutTransaction(nmsPacket);
-            transactionsOut.add(new Pair<>(transaction.getActionNumber(), timestamp));
+            short actionNumber = transaction.getActionNumber();
+
+            // Adds the Transaction packet sent by the server.
+            transactionsOut.add(new Pair<>(actionNumber, timestamp));
             transactionsOutCount++;
 
             // If the client might be cancelling sending Transaction packets, kick them.
@@ -66,6 +69,9 @@ public class PingSpoofA extends Check {
 
         } else if (packetId == PacketType.Play.Client.TRANSACTION) {
             WrappedPacketInTransaction transaction = new WrappedPacketInTransaction(nmsPacket);
+            short actionNumber = transaction.getActionNumber();
+
+            // Increments the count of Transaction packets received.
             transactionsInCount++;
 
             // If the client has sent more Transaction packets than received, kick them.
@@ -75,18 +81,20 @@ public class PingSpoofA extends Check {
             }
 
             // If the client has sent a Transaction packet that was not sent by the server, kick them.
-            if (transactionsOut.stream().noneMatch(pair -> pair.getFirst() == transaction.getActionNumber())) {
+            if (transactionsOut.stream().map(Pair::getFirst).noneMatch(first -> first == actionNumber)) {
                 if (playerData.getTicksSince(ActionType.LOGIN) < 20
                         || playerData.getTicksSince(ActionType.RESPAWN) < 20
                         || playerData.getTicksSince(ActionType.TELEPORT) < 20) {
                     return;
                 }
 
-                KickUtil.kickPlayer(player, event, "Sent a Transaction packet that was not sent by the server: "
-                        + transaction.getActionNumber());
+                KickUtil.kickPlayer(player, event, "Sent a Transaction packet that was not sent by the server: " + actionNumber);
             } else {
                 // Remove the Transaction packet sent by the server.
-                transactionsOut.removeIf(pair -> pair.getFirst() == transaction.getActionNumber());
+                transactionsOut.removeIf(pair -> {
+                    Short first = pair.getFirst();
+                    return first == actionNumber;
+                });
             }
         }
     }

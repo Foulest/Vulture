@@ -22,16 +22,8 @@ import io.github.retrooper.packetevents.event.impl.PacketPlaySendEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.play.out.abilities.WrappedPacketOutAbilities;
-import io.github.retrooper.packetevents.packetwrappers.play.out.animation.WrappedPacketOutAnimation;
-import io.github.retrooper.packetevents.packetwrappers.play.out.camera.WrappedPacketOutCamera;
-import io.github.retrooper.packetevents.packetwrappers.play.out.entity.WrappedPacketOutEntity;
-import io.github.retrooper.packetevents.packetwrappers.play.out.entitydestroy.WrappedPacketOutEntityDestroy;
-import io.github.retrooper.packetevents.packetwrappers.play.out.entityteleport.WrappedPacketOutEntityTeleport;
-import io.github.retrooper.packetevents.packetwrappers.play.out.entityvelocity.WrappedPacketOutEntityVelocity;
-import io.github.retrooper.packetevents.packetwrappers.play.out.namedentityspawn.WrappedPacketOutNamedEntitySpawn;
 import io.github.retrooper.packetevents.packetwrappers.play.out.position.WrappedPacketOutPosition;
 import io.github.retrooper.packetevents.packetwrappers.play.out.resourcepacksend.WrappedPacketOutResourcePackSend;
-import io.github.retrooper.packetevents.packetwrappers.play.out.spawnentityliving.WrappedPacketOutSpawnEntityLiving;
 import io.github.retrooper.packetevents.packetwrappers.play.out.transaction.WrappedPacketOutTransaction;
 import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import net.foulest.vulture.action.ActionType;
@@ -40,12 +32,8 @@ import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.data.PlayerDataManager;
 import net.foulest.vulture.ping.PingTask;
 import net.foulest.vulture.processor.Processor;
-import net.foulest.vulture.util.BlockUtil;
 import net.foulest.vulture.util.MessageUtil;
 import net.foulest.vulture.util.data.CustomLocation;
-import net.foulest.vulture.util.data.Pair;
-import org.bukkit.Location;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -54,7 +42,8 @@ import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
+import java.util.Queue;
 
 /**
  * Handles all outgoing packets before they are encoded.
@@ -69,36 +58,37 @@ public class PacketSendProcessor extends Processor {
      * @param event The packet event.
      */
     @Override
+    @SuppressWarnings("NestedMethodCall")
     public void onPacketPlaySend(@NotNull PacketPlaySendEvent event) {
+        byte packetId = event.getPacketId();
+
         // Ignores invalid outgoing packets.
-        if (PacketType.getPacketFromId(event.getPacketId()) == null) {
+        if (PacketType.getPacketFromId(packetId) == null) {
             return;
         }
 
         Player player = event.getPlayer();
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
-        switch (event.getPacketId()) {
+        NMSPacket nmsPacket = event.getNMSPacket();
+
+        switch (packetId) {
             case PacketType.Play.Server.ABILITIES:
-                WrappedPacketOutAbilities abilities = new WrappedPacketOutAbilities(event.getNMSPacket());
+                WrappedPacketOutAbilities abilities = new WrappedPacketOutAbilities(nmsPacket);
+                boolean abilitiesFlying = abilities.isFlying();
+                boolean abilitiesFlightAllowed = abilities.isFlightAllowed();
+                boolean abilitiesInstantBuild = abilities.canBuildInstantly();
+                boolean abilitiesVulnerable = abilities.isVulnerable();
 
-                playerData.setFlying(abilities.isFlying());
-                playerData.setFlightAllowed(abilities.isFlightAllowed());
-                playerData.setInstantBuild(abilities.canBuildInstantly());
-                playerData.setVulnerable(abilities.isVulnerable());
+                playerData.setFlying(abilitiesFlying);
+                playerData.setFlightAllowed(abilitiesFlightAllowed);
+                playerData.setInstantBuild(abilitiesInstantBuild);
+                playerData.setVulnerable(abilitiesVulnerable);
 
-                if (abilities.isFlying()) {
+                if (abilitiesFlying) {
                     playerData.setTimestamp(ActionType.START_FLYING);
                 } else {
                     playerData.setTimestamp(ActionType.STOP_FLYING);
-                }
-                break;
-
-            case PacketType.Play.Server.ANIMATION:
-                WrappedPacketOutAnimation animation = new WrappedPacketOutAnimation(event.getNMSPacket());
-
-                if (animation.getAnimationType() == WrappedPacketOutAnimation.EntityAnimationType.LEAVE_BED) {
-                    playerData.setInBed(false);
                 }
                 break;
 
@@ -116,34 +106,12 @@ public class PacketSendProcessor extends Processor {
                 playerData.setTimestamp(ActionType.RESPAWN);
                 break;
 
-            case PacketType.Play.Server.CAMERA:
-                WrappedPacketOutCamera camera = new WrappedPacketOutCamera(event.getNMSPacket());
-                playerData.setInCamera(camera.getEntity() != null);
-                break;
-
             case PacketType.Play.Server.CLOSE_WINDOW:
                 playerData.setInventoryOpen(false);
                 break;
 
-            case PacketType.Play.Server.ENTITY_VELOCITY:
-                WrappedPacketOutEntityVelocity entityVelocity = new WrappedPacketOutEntityVelocity(event.getNMSPacket());
-                Vector3d velocity = entityVelocity.getVelocity();
-                int totalTicks = playerData.getTotalTicks();
-
-                if (entityVelocity.getEntityId() == player.getEntityId()) {
-                    playerData.setLastVelocityY(playerData.getVelocityY());
-                    playerData.setLastVelocityXZ(playerData.getVelocityXZ());
-
-                    playerData.setVelocityY(new Pair<>(totalTicks, velocity.getY()));
-                    playerData.setVelocityXZ(new Pair<>(totalTicks, StrictMath.hypot(velocity.getX(), velocity.getZ())));
-
-                    playerData.setVelocityTicks(totalTicks);
-                    playerData.setTimestamp(ActionType.VELOCITY_GIVEN);
-                }
-                break;
-
             case PacketType.Play.Server.RESOURCE_PACK_SEND:
-                WrappedPacketOutResourcePackSend resourcePackSend = new WrappedPacketOutResourcePackSend(event.getNMSPacket());
+                WrappedPacketOutResourcePackSend resourcePackSend = new WrappedPacketOutResourcePackSend(nmsPacket);
                 String url = resourcePackSend.getUrl();
                 String scheme = URI.create(url).getScheme();
 
@@ -160,7 +128,10 @@ public class PacketSendProcessor extends Processor {
                 }
 
                 try {
-                    url = URLDecoder.decode(url.substring("level://".length()), StandardCharsets.UTF_8.toString());
+                    String utf8 = StandardCharsets.UTF_8.toString();
+                    int levelLength = "level://".length();
+                    String beginIndex = url.substring(levelLength);
+                    url = URLDecoder.decode(beginIndex, utf8);
                 } catch (UnsupportedEncodingException ignored) {
                     event.setCancelled(true);
                     MessageUtil.debug("ResourcePackSend packet cancelled; could not decode URL");
@@ -175,8 +146,9 @@ public class PacketSendProcessor extends Processor {
                 break;
 
             case PacketType.Play.Server.TRANSACTION:
-                WrappedPacketOutTransaction transaction = new WrappedPacketOutTransaction(event.getNMSPacket());
-                playerData.getTransactionSentMap().put(transaction.getActionNumber(), System.currentTimeMillis());
+                WrappedPacketOutTransaction transaction = new WrappedPacketOutTransaction(nmsPacket);
+                short actionNumber = transaction.getActionNumber();
+                playerData.getTransactionSentMap().put(actionNumber, System.currentTimeMillis());
                 break;
 
             case PacketType.Play.Server.OPEN_WINDOW:
@@ -194,98 +166,25 @@ public class PacketSendProcessor extends Processor {
                 break;
 
             case PacketType.Play.Server.POSITION:
-                WrappedPacketOutPosition position = new WrappedPacketOutPosition(event.getNMSPacket());
-                Location teleportLoc = new Location(player.getWorld(), position.getPosition().getX(),
-                        position.getPosition().getY(), position.getPosition().getZ(),
-                        position.getYaw(), position.getPitch());
-
-                playerData.setLastServerPositionTick(0);
-                playerData.setLastTeleportPacket(position);
+                WrappedPacketOutPosition positionPacket = new WrappedPacketOutPosition(nmsPacket);
+                playerData.setLastTeleportPacket(positionPacket);
                 playerData.setTimestamp(ActionType.TELEPORT);
 
-                if (BlockUtil.isLocationInUnloadedChunk(teleportLoc)) {
-                    playerData.setInUnloadedChunk(true);
-                    playerData.setTimestamp(ActionType.IN_UNLOADED_CHUNK);
-                }
-
-                CustomLocation loc = new CustomLocation(
-                        position.getPosition().getX(), position.getPosition().getY(), position.getPosition().getZ(),
-                        position.getYaw(), position.getPitch()
-                );
+                Vector3d position = positionPacket.getPosition();
+                double x = position.getX();
+                double y = position.getY();
+                double z = position.getZ();
+                float yaw = positionPacket.getYaw();
+                float pitch = positionPacket.getPitch();
+                CustomLocation loc = new CustomLocation(x, y, z, yaw, pitch);
+                Queue<CustomLocation> teleports = playerData.getTeleports();
 
                 // These packets can be received outside the tick start and end interval
                 if (playerData.getPingTaskScheduler().isStarted()) {
-                    playerData.getPingTaskScheduler().scheduleTask(PingTask.start(() -> playerData.getTeleports().add(loc)));
+                    playerData.getPingTaskScheduler().scheduleTask(PingTask.start(() -> teleports.add(loc)));
                 } else {
-                    playerData.getTeleports().add(loc);
+                    teleports.add(loc);
                 }
-                break;
-
-            case PacketType.Play.Server.SPAWN_ENTITY_LIVING:
-                WrappedPacketOutSpawnEntityLiving spawnEntityLiving = new WrappedPacketOutSpawnEntityLiving(event.getNMSPacket());
-
-                playerData.getPingTaskScheduler().scheduleTask(
-                        PingTask.start(
-                                () -> playerData.getEntityTracker().addEntity(spawnEntityLiving.getEntityId(),
-                                        spawnEntityLiving.getPosition().x, spawnEntityLiving.getPosition().y,
-                                        spawnEntityLiving.getPosition().z)
-                        )
-                );
-                break;
-
-            case PacketType.Play.Server.NAMED_ENTITY_SPAWN:
-                WrappedPacketOutNamedEntitySpawn namedEntitySpawn = new WrappedPacketOutNamedEntitySpawn(event.getNMSPacket());
-
-                if (namedEntitySpawn.getEntity().getType() == EntityType.PLAYER) {
-                    playerData.getPingTaskScheduler().scheduleTask(
-                            PingTask.start(
-                                    () -> playerData.getEntityTracker().addEntity(namedEntitySpawn.getEntityId(),
-                                            namedEntitySpawn.getPosition().x, namedEntitySpawn.getPosition().y,
-                                            namedEntitySpawn.getPosition().z)
-                            )
-                    );
-                }
-                break;
-
-            case PacketType.Play.Server.REL_ENTITY_MOVE:
-                WrappedPacketOutEntity.WrappedPacketOutRelEntityMove move = new WrappedPacketOutEntity.WrappedPacketOutRelEntityMove(event.getNMSPacket());
-
-                playerData.getPingTaskScheduler().scheduleTask(
-                        PingTask.of(
-                                () -> playerData.getEntityTracker().moveEntity(move.getEntityId(), move.getDeltaX(), move.getDeltaY(), move.getDeltaZ()),
-                                () -> playerData.getEntityTracker().markCertain(move.getEntityId())
-                        )
-                );
-                break;
-
-            case PacketType.Play.Server.REL_ENTITY_MOVE_LOOK:
-                WrappedPacketOutEntity.WrappedPacketOutRelEntityMoveLook moveLook = new WrappedPacketOutEntity.WrappedPacketOutRelEntityMoveLook(event.getNMSPacket());
-
-                playerData.getPingTaskScheduler().scheduleTask(
-                        PingTask.of(
-                                () -> playerData.getEntityTracker().moveEntity(moveLook.getEntityId(), moveLook.getDeltaX(), moveLook.getDeltaY(), moveLook.getDeltaZ()),
-                                () -> playerData.getEntityTracker().markCertain(moveLook.getEntityId())
-                        )
-                );
-                break;
-
-            case PacketType.Play.Server.ENTITY_TELEPORT:
-                WrappedPacketOutEntityTeleport teleport = new WrappedPacketOutEntityTeleport(event.getNMSPacket());
-
-                playerData.getPingTaskScheduler().scheduleTask(
-                        PingTask.of(
-                                () -> playerData.getEntityTracker().teleportEntity(teleport.getEntityId(), teleport.getPosition().x, teleport.getPosition().y, teleport.getPosition().z),
-                                () -> playerData.getEntityTracker().markCertain(teleport.getEntityId())
-                        )
-                );
-                break;
-
-            case PacketType.Play.Server.ENTITY_DESTROY:
-                WrappedPacketOutEntityDestroy destroy = new WrappedPacketOutEntityDestroy(event.getNMSPacket());
-
-                playerData.getPingTaskScheduler().scheduleTask(
-                        PingTask.start(() -> Arrays.stream(destroy.getEntityIds()).forEach(playerData.getEntityTracker()::removeEntity))
-                );
                 break;
 
             default:
@@ -306,14 +205,18 @@ public class PacketSendProcessor extends Processor {
                                            @NotNull CancellableNMSPacketEvent event) {
         long timestamp = System.currentTimeMillis();
         NMSPacket nmsPacket = event.getNMSPacket();
+        List<Check> checks = playerData.getChecks();
 
         // Create a copy of the checks list to avoid ConcurrentModificationException
-        if (playerData.getChecks() != null) {
-            Iterable<Check> checksCopy = new ArrayList<>(playerData.getChecks());
+        if (checks != null) {
+            Iterable<Check> checksCopy = new ArrayList<>(checks);
 
             for (Check check : checksCopy) {
-                if (check.getCheckInfo().acceptsServerPackets()) {
-                    check.handle(event, event.getPacketId(), nmsPacket, nmsPacket.getRawNMSPacket(), timestamp);
+                if (check.getCheckInfo().enabled() && check.getCheckInfo().acceptsServerPackets()) {
+                    byte packetId = event.getPacketId();
+                    Object rawNMSPacket = nmsPacket.getRawNMSPacket();
+
+                    check.handle(event, packetId, nmsPacket, rawNMSPacket, timestamp);
                 }
             }
         }

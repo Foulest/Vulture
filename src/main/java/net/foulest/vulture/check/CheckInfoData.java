@@ -27,11 +27,11 @@ public class CheckInfoData {
 
     private String name;
     private CheckType type;
-    private String description = "No description provided.";
-    private boolean enabled = true;
-    private boolean punishable = true;
-    private String banCommand = "vulture kick %player% %check%";
-    private int maxViolations = 10;
+    private String description;
+    private boolean enabled;
+    private boolean punishable;
+    private String banCommand;
+    private int maxViolations;
     private boolean experimental;
     private boolean acceptsServerPackets;
 

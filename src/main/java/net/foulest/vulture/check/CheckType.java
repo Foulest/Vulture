@@ -23,14 +23,8 @@ package net.foulest.vulture.check;
  * @author Foulest
  */
 public enum CheckType {
-    AUTOBLOCK,
     BADPACKETS,
     CLIENTBRAND,
-    FLIGHT,
-    GROUNDSPOOF,
     INVENTORY,
-    PINGSPOOF,
-    REACH,
-    SPEED,
-    VELOCITY
+    PINGSPOOF
 }

@@ -17,8 +17,7 @@
  */
 package net.foulest.vulture.util.command;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -32,8 +31,8 @@ import org.jetbrains.annotations.Nullable;
  * @author minnymin3
  * @see <a href="https://github.com/mcardy/CommandFramework">CommandFramework GitHub</a>
  */
-@Getter
-@Setter
+@Data
+@SuppressWarnings("WeakerAccess")
 public class CommandArgs {
 
     private final CommandSender sender;
@@ -105,7 +104,7 @@ public class CommandArgs {
      *
      * @return true if the sender is a player, false otherwise.
      */
-    private boolean isPlayer() {
+    public boolean isPlayer() {
         return sender instanceof Player;
     }
 

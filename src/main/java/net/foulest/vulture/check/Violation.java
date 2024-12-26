@@ -17,10 +17,7 @@
  */
 package net.foulest.vulture.check;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.bukkit.Location;
 
 /**
@@ -28,9 +25,7 @@ import org.bukkit.Location;
  *
  * @author Foulest
  */
-@Getter
-@Setter
-@ToString
+@Data
 @AllArgsConstructor
 public class Violation {
 

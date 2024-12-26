@@ -17,29 +17,12 @@
  */
 package net.foulest.vulture.check;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import net.foulest.vulture.check.type.autoblock.AutoBlockA;
-import net.foulest.vulture.check.type.autoblock.AutoBlockB;
-import net.foulest.vulture.check.type.autoblock.AutoBlockC;
-import net.foulest.vulture.check.type.autoblock.AutoBlockD;
+import lombok.Data;
 import net.foulest.vulture.check.type.badpackets.*;
 import net.foulest.vulture.check.type.clientbrand.ClientBrand;
-import net.foulest.vulture.check.type.flight.FlightA;
-import net.foulest.vulture.check.type.flight.FlightB;
-import net.foulest.vulture.check.type.flight.FlightC;
-import net.foulest.vulture.check.type.flight.FlightD;
-import net.foulest.vulture.check.type.groundspoof.GroundSpoofA;
-import net.foulest.vulture.check.type.groundspoof.GroundSpoofB;
 import net.foulest.vulture.check.type.inventory.*;
 import net.foulest.vulture.check.type.pingspoof.PingSpoofA;
 import net.foulest.vulture.check.type.pingspoof.PingSpoofB;
-import net.foulest.vulture.check.type.reach.ReachA;
-import net.foulest.vulture.check.type.speed.*;
-import net.foulest.vulture.check.type.velocity.VelocityA;
-import net.foulest.vulture.check.type.velocity.VelocityB;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -50,10 +33,8 @@ import java.util.List;
  *
  * @author Foulest
  */
-@Getter
-@Setter
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class CheckManager {
+@Data
+public class CheckManager {
 
     /**
      * A {@link List} of registered check classes
@@ -61,21 +42,12 @@ public final class CheckManager {
      * @see Check
      */
     public static final List<Class<? extends Check>> CHECK_CLASSES = Collections.unmodifiableList(Arrays.asList(
-            // AutoBlock
-            AutoBlockA.class, AutoBlockB.class, AutoBlockC.class, AutoBlockD.class,
-
             // BadPackets
-            BadPacketsA.class, BadPacketsB.class, BadPacketsC.class, BadPacketsD.class, BadPacketsE.class,
-            BadPacketsF.class, BadPacketsG.class,
+            BadPacketsA.class, BadPacketsB.class, BadPacketsC.class, BadPacketsD.class,
+            BadPacketsE.class, BadPacketsF.class, BadPacketsG.class,
 
             // ClientBrand
             ClientBrand.class,
-
-            // Flight
-            FlightA.class, FlightB.class, FlightC.class, FlightD.class,
-
-            // GroundSpoof
-            GroundSpoofA.class, GroundSpoofB.class,
 
             // Inventory
             InventoryA.class, InventoryB.class, InventoryC.class, InventoryD.class, InventoryE.class,
@@ -83,15 +55,6 @@ public final class CheckManager {
             InventoryK.class,
 
             // PingSpoof
-            PingSpoofA.class, PingSpoofB.class,
-
-            // Reach
-            ReachA.class,
-
-            // Speed
-            SpeedA.class, SpeedB.class, SpeedC.class, SpeedD.class, SpeedE.class,
-
-            // Velocity
-            VelocityA.class, VelocityB.class
+            PingSpoofA.class, PingSpoofB.class
     ));
 }

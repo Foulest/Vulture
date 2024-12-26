@@ -18,8 +18,7 @@
 package net.foulest.vulture.util.data;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,11 +34,9 @@ import java.util.Objects;
  *
  * @param <T> The type of the list.
  */
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
-@SuppressWarnings("unused")
-public final class EvictingList<T> extends LinkedList<T> {
+public class EvictingList<T> extends LinkedList<T> {
 
     private static final long serialVersionUID = -2926788977148580670L;
     private final int maxSize;

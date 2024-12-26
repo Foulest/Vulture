@@ -28,9 +28,10 @@ import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
+import net.foulest.vulture.util.KickUtil;
 import org.bukkit.Material;
 
-@CheckInfo(name = "Inventory (B)", type = CheckType.INVENTORY,
+@CheckInfo(name = "Inventory (B)", type = CheckType.INVENTORY, punishable = false,
         description = "Detects this Inventory pattern: ClickWindow, HeldItemSlot, BlockPlace, HeldItemSlot")
 public class InventoryB extends Check {
 
@@ -86,7 +87,7 @@ public class InventoryB extends Check {
 
         if (stage == 4 && timeDiff < 350) {
             stage = 0;
-            flag(false, "timeDiff=" + timeDiff);
+            KickUtil.kickPlayer(player, event, "Inventory (B) | AutoHeal | timeDiff=" + timeDiff);
         }
     }
 }

@@ -17,8 +17,7 @@
  */
 package net.foulest.vulture.ping;
 
-import lombok.Getter;
-import lombok.ToString;
+import lombok.Data;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayDeque;
@@ -27,18 +26,15 @@ import java.util.Queue;
 /**
  * Utility that schedules tasks to be executed on a client response to server tick pings.
  */
-@Getter
-@ToString
+@Data
 public class PingTaskScheduler {
 
     private final Queue<Queue<PingTask>> scheduledTasks = new ArrayDeque<>();
     private boolean started;
 
     // Players always log in during the server tick so an end ping is sent first
-    @Nullable
-    private Queue<PingTask> schedulingTaskQueue = new ArrayDeque<>();
-    @Nullable
-    private Queue<PingTask> runningTaskQueue = schedulingTaskQueue;
+    private @Nullable Queue<PingTask> schedulingTaskQueue = new ArrayDeque<>();
+    private @Nullable Queue<PingTask> runningTaskQueue = schedulingTaskQueue;
 
     /**
      * Schedules a runnable to execute when the response for the pings
@@ -55,7 +51,8 @@ public class PingTaskScheduler {
         }
 
         if (schedulingTaskQueue == null) {
-            throw new IllegalStateException("No scheduling task queue present!");
+            // Create a new queue for the next tick
+            schedulingTaskQueue = new ArrayDeque<>();
         }
 
         schedulingTaskQueue.add(task);

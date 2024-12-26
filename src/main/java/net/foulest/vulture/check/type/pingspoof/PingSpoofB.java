@@ -52,6 +52,7 @@ public class PingSpoofB extends Check {
     }
 
     @Override
+    @SuppressWarnings("NestedMethodCall")
     public void handle(CancellableNMSPacketEvent event, byte packetId,
                        NMSPacket nmsPacket, Object packet, long timestamp) {
         long timeSinceRespawn = playerData.getTicksSince(ActionType.RESPAWN);
@@ -60,7 +61,10 @@ public class PingSpoofB extends Check {
 
         if (packetId == PacketType.Play.Server.KEEP_ALIVE) {
             WrappedPacketOutKeepAlive keepAlive = new WrappedPacketOutKeepAlive(nmsPacket);
-            keepAliveOut.add(new Pair<>(keepAlive.getId(), timestamp));
+            long id = keepAlive.getId();
+
+            // Adds the KeepAlive packet sent by the server.
+            keepAliveOut.add(new Pair<>(id, timestamp));
             keepAliveOutCount++;
 
             // If the client might be cancelling sending KeepAlive packets, kick them.
@@ -71,15 +75,21 @@ public class PingSpoofB extends Check {
 
         } else if (packetId == PacketType.Play.Client.KEEP_ALIVE) {
             WrappedPacketInKeepAlive keepAlive = new WrappedPacketInKeepAlive(nmsPacket);
+            long keepAliveId = keepAlive.getId();
+
+            // Increments the count of KeepAlive packets received.
             keepAliveInCount++;
 
+            // Ignores the first KeepAlive packet received.
             if (keepAliveOut.isEmpty() || keepAliveOut.size() == 1) {
                 return;
             }
 
-            // Calculates the ping, average ping, and ping deviation of the client.
+            // Calculates the ping and adds it to the list.
             long ping = timestamp - keepAliveOut.getLast().getLast();
             pingValues.add(ping);
+
+            // Calculates the average ping and ping deviation.
             int averagePing = (int) pingValues.stream().mapToLong(val -> val).average().orElse(0.0);
             int pingDeviation = (int) Math.sqrt(pingValues.stream().mapToLong(val -> val).map(i -> i - averagePing).map(i -> i * i).average().orElse(0.0));
 
@@ -105,7 +115,7 @@ public class PingSpoofB extends Check {
             }
 
             // If the client has sent multiple negative KeepAlive packets in a row, kick them.
-            if (keepAlive.getId() == -1) {
+            if (keepAliveId == -1) {
                 ++negativeStreak;
 
                 if (negativeStreak >= 5) {
@@ -124,13 +134,16 @@ public class PingSpoofB extends Check {
             }
 
             // If the client has sent a KeepAlive packet that was not sent by the server, kick them.
-            if (keepAlive.getId() != 0) {
-                if (keepAliveOut.stream().noneMatch(pair -> pair.getFirst() == keepAlive.getId())) {
-                    KickUtil.kickPlayer(player, event, "Sent a KeepAlive packet that was not sent by the server: "
-                            + keepAlive.getId());
+            if (keepAliveId != 0) {
+                if (keepAliveOut.stream().map(Pair::getFirst).noneMatch(first -> first == keepAliveId)) {
+                    KickUtil.kickPlayer(player, event, "Sent a KeepAlive"
+                            + " packet that was not sent by the server: " + keepAliveId);
                 } else {
                     // Remove the KeepAlive packet sent by the server.
-                    keepAliveOut.removeIf(pair -> pair.getFirst() == keepAlive.getId());
+                    keepAliveOut.removeIf(pair -> {
+                        Long first = pair.getFirst();
+                        return first == keepAliveId;
+                    });
                 }
             }
         }

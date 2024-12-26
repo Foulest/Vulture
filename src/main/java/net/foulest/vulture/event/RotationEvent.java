@@ -18,16 +18,13 @@
 package net.foulest.vulture.event;
 
 import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
+import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 import net.foulest.vulture.data.PlayerData;
 import org.jetbrains.annotations.NotNull;
 
-@Getter
-@Setter
-@ToString
+@Data
 @AllArgsConstructor
 public class RotationEvent {
 
@@ -40,7 +37,9 @@ public class RotationEvent {
      * @return The change in yaw.
      */
     public float getDeltaYaw() {
-        return Math.abs(to.getYaw() - from.getYaw());
+        float toYaw = to.getYaw();
+        float fromYaw = from.getYaw();
+        return Math.abs(toYaw - fromYaw);
     }
 
     /**
@@ -49,7 +48,9 @@ public class RotationEvent {
      * @return The change in pitch.
      */
     public float getDeltaPitch() {
-        return Math.abs(to.getPitch() - from.getPitch());
+        float toPitch = to.getPitch();
+        float fromPitch = from.getPitch();
+        return Math.abs(toPitch - fromPitch);
     }
 
     /**
@@ -58,6 +59,7 @@ public class RotationEvent {
      * @return Whether the player is teleporting.
      */
     public boolean isTeleport(@NotNull PlayerData playerData) {
-        return playerData.isTeleporting(to.getPosition());
+        Vector3d toPosition = to.getPosition();
+        return playerData.isTeleporting(toPosition);
     }
 }

@@ -17,10 +17,7 @@
  */
 package net.foulest.vulture.util;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 import net.foulest.vulture.Vulture;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
@@ -28,11 +25,8 @@ import org.bukkit.scheduler.BukkitWorker;
 
 import java.util.List;
 
-@Getter
-@Setter
-@SuppressWarnings("unused")
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class TaskUtil {
+@Data
+public class TaskUtil {
 
     public static void runTask(Runnable runnable) {
         Bukkit.getScheduler().runTask(Vulture.instance, runnable);

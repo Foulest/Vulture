@@ -17,8 +17,7 @@
  */
 package net.foulest.vulture.util;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.Data;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -27,11 +26,15 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.List;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class BeaconUtil {
+@Data
+public class BeaconUtil {
 
     private static final List<Material> beaconTierBlocks = Arrays.asList(
-            Material.IRON_BLOCK, Material.GOLD_BLOCK, Material.DIAMOND_BLOCK, Material.EMERALD_BLOCK);
+            Material.IRON_BLOCK,
+            Material.GOLD_BLOCK,
+            Material.DIAMOND_BLOCK,
+            Material.EMERALD_BLOCK
+    );
 
     /**
      * Gets the tier of a beacon. Credit to Msrules123 for the code.
@@ -54,7 +57,10 @@ public final class BeaconUtil {
                 int zWidth = tierCounter - Math.abs(x); // Adjust z range based on distance from center
 
                 for (int z = -zWidth; z <= zWidth; z++) {
-                    if (!beaconTierBlocks.contains(beaconBlock.getRelative(x, -tierCounter, z).getType())) {
+                    Block relative = beaconBlock.getRelative(x, -tierCounter, z);
+                    Material type = relative.getType();
+
+                    if (!beaconTierBlocks.contains(type)) {
                         return calculatedTier;
                     }
                 }

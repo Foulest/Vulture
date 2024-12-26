@@ -26,8 +26,9 @@ import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
+import net.foulest.vulture.util.KickUtil;
 
-@CheckInfo(name = "Inventory (E)", type = CheckType.INVENTORY,
+@CheckInfo(name = "Inventory (E)", type = CheckType.INVENTORY, punishable = false,
         description = "Detects this Inventory pattern: BlockPlace w/ Item, BlockPlace, HeldItemSlot")
 public class InventoryE extends Check {
 
@@ -42,7 +43,7 @@ public class InventoryE extends Check {
                        NMSPacket nmsPacket, Object packet, long timestamp) {
         if (packetId == PacketType.Play.Client.HELD_ITEM_SLOT) {
             if (stage == 2) {
-                flag(false);
+                KickUtil.kickPlayer(player, event, "Inventory (E) | Scaffold");
             }
 
             stage = 1;

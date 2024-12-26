@@ -52,7 +52,7 @@ public class BadPacketsC extends Check {
 
             if (action == WrappedPacketInUseEntity.EntityUseAction.ATTACK) {
                 if (!swung) {
-                    KickUtil.kickPlayer(player, event, "Attacked an entity without swinging");
+                    KickUtil.kickPlayer(player, event, "BadPackets (C) | Attacked an entity without swinging");
                     return;
                 }
 

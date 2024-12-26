@@ -27,8 +27,10 @@ import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
+import net.foulest.vulture.util.KickUtil;
 
-@CheckInfo(name = "Inventory (J)", type = CheckType.INVENTORY)
+@CheckInfo(name = "Inventory (J)", type = CheckType.INVENTORY, punishable = false,
+        description = "Checks for invalid yaw differences.")
 public class InventoryJ extends Check {
 
     private double lastX;
@@ -53,19 +55,25 @@ public class InventoryJ extends Check {
                 int blockY = blockPosition.getY();
                 int blockZ = blockPosition.getZ();
 
-                if (lastBlockPosition != null && blockX == lastX && blockY == lastY && blockZ == lastZ
-                        && Math.abs(blockX - lastBlockPosition.getX()) + Math.abs(blockZ - lastBlockPosition.getZ()) == 1) {
-                    float yaw = playerData.getPlayer().getLocation().getYaw();
+                if (lastBlockPosition != null && blockX == lastX && blockY == lastY && blockZ == lastZ) {
+                    int lastBlockX = lastBlockPosition.getX();
+                    int lastBlockZ = lastBlockPosition.getZ();
 
-                    if (lastYaw != null) {
-                        double yawDiff = Math.abs(yaw - lastYaw);
+                    if (Math.abs(blockX - lastBlockX) + Math.abs(blockZ - lastBlockZ) == 1) {
+                        float yaw = playerData.getPlayer().getLocation().getYaw();
 
-                        if (yawDiff > 20.0) {
-                            flag(false, "yawDiff=" + yawDiff);
+                        if (lastYaw != null) {
+                            double yawDiff = Math.abs(yaw - lastYaw);
+
+                            if (yawDiff > 20.0) {
+                                KickUtil.kickPlayer(player, event, "Inventory (J) | Invalid yaw difference |"
+                                        + " (yawDiff=" + yawDiff + ")"
+                                );
+                            }
                         }
-                    }
 
-                    lastYaw = yaw;
+                        lastYaw = yaw;
+                    }
                 }
 
                 lastX = blockX;

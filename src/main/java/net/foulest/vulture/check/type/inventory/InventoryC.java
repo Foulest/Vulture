@@ -20,20 +20,18 @@ package net.foulest.vulture.check.type.inventory;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.play.in.blockplace.WrappedPacketInBlockPlace;
-import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
-import io.github.retrooper.packetevents.utils.player.Direction;
+import io.github.retrooper.packetevents.packetwrappers.play.in.blockdig.WrappedPacketInBlockDig;
+import io.github.retrooper.packetevents.packetwrappers.play.in.useentity.WrappedPacketInUseEntity;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
-import org.bukkit.Material;
+import net.foulest.vulture.util.KickUtil;
 
-@CheckInfo(name = "Inventory (C)", type = CheckType.INVENTORY,
-        description = "Detects this Inventory pattern: HeldItemSlot, BlockPlace, HeldItemSlot")
+@CheckInfo(name = "Inventory (C)", type = CheckType.INVENTORY, punishable = false,
+        description = "Detects basic AutoBlock.")
 public class InventoryC extends Check {
 
-    private long start;
     private int stage;
 
     public InventoryC(PlayerData playerData) throws ClassNotFoundException {
@@ -43,44 +41,34 @@ public class InventoryC extends Check {
     @Override
     public void handle(CancellableNMSPacketEvent event, byte packetId,
                        NMSPacket nmsPacket, Object packet, long timestamp) {
-        if (packetId == PacketType.Play.Client.HELD_ITEM_SLOT) {
-            if (stage == 0 || stage == 2) {
-                if (stage == 0) {
-                    start = System.currentTimeMillis();
-                }
+        if (packetId == PacketType.Play.Client.BLOCK_DIG) {
+            WrappedPacketInBlockDig blockDig = new WrappedPacketInBlockDig(nmsPacket);
+            WrappedPacketInBlockDig.PlayerDigType digType = blockDig.getDigType();
 
+            if (digType == WrappedPacketInBlockDig.PlayerDigType.RELEASE_USE_ITEM && stage == 0) {
                 ++stage;
             }
 
-        } else if (packetId == PacketType.Play.Client.BLOCK_PLACE) {
-            WrappedPacketInBlockPlace blockPlace = new WrappedPacketInBlockPlace(nmsPacket);
+        } else if (packetId == PacketType.Play.Client.ARM_ANIMATION) {
+            if (stage == 1) {
+                ++stage;
+            }
 
-            blockPlace.getItemStack().ifPresent(itemStack -> {
-                Material itemType = itemStack.getType();
-                Direction direction = blockPlace.getDirection();
+        } else if (packetId == PacketType.Play.Client.USE_ENTITY) {
+            WrappedPacketInUseEntity useEntity = new WrappedPacketInUseEntity(nmsPacket);
+            WrappedPacketInUseEntity.EntityUseAction action = useEntity.getAction();
 
-                if ((itemType == Material.MUSHROOM_SOUP
-                        || itemType == Material.POTION
-                        || itemType == Material.BOWL)
-                        && direction == Direction.OTHER
-                        && stage == 1) {
-                    ++stage;
-                }
-            });
+            if (action == WrappedPacketInUseEntity.EntityUseAction.ATTACK && stage == 2) {
+                ++stage;
+            }
 
         } else if (PacketType.Play.Client.Util.isInstanceOfFlying(packetId)) {
-            WrappedPacketInFlying flying = new WrappedPacketInFlying(nmsPacket);
-
-            if (!flying.isRotating() && !flying.isMoving()) {
-                stage = 0;
-            }
+            stage = 0;
         }
 
-        long timeDiff = System.currentTimeMillis() - start;
-
-        if (stage == 3 && timeDiff < 99) {
+        if (stage == 3) {
             stage = 0;
-            flag(false, "timeDiff=" + timeDiff);
+            KickUtil.kickPlayer(player, event, "Inventory (C) | AutoBlock");
         }
     }
 }

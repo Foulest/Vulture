@@ -17,8 +17,7 @@
  */
 package net.foulest.vulture.util;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.Data;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -26,8 +25,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class FileUtil {
+@Data
+public class FileUtil {
 
     /**
      * Prints data to a text file.

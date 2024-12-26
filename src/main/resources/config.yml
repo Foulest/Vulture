@@ -58,30 +58,11 @@ vulture:
   # These checks do not have a maximum amount of violations and do not ban players; they only kick players.
   # -----------------------------------------------
   checks:
-    autoblock:
-      A:
-        enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
-      B:
-        enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
-      C:
-        enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
-      D:
-        enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
     badpackets:
       A:
         enabled: true
       B:
         enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
       C:
         enabled: true
       D:
@@ -90,85 +71,33 @@ vulture:
         enabled: true
       F:
         enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
       G:
         enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
     clientbrand:
       enabled: true
-    flight:
-      A:
-        enabled: true
-        maxViolations: 50
-        banCommand: vulture kick %player% %check%
-      B:
-        enabled: true
-        maxViolations: 50
-        banCommand: vulture kick %player% %check%
-      C:
-        enabled: true
-        maxViolations: 50
-        banCommand: vulture kick %player% %check%
-      D:
-        enabled: true
-        maxViolations: 50
-        banCommand: vulture kick %player% %check%
-    groundspoof:
-      A:
-        enabled: true
-        maxViolations: 20
-        banCommand: vulture kick %player% %check%
-      B:
-        enabled: true
-        maxViolations: 20
-        banCommand: vulture kick %player% %check%
     inventory:
       A:
         enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
       B:
         enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
       C:
         enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
       D:
         enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
       E:
         enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
       F:
         enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
       G:
         enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
       H:
         enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
       I:
         enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
       J:
         enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
       K:
         enabled: true
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
     pingspoof:
       A:
         enabled: true
@@ -177,44 +106,6 @@ vulture:
         maxPing: 1000
         maxAveragePing: 500
         maxPingDeviation: 500
-    reach:
-      A:
-        enabled: true
-        cancelDistance: 3.0
-    speed:
-      A:
-        enabled: false
-        maxViolations: 50
-        banCommand: vulture kick %player% %check%
-      B:
-        enabled: true
-        maxViolations: 50
-        banCommand: vulture kick %player% %check%
-      C:
-        enabled: true
-        maxViolations: 50
-        banCommand: vulture kick %player% %check%
-      D:
-        enabled: true
-        maxViolations: 50
-        banCommand: vulture kick %player% %check%
-      E:
-        enabled: true
-        maxViolations: 50
-        banCommand: vulture kick %player% %check%
-      F:
-        enabled: true
-        maxViolations: 50
-        banCommand: vulture kick %player% %check%
-    velocity:
-      A:
-        enabled: false
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
-      B:
-        enabled: false
-        maxViolations: 10
-        banCommand: vulture kick %player% %check%
   # -----------------------------------------------
   # IP Whitelist Settings
   #
@@ -253,10 +144,6 @@ vulture:
         invalid-flying: true
         invalid-instant-build: true
         invalid-invulnerable: true
-      arm-animation:
-        invalid-conditions: true
-      attack-entity:
-        invalid-conditions: true
       beacon:
         invalid-conditions: true
         invalid-data: true
@@ -265,10 +152,8 @@ vulture:
       block-dig:
         invalid-distance: true
       block-place:
-        invalid-conditions: true
         invalid-cursor-position: true
         invalid-distance: true
-        invalid-item: true
         invalid-other-block-position: true
         invalid-other-cursor-position: true
         invalid-up-block-position: true
@@ -284,14 +169,11 @@ vulture:
         invalid-conditions: true
         invalid-message: true
       close-window:
-        closed-inventory: true
         invalid-conditions: true
       command-block:
         invalid-conditions: true
       custom-payload:
         invalid-size: true
-      enchant-item:
-        invalid-window-id: true
       entity-action:
         invalid-jump-boost: true
       flying:
@@ -309,7 +191,6 @@ vulture:
         invalid-data: true
         invalid-size: true
       release-use-item:
-        invalid-conditions: true
         invalid-data: true
       respawn:
         invalid-conditions: true
@@ -326,16 +207,12 @@ vulture:
         invalid-conditions: true
       start-sneaking:
         invalid-conditions: true
-      start-sprinting:
-        invalid-conditions: true
       steer-vehicle:
         invalid-conditions: true
         invalid-dismount-value: true
         invalid-non-dismount-value: true
         invalid-value: true
       stop-sleeping:
-        invalid-conditions: true
-      stop-sneaking:
         invalid-conditions: true
       tab-complete:
         invalid-message: true
@@ -351,7 +228,6 @@ vulture:
         invalid-distance: true
       window-click:
         invalid-clone-button: true
-        invalid-conditions: true
         invalid-pickup-all-button: true
         invalid-pickup-button: true
         invalid-quick-craft-button: true

@@ -26,8 +26,9 @@ import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
+import net.foulest.vulture.util.KickUtil;
 
-@CheckInfo(name = "Inventory (G)", type = CheckType.INVENTORY)
+@CheckInfo(name = "Inventory (G)", type = CheckType.INVENTORY, punishable = false)
 public class InventoryG extends Check {
 
     private boolean wasOpen;
@@ -47,7 +48,7 @@ public class InventoryG extends Check {
 
         if (packetId == PacketType.Play.Client.CLOSE_WINDOW) {
             if (wasOpen) {
-                flag(false, "CLOSE_WINDOW");
+                KickUtil.kickPlayer(player, event, "Inventory (G) | Opening inventory twice");
             }
 
         } else if (packetId == PacketType.Play.Client.CLIENT_COMMAND) {
@@ -62,7 +63,6 @@ public class InventoryG extends Check {
             wasOpen = open;
 
             if (open) {
-                flag(false, "WINDOW_CLICK");
                 open = false;
             }
 

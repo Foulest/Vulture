@@ -20,9 +20,8 @@ package net.foulest.vulture.data;
 import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
 import io.github.retrooper.packetevents.packetwrappers.play.out.position.WrappedPacketOutPosition;
 import io.github.retrooper.packetevents.utils.player.ClientVersion;
+import lombok.Data;
 import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.Violation;
@@ -30,22 +29,15 @@ import net.foulest.vulture.check.type.clientbrand.type.PayloadType;
 import net.foulest.vulture.ping.PingTask;
 import net.foulest.vulture.ping.PingTaskScheduler;
 import net.foulest.vulture.timing.Timing;
-import net.foulest.vulture.tracking.EntityTracker;
 import net.foulest.vulture.util.data.CustomLocation;
 import net.foulest.vulture.util.data.EvictingList;
-import net.foulest.vulture.util.data.Pair;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-@Getter
-@Setter
-@ToString
+@Data
 public class PlayerData {
 
     // Player data
@@ -53,7 +45,7 @@ public class PlayerData {
     private Player player;
     private ClientVersion version = ClientVersion.TEMP_UNRESOLVED;
 
-    // Anti-cheat data
+    // Protection data
     @Getter
     private final List<Check> checks = new ArrayList<>();
     private boolean alertsEnabled;
@@ -71,94 +63,21 @@ public class PlayerData {
 
     // Timestamps
     private Map<ActionType, Integer> actionTimestamps = new EnumMap<>(ActionType.class);
-    private long transPing;
 
     // Ticks
     private int totalTicks;
-    private int aboveBlockTicks;
-    private int aboveBlockTicksStrict;
-    private int underBlockTicks;
-    private int againstBlockTicks;
-    private int againstBlockWideTicks;
-    private int airTicks;
-    private int airTicksStrict;
-    private int groundTicks;
-    private int groundTicksStrict;
-    private int lastAttackTick;
     private int lastDroppedPackets;
     private int lastFlyingTicks;
-    private int lastServerPositionTick;
-    private int velocityTicks;
 
     // Packets
     private WrappedPacketOutPosition lastTeleportPacket;
     private WrappedPacketInFlying lastRotationPacket;
     private WrappedPacketInFlying lastPositionPacket;
 
-    // Reach data
+    // Transaction data
     private Map<Short, Long> transactionSentMap = new HashMap<>();
     private Map<Short, Long> transactionTime = new HashMap<>();
-    private Location lastOnGroundLocation;
-    private Location lastLastLastLocation;
-    private Location lastLastLocation;
-    private Location lastLocation;
-    private Location location;
-    private boolean teleportReset;
-
-    // Attacking data
-    private boolean attacking;
-    private int lastAttacked;
-
-    // Velocity check data
-    private Pair<Integer, Double> velocityY = new Pair<>(0, 0.0);
-    private Pair<Integer, Double> velocityXZ = new Pair<>(0, 0.0);
-    private Pair<Integer, Double> lastVelocityY = new Pair<>(0, 0.0);
-    private Pair<Integer, Double> lastVelocityXZ = new Pair<>(0, 0.0);
-
-    // Block data
-    private Block collidingBlock;
-    private boolean againstBlock;
-    private boolean againstBlockWide;
-    private boolean inCamera;
-    private boolean inLiquid;
-    private boolean inUnloadedChunk;
-    private boolean inWeb;
-    private boolean isInsideBlock;
-    private boolean moving;
-    private boolean nearAnvil;
-    private boolean nearBed;
-    private boolean nearBrewingStand;
-    private boolean nearCactus;
-    private boolean nearCarpet;
-    private boolean nearChest;
-    private boolean nearClimbable;
-    private boolean nearFence;
-    private boolean nearFenceGate;
-    private boolean nearFlowerPot;
-    private boolean nearGround;
-    private boolean nearHopper;
-    private boolean nearLilyPad;
-    private boolean nearLiquid;
-    private boolean nearPiston;
-    private boolean nearPortal;
-    private boolean nearSlab;
-    private boolean nearSlimeBlock;
-    private boolean nearSnowLayer;
-    private boolean nearStairs;
-    private boolean nearTrapdoor;
-    private boolean onChest;
-    private boolean onClimbable;
-    private boolean onGround;
-    private boolean onIce;
-    private boolean onLilyPad;
-    private boolean onRepeater;
-    private boolean onSlab;
-    private boolean onSnowLayer;
-    private boolean onSoulSand;
-    private boolean onStairs;
-    private boolean touchedGroundSinceLogin;
-    private boolean underBlock;
-    private boolean underEffectOfSlime;
+    private long transPing;
 
     // Abilities packet
     private boolean flying;
@@ -166,52 +85,34 @@ public class PlayerData {
     private boolean instantBuild;
     private boolean vulnerable;
 
-    // Other packets
+    // Player state information
+    private Location location;
+    private boolean againstBlock;
+    private boolean moving;
+    private boolean nearPortal;
     private boolean eating;
     private boolean drinking;
-
-    // Animation packet
-    private boolean inBed;
-
-    // BlockDig packet
     private boolean digging;
-
-    // BlockPlace packet
     private boolean blocking;
     private boolean shootingBow;
     private boolean placingBlock;
-
-    // EntityAction packet
     private boolean sprinting;
     private boolean sneaking;
-    private boolean wasSneaking;
     private boolean inventoryOpen;
-
-    // HeldItemSlot packet
     private int currentSlot = -1;
 
     // Dusk
-    private final EntityTracker entityTracker;
     private final PingTaskScheduler pingTaskScheduler;
     private final Timing timing;
-    private final CustomLocation lastLoc = new CustomLocation();
-    private final CustomLocation loc = new CustomLocation();
     private final Queue<CustomLocation> teleports = new ArrayDeque<>();
-    private boolean accuratePosition;
-    private boolean hasPosition;
 
     public PlayerData(UUID uniqueId, @NotNull Player player) {
         this.uniqueId = uniqueId;
         this.player = player;
-        entityTracker = new EntityTracker();
         pingTaskScheduler = new PingTaskScheduler();
         timing = new Timing(player, System.currentTimeMillis());
-
         location = player.getLocation();
-        lastLocation = location;
-        lastLastLocation = lastLocation;
-        lastLastLastLocation = lastLastLocation;
-        lastOnGroundLocation = location;
+        alertsEnabled = player.hasPermission("vulture.alerts") || player.isOp();
 
         for (ActionType action : ActionType.values()) {
             actionTimestamps.put(action, 0);
@@ -260,44 +161,8 @@ public class PlayerData {
             return;
         }
 
-        preTick();
-
-        if (location.hasPos()) {
-            loc.setPos(location.getPos());
-        }
-
-        if (location.hasRot()) {
-            loc.setRot(location.getRot());
-        }
-
-        hasPosition = location.hasPos();
-
-        tick();
-        postTick();
-    }
-
-    // Called before the tick runs, only used for setting previous locations here
-    private void preTick() {
-        lastLoc.set(loc);
-    }
-
-    // Called after the tick has been completed on the client
-    private void tick() {
-        if (attacking) {
-            attacking = false;
-        }
-
-        // Interpolating tracked entities is after attacking in the client tick
-        entityTracker.interpolate();
-
         // Tick timing
         timing.tick();
-    }
-
-    // Called after tick runs
-    private void postTick() {
-        wasSneaking = sneaking;
-        accuratePosition = hasPosition;
     }
 
     // Only for client responses to teleports
@@ -306,8 +171,6 @@ public class PlayerData {
 
         if (location.equals(teleport)) {
             teleports.poll();
-            loc.set(teleport);
-            accuratePosition = true; // Position from last tick is no longer inaccurate
             return true;
         }
         return false;
@@ -356,34 +219,6 @@ public class PlayerData {
                 && lastTeleportPosition.getX() == toPosition.getX()
                 && lastTeleportPosition.getY() == toPosition.getY()
                 && lastTeleportPosition.getZ() == toPosition.getZ();
-    }
-
-    /**
-     * Checks if the player is near a boat.
-     *
-     * @param x The X radius to check.
-     * @param y The Y radius to check.
-     * @param z The Z radius to check.
-     * @return If the player is near a boat.
-     */
-    public boolean isNearbyBoat(double x, double y, double z) {
-        List<Entity> nearbyEntities;
-
-        try {
-            nearbyEntities = player.getNearbyEntities(x, y, z);
-        } catch (RuntimeException ex) {
-            ex.printStackTrace();
-            return false;
-        }
-
-        synchronized (nearbyEntities) {
-            for (Entity entity : nearbyEntities) {
-                if (entity != null && entity.getType() == EntityType.BOAT) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     public int incrementPacketsSentPerTick() {

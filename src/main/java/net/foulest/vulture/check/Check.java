@@ -21,9 +21,7 @@ import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
 import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
 import io.github.retrooper.packetevents.packettype.PacketType;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.event.MovementEvent;
 import net.foulest.vulture.event.RotationEvent;
@@ -38,9 +36,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author Foulest
  */
-@Getter
-@Setter
-@ToString
+@Data
 @SuppressWarnings("unused")
 public class Check implements Listener {
 
@@ -103,12 +99,11 @@ public class Check implements Listener {
     /**
      * This method is used to flag the player and cancel an event.
      *
-     * @param setback Whether to set the player back.
      * @param event   The event to cancel.
      * @param verbose The optional data to include in the flag.
      */
-    protected void flag(boolean setback, @NotNull CancellableEvent event, String... verbose) {
-        PunishUtil.flag(playerData, checkInfoData, setback, event, verbose);
+    protected void flag(@NotNull CancellableEvent event, String... verbose) {
+        PunishUtil.flag(playerData, checkInfoData, event, verbose);
     }
 
     /**
@@ -116,11 +111,10 @@ public class Check implements Listener {
      * <p>
      * When a player is flagged, all online staff members are alerted with the check they flagged and the data
      *
-     * @param setback Whether to set the player back.
      * @param verbose The optional data to include in the flag.
      */
-    protected void flag(boolean setback, String... verbose) {
-        PunishUtil.flag(playerData, checkInfoData, setback, verbose);
+    protected void flag(String... verbose) {
+        PunishUtil.flag(playerData, checkInfoData, verbose);
     }
 
     /**

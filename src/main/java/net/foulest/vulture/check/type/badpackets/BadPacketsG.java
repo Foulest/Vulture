@@ -26,8 +26,9 @@ import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
+import net.foulest.vulture.util.KickUtil;
 
-@CheckInfo(name = "BadPackets (G)", type = CheckType.BADPACKETS,
+@CheckInfo(name = "BadPackets (G)", type = CheckType.BADPACKETS, punishable = false,
         description = "Detects breaking blocks too quickly.")
 public class BadPacketsG extends Check {
 
@@ -58,7 +59,8 @@ public class BadPacketsG extends Check {
 
             } else if (digType == WrappedPacketInBlockDig.PlayerDigType.START_DESTROY_BLOCK) {
                 if (stage == 2 && (ticks != 1 || playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8))) {
-                    flag(false, event, "Break speed" + " (ticks=" + ticks + ")");
+                    KickUtil.kickPlayer(player, event, "BadPackets (G) |"
+                            + " (ticks=" + ticks + ")");
                 }
 
                 stage = 0;

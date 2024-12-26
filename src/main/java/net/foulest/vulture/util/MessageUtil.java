@@ -17,8 +17,7 @@
  */
 package net.foulest.vulture.util;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.Data;
 import net.foulest.vulture.Vulture;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.data.PlayerDataManager;
@@ -42,9 +41,8 @@ import java.util.logging.Logger;
  *
  * @author Foulest
  */
-@SuppressWarnings("unused")
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class MessageUtil {
+@Data
+public class MessageUtil {
 
     private static final Logger logger = Bukkit.getLogger();
 
@@ -179,7 +177,7 @@ public final class MessageUtil {
      * @param message The message to colorize.
      */
     @Contract("_ -> new")
-    static @NotNull String colorize(String message) {
+    public static @NotNull String colorize(String message) {
         return ChatColor.translateAlternateColorCodes('&', message);
     }
 
@@ -215,9 +213,13 @@ public final class MessageUtil {
             PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
             if (playerData.isAlertsEnabled()) {
+                String playerName = player.getName();
+                boolean verboseEnabled = playerData.isVerboseEnabled();
+                boolean verboseEmpty = verbose.isEmpty();
+
                 messagePlayerClickable(player, Collections.singletonList("&aClick to teleport to the player."),
-                        "/tp " + player.getName(), Settings.prefix + " " + message
-                                + (playerData.isVerboseEnabled() && !verbose.isEmpty() ? " " + verbose : ""));
+                        "/tp " + playerName, Settings.prefix + " " + message
+                                + (verboseEnabled && !verboseEmpty ? " " + verbose : ""));
             }
         }
 
