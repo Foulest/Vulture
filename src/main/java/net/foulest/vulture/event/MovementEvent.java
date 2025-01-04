@@ -1,5 +1,5 @@
 /*
- * Vulture - an advanced anti-cheat plugin designed for Minecraft 1.8.9 servers.
+ * Vulture - a server protection plugin designed for Minecraft 1.8.9 servers.
  * Copyright (C) 2024 Foulest (https://github.com/Foulest)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,12 +17,12 @@
  */
 package net.foulest.vulture.event;
 
-import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
-import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
-import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
-import io.github.retrooper.packetevents.utils.vector.Vector3d;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import net.foulest.packetevents.event.eventtypes.CancellableEvent;
+import net.foulest.packetevents.event.eventtypes.CancellableNMSPacketEvent;
+import net.foulest.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
+import net.foulest.packetevents.utils.vector.Vector3d;
 import net.foulest.vulture.data.PlayerData;
 import org.bukkit.Location;
 import org.bukkit.World;

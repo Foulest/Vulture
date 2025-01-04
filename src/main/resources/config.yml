@@ -17,22 +17,23 @@ vulture:
   # -----------------------------------------------
   # Blocked Settings
   #
-  # Both payloads and commands can be blocked below.
+  # Payloads, mods, and commands can be blocked below.
   # The commands section supports RegEx.
   #
   # Players that send blocked payloads will be kicked.
   # Players that send blocked commands will have their command blocked.
   #
-  # For information about what payloads are, visit the links below:
+  # For information about what payloads and mods are, visit the links below:
   # https://github.com/Foulest/Vulture/blob/main/src/main/java/net/foulest/vulture/check/type/clientbrand/type/PayloadType.java
+  # https://github.com/Foulest/Vulture/blob/main/src/main/java/net/foulest/vulture/check/type/clientbrand/type/ModType.java
   # https://github.com/Foulest/Vulture/blob/main/src/main/java/net/foulest/vulture/check/type/clientbrand/ClientBrand.java
   # -----------------------------------------------
   blocked:
     payloads:
       - GalactiCraft
-      - JustEnoughIDs
       - Tinkers Construct
       - InventoryTweaks
+    mods: []
     commands:
       - /calc
       - /eval

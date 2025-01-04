@@ -1,5 +1,5 @@
 /*
- * Vulture - an advanced anti-cheat plugin designed for Minecraft 1.8.9 servers.
+ * Vulture - a server protection plugin designed for Minecraft 1.8.9 servers.
  * Copyright (C) 2024 Foulest (https://github.com/Foulest)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,34 +17,34 @@
  */
 package net.foulest.vulture.processor.type;
 
-import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
-import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
-import io.github.retrooper.packetevents.event.impl.PacketPlayReceiveEvent;
-import io.github.retrooper.packetevents.packettype.PacketType;
-import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.play.in.abilities.WrappedPacketInAbilities;
-import io.github.retrooper.packetevents.packetwrappers.play.in.blockdig.WrappedPacketInBlockDig;
-import io.github.retrooper.packetevents.packetwrappers.play.in.blockplace.WrappedPacketInBlockPlace;
-import io.github.retrooper.packetevents.packetwrappers.play.in.chat.WrappedPacketInChat;
-import io.github.retrooper.packetevents.packetwrappers.play.in.clientcommand.WrappedPacketInClientCommand;
-import io.github.retrooper.packetevents.packetwrappers.play.in.custompayload.WrappedPacketInCustomPayload;
-import io.github.retrooper.packetevents.packetwrappers.play.in.entityaction.WrappedPacketInEntityAction;
-import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
-import io.github.retrooper.packetevents.packetwrappers.play.in.helditemslot.WrappedPacketInHeldItemSlot;
-import io.github.retrooper.packetevents.packetwrappers.play.in.setcreativeslot.WrappedPacketInSetCreativeSlot;
-import io.github.retrooper.packetevents.packetwrappers.play.in.settings.WrappedPacketInSettings;
-import io.github.retrooper.packetevents.packetwrappers.play.in.spectate.WrappedPacketInSpectate;
-import io.github.retrooper.packetevents.packetwrappers.play.in.steervehicle.WrappedPacketInSteerVehicle;
-import io.github.retrooper.packetevents.packetwrappers.play.in.tabcomplete.WrappedPacketInTabComplete;
-import io.github.retrooper.packetevents.packetwrappers.play.in.transaction.WrappedPacketInTransaction;
-import io.github.retrooper.packetevents.packetwrappers.play.in.updatesign.WrappedPacketInUpdateSign;
-import io.github.retrooper.packetevents.packetwrappers.play.in.useentity.WrappedPacketInUseEntity;
-import io.github.retrooper.packetevents.packetwrappers.play.in.windowclick.WrappedPacketInWindowClick;
-import io.github.retrooper.packetevents.utils.player.ClientVersion;
-import io.github.retrooper.packetevents.utils.player.Direction;
-import io.github.retrooper.packetevents.utils.vector.Vector3d;
-import io.github.retrooper.packetevents.utils.vector.Vector3f;
-import io.github.retrooper.packetevents.utils.vector.Vector3i;
+import net.foulest.packetevents.event.eventtypes.CancellableEvent;
+import net.foulest.packetevents.event.eventtypes.CancellableNMSPacketEvent;
+import net.foulest.packetevents.event.impl.PacketPlayReceiveEvent;
+import net.foulest.packetevents.packettype.PacketType;
+import net.foulest.packetevents.packetwrappers.NMSPacket;
+import net.foulest.packetevents.packetwrappers.play.in.abilities.WrappedPacketInAbilities;
+import net.foulest.packetevents.packetwrappers.play.in.blockdig.WrappedPacketInBlockDig;
+import net.foulest.packetevents.packetwrappers.play.in.blockplace.WrappedPacketInBlockPlace;
+import net.foulest.packetevents.packetwrappers.play.in.chat.WrappedPacketInChat;
+import net.foulest.packetevents.packetwrappers.play.in.clientcommand.WrappedPacketInClientCommand;
+import net.foulest.packetevents.packetwrappers.play.in.custompayload.WrappedPacketInCustomPayload;
+import net.foulest.packetevents.packetwrappers.play.in.entityaction.WrappedPacketInEntityAction;
+import net.foulest.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
+import net.foulest.packetevents.packetwrappers.play.in.helditemslot.WrappedPacketInHeldItemSlot;
+import net.foulest.packetevents.packetwrappers.play.in.setcreativeslot.WrappedPacketInSetCreativeSlot;
+import net.foulest.packetevents.packetwrappers.play.in.settings.WrappedPacketInSettings;
+import net.foulest.packetevents.packetwrappers.play.in.spectate.WrappedPacketInSpectate;
+import net.foulest.packetevents.packetwrappers.play.in.steervehicle.WrappedPacketInSteerVehicle;
+import net.foulest.packetevents.packetwrappers.play.in.tabcomplete.WrappedPacketInTabComplete;
+import net.foulest.packetevents.packetwrappers.play.in.transaction.WrappedPacketInTransaction;
+import net.foulest.packetevents.packetwrappers.play.in.updatesign.WrappedPacketInUpdateSign;
+import net.foulest.packetevents.packetwrappers.play.in.useentity.WrappedPacketInUseEntity;
+import net.foulest.packetevents.packetwrappers.play.in.windowclick.WrappedPacketInWindowClick;
+import net.foulest.packetevents.utils.player.ClientVersion;
+import net.foulest.packetevents.utils.player.Direction;
+import net.foulest.packetevents.utils.vector.Vector3d;
+import net.foulest.packetevents.utils.vector.Vector3f;
+import net.foulest.packetevents.utils.vector.Vector3i;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.data.PlayerData;
@@ -61,7 +61,6 @@ import org.bukkit.entity.*;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2f;
 
@@ -132,7 +131,6 @@ public class PacketReceiveProcessor extends Processor {
 
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
         boolean playerFlightAllowed = playerData.isFlightAllowed();
-        boolean blocking = playerData.isBlocking();
         boolean inventoryOpen = playerData.isInventoryOpen();
         boolean digging = playerData.isDigging();
         boolean placingBlock = playerData.isPlacingBlock();
@@ -142,7 +140,7 @@ public class PacketReceiveProcessor extends Processor {
                 WrappedPacketInAbilities abilities = new WrappedPacketInAbilities(nmsPacket);
                 boolean abilitiesFlying = abilities.isFlying();
 
-                if (playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8)) {
+                if (playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8_9)) {
                     boolean playerFlying = playerData.isFlying();
 
                     if (abilitiesFlying == playerFlying) {
@@ -411,7 +409,6 @@ public class PacketReceiveProcessor extends Processor {
                 if (blockPlace.getItemStack().isPresent()) {
                     ItemStack itemStack = blockPlace.getItemStack().get();
                     Material type = itemStack.getType();
-                    PlayerInventory inventory = player.getInventory();
 
                     if (blockPlace.getDirection() == Direction.OTHER) {
                         switch (type) {
@@ -573,7 +570,7 @@ public class PacketReceiveProcessor extends Processor {
 
                 // Checks for invalid item name payloads.
                 if (channelName.equals("MC|ItemName")) {
-                    if (payloadSize > (playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8) ? 31 : 32)) {
+                    if (payloadSize > (playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8_9) ? 31 : 32)) {
                         KickUtil.kickPlayer(player, event, Settings.itemNameInvalidSize,
                                 "Sent ItemName payload with invalid size"
                                         + " (size=" + payloadSize + ")"
@@ -966,7 +963,7 @@ public class PacketReceiveProcessor extends Processor {
                 if (playerData.getTicksSince(ActionType.BLOCKING) > 1
                         && playerData.getTicksSince(ActionType.RELEASE_USE_ITEM) > 1
                         && playerData.getTicksSince(ActionType.BLOCK_BREAK) > 1
-                        && playerData.getTicksSince(ActionType.TELEPORT) > 1) {
+                        && playerData.getTicksSince(ActionType.TELEPORT) > 2) {
                     if (!flying.isMoving() && !flying.isRotating()) {
                         playerData.handlePlayerPacket(new CustomLocation(null, null));
                     } else if (!flying.isMoving() && flying.isRotating()) {
@@ -1074,7 +1071,7 @@ public class PacketReceiveProcessor extends Processor {
                 int currentSlot = playerData.getCurrentSlot();
 
                 if (heldItemSlot == currentSlot
-                        && playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8)
+                        && playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8_9)
                         && playerData.getTicksSince(ActionType.LOGIN) > 20) {
                     KickUtil.kickPlayer(player, event, Settings.heldItemSlotInvalidSlotChange,
                             "Sent HeldItemSlot packet with invalid slot change"

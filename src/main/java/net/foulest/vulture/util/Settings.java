@@ -1,5 +1,5 @@
 /*
- * Vulture - an advanced anti-cheat plugin designed for Minecraft 1.8.9 servers.
+ * Vulture - a server protection plugin designed for Minecraft 1.8.9 servers.
  * Copyright (C) 2024 Foulest (https://github.com/Foulest)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -61,6 +61,9 @@ public class Settings {
 
     // Blocked payloads
     public static List<String> blockedPayloads;
+
+    // Blocked mods
+    public static List<String> blockedMods;
 
     // Blocked commands
     public static List<String> blockedCommands;
@@ -218,6 +221,9 @@ public class Settings {
 
         // Blocked payloads
         blockedPayloads = config.getStringList("vulture.blocked.payloads");
+
+        // Blocked mods
+        blockedMods = config.getStringList("vulture.blocked.mods");
 
         // Blocked commands
         blockedCommands = config.getStringList("vulture.blocked.commands");

@@ -1,5 +1,5 @@
 /*
- * Vulture - an advanced anti-cheat plugin designed for Minecraft 1.8.9 servers.
+ * Vulture - a server protection plugin designed for Minecraft 1.8.9 servers.
  * Copyright (C) 2024 Foulest (https://github.com/Foulest)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,7 +32,7 @@ public enum DataType {
             case BRAND:
                 return "Brand";
             case REGISTER_DATA_MOD:
-                return "Mod";
+                return "Mod Data";
             case REGISTER_DATA_OTHER:
                 return "Register Data";
             case CHANNEL:

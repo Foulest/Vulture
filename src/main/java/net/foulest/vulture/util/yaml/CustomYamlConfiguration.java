@@ -1,5 +1,5 @@
 /*
- * Vulture - an advanced anti-cheat plugin designed for Minecraft 1.8.9 servers.
+ * Vulture - a server protection plugin designed for Minecraft 1.8.9 servers.
  * Copyright (C) 2024 Foulest (https://github.com/Foulest)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -150,6 +150,7 @@ public class CustomYamlConfiguration extends YamlConfiguration {
      * @throws InvalidConfigurationException If the configuration is invalid.
      */
     @Override
+    @SuppressWarnings("RedundantThrows")
     public void load(Reader reader) throws IOException, InvalidConfigurationException {
         @Cleanup BufferedReader input = reader instanceof BufferedReader ? (BufferedReader) reader : new BufferedReader(reader);
         String builder = input.lines().map(line -> line + '\n').collect(Collectors.joining());

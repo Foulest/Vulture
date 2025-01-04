@@ -1,5 +1,5 @@
 /*
- * Vulture - an advanced anti-cheat plugin designed for Minecraft 1.8.9 servers.
+ * Vulture - a server protection plugin designed for Minecraft 1.8.9 servers.
  * Copyright (C) 2024 Foulest (https://github.com/Foulest)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,11 +17,11 @@
  */
 package net.foulest.vulture.check.type.badpackets;
 
-import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
-import io.github.retrooper.packetevents.packettype.PacketType;
-import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.play.in.setcreativeslot.WrappedPacketInSetCreativeSlot;
-import io.github.retrooper.packetevents.utils.player.ClientVersion;
+import net.foulest.packetevents.event.eventtypes.CancellableNMSPacketEvent;
+import net.foulest.packetevents.packettype.PacketType;
+import net.foulest.packetevents.packetwrappers.NMSPacket;
+import net.foulest.packetevents.packetwrappers.play.in.setcreativeslot.WrappedPacketInSetCreativeSlot;
+import net.foulest.packetevents.utils.player.ClientVersion;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
@@ -57,18 +57,21 @@ public class BadPacketsA extends Check {
             }
 
             String packetName = PacketType.getPacketFromId(packetId).getSimpleName();
-            boolean olderThan1_8 = playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8);
+            boolean olderThan1_8 = playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8_9);
             boolean inCreative = player.getGameMode() == GameMode.CREATIVE;
 
             switch (packetId) {
                 case PacketType.Play.Client.BLOCK_PLACE:
-                case PacketType.Play.Client.HELD_ITEM_SLOT:
-                    if (count >= (olderThan1_8 && inCreative ? 3 : 5)) {
+                case PacketType.Play.Client.HELD_ITEM_SLOT: {
+                    int threshold = olderThan1_8 && inCreative ? 3 : 5;
+
+                    if (count >= threshold) {
                         KickUtil.kickPlayer(player, event, "BadPackets (A) |"
                                 + " packet=" + packetName
                                 + " count=" + count);
                     }
                     break;
+                }
 
                 case PacketType.Play.Client.CLIENT_COMMAND:
                 case PacketType.Play.Client.TAB_COMPLETE:
@@ -87,13 +90,16 @@ public class BadPacketsA extends Check {
                     }
                     break;
 
-                case PacketType.Play.Client.WINDOW_CLICK:
-                    if (count >= (olderThan1_8 ? 52 : 6)) {
+                case PacketType.Play.Client.WINDOW_CLICK: {
+                    int threshold = olderThan1_8 ? 52 : 6;
+
+                    if (count >= threshold) {
                         KickUtil.kickPlayer(player, event, "BadPackets (A) |"
                                 + " packet=" + packetName
                                 + " count=" + count);
                     }
                     break;
+                }
 
                 case PacketType.Play.Client.ENTITY_ACTION:
                     if (count >= 5) {
@@ -112,7 +118,7 @@ public class BadPacketsA extends Check {
                     break;
 
                 case PacketType.Play.Client.USE_ENTITY:
-                    if (count >= 7) {
+                    if (count >= 10) {
                         KickUtil.kickPlayer(player, event, "BadPackets (A) |"
                                 + " packet=" + packetName
                                 + " count=" + count);
@@ -120,7 +126,7 @@ public class BadPacketsA extends Check {
                     break;
 
                 case PacketType.Play.Client.ARM_ANIMATION:
-                    if (count >= 8) {
+                    if (count >= 9) {
                         KickUtil.kickPlayer(player, event, "BadPackets (A) |"
                                 + " packet=" + packetName
                                 + " count=" + count);

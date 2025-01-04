@@ -1,5 +1,5 @@
 /*
- * Vulture - an advanced anti-cheat plugin designed for Minecraft 1.8.9 servers.
+ * Vulture - a server protection plugin designed for Minecraft 1.8.9 servers.
  * Copyright (C) 2024 Foulest (https://github.com/Foulest)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,14 +17,16 @@
  */
 package net.foulest.vulture.data;
 
-import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
-import io.github.retrooper.packetevents.packetwrappers.play.out.position.WrappedPacketOutPosition;
-import io.github.retrooper.packetevents.utils.player.ClientVersion;
 import lombok.Data;
 import lombok.Getter;
+import net.foulest.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
+import net.foulest.packetevents.packetwrappers.play.out.position.WrappedPacketOutPosition;
+import net.foulest.packetevents.utils.player.ClientVersion;
+import net.foulest.packetevents.utils.vector.Vector3d;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.Violation;
+import net.foulest.vulture.check.type.clientbrand.type.ModType;
 import net.foulest.vulture.check.type.clientbrand.type.PayloadType;
 import net.foulest.vulture.ping.PingTask;
 import net.foulest.vulture.ping.PingTaskScheduler;
@@ -52,7 +54,10 @@ public class PlayerData {
     private boolean verboseEnabled;
     private boolean newViolationsPaused;
     private List<Violation> violations = new ArrayList<>();
+
+    // Payload data
     private List<PayloadType> payloads = new ArrayList<>();
+    private List<ModType> mods = new ArrayList<>();
 
     // Packet counts
     private int ticksBeforeReset;
@@ -125,6 +130,7 @@ public class PlayerData {
         pingTaskScheduler.onPingSendStart();
     }
 
+    @SuppressWarnings("NestedMethodCall")
     public void onPingSendEnd() {
         // Increment the total ticks
         totalTicks++;
@@ -212,8 +218,9 @@ public class PlayerData {
      * @param toPosition Position to check.
      * @return If the player is teleporting.
      */
-    public boolean isTeleporting(io.github.retrooper.packetevents.utils.vector.Vector3d toPosition) {
-        io.github.retrooper.packetevents.utils.vector.Vector3d lastTeleportPosition = lastTeleportPacket != null ? lastTeleportPacket.getPosition() : null;
+    public boolean isTeleporting(Vector3d toPosition) {
+        Vector3d lastTeleportPosition = lastTeleportPacket != null
+                ? lastTeleportPacket.getPosition() : null;
 
         return lastTeleportPacket != null && lastTeleportPosition != null
                 && lastTeleportPosition.getX() == toPosition.getX()

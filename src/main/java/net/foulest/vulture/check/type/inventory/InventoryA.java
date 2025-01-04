@@ -1,5 +1,5 @@
 /*
- * Vulture - an advanced anti-cheat plugin designed for Minecraft 1.8.9 servers.
+ * Vulture - a server protection plugin designed for Minecraft 1.8.9 servers.
  * Copyright (C) 2024 Foulest (https://github.com/Foulest)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,13 +17,13 @@
  */
 package net.foulest.vulture.check.type.inventory;
 
-import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
-import io.github.retrooper.packetevents.packettype.PacketType;
-import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
-import io.github.retrooper.packetevents.packetwrappers.play.in.useentity.WrappedPacketInUseEntity;
-import io.github.retrooper.packetevents.packetwrappers.play.in.windowclick.WrappedPacketInWindowClick;
-import io.github.retrooper.packetevents.utils.player.ClientVersion;
+import net.foulest.packetevents.event.eventtypes.CancellableNMSPacketEvent;
+import net.foulest.packetevents.packettype.PacketType;
+import net.foulest.packetevents.packetwrappers.NMSPacket;
+import net.foulest.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
+import net.foulest.packetevents.packetwrappers.play.in.useentity.WrappedPacketInUseEntity;
+import net.foulest.packetevents.packetwrappers.play.in.windowclick.WrappedPacketInWindowClick;
+import net.foulest.packetevents.utils.player.ClientVersion;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
@@ -44,7 +44,7 @@ public class InventoryA extends Check {
     public void handle(CancellableNMSPacketEvent event, byte packetId,
                        NMSPacket nmsPacket, Object packet, long timestamp) {
         // Checks the player for exemptions.
-        if (!playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8)) {
+        if (!playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8_9)) {
             return;
         }
 

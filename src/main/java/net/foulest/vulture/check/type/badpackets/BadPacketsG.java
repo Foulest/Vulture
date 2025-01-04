@@ -1,5 +1,5 @@
 /*
- * Vulture - an advanced anti-cheat plugin designed for Minecraft 1.8.9 servers.
+ * Vulture - a server protection plugin designed for Minecraft 1.8.9 servers.
  * Copyright (C) 2024 Foulest (https://github.com/Foulest)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,11 +17,11 @@
  */
 package net.foulest.vulture.check.type.badpackets;
 
-import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
-import io.github.retrooper.packetevents.packettype.PacketType;
-import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.play.in.blockdig.WrappedPacketInBlockDig;
-import io.github.retrooper.packetevents.utils.player.ClientVersion;
+import net.foulest.packetevents.event.eventtypes.CancellableNMSPacketEvent;
+import net.foulest.packetevents.packettype.PacketType;
+import net.foulest.packetevents.packetwrappers.NMSPacket;
+import net.foulest.packetevents.packetwrappers.play.in.blockdig.WrappedPacketInBlockDig;
+import net.foulest.packetevents.utils.player.ClientVersion;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
@@ -58,7 +58,7 @@ public class BadPacketsG extends Check {
                 stage = 1;
 
             } else if (digType == WrappedPacketInBlockDig.PlayerDigType.START_DESTROY_BLOCK) {
-                if (stage == 2 && (ticks != 1 || playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8))) {
+                if (stage == 2 && (ticks != 1 || playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8_9))) {
                     KickUtil.kickPlayer(player, event, "BadPackets (G) |"
                             + " (ticks=" + ticks + ")");
                 }

@@ -1,5 +1,5 @@
 /*
- * Vulture - an advanced anti-cheat plugin designed for Minecraft 1.8.9 servers.
+ * Vulture - a server protection plugin designed for Minecraft 1.8.9 servers.
  * Copyright (C) 2024 Foulest (https://github.com/Foulest)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,13 +17,13 @@
  */
 package net.foulest.vulture.cmds;
 
-import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.utils.player.ClientVersion;
-import io.github.retrooper.packetevents.utils.player.PlayerUtils;
 import lombok.Data;
+import net.foulest.packetevents.PacketEvents;
+import net.foulest.packetevents.utils.player.ClientVersion;
+import net.foulest.packetevents.utils.player.PlayerUtils;
 import net.foulest.vulture.Vulture;
-import net.foulest.vulture.check.Violation;
 import net.foulest.vulture.check.type.clientbrand.type.DataType;
+import net.foulest.vulture.check.type.clientbrand.type.ModType;
 import net.foulest.vulture.check.type.clientbrand.type.PayloadType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.data.PlayerDataManager;
@@ -174,26 +174,52 @@ public class VultureCmd {
                 ClientVersion targetVersion = targetData.getVersion();
                 String versionName = targetVersion.getDisplayName();
                 int targetPing = playerUtils.getPing(target);
-                List<Violation> targetVLs = targetData.getViolations();
-                int targetVLSize = targetVLs.size();
 
                 MessageUtil.messagePlayer(sender, "");
                 MessageUtil.messagePlayer(sender, "&e" + targetName + "'s Info");
                 MessageUtil.messagePlayer(sender, "&7* &fVersion: &e" + versionName);
                 MessageUtil.messagePlayer(sender, "&7* &fPing: &e" + targetPing + "ms");
-                MessageUtil.messagePlayer(sender, "&7* &fViolations: &e" + targetVLSize);
 
                 if (!targetData.getPayloads().isEmpty()) {
                     MessageUtil.messagePlayer(sender, "");
-                    MessageUtil.messagePlayer(sender, "&fPayloads:");
+                    MessageUtil.messagePlayer(sender, "&fPayloads (" + targetData.getPayloads().size() + "):");
+
+                    StringBuilder payloadBuilder = new StringBuilder();
+                    payloadBuilder.append("&7* ");
 
                     for (PayloadType payloadType : targetData.getPayloads()) {
                         String payloadName = payloadType.getName();
                         DataType dataType = payloadType.getDataType();
                         String dataTypeName = dataType.getName();
 
-                        MessageUtil.messagePlayer(sender, "&7* &e" + payloadName + " &7(" + dataTypeName + ")");
+                        payloadBuilder.append("&e").append(payloadName)
+                                .append(" &7(").append(dataTypeName).append(")&f, ");
                     }
+
+                    // Trim the last comma and space.
+                    String payloads = payloadBuilder.toString().trim();
+                    payloads = payloads.substring(0, payloads.length() - 1);
+
+                    MessageUtil.messagePlayer(sender, payloads);
+                }
+
+                if (!targetData.getMods().isEmpty()) {
+                    MessageUtil.messagePlayer(sender, "");
+                    MessageUtil.messagePlayer(sender, "&fMods (" + targetData.getMods().size() + "):");
+
+                    StringBuilder modBuilder = new StringBuilder();
+                    modBuilder.append("&7* ");
+
+                    for (ModType modType : targetData.getMods()) {
+                        modBuilder.append("&e").append(modType.getName())
+                                .append(" &7(").append(modType.getVersion()).append(")&f, ");
+                    }
+
+                    // Trim the last comma and space.
+                    String mods = modBuilder.toString().trim();
+                    mods = mods.substring(0, mods.length() - 1);
+
+                    MessageUtil.messagePlayer(sender, mods);
                 }
 
                 MessageUtil.messagePlayer(sender, "");

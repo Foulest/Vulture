@@ -1,5 +1,5 @@
 /*
- * Vulture - an advanced anti-cheat plugin designed for Minecraft 1.8.9 servers.
+ * Vulture - a server protection plugin designed for Minecraft 1.8.9 servers.
  * Copyright (C) 2024 Foulest (https://github.com/Foulest)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,18 +17,19 @@
  */
 package net.foulest.vulture;
 
-import dev.thomazz.pledge.Pledge;
-import dev.thomazz.pledge.pinger.ClientPinger;
-import dev.thomazz.pledge.pinger.ClientPingerListener;
-import io.github.retrooper.packetevents.PacketEvents;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
+import net.foulest.packetevents.PacketEvents;
+import net.foulest.pledge.Pledge;
+import net.foulest.pledge.pinger.ClientPinger;
+import net.foulest.pledge.pinger.ClientPingerListener;
 import net.foulest.vulture.cmds.VultureCmd;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.data.PlayerDataManager;
 import net.foulest.vulture.listeners.CommandListener;
 import net.foulest.vulture.listeners.ExploitListener;
+import net.foulest.vulture.listeners.ModDataListener;
 import net.foulest.vulture.listeners.PlayerDataListener;
 import net.foulest.vulture.processor.type.PacketDecodeProcessor;
 import net.foulest.vulture.processor.type.PacketReceiveProcessor;
@@ -77,7 +78,9 @@ public class Vulture extends JavaPlugin implements ClientPingerListener {
     @SneakyThrows
     public void onEnable() {
         // Kicks all online players.
-        Bukkit.getOnlinePlayers().forEach(player -> player.kickPlayer("Disconnected"));
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            player.kickPlayer("Disconnected");
+        }
 
         // Initializes Pledge.
         MessageUtil.log(Level.INFO, "Loading Pledge...");
@@ -101,7 +104,7 @@ public class Vulture extends JavaPlugin implements ClientPingerListener {
 
         // Loads the plugin's listeners.
         MessageUtil.log(Level.INFO, "Loading Listeners...");
-        loadListeners(new CommandListener(), new ExploitListener(), new PlayerDataListener());
+        loadListeners(new CommandListener(), new ExploitListener(), new PlayerDataListener(), new ModDataListener());
 
         // Initializes the Command Framework.
         MessageUtil.log(Level.INFO, "Loading Command Framework...");

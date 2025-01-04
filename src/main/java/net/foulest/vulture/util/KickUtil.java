@@ -1,5 +1,5 @@
 /*
- * Vulture - an advanced anti-cheat plugin designed for Minecraft 1.8.9 servers.
+ * Vulture - a server protection plugin designed for Minecraft 1.8.9 servers.
  * Copyright (C) 2024 Foulest (https://github.com/Foulest)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,21 +17,20 @@
  */
 package net.foulest.vulture.util;
 
-import io.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
-import io.github.retrooper.packetevents.packetwrappers.play.out.kickdisconnect.WrappedPacketOutKickDisconnect;
 import io.netty.channel.Channel;
 import lombok.Data;
+import net.foulest.packetevents.PacketEvents;
+import net.foulest.packetevents.event.eventtypes.CancellableEvent;
+import net.foulest.packetevents.packetwrappers.play.out.kickdisconnect.WrappedPacketOutKickDisconnect;
 import net.foulest.vulture.Vulture;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Utility class for kicking players.
@@ -41,7 +40,7 @@ import java.util.UUID;
 @Data
 public class KickUtil {
 
-    private static final Set<UUID> currentlyKicking = Collections.synchronizedSet(new HashSet<>());
+    private static final Set<UUID> currentlyKicking = ConcurrentHashMap.newKeySet();
 
     public static void kickPlayer(Player player, String debugMessage) {
         kick(player, debugMessage, "Disconnected", true);
@@ -113,18 +112,16 @@ public class KickUtil {
      * @param player The player to be kicked.
      * @param reason The reason for kicking the player.
      */
+    @SuppressWarnings("NestedMethodCall")
     private static void kick(@NotNull Player player,
                              String debugMessage,
                              String reason, boolean announceKick) {
         UUID uniqueId = player.getUniqueId();
 
-        synchronized (currentlyKicking) {
-            if (currentlyKicking.contains(uniqueId)) {
-                // Already in the process of kicking this player.
-                return;
-            }
-
-            currentlyKicking.add(uniqueId);
+        // Use atomic operations on ConcurrentHashMap keySet
+        if (!currentlyKicking.add(uniqueId)) {
+            // Already in the process of kicking this player.
+            return;
         }
 
         if (announceKick) {
@@ -171,9 +168,7 @@ public class KickUtil {
      * @return If the player is being kicked.
      */
     public static boolean isPlayerBeingKicked(@NotNull Entity entity) {
-        synchronized (currentlyKicking) {
-            UUID uniqueId = entity.getUniqueId();
-            return currentlyKicking.contains(uniqueId);
-        }
+        UUID uniqueId = entity.getUniqueId();
+        return currentlyKicking.contains(uniqueId);
     }
 }

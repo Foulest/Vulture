@@ -5,7 +5,7 @@
 [![Downloads](https://img.shields.io/github/downloads/Foulest/Vulture/total.svg)](https://github.com/Foulest/Vulture/releases)
 [![JitPack Badge](https://jitpack.io/v/Foulest/Vulture.svg)](https://jitpack.io/#Foulest/Vulture)
 
-**Vulture** is an exploit protection plugin designed for Minecraft 1.8.9 servers.
+**Vulture** is a server protection plugin designed for Minecraft 1.8.9 servers.
 
 > **Note:** This project is still in development and is not yet ready for production use.
 

@@ -1,5 +1,5 @@
 /*
- * Vulture - an advanced anti-cheat plugin designed for Minecraft 1.8.9 servers.
+ * Vulture - a server protection plugin designed for Minecraft 1.8.9 servers.
  * Copyright (C) 2024 Foulest (https://github.com/Foulest)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,11 +17,12 @@
  */
 package net.foulest.vulture.check.type.clientbrand;
 
-import io.github.retrooper.packetevents.event.eventtypes.CancellableEvent;
-import io.github.retrooper.packetevents.event.eventtypes.CancellableNMSPacketEvent;
-import io.github.retrooper.packetevents.packettype.PacketType;
-import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.play.in.custompayload.WrappedPacketInCustomPayload;
+import net.foulest.packetevents.event.eventtypes.CancellableEvent;
+import net.foulest.packetevents.event.eventtypes.CancellableNMSPacketEvent;
+import net.foulest.packetevents.packettype.PacketType;
+import net.foulest.packetevents.packetwrappers.NMSPacket;
+import net.foulest.packetevents.packetwrappers.play.in.custompayload.WrappedPacketInCustomPayload;
+import net.foulest.packetevents.utils.player.ClientVersion;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
@@ -38,8 +39,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
-@CheckInfo(name = "ClientBrand", type = CheckType.CLIENTBRAND,
-        punishable = false, description = "Checks for modified client brands.")
+@CheckInfo(name = "ClientBrand", type = CheckType.CLIENTBRAND, punishable = false,
+        description = "Checks for modified client brands.")
 public class ClientBrand extends Check {
 
     private static final List<PayloadType> BRANDS = Arrays.asList(
@@ -98,18 +99,161 @@ public class ClientBrand extends Check {
             new PayloadType("forge:split_11", "Forge", DataType.REGISTER_DATA_OTHER, false),
             new PayloadType("fml:handshake", "Forge", DataType.REGISTER_DATA_OTHER, false),
             new PayloadType("fabric-screen-handle", "Fabric", DataType.REGISTER_DATA_OTHER, false),
+            new PayloadType("fabric:attachment_sy", "Fabric", DataType.REGISTER_DATA_OTHER, false),
+
+            new PayloadType("lunar:apollo", "Lunar Client", DataType.REGISTER_DATA_OTHER, false),
+            new PayloadType("lunarclient:pm", "Lunar Client", DataType.REGISTER_DATA_OTHER, false),
+            new PayloadType("apollo:json", "Lunar Client", DataType.REGISTER_DATA_OTHER, false),
+            new PayloadType("transfer:channel", "Lunar Client", DataType.REGISTER_DATA_OTHER, false),
 
             new PayloadType("labymod3:main", "LabyMod", DataType.REGISTER_DATA_OTHER, false),
             new PayloadType("labymod:neo", "LabyMod", DataType.REGISTER_DATA_OTHER, false),
             new PayloadType("minecraft:intave", "LabyMod", DataType.REGISTER_DATA_OTHER, false),
-            new PayloadType("labymod:neo/addons/l", "LabyMod Minimap", DataType.REGISTER_DATA_OTHER, false),
-            new PayloadType("labymod:neo/addons/labysminimap", "LabyMod Minimap", DataType.REGISTER_DATA_OTHER, false),
+
+            new PayloadType("labymod:neo/addons/l", "LabyMod Minimap", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("labymod:neo/addons/labysminimap", "LabyMod Minimap", DataType.REGISTER_DATA_MOD, false),
 
             new PayloadType("EB", "Unknown (EB)", DataType.REGISTER_DATA_OTHER, false),
             new PayloadType("ES", "Unknown (ES)", DataType.REGISTER_DATA_OTHER, false),
             new PayloadType("ET", "Unknown (ET)", DataType.REGISTER_DATA_OTHER, false),
             new PayloadType("GEN", "Unknown (GEN)", DataType.REGISTER_DATA_OTHER, false),
             new PayloadType("autoconfig", "Unknown (autoconfig)", DataType.REGISTER_DATA_OTHER, false),
+
+            new PayloadType("noxesium-v2:mcc_serv", "Noxesium", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("noxesium-v2:mcc_game", "Noxesium", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("noxesium-v2:reset_se", "Noxesium", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("noxesium-v2:reset", "Noxesium", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("noxesium-v2:stop_sou", "Noxesium", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("noxesium-v2:modify_s", "Noxesium", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("noxesium-v2:change_s", "Noxesium", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("noxesium-v2:reset_ex", "Noxesium", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("noxesium-v2:change_e", "Noxesium", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("noxesium-v2:server_i", "Noxesium", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("noxesium-v2:start_so", "Noxesium", DataType.REGISTER_DATA_MOD, false),
+
+            new PayloadType("voicechat:secret", "Simple Voice Chat", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("voicechat:joined_gro", "Simple Voice Chat", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("voicechat:player_sta", "Simple Voice Chat", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("voicechat:add_group", "Simple Voice Chat", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("voicechat:remove_cat", "Simple Voice Chat", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("voicechat:remove_gro", "Simple Voice Chat", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("voicechat:add_catego", "Simple Voice Chat", DataType.REGISTER_DATA_MOD, false),
+
+            new PayloadType("cobblemon:ability_sy", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:ability_up", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:add_evolut", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:aspects_up", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:battle_app", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:battle_cap", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:battle_cha", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:battle_end", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:battle_fai", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:battle_hea", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:battle_ini", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:battle_mad", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:battle_mak", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:battle_mes", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:battle_mus", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:battle_per", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:battle_que", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:battle_rep", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:battle_set", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:battle_swa", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:battle_swi", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:battle_tra", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:battle_upd", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:benched_mo", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:berry_sync", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:caught_bal", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:clear_evol", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:close_npc_", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:close_past", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:close_pc", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:dex_entry_", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:dialogue_c", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:dialogue_o", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:ev_update", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:experience", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:fishing_ba", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:fossils", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:friendship", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:gender_upd", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:global_spe", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:health_upd", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:held_item_", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:initialize", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:interact_p", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:iv_update", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:move_clien", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:moves_sync", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:moveset_up", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:natural_ma", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:nature_upd", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:nickname_u", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:npcs_sync", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:open_move_", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:open_npc_e", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:open_party", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:open_pastu", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:open_pc", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:open_start", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:original_t", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:packets/fo", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:pasture_po", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:play_posab", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:player_int", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:pokedex_sy", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:pokedex_ui", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:pokerod_sy", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:properties", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:remove_cli", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:remove_evo", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:run_posabl", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:script_reg", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:server_con", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:server_set", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:set_client", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:set_party_", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:set_pc_box", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:set_pc_pok", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:shiny_upda", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:spawn_empt", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:spawn_gene", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:spawn_npc_", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:spawn_poke", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:spawn_snow", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:species_fe", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:species_sy", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:species_up", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:standard_s", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:state_upda", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:status_upd", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:summary_ui", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:swap_clien", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:team_join_", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:team_membe", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:team_reque", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:tethering_", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:toast", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:trade_acce", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:trade_canc", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:trade_comp", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:trade_offe", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:trade_proc", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:trade_star", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:trade_upda", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:tradeable_", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:unlock_rel", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cobblemon:unvalidate", "Cobblemon", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("creativecore:0s", "CreativeCore", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("creativecore:1s", "CreativeCore", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("creativecore:2s", "CreativeCore", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("creativecore:3s", "CreativeCore", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("creativecore:4s", "CreativeCore", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("creativecore:5s", "CreativeCore", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("creativecore:6s", "CreativeCore", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("creativecore:7s", "CreativeCore", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("jei:cheat_permission", "JustEnoughItems", DataType.REGISTER_DATA_MOD, false),
 
             new PayloadType("refinedstorage", "RefinedStorage", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("AE2", "AE2", DataType.REGISTER_DATA_MOD, false),
@@ -430,7 +574,7 @@ public class ClientBrand extends Check {
             new PayloadType("jm_dim_permission", "JourneyMap", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("jm_init_login", "JourneyMap", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("journeymap_channel", "JourneyMap", DataType.REGISTER_DATA_MOD, false),
-            new PayloadType("justenoughdrags", "Just Enough Drags", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("justenoughdrags", "JustEnoughDrags", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("kimetsuanimationplay", "Kimetsu Animation Player", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("kimetsunoallied:kime", "Kimetsuno Allied", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("kimetsunoyaiba:kimet", "Kimetsuno Yaiba", DataType.REGISTER_DATA_MOD, false),
@@ -623,6 +767,7 @@ public class ClientBrand extends Check {
             new PayloadType("xreliquary:channel", "XReliquary", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("zerocore:network", "ZeroCore", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("zettaindustries", "ZettaIndustries", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("JEI", "JustEnoughItems", DataType.REGISTER_DATA_MOD, false),
 
             new PayloadType("eosclient:a", "Eos Client", DataType.REGISTER_DATA_OTHER, true),
             new PayloadType("Lunar-Client", "Lunar Client Spoof", DataType.REGISTER_DATA_OTHER, true),
@@ -630,6 +775,8 @@ public class ClientBrand extends Check {
     );
 
     private static final List<PayloadType> CHANNELS = Arrays.asList(
+            new PayloadType("voicechat:request_se", "Simple Voice Chat", DataType.CHANNEL, false),
+
             new PayloadType("AE2", "AE2", DataType.CHANNEL, false),
             new PayloadType("AS_IF", "ASMC", DataType.CHANNEL, false),
             new PayloadType("AS_MM", "ASMC", DataType.CHANNEL, false),
@@ -933,8 +1080,11 @@ public class ClientBrand extends Check {
                 validateAndProcessPayload(CHANNELS, event, channelName, DataType.CHANNEL);
             }
 
-            // Checks for blocked mods registered by the player.
-            checkForBlockedMods(event);
+            // Checks for blocked payloads registered by the player.
+            checkForBlockedPayloads(event);
+
+            // Checks for inconsistencies between version and brand data.
+            checkForImpossibilities(event);
         }
     }
 
@@ -1009,17 +1159,164 @@ public class ClientBrand extends Check {
     }
 
     /**
-     * Checks for blocked mods registered by the player.
+     * Checks for blocked payloads registered by the player.
      *
      * @param event The event to cancel.
      */
-    private void checkForBlockedMods(CancellableEvent event) {
+    private void checkForBlockedPayloads(CancellableEvent event) {
         // If the payload is blocked, kick the player.
         for (PayloadType payloadType : playerData.getPayloads()) {
             if (Settings.blockedPayloads.contains(payloadType.name)) {
-                KickUtil.kickPlayer(player, event, "Blocked Mod: " + payloadType.name,
+                KickUtil.kickPlayer(player, event, "Blocked Payload: " + payloadType.name,
                         "&c" + payloadType.name + " is not allowed on this server.");
                 return;
+            }
+        }
+    }
+
+    /**
+     * Checks for impossibilities between version and brand data.
+     *
+     * @param event The event to cancel.
+     */
+    private void checkForImpossibilities(CancellableEvent event) {
+        for (PayloadType payloadType : playerData.getPayloads()) {
+            ClientVersion playerVersion = playerData.getVersion();
+            String versionName = playerVersion.getDisplayName();
+
+            // Checks if the player is using Fabric with an impossible version.
+            // Fabric only goes down to 1.14, so any version below that is invalid.
+            if (payloadType.name.equals("Fabric") && playerVersion.isOlderThan(ClientVersion.v_1_14)) {
+                KickUtil.kickPlayer(player, event, "Impossible Fabric Version: " + versionName,
+                        "&cYour Fabric version is not compatible with this server.");
+                return;
+            }
+
+            // Checks if the player is using LiteLoader with an impossible version.
+            // LiteLoader only goes up to 1.12.2, so any version above that is invalid.
+            if (payloadType.name.equals("LiteLoader")
+                    && playerVersion.isNewerThan(ClientVersion.v_1_12_2)) {
+                KickUtil.kickPlayer(player, event, "Impossible LiteLoader Version: " + versionName,
+                        "&cYour LiteLoader version is not compatible with this server.");
+                return;
+            }
+
+            // Checks if the player is using Feather Client with an impossible version.
+            if (payloadType.name.equals("Feather Client")) {
+                switch (playerVersion) {
+                    case HIGHER_THAN_SUPPORTED_VERSIONS:
+                    case v_1_21_4:
+                    case v_1_21_3:
+                    case v_1_21_1:
+                    case v_1_20_6:
+                    case v_1_20_4:
+                    case v_1_20_2:
+                    case v_1_20_1:
+                    case v_1_19_4:
+                    case v_1_19_3:
+                    case v_1_19_2:
+                    case v_1_19:
+                    case v_1_18_2:
+                    case v_1_17_1:
+                    case v_1_12_2:
+                    case v_1_8_9:
+                        break;
+
+                    default:
+                        KickUtil.kickPlayer(player, event, "Impossible Feather Client Version: " + versionName,
+                                "&cYour Feather Client version is not compatible with this server.");
+                        return;
+                }
+            }
+
+            // Checks if the player is using PvPLounge Client with an impossible version.
+            // PvPLounge client only goes up to 1.8.9, so any version above that is invalid.
+            if (payloadType.name.equals("PvPLounge Client")
+                    && playerVersion.isNewerThan(ClientVersion.v_1_8_9)) {
+                KickUtil.kickPlayer(player, event, "Impossible PvPLounge Client Version: " + versionName,
+                        "&cYour PvPLounge Client version is not compatible with this server.");
+                return;
+            }
+
+            // Checks if the player is using LabyMod with an impossible version.
+            if (payloadType.name.equals("LabyMod")) {
+                switch (playerVersion) {
+                    case HIGHER_THAN_SUPPORTED_VERSIONS:
+                    case v_1_21_4:
+                    case v_1_21_3:
+                    case v_1_21_1:
+                    case v_1_20_6:
+                    case v_1_20_4:
+                    case v_1_20_2:
+                    case v_1_20_1:
+                    case v_1_19_4:
+                    case v_1_19_3:
+                    case v_1_19_2:
+                    case v_1_18_2:
+                    case v_1_17_1:
+                    case v_1_16_5:
+                    case v_1_12_2:
+                    case v_1_8_9:
+                        break;
+
+                    default:
+                        KickUtil.kickPlayer(player, event, "Impossible LabyMod Version: " + versionName,
+                                "&cYour LabyMod version is not compatible with this server.");
+                        return;
+                }
+            }
+
+            // Checks if the player is using Lunar Client with an impossible version.
+            if (payloadType.name.equals("Lunar Client")) {
+                switch (playerVersion) {
+                    case HIGHER_THAN_SUPPORTED_VERSIONS:
+                    case LOWER_THAN_SUPPORTED_VERSIONS:
+                    case v_1_21_4:
+                    case v_1_21_3:
+                    case v_1_21_1:
+                    case v_1_20_6:
+                    case v_1_20_4:
+                    case v_1_20_2:
+                    case v_1_20_1:
+                    case v_1_19_4:
+                    case v_1_19_3:
+                    case v_1_19_2:
+                    case v_1_19:
+                    case v_1_18_2:
+                    case v_1_18_1:
+                    case v_1_17_1:
+                    case v_1_16_5:
+                    case v_1_12_2:
+                    case v_1_8_9:
+                        break;
+
+                    default:
+                        KickUtil.kickPlayer(player, event, "Impossible Lunar Client Version: " + versionName,
+                                "&cYour Lunar Client version is not compatible with this server.");
+                        return;
+                }
+            }
+
+            // Checks if the player is using Badlion Client with an impossible version.
+            if (payloadType.name.equals("Badlion Client")) {
+                switch (playerVersion) {
+                    case HIGHER_THAN_SUPPORTED_VERSIONS:
+                    case v_1_21_4:
+                    case v_1_21_3:
+                    case v_1_21_1:
+                    case v_1_20_4:
+                    case v_1_20_1:
+                    case v_1_19_4:
+                    case v_1_16_5:
+                    case v_1_12_2:
+                    case v_1_8_9:
+                        break;
+
+                    default:
+                        KickUtil.kickPlayer(player, event, "Impossible Badlion Client Version: " + versionName,
+                                "&cYour Badlion Client version is not compatible with this server.");
+                        return;
+                }
             }
         }
     }
