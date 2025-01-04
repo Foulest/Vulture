@@ -92,9 +92,7 @@ public class PlayerData {
 
     // Player state information
     private Location location;
-    private boolean againstBlock;
     private boolean moving;
-    private boolean nearPortal;
     private boolean eating;
     private boolean drinking;
     private boolean digging;

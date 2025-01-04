@@ -152,11 +152,6 @@ public class PacketSendProcessor extends Processor {
                 break;
 
             case PacketType.Play.Server.OPEN_WINDOW:
-                // Players can't open their inventory in portals.
-                if (playerData.isNearPortal()) {
-                    break;
-                }
-
                 playerData.setInventoryOpen(true);
                 playerData.setBlocking(false);
                 playerData.setShootingBow(false);

@@ -33,7 +33,9 @@ vulture:
       - GalactiCraft
       - Tinkers Construct
       - InventoryTweaks
-    mods: []
+      - Aqua Acrobatics
+    mods:
+      - aquaacrobatics
     commands:
       - /calc
       - /eval

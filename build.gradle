@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'net.foulest'
-version = '2.0.1'
+version = '2.0.2'
 description = project.name
 
 // Set the project's language level
@@ -26,6 +26,28 @@ repositories {
     }
 
     maven {
+        name 'SpigotMC'
+        url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+
+        // As of Gradle 5.1, you can limit this to only those
+        // dependencies you expect from it
+        content {
+            includeGroup 'org.bukkit'
+            includeGroup 'org.spigotmc'
+        }
+    }
+
+    maven {
+        name 'Sonatype Snapshots'
+        url 'https://oss.sonatype.org/content/repositories/snapshots'
+    }
+
+    maven {
+        name 'Sonatype Releases'
+        url 'https://oss.sonatype.org/content/repositories/central'
+    }
+
+    maven {
         name 'JitPack'
         url 'https://jitpack.io'
     }
@@ -39,16 +61,26 @@ repositories {
         name 'Pledge'
         url 'https://raw.github.com/ThomasOM/Pledge/repository'
     }
+
+    maven {
+        name 'Minebench'
+        url 'https://repo.minebench.de/'
+    }
 }
 
 dependencies {
-    // Spigot 1.8.8 - necessary for project; provided in libs
+    // Spigot 1.8.8 API - necessary for project
     // https://hub.spigotmc.org/nexus/content/repositories/snapshots
-    compileOnly group: 'org.spigotmc', name: 'spigot', version: '1.8.8-R0.1-SNAPSHOT'
+    compileOnly group: 'org.spigotmc', name: 'spigot-api', version: '1.8.8-R0.1-SNAPSHOT'
 
-    // JOML - for vector math
-    // https://mvnrepository.com/artifact/org.joml/joml
-    implementation group: 'org.joml', name: 'joml', version: '1.10.8'
+    // Netty - for networking
+    // https://mvnrepository.com/artifact/io.netty/netty-all
+    compileOnly group: 'io.netty', name: 'netty-all', version: '4.1.116.Final'
+
+    // Authlib - for Mojang authentication
+    // Latest working version: 2.0.27 from Minebench
+    // https://mvnrepository.com/artifact/com.mojang/authlib
+    compileOnly group: 'com.mojang', name: 'authlib', version: '2.0.27'
 
     // ViaVersion - for version checking in PacketEvents
     // Note: Keep on version 4.10.2 for compatibility with PacketEvents

@@ -25,11 +25,12 @@ import net.foulest.packetevents.utils.entityfinder.EntityFinderUtils;
 import net.foulest.packetevents.utils.nms.NMSUtils;
 import net.foulest.packetevents.utils.npc.NPCManager;
 import org.bukkit.World;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.spigotmc.SpigotConfig;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -70,7 +71,8 @@ public final class ServerUtils {
     }
 
     public static boolean isBungeeCordEnabled() {
-        return SpigotConfig.bungee;
+        YamlConfiguration spigotConfig = YamlConfiguration.loadConfiguration(new File("spigot.yml"));
+        return spigotConfig.getBoolean("settings.bungeecord");
     }
 
     public static @NotNull BoundingBox getEntityBoundingBox(Entity entity) {

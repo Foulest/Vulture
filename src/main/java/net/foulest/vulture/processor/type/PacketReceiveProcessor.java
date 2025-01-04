@@ -54,6 +54,7 @@ import net.foulest.vulture.event.RotationEvent;
 import net.foulest.vulture.processor.Processor;
 import net.foulest.vulture.util.*;
 import net.foulest.vulture.util.data.CustomLocation;
+import net.foulest.packetevents.utils.vector.Vector2f;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -62,7 +63,6 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Vector2f;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -507,11 +507,6 @@ public class PacketReceiveProcessor extends Processor {
 
                 switch (clientCommand.getClientCommand()) {
                     case OPEN_INVENTORY_ACHIEVEMENT:
-                        // Players can't open their inventory in portals.
-                        if (playerData.isNearPortal()) {
-                            break;
-                        }
-
                         playerData.setInventoryOpen(true);
                         playerData.setTimestamp(ActionType.INVENTORY_OPEN);
                         break;
@@ -850,11 +845,6 @@ public class PacketReceiveProcessor extends Processor {
                             }
                         }
 
-                        // Players can't open their inventory in portals.
-                        if (playerData.isNearPortal()) {
-                            break;
-                        }
-
                         playerData.setInventoryOpen(true);
                         playerData.setTimestamp(ActionType.INVENTORY_OPEN);
                         break;
@@ -969,9 +959,9 @@ public class PacketReceiveProcessor extends Processor {
                     } else if (!flying.isMoving() && flying.isRotating()) {
                         playerData.handlePlayerPacket(new CustomLocation(null, new Vector2f(flyingYaw, flyingPitch)));
                     } else if (flying.isMoving() && !flying.isRotating()) {
-                        playerData.handlePlayerPacket(new CustomLocation(new org.joml.Vector3d(flyingXPos, flyingYPos, flyingZPos), null));
+                        playerData.handlePlayerPacket(new CustomLocation(new Vector3d(flyingXPos, flyingYPos, flyingZPos), null));
                     } else {
-                        playerData.handlePlayerPacket(new CustomLocation(new org.joml.Vector3d(flyingXPos, flyingYPos, flyingZPos), new Vector2f(flyingYaw, flyingPitch)));
+                        playerData.handlePlayerPacket(new CustomLocation(new Vector3d(flyingXPos, flyingYPos, flyingZPos), new Vector2f(flyingYaw, flyingPitch)));
                     }
                 }
 
@@ -1011,10 +1001,6 @@ public class PacketReceiveProcessor extends Processor {
                         vehicle.eject();
                         MessageUtil.debug("Flying packet ignored for " + playerName + " (inside vehicle) " + enterVehicleTicks);
                     }
-
-                    // Set block data
-                    playerData.setNearPortal(BlockUtil.isNearPortal(player));
-                    playerData.setAgainstBlock(BlockUtil.isAgainstBlock(player));
 
                     WrappedPacketInFlying lastPositionPacket = playerData.getLastPositionPacket();
 

@@ -19,11 +19,9 @@ package net.foulest.vulture.util.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import net.foulest.packetevents.utils.vector.Vector3d;
+import net.foulest.packetevents.utils.vector.Vector2f;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Vector2f;
-import org.joml.Vector2fc;
-import org.joml.Vector3d;
-import org.joml.Vector3dc;
 
 /**
  * Utility class to define a custom location containing a position and rotation.
@@ -61,16 +59,16 @@ public class CustomLocation {
         return this;
     }
 
-    private void setPos(@NotNull Vector3dc vec) {
-        double x = vec.x();
-        double y = vec.y();
-        double z = vec.z();
+    private void setPos(@NotNull Vector3d vec) {
+        double x = vec.getX();
+        double y = vec.getY();
+        double z = vec.getZ();
         setPos(x, y, z);
     }
 
-    private void setRot(@NotNull Vector2fc vec) {
-        float x = vec.x();
-        float y = vec.y();
+    private void setRot(@NotNull Vector2f vec) {
+        float x = vec.getX();
+        float y = vec.getY();
         setRot(x, y);
     }
 
