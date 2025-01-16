@@ -88,12 +88,12 @@ public class VultureCmd {
                 }
 
                 PlayerData playerData = PlayerDataManager.getPlayerData(player);
-                boolean alertsEnabled = playerData.isAlertsEnabled();
 
-                playerData.setAlertsEnabled(!alertsEnabled);
+                // Toggle alerts for the player.
+                playerData.setAlertsEnabled(!playerData.isAlertsEnabled());
 
                 MessageUtil.messagePlayer(player, Settings.prefix + " &7Alerts have been &f"
-                        + (alertsEnabled ? "enabled" : "disabled") + "&7.");
+                        + (playerData.isAlertsEnabled() ? "enabled" : "disabled") + "&7.");
                 break;
             }
 

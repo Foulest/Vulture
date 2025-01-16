@@ -19,7 +19,6 @@ package net.foulest.vulture.util;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.ProtocolPacketEvent;
-import io.github.retrooper.packetevents.util.PlayerPingAccessorModern;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import lombok.Data;
 import net.foulest.vulture.check.CheckInfoData;

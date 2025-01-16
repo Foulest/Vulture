@@ -18,7 +18,6 @@
 package net.foulest.vulture.check.type.clientbrand;
 
 import com.github.retrooper.packetevents.event.CancellableEvent;
-import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;

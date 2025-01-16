@@ -25,7 +25,6 @@ import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.util.KickUtil;
-import net.foulest.vulture.util.MessageUtil;
 import org.bukkit.GameMode;
 import org.jetbrains.annotations.NotNull;
 
