@@ -38,7 +38,7 @@ public class PingData {
 
     private final Queue<Ping> expectingIds = new ConcurrentLinkedQueue<>();
     private final Player player;
-    private final ClientPingerImpl pinger;
+    private final @NotNull ClientPingerImpl pinger;
 
     private boolean validated;
     private int id;
@@ -69,7 +69,7 @@ public class PingData {
         expectingIds.add(ping);
     }
 
-    public Optional<Ping> confirm(int id) {
+    public @NotNull Optional<Ping> confirm(int id) {
         Ping ping = expectingIds.peek();
 
         if (ping != null && ping.getId() == id) {

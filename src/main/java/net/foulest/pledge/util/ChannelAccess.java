@@ -59,16 +59,16 @@ public class ChannelAccess {
         try {
             UUID playerId = player.getUniqueId();
             Object handle = player.getClass().getDeclaredMethod("getHandle").invoke(player);
-            Class<?> handleClass = handle.getClass();
+            @NotNull Class<?> handleClass = handle.getClass();
 
-            Field playerConnectionField = ReflectionUtil.getFieldByType(handleClass, PLAYER_CONNECTION_CLASS);
-            Field channelField = ReflectionUtil.getFieldByType(NETWORK_MANAGER_CLASS, Channel.class);
+            @NotNull Field playerConnectionField = ReflectionUtil.getFieldByType(handleClass, PLAYER_CONNECTION_CLASS);
+            @NotNull Field channelField = ReflectionUtil.getFieldByType(NETWORK_MANAGER_CLASS, Channel.class);
 
             // Try the easy way first
             Object playerConnection = playerConnectionField.get(handle);
             if (playerConnection != null) {
                 try {
-                    Field networkManagerField = ReflectionUtil.getFieldByType(PLAYER_CONNECTION_CLASS, NETWORK_MANAGER_CLASS);
+                    @NotNull Field networkManagerField = ReflectionUtil.getFieldByType(PLAYER_CONNECTION_CLASS, NETWORK_MANAGER_CLASS);
                     Object networkManager = networkManagerField.get(playerConnection);
                     return (Channel) channelField.get(networkManager);
                 } catch (NoSuchFieldException ignored) {
@@ -76,22 +76,22 @@ public class ChannelAccess {
             }
 
             // Try to match all network managers after from game profile
-            List<Object> networkManagers = getNetworkManagers();
+            @NotNull List<Object> networkManagers = getNetworkManagers();
 
-            for (Object networkManager : networkManagers) {
-                Object packetListener = ReflectionUtil.getNonNullFieldByType(networkManager, PACKET_LISTENER_CLASS);
+            for (@NotNull Object networkManager : networkManagers) {
+                @NotNull Object packetListener = ReflectionUtil.getNonNullFieldByType(networkManager, PACKET_LISTENER_CLASS);
 
                 if (packetListener != null) {
-                    Class<?> packetListenerClass = packetListener.getClass();
+                    @NotNull Class<?> packetListenerClass = packetListener.getClass();
 
                     if (packetListenerClass.getSimpleName().equals("LoginListener")
                             || packetListenerClass.getSimpleName().equals("ServerLoginPacketListenerImpl")) {
-                        Field profileField = ReflectionUtil.getFieldByClassNames(packetListenerClass, "GameProfile");
+                        @NotNull Field profileField = ReflectionUtil.getFieldByClassNames(packetListenerClass, "GameProfile");
                         Object gameProfile = profileField.get(packetListener);
 
                         // We can use the game profile to look up the player id in the listener
-                        Class<?> gameProfileClass = gameProfile.getClass();
-                        Field uuidField = ReflectionUtil.getFieldByType(gameProfileClass, UUID.class);
+                        @NotNull Class<?> gameProfileClass = gameProfile.getClass();
+                        @NotNull Field uuidField = ReflectionUtil.getFieldByType(gameProfileClass, UUID.class);
                         UUID foundId = (UUID) uuidField.get(gameProfile);
 
                         if (playerId.equals(foundId)) {
@@ -128,9 +128,9 @@ public class ChannelAccess {
         try {
             Object serverConnection = MinecraftReflection.getServerConnection();
 
-            for (Field field : serverConnection.getClass().getDeclaredFields()) {
+            for (@NotNull Field field : serverConnection.getClass().getDeclaredFields()) {
                 String typeName = field.getGenericType().getTypeName();
-                Class<?> fieldType = field.getType();
+                @NotNull Class<?> fieldType = field.getType();
 
                 if (!List.class.isAssignableFrom(fieldType)
                         || (!typeName.contains("NetworkManager")

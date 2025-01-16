@@ -17,11 +17,10 @@
  */
 package net.foulest.vulture.check;
 
+import com.github.retrooper.packetevents.event.ProtocolPacketEvent;
+import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
+import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
 import lombok.Data;
-import net.foulest.packetevents.event.eventtypes.CancellableEvent;
-import net.foulest.packetevents.event.eventtypes.CancellableNMSPacketEvent;
-import net.foulest.packetevents.packettype.PacketType;
-import net.foulest.packetevents.packetwrappers.NMSPacket;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.event.MovementEvent;
 import net.foulest.vulture.event.RotationEvent;
@@ -40,12 +39,12 @@ import org.jetbrains.annotations.NotNull;
 @SuppressWarnings("unused")
 public class Check implements Listener {
 
-    protected final PlayerData playerData;
+    protected final @NotNull PlayerData playerData;
     protected final Player player;
     private final CheckInfo checkInfo;
-    private final CheckInfoData checkInfoData;
+    private final @NotNull CheckInfoData checkInfoData;
 
-    public Check(PlayerData playerData) throws ClassNotFoundException {
+    public Check(@NotNull PlayerData playerData) throws ClassNotFoundException {
         if (!getClass().isAnnotationPresent(CheckInfo.class)) {
             throw new ClassNotFoundException("Check is missing @CheckInfo annotation.");
         }
@@ -57,18 +56,20 @@ public class Check implements Listener {
     }
 
     /**
-     * This method is fired when the player sends or receives a packet.
+     * This method is fired when the player sends a packet.
      *
-     * @param nmsPacketEvent The packet event.
-     * @param packetId    The packet ID.
-     * @param nmsPacket  The NMS packet.
-     * @param packet    The packet.
-     * @param timestamp The timestamp the event was handled.
-     * @see PacketType
-     * @see NMSPacket
+     * @param event The packet event.
      */
-    public void handle(CancellableNMSPacketEvent nmsPacketEvent, byte packetId,
-                       NMSPacket nmsPacket, Object packet, long timestamp) {
+    public void handle(PacketPlaySendEvent event) {
+        // This method is intentionally left blank.
+    }
+
+    /**
+     * This method is fired when the player receives a packet.
+     *
+     * @param event The packet event.
+     */
+    public void handle(PacketPlayReceiveEvent event) {
         // This method is intentionally left blank.
     }
 
@@ -104,7 +105,7 @@ public class Check implements Listener {
      * @param event   The event to cancel.
      * @param verbose The optional data to include in the flag.
      */
-    protected void flag(@NotNull CancellableEvent event, String... verbose) {
+    protected void flag(@NotNull ProtocolPacketEvent event, String... verbose) {
         PunishUtil.flag(playerData, checkInfoData, event, verbose);
     }
 
@@ -133,7 +134,7 @@ public class Check implements Listener {
      *
      * @param verbose The verbose to add to the alert message.
      */
-    private void handleAlert(String verbose) {
+    private void handleAlert(@NotNull String verbose) {
         PunishUtil.handleAlert(playerData, checkInfoData, verbose);
     }
 
@@ -142,7 +143,7 @@ public class Check implements Listener {
      *
      * @param verbose The verbose to add to the punishment.
      */
-    private void handlePunishment(String verbose) {
+    private void handlePunishment(@NotNull String verbose) {
         PunishUtil.handlePunishment(playerData, checkInfoData, verbose);
     }
 }

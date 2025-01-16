@@ -39,7 +39,7 @@ public class TickStartEvent extends Event {
         return handlers;
     }
 
-    public static HandlerList getHandlerList() {
+    public static @NotNull HandlerList getHandlerList() {
         return handlers;
     }
 }

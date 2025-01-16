@@ -17,17 +17,18 @@
  */
 package net.foulest.vulture.check.type.inventory;
 
-import net.foulest.packetevents.event.eventtypes.CancellableNMSPacketEvent;
-import net.foulest.packetevents.packettype.PacketType;
-import net.foulest.packetevents.packetwrappers.NMSPacket;
-import net.foulest.packetevents.packetwrappers.play.in.blockplace.WrappedPacketInBlockPlace;
-import net.foulest.packetevents.utils.player.Direction;
-import net.foulest.packetevents.utils.vector.Vector3i;
+import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
+import com.github.retrooper.packetevents.protocol.world.BlockFace;
+import com.github.retrooper.packetevents.util.Vector3i;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerBlockPlacement;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.util.KickUtil;
+import org.jetbrains.annotations.NotNull;
 
 @CheckInfo(name = "Inventory (J)", type = CheckType.INVENTORY, punishable = false,
         description = "Checks for invalid yaw differences.")
@@ -39,48 +40,52 @@ public class InventoryJ extends Check {
     private Vector3i lastBlockPosition;
     private Float lastYaw;
 
-    public InventoryJ(PlayerData playerData) throws ClassNotFoundException {
+    public InventoryJ(@NotNull PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(CancellableNMSPacketEvent event, byte packetId,
-                       NMSPacket nmsPacket, Object packet, long timestamp) {
-        if (packetId == PacketType.Play.Client.BLOCK_PLACE) {
-            WrappedPacketInBlockPlace blockPlace = new WrappedPacketInBlockPlace(nmsPacket);
+    public void handle(@NotNull PacketPlayReceiveEvent event) {
+        PacketTypeCommon packetType = event.getPacketType();
 
-            if (blockPlace.getDirection() != Direction.OTHER) {
-                Vector3i blockPosition = blockPlace.getBlockPosition();
-                int blockX = blockPosition.getX();
-                int blockY = blockPosition.getY();
-                int blockZ = blockPosition.getZ();
+        if (packetType == PacketType.Play.Client.PLAYER_BLOCK_PLACEMENT) {
+            @NotNull WrapperPlayClientPlayerBlockPlacement blockPlace = new WrapperPlayClientPlayerBlockPlacement(event);
+            BlockFace blockFace = blockPlace.getFace();
 
-                if (lastBlockPosition != null && blockX == lastX && blockY == lastY && blockZ == lastZ) {
-                    int lastBlockX = lastBlockPosition.getX();
-                    int lastBlockZ = lastBlockPosition.getZ();
-
-                    if (Math.abs(blockX - lastBlockX) + Math.abs(blockZ - lastBlockZ) == 1) {
-                        float yaw = playerData.getPlayer().getLocation().getYaw();
-
-                        if (lastYaw != null) {
-                            double yawDiff = Math.abs(yaw - lastYaw);
-
-                            if (yawDiff > 20.0) {
-                                KickUtil.kickPlayer(player, event, "Inventory (J) | Invalid yaw difference |"
-                                        + " (yawDiff=" + yawDiff + ")"
-                                );
-                            }
-                        }
-
-                        lastYaw = yaw;
-                    }
-                }
-
-                lastX = blockX;
-                lastY = blockY;
-                lastZ = blockZ;
-                lastBlockPosition = blockPosition;
+            if (blockFace == BlockFace.OTHER) {
+                return;
             }
+
+            Vector3i blockPosition = blockPlace.getBlockPosition();
+            int blockX = blockPosition.getX();
+            int blockY = blockPosition.getY();
+            int blockZ = blockPosition.getZ();
+
+            if (lastBlockPosition != null && blockX == lastX && blockY == lastY && blockZ == lastZ) {
+                int lastBlockX = lastBlockPosition.getX();
+                int lastBlockZ = lastBlockPosition.getZ();
+
+                if (Math.abs(blockX - lastBlockX) + Math.abs(blockZ - lastBlockZ) == 1) {
+                    float yaw = playerData.getPlayer().getLocation().getYaw();
+
+                    if (lastYaw != null) {
+                        double yawDiff = Math.abs(yaw - lastYaw);
+
+                        if (yawDiff > 20.0) {
+                            KickUtil.kickPlayer(player, event, "Inventory (J) |"
+                                    + " (yawDiff=" + yawDiff + ")"
+                            );
+                        }
+                    }
+
+                    lastYaw = yaw;
+                }
+            }
+
+            lastX = blockX;
+            lastY = blockY;
+            lastZ = blockZ;
+            lastBlockPosition = blockPosition;
         }
     }
 }

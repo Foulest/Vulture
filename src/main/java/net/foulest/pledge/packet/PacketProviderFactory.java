@@ -48,7 +48,7 @@ public class PacketProviderFactory {
                 .orElseThrow(() -> new RuntimeException("Could not create packet provider!"));
     }
 
-    private Optional<PingPacketProvider> buildProvider(@NotNull ThrowingSupplier<PingPacketProvider> supplier) {
+    private @NotNull Optional<PingPacketProvider> buildProvider(@NotNull ThrowingSupplier<PingPacketProvider> supplier) {
         try {
             return Optional.of(supplier.get());
         } catch (NoSuchFieldException | ClassNotFoundException | NoSuchMethodException ignored) {

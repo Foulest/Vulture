@@ -19,10 +19,11 @@ package net.foulest.vulture.timing;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import net.foulest.vulture.util.ConstantUtil;
 import net.foulest.vulture.util.KickUtil;
+import net.foulest.vulture.util.Settings;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Estimates player client time by synchronizing timestamps between server and client.
@@ -32,15 +33,18 @@ import org.bukkit.event.Listener;
 @RequiredArgsConstructor
 public class Timing implements Listener {
 
-    private final Player player;
+    private final @NotNull Player player;
     private final long loginTime;
 
     private long clientTimePassed; // Amount of time has passed according to client
     private long pingTimePassed; // Amount of time has passed according to server synchronized with client
 
+    public int maxCatchupTicks = 10;
+    public long tickMillis = 50L;
+
     public void tick() {
         // Lower bound is the last synced timestamp and the maximum amount of ticks the client can lag for
-        long maxCatchupTime = ConstantUtil.MAX_CATCHUP_TICKS * ConstantUtil.TICK_MILLIS;
+        long maxCatchupTime = maxCatchupTicks * tickMillis;
         long lowerBound = Math.max(pingTimePassed - maxCatchupTime, 0L);
 
         long currentServerTime = getCurrentServerTime();
@@ -49,13 +53,13 @@ public class Timing implements Listener {
         long upperBound = currentServerTime - loginTime;
 
         // Every tick increments the client time passed, but the time can not go below the lower bound
-        clientTimePassed = Math.max(clientTimePassed + ConstantUtil.TICK_MILLIS, lowerBound);
+        clientTimePassed = Math.max(clientTimePassed + tickMillis, lowerBound);
 
         // If the client runs faster than our server time
         if (clientTimePassed > upperBound) {
             long timeOver = clientTimePassed - upperBound; // Time over the upper bound
 
-            if (timeOver > 211) {
+            if (timeOver > Settings.maxTimeOverServer) {
                 KickUtil.kickPlayer(player, "Modifying game speed (" + timeOver + "ms)");
             }
         }

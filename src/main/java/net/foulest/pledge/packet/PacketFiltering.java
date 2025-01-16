@@ -37,7 +37,7 @@ public class PacketFiltering {
     private final List<Class<?>> loginPackets = buildLoginPackets();
 
     private @Unmodifiable List<Class<?>> buildQueueWhitelistPackets() {
-        ImmutableList.Builder<Class<?>> builder = ImmutableList.builder();
+        ImmutableList.@NotNull Builder<Class<?>> builder = ImmutableList.builder();
         addGamePacket(builder, "PacketPlayOutKeepAlive");
         addGamePacket(builder, "ClientboundKeepAlivePacket");
         addGamePacket(builder, "PacketPlayOutKickDisconnect");
@@ -48,7 +48,7 @@ public class PacketFiltering {
     }
 
     private @Unmodifiable List<Class<?>> buildLoginPackets() {
-        ImmutableList.Builder<Class<?>> builder = ImmutableList.builder();
+        ImmutableList.@NotNull Builder<Class<?>> builder = ImmutableList.builder();
         addGamePacket(builder, "PacketPlayOutLogin");
         addGamePacket(builder, "ClientboundLoginPacket");
         return builder.build();

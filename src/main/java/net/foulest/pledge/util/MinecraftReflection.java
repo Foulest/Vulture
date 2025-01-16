@@ -37,7 +37,7 @@ public class MinecraftReflection {
     private final String BASE = Bukkit.getServer().getClass().getPackage().getName();
     private final String NMS = BASE.replace("org.bukkit.craftbukkit", "net.minecraft.server");
 
-    public Class<?> gamePacket(String className) throws ClassNotFoundException {
+    public @NotNull Class<?> gamePacket(String className) throws ClassNotFoundException {
         try {
             return Class.forName(NMS + "." + className); // Legacy structure
         } catch (ClassNotFoundException ignored) {
@@ -56,8 +56,9 @@ public class MinecraftReflection {
         throw new ClassNotFoundException("Game packet class not found!");
     }
 
-    Class<?> getMinecraftClass(String... names) {
-        String[] packageNames = {
+    @NotNull
+    public Class<?> getMinecraftClass(String @NotNull ... names) {
+        String @NotNull [] packageNames = {
                 getMinecraftPackage(),
                 getMinecraftPackageLegacy()
         };
@@ -90,7 +91,7 @@ public class MinecraftReflection {
     Object getServerConnection() throws NoSuchFieldException, NoSuchMethodException,
             IllegalAccessException, InvocationTargetException {
         Object minecraftServer = Bukkit.getServer().getClass().getDeclaredMethod("getServer").invoke(Bukkit.getServer());
-        Field connectionField = ReflectionUtil.getFieldByClassNames(minecraftServer.getClass().getSuperclass(), "ServerConnectionListener", "ServerConnection");
+        @NotNull Field connectionField = ReflectionUtil.getFieldByClassNames(minecraftServer.getClass().getSuperclass(), "ServerConnectionListener", "ServerConnection");
         return connectionField.get(minecraftServer);
     }
 }

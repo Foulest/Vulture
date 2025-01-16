@@ -17,11 +17,11 @@
  */
 package net.foulest.vulture.util;
 
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.ProtocolPacketEvent;
+import io.github.retrooper.packetevents.util.PlayerPingAccessorModern;
+import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import lombok.Data;
-import net.foulest.packetevents.PacketEvents;
-import net.foulest.packetevents.event.eventtypes.CancellableEvent;
-import net.foulest.packetevents.utils.player.PlayerUtils;
-import net.foulest.packetevents.utils.server.ServerUtils;
 import net.foulest.vulture.check.CheckInfoData;
 import net.foulest.vulture.check.Violation;
 import net.foulest.vulture.data.PlayerData;
@@ -42,8 +42,10 @@ public class PunishUtil {
      * @param event   the event to cancel
      * @param verbose the optional data to include in the flag
      */
-    public static void flag(@NotNull PlayerData playerData, CheckInfoData checkInfo,
-                            @NotNull CancellableEvent event, String... verbose) {
+    public static void flag(@NotNull PlayerData playerData,
+                            @NotNull CheckInfoData checkInfo,
+                            @NotNull ProtocolPacketEvent event,
+                            String... verbose) {
         event.setCancelled(true);
         flag(playerData, checkInfo, verbose);
     }
@@ -55,19 +57,21 @@ public class PunishUtil {
      *
      * @param verbose the optional data to include in the flag
      */
-    public static void flag(@NotNull PlayerData playerData, CheckInfoData checkInfo, String... verbose) {
+    public static void flag(@NotNull PlayerData playerData,
+                            @NotNull CheckInfoData checkInfo,
+                            String @NotNull ... verbose) {
         Player player = playerData.getPlayer();
 
         // Checks the player for exemptions.
         if (playerData.isNewViolationsPaused()
                 || KickUtil.isPlayerBeingKicked(player)
-                || ServerUtils.getTPS() < 18
+                || SpigotReflectionUtil.getTPS() < 18
                 || !checkInfo.isEnabled()
                 || !checkInfo.isPunishable()) {
             return;
         }
 
-        String verboseString = verbose.length == 0 ? "" : "&7[" + String.join(", ", verbose) + "]";
+        @NotNull String verboseString = verbose.length == 0 ? "" : "&7[" + String.join(", ", verbose) + "]";
 
         // Handles adding a violation.
         handleNewViolation(playerData, checkInfo, verbose);
@@ -84,7 +88,9 @@ public class PunishUtil {
      *
      * @param verbose The verbose to add to the violation.
      */
-    public static void handleNewViolation(@NotNull PlayerData playerData, @NotNull CheckInfoData checkInfo, String... verbose) {
+    public static void handleNewViolation(@NotNull PlayerData playerData,
+                                          @NotNull CheckInfoData checkInfo,
+                                          String @NotNull ... verbose) {
         Player player = playerData.getPlayer();
         Location location = player.getLocation();
 
@@ -95,18 +101,17 @@ public class PunishUtil {
         });
 
         int violations = getViolationCount(playerData, checkInfo) + 1;
-        PlayerUtils playerUtils = PacketEvents.getInstance().getPlayerUtils();
-        int ping = playerUtils.getPing(player);
+        int ping = PacketEvents.getAPI().getPlayerManager().getPing(player);
 
         // Creates a new violation.
 
-        Violation violation = new Violation(
+        @NotNull Violation violation = new Violation(
                 checkInfo,
                 verbose,
                 violations,
                 location,
                 ping,
-                ServerUtils.getTPS(),
+                SpigotReflectionUtil.getTPS(),
                 System.currentTimeMillis()
         );
 
@@ -119,7 +124,9 @@ public class PunishUtil {
      *
      * @param verbose The verbose to add to the alert message.
      */
-    public static void handleAlert(@NotNull PlayerData playerData, @NotNull CheckInfoData checkInfo, String verbose) {
+    public static void handleAlert(@NotNull PlayerData playerData,
+                                   @NotNull CheckInfoData checkInfo,
+                                   @NotNull String verbose) {
         Player player = playerData.getPlayer();
         String playerName = player.getName();
         int violations = getViolationCount(playerData, checkInfo);
@@ -137,7 +144,7 @@ public class PunishUtil {
     @SuppressWarnings("NestedMethodCall")
     public static void handlePunishment(@NotNull PlayerData playerData,
                                         @NotNull CheckInfoData checkInfo,
-                                        String verbose) {
+                                        @NotNull String verbose) {
         Player player = playerData.getPlayer();
         String playerName = player.getName();
         String banCommand = checkInfo.getBanCommand();
@@ -160,7 +167,7 @@ public class PunishUtil {
             // Sends the public punishment message, if one is set.
             // Punishment messages are not sent if the player is being kicked.
             if (!Settings.banMessage.isEmpty() && !kicking) {
-                List<String> banMessageEdited = new ArrayList<>(Settings.banMessage);
+                @NotNull List<String> banMessageEdited = new ArrayList<>(Settings.banMessage);
                 banMessageEdited.replaceAll(s -> s.replace("%player%", playerName));
                 banMessageEdited.replaceAll(s -> s.replace("%check%", checkName));
                 MessageUtil.broadcast(banMessageEdited);
@@ -173,11 +180,12 @@ public class PunishUtil {
         }
     }
 
-    private static int getViolationCount(@NotNull PlayerData playerData, CheckInfoData checkInfo) {
+    private static int getViolationCount(@NotNull PlayerData playerData,
+                                         CheckInfoData checkInfo) {
         int violations = 0;
 
         // Increments the violations.
-        for (Violation violation : playerData.getViolations()) {
+        for (@NotNull Violation violation : playerData.getViolations()) {
             if (violation.getCheckInfo() == checkInfo) {
                 violations++;
             }

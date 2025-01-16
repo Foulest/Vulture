@@ -17,17 +17,19 @@
  */
 package net.foulest.vulture.check.type.badpackets;
 
+import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import lombok.ToString;
-import net.foulest.packetevents.event.eventtypes.CancellableNMSPacketEvent;
-import net.foulest.packetevents.packettype.PacketType;
-import net.foulest.packetevents.packetwrappers.NMSPacket;
-import net.foulest.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.util.KickUtil;
+import org.bukkit.GameMode;
+import org.jetbrains.annotations.NotNull;
 
 @ToString
 @CheckInfo(name = "BadPackets (B)", type = CheckType.BADPACKETS, punishable = false,
@@ -37,26 +39,35 @@ public class BadPacketsB extends Check {
     private long lastPosition;
     private long lastTransaction;
 
-    public BadPacketsB(PlayerData playerData) throws ClassNotFoundException {
+    public BadPacketsB(@NotNull PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
         lastPosition = System.currentTimeMillis();
         lastTransaction = System.currentTimeMillis();
     }
 
     @Override
-    public void handle(CancellableNMSPacketEvent event, byte packetId,
-                       NMSPacket nmsPacket, Object packet, long timestamp) {
-        if (PacketType.Play.Client.Util.isInstanceOfFlying(packetId)) {
-            WrappedPacketInFlying flying = new WrappedPacketInFlying(nmsPacket);
+    public void handle(@NotNull PacketPlayReceiveEvent event) {
+        // Ignores players in Spectator mode, as they don't send Position packets.
+        if (player.getGameMode() == GameMode.SPECTATOR) {
+            return;
+        }
 
-            if (flying.isMoving()) {
+        PacketTypeCommon packetType = event.getPacketType();
+
+        if (packetType == PacketType.Play.Client.PLAYER_FLYING
+                || packetType == PacketType.Play.Client.PLAYER_POSITION
+                || packetType == PacketType.Play.Client.PLAYER_ROTATION
+                || packetType == PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION) {
+            @NotNull WrapperPlayClientPlayerFlying flying = new WrapperPlayClientPlayerFlying(event);
+
+            if (flying.hasPositionChanged()) {
                 lastPosition = System.currentTimeMillis();
             }
 
-        } else if (packetId == PacketType.Play.Client.TRANSACTION) {
+        } else if (packetType == PacketType.Play.Client.WINDOW_CONFIRMATION) {
             lastTransaction = System.currentTimeMillis();
 
-        } else if (packetId == PacketType.Play.Client.KEEP_ALIVE) {
+        } else if (packetType == PacketType.Play.Client.KEEP_ALIVE) {
             // Checks the player for exemptions.
             if (player.isDead()
                     || playerData.getTicksSince(ActionType.STEER_VEHICLE) < 100

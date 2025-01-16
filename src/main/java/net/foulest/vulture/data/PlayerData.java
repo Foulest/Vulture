@@ -17,12 +17,12 @@
  */
 package net.foulest.vulture.data;
 
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.util.Vector3d;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSettings;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerPositionAndLook;
 import lombok.Data;
-import lombok.Getter;
-import net.foulest.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
-import net.foulest.packetevents.packetwrappers.play.out.position.WrappedPacketOutPosition;
-import net.foulest.packetevents.utils.player.ClientVersion;
-import net.foulest.packetevents.utils.vector.Vector3d;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.Violation;
@@ -45,29 +45,28 @@ public class PlayerData {
     // Player data
     private UUID uniqueId;
     private Player player;
-    private ClientVersion version = ClientVersion.TEMP_UNRESOLVED;
+    private @NotNull ClientVersion version = ClientVersion.UNKNOWN;
 
     // Protection data
-    @Getter
     private final List<Check> checks = new ArrayList<>();
     private boolean alertsEnabled;
     private boolean verboseEnabled;
     private boolean newViolationsPaused;
-    private List<Violation> violations = new ArrayList<>();
+    private @NotNull List<Violation> violations = new ArrayList<>();
 
     // Payload data
-    private List<PayloadType> payloads = new ArrayList<>();
-    private List<ModType> mods = new ArrayList<>();
+    private @NotNull List<PayloadType> payloads = new ArrayList<>();
+    private @NotNull List<ModType> mods = new ArrayList<>();
 
     // Packet counts
     private int ticksBeforeReset;
     private int packetsSentPerTick;
     private int packetsSentPerSecond;
     private final EvictingList<Integer> smoothedSentPerSecond = new EvictingList<>(5);
-    private final Map<Byte, Integer> packetCounts = new HashMap<>();
+    private final Map<Integer, Integer> packetCounts = new HashMap<>();
 
     // Timestamps
-    private Map<ActionType, Integer> actionTimestamps = new EnumMap<>(ActionType.class);
+    private @NotNull Map<ActionType, Integer> actionTimestamps = new EnumMap<>(ActionType.class);
 
     // Ticks
     private int totalTicks;
@@ -75,20 +74,21 @@ public class PlayerData {
     private int lastFlyingTicks;
 
     // Packets
-    private WrappedPacketOutPosition lastTeleportPacket;
-    private WrappedPacketInFlying lastRotationPacket;
-    private WrappedPacketInFlying lastPositionPacket;
+    private WrapperPlayServerPlayerPositionAndLook lastTeleportPacket;
+    private WrapperPlayClientPlayerFlying lastRotationPacket;
+    private WrapperPlayClientPlayerFlying lastPositionPacket;
+    private WrapperPlayClientSettings lastSettingsPacket;
 
     // Transaction data
-    private Map<Short, Long> transactionSentMap = new HashMap<>();
-    private Map<Short, Long> transactionTime = new HashMap<>();
+    private @NotNull Map<Short, Long> transactionSentMap = new HashMap<>();
+    private @NotNull Map<Short, Long> transactionTime = new HashMap<>();
     private long transPing;
 
     // Abilities packet
     private boolean flying;
     private boolean flightAllowed;
-    private boolean instantBuild;
-    private boolean vulnerable;
+    private boolean creativeMode;
+    private boolean godMode;
 
     // Player state information
     private Location location;
@@ -105,8 +105,8 @@ public class PlayerData {
     private int currentSlot = -1;
 
     // Dusk
-    private final PingTaskScheduler pingTaskScheduler;
-    private final Timing timing;
+    private final @NotNull PingTaskScheduler pingTaskScheduler;
+    private final @NotNull Timing timing;
     private final Queue<CustomLocation> teleports = new ArrayDeque<>();
 
     public PlayerData(UUID uniqueId, @NotNull Player player) {
@@ -159,7 +159,7 @@ public class PlayerData {
         pingTaskScheduler.onPongReceiveEnd();
     }
 
-    public void handlePlayerPacket(CustomLocation location) {
+    public void handlePlayerPacket(@NotNull CustomLocation location) {
         // Handle teleports separately
         if (handleTeleport(location)) {
             return;
@@ -216,9 +216,8 @@ public class PlayerData {
      * @param toPosition Position to check.
      * @return If the player is teleporting.
      */
-    public boolean isTeleporting(Vector3d toPosition) {
-        Vector3d lastTeleportPosition = lastTeleportPacket != null
-                ? lastTeleportPacket.getPosition() : null;
+    public boolean isTeleporting(@NotNull Vector3d toPosition) {
+        Vector3d lastTeleportPosition = lastTeleportPacket != null ? lastTeleportPacket.getPosition() : null;
 
         return lastTeleportPacket != null && lastTeleportPosition != null
                 && lastTeleportPosition.getX() == toPosition.getX()

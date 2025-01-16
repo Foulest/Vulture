@@ -17,28 +17,29 @@
  */
 package net.foulest.vulture.check.type.badpackets;
 
-import net.foulest.packetevents.event.eventtypes.CancellableNMSPacketEvent;
-import net.foulest.packetevents.packettype.PacketType;
-import net.foulest.packetevents.packetwrappers.NMSPacket;
-import net.foulest.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
-import net.foulest.packetevents.utils.vector.Vector3d;
+import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
+import com.github.retrooper.packetevents.protocol.world.Location;
+import com.github.retrooper.packetevents.util.Vector3d;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.util.KickUtil;
+import org.jetbrains.annotations.NotNull;
 
 @CheckInfo(name = "BadPackets (E)", type = CheckType.BADPACKETS, punishable = false,
         description = "Detects sending invalid packets while in a bed.")
 public class BadPacketsE extends Check {
 
-    public BadPacketsE(PlayerData playerData) throws ClassNotFoundException {
+    public BadPacketsE(@NotNull PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(CancellableNMSPacketEvent event, byte packetId,
-                       NMSPacket nmsPacket, Object packet, long timestamp) {
+    public void handle(@NotNull PacketPlayReceiveEvent event) {
         int sleepTicks = player.getSleepTicks();
 
         // Checks the player for exemptions.
@@ -46,22 +47,31 @@ public class BadPacketsE extends Check {
             return;
         }
 
-        if (PacketType.Play.Client.Util.isInstanceOfFlying(packetId)) {
-            WrappedPacketInFlying flying = new WrappedPacketInFlying(nmsPacket);
-            Vector3d flyingPosition = flying.getPosition();
+        PacketTypeCommon packetType = event.getPacketType();
+        String packetName = packetType.getName();
 
-            if (flying.isRotating()) {
+        if (packetType == PacketType.Play.Client.PLAYER_FLYING
+                || packetType == PacketType.Play.Client.PLAYER_POSITION
+                || packetType == PacketType.Play.Client.PLAYER_ROTATION
+                || packetType == PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION) {
+            @NotNull WrapperPlayClientPlayerFlying flying = new WrapperPlayClientPlayerFlying(event);
+            Location location = flying.getLocation();
+            Vector3d position = location.getPosition();
+
+            if (flying.hasRotationChanged()) {
                 KickUtil.kickPlayer(player, event, "BadPackets (E) | Sent invalid Rotation packet while in bed"
                         + " (ticks=" + sleepTicks + ")");
+                return;
             }
 
-            if (flying.isMoving() && playerData.isMoving() && !playerData.isTeleporting(flyingPosition)) {
+            if (flying.hasPositionChanged()
+                    && playerData.isMoving()
+                    && !playerData.isTeleporting(position)) {
                 KickUtil.kickPlayer(player, event, "BadPackets (E) | Sent invalid Position packet while in bed"
                         + " (ticks=" + sleepTicks + ")");
             }
-        } else if (packetId != PacketType.Play.Client.CHAT
-                && packetId != PacketType.Play.Client.KEEP_ALIVE) {
-            String packetName = PacketType.getPacketFromId(packetId).getSimpleName();
+        } else if (packetType != PacketType.Play.Client.CHAT_MESSAGE
+                && packetType != PacketType.Play.Client.KEEP_ALIVE) {
             KickUtil.kickPlayer(player, event, "BadPackets (E) | Sent invalid packet while in bed"
                     + " (packetName=" + packetName + " ticks=" + sleepTicks + ")");
         }

@@ -17,15 +17,17 @@
  */
 package net.foulest.vulture.check.type.inventory;
 
-import net.foulest.packetevents.event.eventtypes.CancellableNMSPacketEvent;
-import net.foulest.packetevents.packettype.PacketType;
-import net.foulest.packetevents.packetwrappers.NMSPacket;
-import net.foulest.packetevents.packetwrappers.play.in.blockdig.WrappedPacketInBlockDig;
+import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
+import com.github.retrooper.packetevents.protocol.player.DiggingAction;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerDigging;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.util.KickUtil;
+import org.jetbrains.annotations.NotNull;
 
 @CheckInfo(name = "Inventory (K)", type = CheckType.INVENTORY, punishable = false,
         description = "Detects sending multiple ReleaseUseItem packets in the same tick.")
@@ -33,25 +35,29 @@ public class InventoryK extends Check {
 
     private int buffer;
 
-    public InventoryK(PlayerData playerData) throws ClassNotFoundException {
+    public InventoryK(@NotNull PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(CancellableNMSPacketEvent event, byte packetId,
-                       NMSPacket nmsPacket, Object packet, long timestamp) {
-        if (packetId == PacketType.Play.Client.BLOCK_DIG) {
-            WrappedPacketInBlockDig blockDig = new WrappedPacketInBlockDig(nmsPacket);
-            WrappedPacketInBlockDig.PlayerDigType digType = blockDig.getDigType();
+    public void handle(@NotNull PacketPlayReceiveEvent event) {
+        PacketTypeCommon packetType = event.getPacketType();
 
-            if (digType == WrappedPacketInBlockDig.PlayerDigType.RELEASE_USE_ITEM) {
+        if (packetType == PacketType.Play.Client.PLAYER_DIGGING) {
+            @NotNull WrapperPlayClientPlayerDigging wrapper = new WrapperPlayClientPlayerDigging(event);
+            DiggingAction digType = wrapper.getAction();
+
+            if (digType == DiggingAction.RELEASE_USE_ITEM) {
                 ++buffer;
 
                 if (buffer > 2) {
                     KickUtil.kickPlayer(player, event, "Inventory (K) | Multiple ReleaseUseItem packets");
                 }
             }
-        } else if (PacketType.Play.Client.Util.isInstanceOfFlying(packetId)) {
+        } else if (packetType == PacketType.Play.Client.PLAYER_FLYING
+                || packetType == PacketType.Play.Client.PLAYER_POSITION
+                || packetType == PacketType.Play.Client.PLAYER_ROTATION
+                || packetType == PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION) {
             buffer = 0;
         }
     }

@@ -69,7 +69,7 @@ public class PledgeImpl implements Pledge, Listener {
 
     private final PingPacketProvider packetProvider;
     private final BukkitTask startTask;
-    private final TickEndTask endTask;
+    private final @NotNull TickEndTask endTask;
 
     private final List<ClientPingerImpl> clientPingers = new ArrayList<>();
     private final Map<Player, Channel> playerChannels = new HashMap<>();
@@ -91,7 +91,7 @@ public class PledgeImpl implements Pledge, Listener {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
-    private void setupPlayer(Player player) {
+    private void setupPlayer(@NotNull Player player) {
         Channel channel = ChannelAccess.getChannel(player);
         playerChannels.put(player, channel);
 
@@ -111,7 +111,7 @@ public class PledgeImpl implements Pledge, Listener {
         clientPingers.forEach(pinger -> pinger.registerPlayer(player));
     }
 
-    private void teardownPlayer(Player player) {
+    private void teardownPlayer(@NotNull Player player) {
         playerChannels.remove(player);
 
         // Unregister from client pingers
@@ -167,7 +167,7 @@ public class PledgeImpl implements Pledge, Listener {
         );
     }
 
-    public void sendPingRaw(Player player, @NotNull Channel channel, int pingId) {
+    public void sendPingRaw(@NotNull Player player, @NotNull Channel channel, int pingId) {
         try {
             Object packet = packetProvider.buildPacket(pingId);
             Bukkit.getPluginManager().callEvent(new PingSendEvent(player, pingId));
@@ -180,20 +180,20 @@ public class PledgeImpl implements Pledge, Listener {
     }
 
     @Override
-    public Optional<Channel> getChannel(@NotNull Player player) {
+    public @NotNull Optional<Channel> getChannel(@NotNull Player player) {
         return Optional.ofNullable(playerChannels.get(player));
     }
 
     @Override
-    public ClientPinger createPinger(int startId, int endId) {
-        ClientPingerImpl pinger = new ClientPingerImpl(this, startId, endId);
+    public @NotNull ClientPinger createPinger(int startId, int endId) {
+        @NotNull ClientPingerImpl pinger = new ClientPingerImpl(this, startId, endId);
         clientPingers.add(pinger);
         return pinger;
     }
 
     @Override
-    public FrameClientPinger createFramePinger(int startId, int endId) {
-        FrameClientPingerImpl pinger = new FrameClientPingerImpl(this, startId, endId);
+    public @NotNull FrameClientPinger createFramePinger(int startId, int endId) {
+        @NotNull FrameClientPingerImpl pinger = new FrameClientPingerImpl(this, startId, endId);
         clientPingers.add(pinger);
         return pinger;
     }

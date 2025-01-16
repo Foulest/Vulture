@@ -23,10 +23,11 @@
 package net.foulest.pledge.pinger.data;
 
 import lombok.Data;
+import org.jetbrains.annotations.NotNull;
 
 @Data
 public class Ping {
 
-    private final PingOrder order;
+    private final @NotNull PingOrder order;
     private final int id;
 }

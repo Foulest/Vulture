@@ -17,18 +17,19 @@
  */
 package net.foulest.vulture.check.type.inventory;
 
-import net.foulest.packetevents.event.eventtypes.CancellableNMSPacketEvent;
-import net.foulest.packetevents.packettype.PacketType;
-import net.foulest.packetevents.packetwrappers.NMSPacket;
-import net.foulest.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
-import net.foulest.packetevents.packetwrappers.play.in.useentity.WrappedPacketInUseEntity;
-import net.foulest.packetevents.packetwrappers.play.in.windowclick.WrappedPacketInWindowClick;
-import net.foulest.packetevents.utils.player.ClientVersion;
+import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.util.KickUtil;
+import org.jetbrains.annotations.NotNull;
 
 @CheckInfo(name = "Inventory (A)", type = CheckType.INVENTORY, punishable = false,
         description = "Detects this Inventory pattern: ArmAnimation, WindowClick, UseEntity, WindowClick")
@@ -36,44 +37,49 @@ public class InventoryA extends Check {
 
     private int stage;
 
-    public InventoryA(PlayerData playerData) throws ClassNotFoundException {
+    public InventoryA(@NotNull PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(CancellableNMSPacketEvent event, byte packetId,
-                       NMSPacket nmsPacket, Object packet, long timestamp) {
+    public void handle(@NotNull PacketPlayReceiveEvent event) {
         // Checks the player for exemptions.
-        if (!playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8_9)) {
+        if (!playerData.getVersion().isOlderThanOrEquals(ClientVersion.V_1_8)) {
             return;
         }
 
-        if (packetId == PacketType.Play.Client.ARM_ANIMATION) {
+        PacketTypeCommon packetType = event.getPacketType();
+
+        if (packetType == PacketType.Play.Client.ANIMATION) {
             if (stage == 0) {
                 ++stage;
             }
 
-        } else if (packetId == PacketType.Play.Client.WINDOW_CLICK) {
-            WrappedPacketInWindowClick windowClick = new WrappedPacketInWindowClick(nmsPacket);
-            int windowId = windowClick.getWindowId();
-            int windowMode = windowClick.getMode();
+        } else if (packetType == PacketType.Play.Client.CLICK_WINDOW) {
+            @NotNull WrapperPlayClientClickWindow packet = new WrapperPlayClientClickWindow(event);
+            WrapperPlayClientClickWindow.WindowClickType windowClickType = packet.getWindowClickType();
+            int windowId = packet.getWindowId();
 
-            if (windowId == 0 && windowMode == 2 && (stage == 1 || stage == 3)) {
+            if (windowClickType == WrapperPlayClientClickWindow.WindowClickType.SWAP
+                    && windowId == 0 && (stage == 1 || stage == 3)) {
                 ++stage;
             }
 
-        } else if (packetId == PacketType.Play.Client.USE_ENTITY) {
-            WrappedPacketInUseEntity useEntity = new WrappedPacketInUseEntity(nmsPacket);
-            WrappedPacketInUseEntity.EntityUseAction action = useEntity.getAction();
+        } else if (packetType == PacketType.Play.Client.INTERACT_ENTITY) {
+            @NotNull WrapperPlayClientInteractEntity packet = new WrapperPlayClientInteractEntity(event);
+            WrapperPlayClientInteractEntity.InteractAction action = packet.getAction();
 
-            if (action == WrappedPacketInUseEntity.EntityUseAction.ATTACK && stage == 2) {
+            if (action == WrapperPlayClientInteractEntity.InteractAction.ATTACK && stage == 2) {
                 ++stage;
             }
 
-        } else if (PacketType.Play.Client.Util.isInstanceOfFlying(packetId)) {
-            WrappedPacketInFlying flying = new WrappedPacketInFlying(nmsPacket);
+        } else if (packetType == PacketType.Play.Client.PLAYER_FLYING
+                || packetType == PacketType.Play.Client.PLAYER_POSITION
+                || packetType == PacketType.Play.Client.PLAYER_ROTATION
+                || packetType == PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION) {
+            @NotNull WrapperPlayClientPlayerFlying packet = new WrapperPlayClientPlayerFlying(event);
 
-            if (flying.isMoving()) {
+            if (packet.hasPositionChanged()) {
                 stage = 0;
             }
         }

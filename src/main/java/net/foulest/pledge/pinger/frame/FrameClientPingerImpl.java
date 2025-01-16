@@ -48,7 +48,7 @@ public class FrameClientPingerImpl extends ClientPingerImpl implements FrameClie
     private final Map<Player, FrameData> frameDataMap = new LinkedHashMap<>();
     private final Collection<FrameClientPingerListener> frameListener = new ArrayList<>();
 
-    public FrameClientPingerImpl(PledgeImpl clientPing, int startId, int endId) {
+    public FrameClientPingerImpl(@NotNull PledgeImpl clientPing, int startId, int endId) {
         super(clientPing, startId, endId);
     }
 
@@ -59,21 +59,21 @@ public class FrameClientPingerImpl extends ClientPingerImpl implements FrameClie
     }
 
     @Override
-    public void registerPlayer(Player player) {
+    public void registerPlayer(@NotNull Player player) {
         super.registerPlayer(player);
         frameDataMap.put(player, new FrameData());
     }
 
     @Override
-    public void unregisterPlayer(Player player) {
+    public void unregisterPlayer(@NotNull Player player) {
         super.unregisterPlayer(player);
         frameDataMap.remove(player);
     }
 
     @Override
-    protected void injectPlayer(Player player) {
-        MessageQueueHandler queueHandler = new MessageQueueHandler();
-        ChannelHandler queuePrimer = new MessageQueuePrimer(queueHandler);
+    protected void injectPlayer(@NotNull Player player) {
+        @NotNull MessageQueueHandler queueHandler = new MessageQueueHandler();
+        @NotNull ChannelHandler queuePrimer = new MessageQueuePrimer(queueHandler);
 
         api.getChannel(player).ifPresent(channel ->
                 ChannelUtils.runInEventLoop(channel, () ->
@@ -85,7 +85,7 @@ public class FrameClientPingerImpl extends ClientPingerImpl implements FrameClie
     }
 
     @Override
-    protected void ejectPlayer(Player player) {
+    protected void ejectPlayer(@NotNull Player player) {
         api.getChannel(player).ifPresent(channel ->
                 ChannelUtils.runInEventLoop(channel, () -> {
                     channel.pipeline().remove(MessageQueueHandler.class);
@@ -146,12 +146,12 @@ public class FrameClientPingerImpl extends ClientPingerImpl implements FrameClie
         return frameData.getFrame();
     }
 
-    public Optional<FrameData> getFrameData(Player player) {
+    public @NotNull Optional<FrameData> getFrameData(Player player) {
         return Optional.ofNullable(frameDataMap.get(player));
     }
 
-    private void trySendPings(Player player, @NotNull FrameData frameData) {
-        Optional<Frame> optionalFrame = frameData.continueFrame();
+    private void trySendPings(@NotNull Player player, @NotNull FrameData frameData) {
+        @NotNull Optional<Frame> optionalFrame = frameData.continueFrame();
 
         api.getChannel(player).filter(Channel::isOpen).ifPresent(channel ->
                 ChannelUtils.runInEventLoop(channel, () -> {
@@ -160,7 +160,7 @@ public class FrameClientPingerImpl extends ClientPingerImpl implements FrameClie
 
                         if (handler != null) {
                             if (optionalFrame.isPresent()) {
-                                Frame frame = optionalFrame.get();
+                                @NotNull Frame frame = optionalFrame.get();
                                 frameListener.forEach(listener -> listener.onFrameSend(player, frame));
 
                                 // Wrap by ping packets
@@ -181,7 +181,7 @@ public class FrameClientPingerImpl extends ClientPingerImpl implements FrameClie
     }
 
     private @NotNull Frame createFrame(Player player, @NotNull PingData data) {
-        Frame frame = new Frame(data.pullId(), data.pullId());
+        @NotNull Frame frame = new Frame(data.pullId(), data.pullId());
         frameListener.forEach(listener -> listener.onFrameCreate(player, frame));
         return frame;
     }

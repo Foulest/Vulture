@@ -26,6 +26,7 @@ import lombok.ToString;
 import net.foulest.pledge.packet.PingPacketProvider;
 import net.foulest.pledge.util.MinecraftReflection;
 import net.foulest.pledge.util.ReflectionUtil;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -34,20 +35,20 @@ import java.lang.reflect.InvocationTargetException;
 @ToString
 public class TransactionPacketProvider implements PingPacketProvider {
 
-    private final Class<?> inTransactionClass;
-    private final Field inTransactionIdField;
-    private final Constructor<?> outTransactionConstructor;
+    private final @NotNull Class<?> inTransactionClass;
+    private final @NotNull Field inTransactionIdField;
+    private final @NotNull Constructor<?> outTransactionConstructor;
 
     public TransactionPacketProvider() throws ClassNotFoundException, NoSuchFieldException, NoSuchMethodException {
         inTransactionClass = MinecraftReflection.gamePacket("PacketPlayInTransaction");
         inTransactionIdField = ReflectionUtil.getFieldByType(inTransactionClass, short.class);
 
-        Class<?> outTransactionClass = MinecraftReflection.gamePacket("PacketPlayOutTransaction");
+        @NotNull Class<?> outTransactionClass = MinecraftReflection.gamePacket("PacketPlayOutTransaction");
         outTransactionConstructor = outTransactionClass.getConstructor(int.class, short.class, boolean.class);
     }
 
     @Override
-    public Object buildPacket(int id) throws InvocationTargetException, InstantiationException, IllegalAccessException {
+    public @NotNull Object buildPacket(int id) throws InvocationTargetException, InstantiationException, IllegalAccessException {
         return outTransactionConstructor.newInstance(0, (short) id, false);
     }
 

@@ -26,6 +26,7 @@ import lombok.ToString;
 import net.foulest.pledge.packet.PingPacketProvider;
 import net.foulest.pledge.util.MinecraftReflection;
 import net.foulest.pledge.util.ReflectionUtil;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -34,20 +35,20 @@ import java.lang.reflect.InvocationTargetException;
 @ToString
 public class PingPongPacketProvider implements PingPacketProvider {
 
-    private final Class<?> pongClass;
-    private final Field pongIdField;
-    private final Constructor<?> pingConstructor;
+    private final @NotNull Class<?> pongClass;
+    private final @NotNull Field pongIdField;
+    private final @NotNull Constructor<?> pingConstructor;
 
     public PingPongPacketProvider() throws ClassNotFoundException, NoSuchFieldException, NoSuchMethodException {
         pongClass = MinecraftReflection.gamePacket("ServerboundPongPacket");
         pongIdField = ReflectionUtil.getFieldByType(pongClass, int.class);
 
-        Class<?> pingClass = MinecraftReflection.gamePacket("ClientboundPingPacket");
+        @NotNull Class<?> pingClass = MinecraftReflection.gamePacket("ClientboundPingPacket");
         pingConstructor = pingClass.getConstructor(int.class);
     }
 
     @Override
-    public Object buildPacket(int id) throws InvocationTargetException, InstantiationException, IllegalAccessException {
+    public @NotNull Object buildPacket(int id) throws InvocationTargetException, InstantiationException, IllegalAccessException {
         return pingConstructor.newInstance(id);
     }
 

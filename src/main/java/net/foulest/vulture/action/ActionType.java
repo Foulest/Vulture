@@ -20,7 +20,7 @@ package net.foulest.vulture.action;
 public enum ActionType {
     AGAINST_BLOCK,
     AGAINST_BLOCK_WIDE,
-    ARM_ANIMATION,
+    ANIMATION,
     ATTACKING,
     BLOCKING,
     BLOCK_BREAK,
@@ -32,6 +32,7 @@ public enum ActionType {
     DELAYED_PACKET,
     DIGGING,
     ENTITY_INTERACT,
+    ENTITY_ATTACK,
     ENTER_VEHICLE,
     FLYING_PACKET,
     INVENTORY_OPEN,

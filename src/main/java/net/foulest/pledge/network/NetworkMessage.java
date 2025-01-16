@@ -33,11 +33,11 @@ import org.jetbrains.annotations.NotNull;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class NetworkMessage {
 
-    private final Object message;
-    private final ChannelPromise promise;
+    private final @NotNull Object message;
+    private final @NotNull ChannelPromise promise;
 
     @Contract("_, _ -> new")
-    public static @NotNull NetworkMessage of(Object message, ChannelPromise promise) {
+    public static @NotNull NetworkMessage of(@NotNull Object message, @NotNull ChannelPromise promise) {
         return new NetworkMessage(message, promise);
     }
 }

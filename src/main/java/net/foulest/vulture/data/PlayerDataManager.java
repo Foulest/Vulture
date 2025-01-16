@@ -65,13 +65,13 @@ public class PlayerDataManager {
             return;
         }
 
-        PlayerData data = new PlayerData(uniqueId, player);
+        @NotNull PlayerData data = new PlayerData(uniqueId, player);
 
         // Initialize checks for the player.
-        for (Class<? extends Check> checkClass : CheckManager.CHECK_CLASSES) {
+        for (@NotNull Class<? extends Check> checkClass : CheckManager.CHECK_CLASSES) {
             try {
-                Constructor<? extends Check> constructor = checkClass.getConstructor(PlayerData.class);
-                Check checkInstance = constructor.newInstance(data);
+                @NotNull Constructor<? extends Check> constructor = checkClass.getConstructor(PlayerData.class);
+                @NotNull Check checkInstance = constructor.newInstance(data);
                 data.getChecks().add(checkInstance);
             } catch (NoSuchMethodException | IllegalAccessException | InstantiationException
                      | InvocationTargetException ex) {

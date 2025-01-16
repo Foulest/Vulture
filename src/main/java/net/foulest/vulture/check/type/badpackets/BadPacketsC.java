@@ -17,16 +17,17 @@
  */
 package net.foulest.vulture.check.type.badpackets;
 
-import net.foulest.packetevents.event.eventtypes.CancellableNMSPacketEvent;
-import net.foulest.packetevents.packettype.PacketType;
-import net.foulest.packetevents.packetwrappers.NMSPacket;
-import net.foulest.packetevents.packetwrappers.play.in.useentity.WrappedPacketInUseEntity;
-import net.foulest.packetevents.utils.player.ClientVersion;
+import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.util.KickUtil;
+import org.jetbrains.annotations.NotNull;
 
 @CheckInfo(name = "BadPackets (C)", type = CheckType.BADPACKETS, punishable = false,
         description = "Detects sending attack packets without swinging.")
@@ -34,23 +35,24 @@ public class BadPacketsC extends Check {
 
     private boolean swung;
 
-    public BadPacketsC(PlayerData playerData) throws ClassNotFoundException {
+    public BadPacketsC(@NotNull PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(CancellableNMSPacketEvent event, byte packetId,
-                       NMSPacket nmsPacket, Object packet, long timestamp) {
+    public void handle(@NotNull PacketPlayReceiveEvent event) {
         // Checks the player for exemptions.
-        if (playerData.getVersion().isNewerThan(ClientVersion.v_1_8_9)) {
+        if (playerData.getVersion().isNewerThan(ClientVersion.V_1_8)) {
             return;
         }
 
-        if (packetId == PacketType.Play.Client.USE_ENTITY) {
-            WrappedPacketInUseEntity useEntity = new WrappedPacketInUseEntity(nmsPacket);
-            WrappedPacketInUseEntity.EntityUseAction action = useEntity.getAction();
+        PacketTypeCommon packetType = event.getPacketType();
 
-            if (action == WrappedPacketInUseEntity.EntityUseAction.ATTACK) {
+        if (packetType == PacketType.Play.Client.INTERACT_ENTITY) {
+            @NotNull WrapperPlayClientInteractEntity wrapper = new WrapperPlayClientInteractEntity(event);
+            WrapperPlayClientInteractEntity.InteractAction action = wrapper.getAction();
+
+            if (action == WrapperPlayClientInteractEntity.InteractAction.ATTACK) {
                 if (!swung) {
                     KickUtil.kickPlayer(player, event, "BadPackets (C) | Attacked an entity without swinging");
                     return;
@@ -59,10 +61,13 @@ public class BadPacketsC extends Check {
                 swung = false;
             }
 
-        } else if (packetId == PacketType.Play.Client.ARM_ANIMATION) {
+        } else if (packetType == PacketType.Play.Client.ANIMATION) {
             swung = true;
 
-        } else if (PacketType.Play.Client.Util.isInstanceOfFlying(packetId)) {
+        } else if (packetType == PacketType.Play.Client.PLAYER_FLYING
+                || packetType == PacketType.Play.Client.PLAYER_POSITION
+                || packetType == PacketType.Play.Client.PLAYER_ROTATION
+                || packetType == PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION) {
             swung = false;
         }
     }

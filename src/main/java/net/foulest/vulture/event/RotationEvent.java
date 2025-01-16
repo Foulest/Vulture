@@ -17,10 +17,11 @@
  */
 package net.foulest.vulture.event;
 
+import com.github.retrooper.packetevents.protocol.world.Location;
+import com.github.retrooper.packetevents.util.Vector3d;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import net.foulest.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
-import net.foulest.packetevents.utils.vector.Vector3d;
 import net.foulest.vulture.data.PlayerData;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,8 +29,8 @@ import org.jetbrains.annotations.NotNull;
 @AllArgsConstructor
 public class RotationEvent {
 
-    public final WrappedPacketInFlying to;
-    public final WrappedPacketInFlying from;
+    public final @NotNull WrapperPlayClientPlayerFlying to;
+    public final @NotNull WrapperPlayClientPlayerFlying from;
 
     /**
      * Gets the change in yaw.
@@ -37,8 +38,8 @@ public class RotationEvent {
      * @return The change in yaw.
      */
     public float getDeltaYaw() {
-        float toYaw = to.getYaw();
-        float fromYaw = from.getYaw();
+        float toYaw = to.getLocation().getYaw();
+        float fromYaw = from.getLocation().getYaw();
         return Math.abs(toYaw - fromYaw);
     }
 
@@ -48,8 +49,8 @@ public class RotationEvent {
      * @return The change in pitch.
      */
     public float getDeltaPitch() {
-        float toPitch = to.getPitch();
-        float fromPitch = from.getPitch();
+        float toPitch = to.getLocation().getPitch();
+        float fromPitch = from.getLocation().getPitch();
         return Math.abs(toPitch - fromPitch);
     }
 
@@ -59,7 +60,8 @@ public class RotationEvent {
      * @return Whether the player is teleporting.
      */
     public boolean isTeleport(@NotNull PlayerData playerData) {
-        Vector3d toPosition = to.getPosition();
-        return playerData.isTeleporting(toPosition);
+        @NotNull Location toPosition = to.getLocation();
+        Vector3d position = toPosition.getPosition();
+        return playerData.isTeleporting(position);
     }
 }

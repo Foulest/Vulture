@@ -17,19 +17,21 @@
  */
 package net.foulest.vulture.check.type.inventory;
 
-import net.foulest.packetevents.event.eventtypes.CancellableNMSPacketEvent;
-import net.foulest.packetevents.packettype.PacketType;
-import net.foulest.packetevents.packetwrappers.NMSPacket;
-import net.foulest.packetevents.packetwrappers.play.in.blockplace.WrappedPacketInBlockPlace;
-import net.foulest.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
-import net.foulest.packetevents.packetwrappers.play.in.windowclick.WrappedPacketInWindowClick;
-import net.foulest.packetevents.utils.player.Direction;
+import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
+import com.github.retrooper.packetevents.protocol.item.type.ItemType;
+import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
+import com.github.retrooper.packetevents.protocol.world.BlockFace;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerBlockPlacement;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.util.KickUtil;
-import org.bukkit.Material;
+import org.jetbrains.annotations.NotNull;
 
 @CheckInfo(name = "Inventory (B)", type = CheckType.INVENTORY, punishable = false,
         description = "Detects this Inventory pattern: ClickWindow, HeldItemSlot, BlockPlace, HeldItemSlot")
@@ -38,15 +40,16 @@ public class InventoryB extends Check {
     private long start;
     private int stage;
 
-    public InventoryB(PlayerData playerData) throws ClassNotFoundException {
+    public InventoryB(@NotNull PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(CancellableNMSPacketEvent event, byte packetId,
-                       NMSPacket nmsPacket, Object packet, long timestamp) {
-        if (packetId == PacketType.Play.Client.WINDOW_CLICK) {
-            WrappedPacketInWindowClick windowClick = new WrappedPacketInWindowClick(nmsPacket);
+    public void handle(@NotNull PacketPlayReceiveEvent event) {
+        PacketTypeCommon packetType = event.getPacketType();
+
+        if (packetType == PacketType.Play.Client.CLICK_WINDOW) {
+            @NotNull WrapperPlayClientClickWindow windowClick = new WrapperPlayClientClickWindow(event);
             int windowId = windowClick.getWindowId();
 
             if (windowId == 0 && stage == 0) {
@@ -54,31 +57,35 @@ public class InventoryB extends Check {
                 start = System.currentTimeMillis();
             }
 
-        } else if (packetId == PacketType.Play.Client.HELD_ITEM_SLOT) {
+        } else if (packetType == PacketType.Play.Client.SLOT_STATE_CHANGE) {
             if (stage == 1 || stage == 3) {
                 ++stage;
             }
 
-        } else if (packetId == PacketType.Play.Client.BLOCK_PLACE) {
-            WrappedPacketInBlockPlace blockPlace = new WrappedPacketInBlockPlace(nmsPacket);
+        } else if (packetType == PacketType.Play.Client.PLAYER_BLOCK_PLACEMENT) {
+            @NotNull WrapperPlayClientPlayerBlockPlacement blockPlace = new WrapperPlayClientPlayerBlockPlacement(event);
 
             blockPlace.getItemStack().ifPresent(itemStack -> {
-                Material itemType = itemStack.getType();
-                Direction direction = blockPlace.getDirection();
+                ItemType itemType = itemStack.getType();
+                BlockFace direction = blockPlace.getFace();
 
-                if ((itemType == Material.MUSHROOM_SOUP
-                        || itemType == Material.POTION
-                        || itemType == Material.BOWL)
-                        && direction == Direction.OTHER
+                if ((itemType == ItemTypes.MUSHROOM_STEW
+                        || itemType == ItemTypes.POTION
+                        || itemType == ItemTypes.SPLASH_POTION
+                        || itemType == ItemTypes.BOWL)
+                        && direction == BlockFace.OTHER
                         && stage == 2) {
                     ++stage;
                 }
             });
 
-        } else if (PacketType.Play.Client.Util.isInstanceOfFlying(packetId)) {
-            WrappedPacketInFlying flying = new WrappedPacketInFlying(nmsPacket);
+        } else if (packetType == PacketType.Play.Client.PLAYER_FLYING
+                || packetType == PacketType.Play.Client.PLAYER_POSITION
+                || packetType == PacketType.Play.Client.PLAYER_ROTATION
+                || packetType == PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION) {
+            @NotNull WrapperPlayClientPlayerFlying flying = new WrapperPlayClientPlayerFlying(event);
 
-            if (!flying.isRotating() && !flying.isMoving()) {
+            if (!flying.hasRotationChanged() && !flying.hasPositionChanged()) {
                 stage = 0;
             }
         }

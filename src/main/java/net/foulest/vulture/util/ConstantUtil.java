@@ -25,10 +25,6 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class ConstantUtil {
 
-    // Timing
-    public final int MAX_CATCHUP_TICKS = 10;
-    public final long TICK_MILLIS = 50L;
-
     // Messages
     public final String NO_PERMISSION = "&cNo permission.";
     public final String UNABLE_TO_REGISTER_TAB_COMPLETER = "Unable to register tab completer: ";

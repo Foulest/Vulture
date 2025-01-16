@@ -46,6 +46,4 @@ public @interface CheckInfo {
     int maxViolations() default 10;
 
     boolean experimental() default false;
-
-    boolean acceptsServerPackets() default false;
 }

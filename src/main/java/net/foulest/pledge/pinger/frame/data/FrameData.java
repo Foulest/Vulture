@@ -23,6 +23,7 @@
 package net.foulest.pledge.pinger.frame.data;
 
 import lombok.ToString;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 import java.util.Queue;
@@ -47,7 +48,7 @@ public class FrameData {
         return currentFrame.get();
     }
 
-    public Optional<Frame> continueFrame() {
+    public @NotNull Optional<Frame> continueFrame() {
         Frame frame = currentFrame.getAndSet(null);
 
         if (frame != null) {
@@ -56,11 +57,11 @@ public class FrameData {
         return Optional.ofNullable(frame);
     }
 
-    public Optional<Frame> matchStart(int id) {
+    public @NotNull Optional<Frame> matchStart(int id) {
         return Optional.ofNullable(expectingFrames.peek()).filter(frame -> frame.getStartId() == id);
     }
 
-    public Optional<Frame> matchEnd(int id) {
+    public @NotNull Optional<Frame> matchEnd(int id) {
         return Optional.ofNullable(expectingFrames.peek()).filter(frame -> frame.getEndId() == id);
     }
 

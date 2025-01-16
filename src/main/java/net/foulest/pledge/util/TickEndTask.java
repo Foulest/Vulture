@@ -27,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -41,13 +42,13 @@ import java.util.concurrent.atomic.AtomicReference;
 public final class TickEndTask {
 
     private static final List<Object> runnables;
-    private static final Class<?> runnableClass;
+    private static final @NotNull Class<?> runnableClass;
 
     static {
         try {
             Server server = Bukkit.getServer();
             Object mcServer = server.getClass().getMethod("getServer").invoke(server);
-            Field field = ReflectionUtil.getFieldByType(mcServer.getClass().getSuperclass(), List.class);
+            @NotNull Field field = ReflectionUtil.getFieldByType(mcServer.getClass().getSuperclass(), List.class);
             runnables = (List<Object>) field.get(mcServer);
             runnableClass = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
         } catch (NoSuchMethodException | NoSuchFieldException
@@ -56,10 +57,10 @@ public final class TickEndTask {
         }
     }
 
-    private final Runnable runnable;
+    private final @NotNull Runnable runnable;
     private final AtomicReference<Object> registeredObject = new AtomicReference<>();
 
-    private TickEndTask start() {
+    private @NotNull TickEndTask start() {
         if (registeredObject.get() != null) {
             throw new IllegalStateException("Already registered!");
         }
@@ -70,11 +71,11 @@ public final class TickEndTask {
         if (Runnable.class.isAssignableFrom(runnableClass)) {
             newObject = runnable;
         } else {
-            Object handle = new Object();
+            @NotNull Object handle = new Object();
 
             newObject = Proxy.newProxyInstance(runnableClass.getClassLoader(), new Class[]{runnableClass},
                     (proxy, method, args) -> {
-                        Class<?> declaring = method.getDeclaringClass();
+                        @NotNull Class<?> declaring = method.getDeclaringClass();
 
                         if (declaring.equals(Object.class)) {
                             return method.invoke(handle, args);
@@ -104,7 +105,7 @@ public final class TickEndTask {
         runnables.remove(currentObject);
     }
 
-    public static TickEndTask create(Runnable runnable) {
+    public static @NotNull TickEndTask create(@NotNull Runnable runnable) {
         return new TickEndTask(runnable).start();
     }
 }

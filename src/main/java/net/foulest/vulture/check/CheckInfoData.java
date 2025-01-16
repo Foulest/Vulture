@@ -33,7 +33,6 @@ public class CheckInfoData {
     private String banCommand;
     private int maxViolations;
     private boolean experimental;
-    private boolean acceptsServerPackets;
 
     CheckInfoData(@NotNull CheckInfo checkInfo) {
         name = checkInfo.name();
@@ -44,6 +43,5 @@ public class CheckInfoData {
         banCommand = checkInfo.banCommand();
         maxViolations = checkInfo.maxViolations();
         experimental = checkInfo.experimental();
-        acceptsServerPackets = checkInfo.acceptsServerPackets();
     }
 }

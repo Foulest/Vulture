@@ -37,8 +37,8 @@ public class CommandArgs {
 
     private final CommandSender sender;
     private final org.bukkit.command.Command command;
-    private final String label;
-    private final String[] args;
+    private final @NotNull String label;
+    private final String @NotNull [] args;
 
     /**
      * Constructor for CommandArgs.
@@ -51,20 +51,20 @@ public class CommandArgs {
      */
     CommandArgs(CommandSender sender, org.bukkit.command.Command command,
                 String label, String @NotNull [] args, int subCommand) {
-        String[] modArgs = new String[args.length - subCommand];
+        String @NotNull [] modArgs = new String[args.length - subCommand];
 
         if (args.length - subCommand >= 0) {
             System.arraycopy(args, subCommand, modArgs, 0, args.length - subCommand);
         }
 
-        StringBuilder buffer = new StringBuilder();
+        @NotNull StringBuilder buffer = new StringBuilder();
         buffer.append(label);
 
         for (int x = 0; x < subCommand; x++) {
             buffer.append(".").append(args[x]);
         }
 
-        String cmdLabel = buffer.toString();
+        @NotNull String cmdLabel = buffer.toString();
         this.sender = sender;
         this.command = command;
         this.label = cmdLabel;
@@ -76,7 +76,7 @@ public class CommandArgs {
      *
      * @return The formatted command label.
      */
-    String getLabel() {
+    @NotNull String getLabel() {
         return label.replace(".", " ");
     }
 

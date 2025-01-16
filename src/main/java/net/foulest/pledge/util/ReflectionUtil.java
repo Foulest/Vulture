@@ -31,10 +31,11 @@ import java.util.Arrays;
 @UtilityClass
 public class ReflectionUtil {
 
-    Field getFieldByClassNames(Class<?> clazz, String @NotNull ... simpleNames) throws NoSuchFieldException {
-        for (String name : simpleNames) {
-            for (Field field : clazz.getDeclaredFields()) {
-                String typeSimpleName = field.getType().getSimpleName();
+    @NotNull
+    public Field getFieldByClassNames(@NotNull Class<?> clazz, String @NotNull ... simpleNames) throws NoSuchFieldException {
+        for (@NotNull String name : simpleNames) {
+            for (@NotNull Field field : clazz.getDeclaredFields()) {
+                @NotNull String typeSimpleName = field.getType().getSimpleName();
 
                 if (name.equals(typeSimpleName)) {
                     field.setAccessible(true);
@@ -47,9 +48,9 @@ public class ReflectionUtil {
                 + clazz.getName() + " with names " + Arrays.toString(simpleNames));
     }
 
-    public Field getFieldByType(@NotNull Class<?> clazz, Class<?> type) throws NoSuchFieldException {
-        for (Field field : clazz.getDeclaredFields()) {
-            Class<?> foundType = field.getType();
+    public @NotNull Field getFieldByType(@NotNull Class<?> clazz, @NotNull Class<?> type) throws NoSuchFieldException {
+        for (@NotNull Field field : clazz.getDeclaredFields()) {
+            @NotNull Class<?> foundType = field.getType();
 
             if (type.isAssignableFrom(foundType)) {
                 field.setAccessible(true);
@@ -61,11 +62,11 @@ public class ReflectionUtil {
                 + clazz.getName() + " with type " + type.getName());
     }
 
-    Object getNonNullFieldByType(@NotNull Object instance, Class<?> type) throws ReflectiveOperationException {
-        Class<?> clazz = instance.getClass();
+    @NotNull Object getNonNullFieldByType(@NotNull Object instance, @NotNull Class<?> type) throws ReflectiveOperationException {
+        @NotNull Class<?> clazz = instance.getClass();
 
-        for (Field field : clazz.getDeclaredFields()) {
-            Class<?> foundType = field.getType();
+        for (@NotNull Field field : clazz.getDeclaredFields()) {
+            @NotNull Class<?> foundType = field.getType();
 
             if (type.isAssignableFrom(foundType)) {
                 field.setAccessible(true);

@@ -17,12 +17,13 @@
  */
 package net.foulest.vulture.check.type.clientbrand;
 
-import net.foulest.packetevents.event.eventtypes.CancellableEvent;
-import net.foulest.packetevents.event.eventtypes.CancellableNMSPacketEvent;
-import net.foulest.packetevents.packettype.PacketType;
-import net.foulest.packetevents.packetwrappers.NMSPacket;
-import net.foulest.packetevents.packetwrappers.play.in.custompayload.WrappedPacketInCustomPayload;
-import net.foulest.packetevents.utils.player.ClientVersion;
+import com.github.retrooper.packetevents.event.CancellableEvent;
+import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPluginMessage;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
@@ -34,6 +35,7 @@ import net.foulest.vulture.util.KickUtil;
 import net.foulest.vulture.util.MessageUtil;
 import net.foulest.vulture.util.Settings;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -1052,18 +1054,25 @@ public class ClientBrand extends Check {
             new PayloadType("wigger", "Merge Client", DataType.CHANNEL, true)
     );
 
-    public ClientBrand(PlayerData playerData) throws ClassNotFoundException {
+    public ClientBrand(@NotNull PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(CancellableNMSPacketEvent event, byte packetId,
-                       NMSPacket nmsPacket, Object packet, long timestamp) {
-        if (packetId == PacketType.Play.Client.CUSTOM_PAYLOAD) {
-            WrappedPacketInCustomPayload payload = new WrappedPacketInCustomPayload(nmsPacket);
+    public void handle(@NotNull PacketPlayReceiveEvent event) {
+        PacketTypeCommon packetType = event.getPacketType();
+
+        if (packetType == PacketType.Play.Client.PLUGIN_MESSAGE) {
+            @NotNull WrapperPlayClientPluginMessage payload = new WrapperPlayClientPluginMessage(event);
             byte[] rawData = payload.getData();
-            String data = new String(rawData, StandardCharsets.UTF_8).replace(" (Velocity)", "");
-            String channelName = payload.getChannelName();
+            @NotNull String data = new String(rawData, StandardCharsets.UTF_8).replace(" (Velocity)", "");
+            @Nullable String channelName = payload.getChannelName();
+
+            // Handles null channel names.
+            if (channelName == null) {
+                KickUtil.kickPlayer(player, event, "Sent payload with null channelName");
+                return;
+            }
 
             // Handles and validates the payload sent by the player.
             if (channelName.equals("minecraft:brand") || channelName.equals("MC|Brand")) {
@@ -1088,7 +1097,7 @@ public class ClientBrand extends Check {
      * @param data  The data sent by the player.
      * @param event The event to cancel.
      */
-    private void handleBrandData(@NotNull String data, CancellableEvent event) {
+    private void handleBrandData(@NotNull String data, @NotNull CancellableEvent event) {
         // Kicks players sending the Log4J Exploit through their brand.
         if (data.contains("jndi") || data.contains("ldap")
                 || data.contains("://") || data.contains("${")
@@ -1133,7 +1142,7 @@ public class ClientBrand extends Check {
      * @param data  The data sent by the player.
      * @param event The event to cancel.
      */
-    private void handleRegisterData(@NotNull String data, CancellableEvent event) {
+    private void handleRegisterData(@NotNull String data, @NotNull CancellableEvent event) {
         // Kicks players that register empty data.
         if (data.isEmpty()) {
             KickUtil.kickPlayer(player, event, "Empty Data");
@@ -1142,9 +1151,9 @@ public class ClientBrand extends Check {
 
         // Splits the null spaces from the data and checks lines individually.
         if (data.contains("\0")) {
-            String[] splitData = data.split("\0");
+            String @NotNull [] splitData = data.split("\0");
 
-            for (String line : splitData) {
+            for (@NotNull String line : splitData) {
                 validateAndProcessPayload(REGISTER_DATA, event, line, DataType.REGISTER_DATA_OTHER);
             }
         } else {
@@ -1157,9 +1166,9 @@ public class ClientBrand extends Check {
      *
      * @param event The event to cancel.
      */
-    private void checkForBlockedPayloads(CancellableEvent event) {
+    private void checkForBlockedPayloads(@NotNull CancellableEvent event) {
         // If the payload is blocked, kick the player.
-        for (PayloadType payloadType : playerData.getPayloads()) {
+        for (@NotNull PayloadType payloadType : playerData.getPayloads()) {
             if (Settings.blockedPayloads.contains(payloadType.name)) {
                 KickUtil.kickPlayer(player, event, "Blocked Payload: " + payloadType.name,
                         "&c" + payloadType.name + " is not allowed on this server.");
@@ -1173,14 +1182,14 @@ public class ClientBrand extends Check {
      *
      * @param event The event to cancel.
      */
-    private void checkForImpossibilities(CancellableEvent event) {
-        for (PayloadType payloadType : playerData.getPayloads()) {
-            ClientVersion playerVersion = playerData.getVersion();
-            String versionName = playerVersion.getDisplayName();
+    private void checkForImpossibilities(@NotNull CancellableEvent event) {
+        for (@NotNull PayloadType payloadType : playerData.getPayloads()) {
+            @NotNull ClientVersion playerVersion = playerData.getVersion();
+            String versionName = playerVersion.getReleaseName();
 
             // Checks if the player is using Fabric with an impossible version.
             // Fabric only goes down to 1.14, so any version below that is invalid.
-            if (payloadType.name.equals("Fabric") && playerVersion.isOlderThan(ClientVersion.v_1_14)) {
+            if (payloadType.name.equals("Fabric") && playerVersion.isOlderThan(ClientVersion.V_1_14)) {
                 KickUtil.kickPlayer(player, event, "Impossible Fabric Version: " + versionName,
                         "&cYour Fabric version is not compatible with this server.");
                 return;
@@ -1189,7 +1198,7 @@ public class ClientBrand extends Check {
             // Checks if the player is using LiteLoader with an impossible version.
             // LiteLoader only goes up to 1.12.2, so any version above that is invalid.
             if (payloadType.name.equals("LiteLoader")
-                    && playerVersion.isNewerThan(ClientVersion.v_1_12_2)) {
+                    && playerVersion.isNewerThan(ClientVersion.V_1_12_2)) {
                 KickUtil.kickPlayer(player, event, "Impossible LiteLoader Version: " + versionName,
                         "&cYour LiteLoader version is not compatible with this server.");
                 return;
@@ -1199,21 +1208,21 @@ public class ClientBrand extends Check {
             if (payloadType.name.equals("Feather Client")) {
                 switch (playerVersion) {
                     case HIGHER_THAN_SUPPORTED_VERSIONS:
-                    case v_1_21_4:
-                    case v_1_21_3:
-                    case v_1_21_1:
-                    case v_1_20_6:
-                    case v_1_20_4:
-                    case v_1_20_2:
-                    case v_1_20_1:
-                    case v_1_19_4:
-                    case v_1_19_3:
-                    case v_1_19_2:
-                    case v_1_19:
-                    case v_1_18_2:
-                    case v_1_17_1:
-                    case v_1_12_2:
-                    case v_1_8_9:
+                    case V_1_21_4:
+                    case V_1_21_2:
+                    case V_1_12_1:
+                    case V_1_20_5:
+                    case V_1_20_3:
+                    case V_1_20_2:
+                    case V_1_20:
+                    case V_1_19_4:
+                    case V_1_19_3:
+                    case V_1_19_1:
+                    case V_1_19:
+                    case V_1_18_2:
+                    case V_1_17_1:
+                    case V_1_12_2:
+                    case V_1_8:
                         break;
 
                     default:
@@ -1226,7 +1235,7 @@ public class ClientBrand extends Check {
             // Checks if the player is using PvPLounge Client with an impossible version.
             // PvPLounge client only goes up to 1.8.9, so any version above that is invalid.
             if (payloadType.name.equals("PvPLounge Client")
-                    && playerVersion.isNewerThan(ClientVersion.v_1_8_9)) {
+                    && playerVersion.isNewerThan(ClientVersion.V_1_8)) {
                 KickUtil.kickPlayer(player, event, "Impossible PvPLounge Client Version: " + versionName,
                         "&cYour PvPLounge Client version is not compatible with this server.");
                 return;
@@ -1236,21 +1245,21 @@ public class ClientBrand extends Check {
             if (payloadType.name.equals("LabyMod")) {
                 switch (playerVersion) {
                     case HIGHER_THAN_SUPPORTED_VERSIONS:
-                    case v_1_21_4:
-                    case v_1_21_3:
-                    case v_1_21_1:
-                    case v_1_20_6:
-                    case v_1_20_4:
-                    case v_1_20_2:
-                    case v_1_20_1:
-                    case v_1_19_4:
-                    case v_1_19_3:
-                    case v_1_19_2:
-                    case v_1_18_2:
-                    case v_1_17_1:
-                    case v_1_16_5:
-                    case v_1_12_2:
-                    case v_1_8_9:
+                    case V_1_21_4:
+                    case V_1_21_2:
+                    case V_1_21:
+                    case V_1_20_5:
+                    case V_1_20_3:
+                    case V_1_20_2:
+                    case V_1_20:
+                    case V_1_19_4:
+                    case V_1_19_3:
+                    case V_1_19_1:
+                    case V_1_18_2:
+                    case V_1_17_1:
+                    case V_1_16_4:
+                    case V_1_12_2:
+                    case V_1_8:
                         break;
 
                     default:
@@ -1265,23 +1274,23 @@ public class ClientBrand extends Check {
                 switch (playerVersion) {
                     case HIGHER_THAN_SUPPORTED_VERSIONS:
                     case LOWER_THAN_SUPPORTED_VERSIONS:
-                    case v_1_21_4:
-                    case v_1_21_3:
-                    case v_1_21_1:
-                    case v_1_20_6:
-                    case v_1_20_4:
-                    case v_1_20_2:
-                    case v_1_20_1:
-                    case v_1_19_4:
-                    case v_1_19_3:
-                    case v_1_19_2:
-                    case v_1_19:
-                    case v_1_18_2:
-                    case v_1_18_1:
-                    case v_1_17_1:
-                    case v_1_16_5:
-                    case v_1_12_2:
-                    case v_1_8_9:
+                    case V_1_21_4:
+                    case V_1_21_2:
+                    case V_1_21:
+                    case V_1_20_5:
+                    case V_1_20_3:
+                    case V_1_20_2:
+                    case V_1_20:
+                    case V_1_19_4:
+                    case V_1_19_3:
+                    case V_1_19_1:
+                    case V_1_19:
+                    case V_1_18_2:
+                    case V_1_18:
+                    case V_1_17_1:
+                    case V_1_16_4:
+                    case V_1_12_2:
+                    case V_1_8:
                         break;
 
                     default:
@@ -1295,15 +1304,15 @@ public class ClientBrand extends Check {
             if (payloadType.name.equals("Badlion Client")) {
                 switch (playerVersion) {
                     case HIGHER_THAN_SUPPORTED_VERSIONS:
-                    case v_1_21_4:
-                    case v_1_21_3:
-                    case v_1_21_1:
-                    case v_1_20_4:
-                    case v_1_20_1:
-                    case v_1_19_4:
-                    case v_1_16_5:
-                    case v_1_12_2:
-                    case v_1_8_9:
+                    case V_1_21_4:
+                    case V_1_21_2:
+                    case V_1_21:
+                    case V_1_20_3:
+                    case V_1_20:
+                    case V_1_19_4:
+                    case V_1_16_4:
+                    case V_1_12_2:
+                    case V_1_8:
                         break;
 
                     default:
@@ -1323,12 +1332,14 @@ public class ClientBrand extends Check {
      * @param data            The data to check.
      */
     private void validateAndProcessPayload(@NotNull Iterable<PayloadType> payloadTypeList,
-                                           CancellableEvent event, String data, @NotNull DataType dataType) {
+                                           @NotNull CancellableEvent event,
+                                           @NotNull String data,
+                                           @NotNull DataType dataType) {
         String playerName = player.getName();
-        String dataTypeName = dataType.getName();
+        @NotNull String dataTypeName = dataType.getName();
 
         // Checks if the data is present in the payload type list.
-        for (PayloadType payloadType : payloadTypeList) {
+        for (@NotNull PayloadType payloadType : payloadTypeList) {
             if (payloadType.data.equals(data)) {
                 // If the payload is blocked, kick the player.
                 if (payloadType.isBlocked()) {

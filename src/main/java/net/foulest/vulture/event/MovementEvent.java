@@ -17,26 +17,23 @@
  */
 package net.foulest.vulture.event;
 
+import com.github.retrooper.packetevents.event.CancellableEvent;
+import com.github.retrooper.packetevents.protocol.world.Location;
+import com.github.retrooper.packetevents.util.Vector3d;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import net.foulest.packetevents.event.eventtypes.CancellableEvent;
-import net.foulest.packetevents.event.eventtypes.CancellableNMSPacketEvent;
-import net.foulest.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
-import net.foulest.packetevents.utils.vector.Vector3d;
 import net.foulest.vulture.data.PlayerData;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 @Data
 @AllArgsConstructor
 public class MovementEvent implements CancellableEvent {
 
-    public final PlayerData playerData;
-    public final WrappedPacketInFlying to;
-    public final WrappedPacketInFlying from;
-    public final CancellableNMSPacketEvent event;
+    public final @NotNull PlayerData playerData;
+    public final @NotNull WrapperPlayClientPlayerFlying to;
+    public final @NotNull WrapperPlayClientPlayerFlying from;
+    public final @NotNull CancellableEvent event;
 
     @Override
     public boolean isCancelled() {
@@ -54,7 +51,7 @@ public class MovementEvent implements CancellableEvent {
      * @return The change in X.
      */
     private double getDeltaX() {
-        return to.getPosition().getX() - from.getPosition().getX();
+        return to.getLocation().getPosition().getX() - from.getLocation().getPosition().getX();
     }
 
     /**
@@ -63,7 +60,7 @@ public class MovementEvent implements CancellableEvent {
      * @return The change in Y.
      */
     public double getDeltaY() {
-        return to.getPosition().getY() - from.getPosition().getY();
+        return to.getLocation().getPosition().getY() - from.getLocation().getPosition().getY();
     }
 
     /**
@@ -72,7 +69,7 @@ public class MovementEvent implements CancellableEvent {
      * @return The change in Z.
      */
     private double getDeltaZ() {
-        return to.getPosition().getZ() - from.getPosition().getZ();
+        return to.getLocation().getPosition().getZ() - from.getLocation().getPosition().getZ();
     }
 
     /**
@@ -92,37 +89,8 @@ public class MovementEvent implements CancellableEvent {
      * @return Whether the player is teleporting.
      */
     public boolean isTeleport(@NotNull PlayerData playerData) {
-        Vector3d toPosition = to.getPosition();
-        return playerData.isTeleporting(toPosition);
-    }
-
-    /**
-     * Gets the player's to location.
-     *
-     * @return The player's to location.
-     */
-    public Location getToLocation() {
-        Player player = playerData.getPlayer();
-        World world = player.getWorld();
-        Vector3d toPosition = to.getPosition();
-        double x = toPosition.getX();
-        double y = toPosition.getY();
-        double z = toPosition.getZ();
-        return new Location(world, x, y, z);
-    }
-
-    /**
-     * Gets the player's from location.
-     *
-     * @return The player's from location.
-     */
-    public Location getFromLocation() {
-        Player player = playerData.getPlayer();
-        World world = player.getWorld();
-        Vector3d fromPosition = from.getPosition();
-        double x = fromPosition.getX();
-        double y = fromPosition.getY();
-        double z = fromPosition.getZ();
-        return new Location(world, x, y, z);
+        @NotNull Location toPosition = to.getLocation();
+        Vector3d position = toPosition.getPosition();
+        return playerData.isTeleporting(position);
     }
 }

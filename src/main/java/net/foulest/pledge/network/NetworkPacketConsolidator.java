@@ -27,6 +27,7 @@ import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import lombok.ToString;
 import net.foulest.pledge.packet.PacketFiltering;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
@@ -41,7 +42,7 @@ public class NetworkPacketConsolidator extends ChannelOutboundHandlerAdapter {
 
     @Override
     @SuppressWarnings("ProhibitedExceptionDeclared")
-    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+    public void write(ChannelHandlerContext ctx, @NotNull Object msg, @NotNull ChannelPromise promise) throws Exception {
         // Start with login packet in game state
         if (PacketFiltering.isLoginPacket(msg)) {
             started = true;
@@ -64,7 +65,7 @@ public class NetworkPacketConsolidator extends ChannelOutboundHandlerAdapter {
         open = false;
     }
 
-    public void drain(ChannelHandlerContext ctx) {
+    public void drain(@NotNull ChannelHandlerContext ctx) {
         while (!messageQueue.isEmpty()) {
             NetworkMessage message = messageQueue.poll();
             ctx.write(message.getMessage(), message.getPromise());

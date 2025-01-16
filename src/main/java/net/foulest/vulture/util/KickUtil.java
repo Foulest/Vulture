@@ -17,11 +17,9 @@
  */
 package net.foulest.vulture.util;
 
-import io.netty.channel.Channel;
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.CancellableEvent;
 import lombok.Data;
-import net.foulest.packetevents.PacketEvents;
-import net.foulest.packetevents.event.eventtypes.CancellableEvent;
-import net.foulest.packetevents.packetwrappers.play.out.kickdisconnect.WrappedPacketOutKickDisconnect;
 import net.foulest.vulture.Vulture;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -42,67 +40,86 @@ public class KickUtil {
 
     private static final Set<UUID> currentlyKicking = ConcurrentHashMap.newKeySet();
 
-    public static void kickPlayer(Player player, String debugMessage) {
+    public static void kickPlayer(@NotNull Player player,
+                                  @NotNull String debugMessage) {
         kick(player, debugMessage, "Disconnected", true);
     }
 
-    public static void kickPlayer(Player player, String debugMessage, String reason) {
+    public static void kickPlayer(@NotNull Player player,
+                                  @NotNull String debugMessage,
+                                  @NotNull String reason) {
         kick(player, debugMessage, reason, true);
     }
 
-    public static void kickPlayer(Player player, @NotNull Cancellable event,
-                                  String debugMessage, String reason) {
+    public static void kickPlayer(@NotNull Player player,
+                                  @NotNull Cancellable event,
+                                  @NotNull String debugMessage,
+                                  @NotNull String reason) {
         event.setCancelled(true);
         kick(player, debugMessage, reason, true);
     }
 
-    public static void kickPlayer(Player player, @NotNull Cancellable event,
-                                  String debugMessage) {
+    public static void kickPlayer(@NotNull Player player,
+                                  @NotNull Cancellable event,
+                                  @NotNull String debugMessage) {
         event.setCancelled(true);
         kick(player, debugMessage, "Disconnected", true);
     }
 
-    public static void kickPlayer(Player player, Cancellable event,
-                                  boolean valueToCheck, String debugMessage) {
+    public static void kickPlayer(@NotNull Player player,
+                                  @NotNull Cancellable event,
+                                  boolean valueToCheck,
+                                  @NotNull String debugMessage) {
         if (valueToCheck) {
             event.setCancelled(true);
             kick(player, debugMessage, "Disconnected", true);
         }
     }
 
-    public static void kickPlayer(Player player, @NotNull CancellableEvent event,
-                                  String debugMessage, String reason) {
+    public static void kickPlayer(@NotNull Player player,
+                                  @NotNull CancellableEvent event,
+                                  @NotNull String debugMessage,
+                                  @NotNull String reason) {
         event.setCancelled(true);
         kick(player, debugMessage, reason, true);
     }
 
-    public static void kickPlayer(Player player, @NotNull CancellableEvent event,
-                                  String debugMessage) {
+    public static void kickPlayer(@NotNull Player player,
+                                  @NotNull CancellableEvent event,
+                                  @NotNull String debugMessage) {
         event.setCancelled(true);
         kick(player, debugMessage, "Disconnected", true);
     }
 
-    public static void kickPlayer(Player player, CancellableEvent event,
-                                  boolean valueToCheck, String debugMessage) {
+    public static void kickPlayer(@NotNull Player player,
+                                  @NotNull CancellableEvent event,
+                                  boolean valueToCheck,
+                                  @NotNull String debugMessage) {
         if (valueToCheck) {
             event.setCancelled(true);
             kick(player, debugMessage, "Disconnected", true);
         }
     }
 
-    public static void kickPlayer(Player player, String debugMessage, boolean announceKick) {
+    public static void kickPlayer(@NotNull Player player,
+                                  @NotNull String debugMessage,
+                                  boolean announceKick) {
         kick(player, debugMessage, "Disconnected", announceKick);
     }
 
-    public static void kickPlayer(Player player, String debugMessage,
-                                  boolean valueToCheck, boolean announceKick) {
+    public static void kickPlayer(@NotNull Player player,
+                                  @NotNull String debugMessage,
+                                  boolean valueToCheck,
+                                  boolean announceKick) {
         if (valueToCheck) {
             kick(player, debugMessage, "Disconnected", announceKick);
         }
     }
 
-    public static void kickPlayer(Player player, String debugMessage,
-                                  String reason, boolean announceKick) {
+    public static void kickPlayer(@NotNull Player player,
+                                  @NotNull String debugMessage,
+                                  @NotNull String reason,
+                                  boolean announceKick) {
         kick(player, debugMessage, reason, announceKick);
     }
 
@@ -114,8 +131,9 @@ public class KickUtil {
      */
     @SuppressWarnings("NestedMethodCall")
     private static void kick(@NotNull Player player,
-                             String debugMessage,
-                             String reason, boolean announceKick) {
+                             @NotNull String debugMessage,
+                             @NotNull String reason,
+                             boolean announceKick) {
         UUID uniqueId = player.getUniqueId();
 
         // Use atomic operations on ConcurrentHashMap keySet
@@ -141,20 +159,11 @@ public class KickUtil {
 
                 // If the player is still online, forcefully terminate their connection.
                 if (player.isOnline()) {
-                    // Forcefully terminate the player's connection.
-                    if (Vulture.getInstance().getPledge().getChannel(player).isPresent()) {
-                        Channel channel = Vulture.getInstance().getPledge().getChannel(player).get();
-                        channel.disconnect(); // Disconnect the player
-                        channel.close(); // Close the channel
-                    } else {
-                        // The player's pledge channel is not present... what?
-                        // Kick them using raw packets instead.
-                        PacketEvents.getInstance().getPlayerUtils().sendPacket(player, new WrappedPacketOutKickDisconnect(reason));
-                    }
+                    PacketEvents.getAPI().getPlayerManager().getUser(player).closeConnection();
                 }
 
                 // Run the task later to avoid kicking the player multiple times.
-                TaskUtil.runTaskLater(() -> currentlyKicking.remove(uniqueId), 10L);
+                TaskUtil.runTaskLater(() -> currentlyKicking.remove(uniqueId), 20L);
             });
         } else {
             currentlyKicking.remove(uniqueId);

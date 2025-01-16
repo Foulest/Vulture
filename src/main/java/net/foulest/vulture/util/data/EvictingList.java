@@ -73,7 +73,7 @@ public class EvictingList<T> extends LinkedList<T> {
             return false;
         }
 
-        EvictingList<?> list = (EvictingList<?>) o;
+        @NotNull EvictingList<?> list = (EvictingList<?>) o;
         return maxSize == list.maxSize && super.equals(list);
     }
 

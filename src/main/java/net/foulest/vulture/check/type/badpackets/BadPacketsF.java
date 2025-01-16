@@ -17,17 +17,18 @@
  */
 package net.foulest.vulture.check.type.badpackets;
 
-import net.foulest.packetevents.event.eventtypes.CancellableNMSPacketEvent;
-import net.foulest.packetevents.packettype.PacketType;
-import net.foulest.packetevents.packetwrappers.NMSPacket;
+import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
+import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.util.KickUtil;
+import org.jetbrains.annotations.NotNull;
 
-@CheckInfo(name = "BadPackets (F)", type = CheckType.BADPACKETS,
-        acceptsServerPackets = true, punishable = false,
+@CheckInfo(name = "BadPackets (F)", type = CheckType.BADPACKETS, punishable = false,
         description = "Detects sending invalid UpdateSign packets.")
 public class BadPacketsF extends Check {
 
@@ -35,29 +36,25 @@ public class BadPacketsF extends Check {
     private boolean sentSignEditor;
     private boolean sentBlockChange;
 
-    public BadPacketsF(PlayerData playerData) throws ClassNotFoundException {
+    public BadPacketsF(@NotNull PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(CancellableNMSPacketEvent event, byte packetId,
-                       NMSPacket nmsPacket, Object packet, long timestamp) {
-        if (packetId == PacketType.Play.Server.OPEN_SIGN_EDITOR) {
-            sentSignEditor = true;
-            sentBlockChange = false;
+    public void handle(@NotNull PacketPlayReceiveEvent event) {
+        PacketTypeCommon packetType = event.getPacketType();
 
-        } else if (packetId == PacketType.Play.Server.BLOCK_CHANGE) {
-            sentBlockChange = true;
-            sentSignEditor = false;
-
-        } else if (packetId == PacketType.Play.Client.UPDATE_SIGN) {
+        if (packetType == PacketType.Play.Client.UPDATE_SIGN) {
             if (!sentSignEditor) {
                 KickUtil.kickPlayer(player, event, "BadPackets (F) | Sent UpdateSign packet without SignEditor");
             }
 
             sentUpdateSign = true;
 
-        } else if (PacketType.Play.Client.Util.isInstanceOfFlying(packetId)) {
+        } else if (packetType == PacketType.Play.Client.PLAYER_FLYING
+                || packetType == PacketType.Play.Client.PLAYER_POSITION
+                || packetType == PacketType.Play.Client.PLAYER_ROTATION
+                || packetType == PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION) {
             if (sentUpdateSign && !sentBlockChange) {
                 KickUtil.kickPlayer(player, event, "BadPackets (F) | Sent UpdateSign packet without BlockChange");
             }
@@ -65,6 +62,20 @@ public class BadPacketsF extends Check {
             sentUpdateSign = false;
             sentSignEditor = false;
             sentBlockChange = false;
+        }
+    }
+
+    @Override
+    public void handle(@NotNull PacketPlaySendEvent event) {
+        PacketTypeCommon packetType = event.getPacketType();
+
+        if (packetType == PacketType.Play.Server.OPEN_SIGN_EDITOR) {
+            sentSignEditor = true;
+            sentBlockChange = false;
+
+        } else if (packetType == PacketType.Play.Server.BLOCK_CHANGE) {
+            sentBlockChange = true;
+            sentSignEditor = false;
         }
     }
 }

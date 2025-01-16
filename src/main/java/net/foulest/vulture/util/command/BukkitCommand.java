@@ -22,6 +22,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -95,8 +96,8 @@ class BukkitCommand extends org.bukkit.command.Command {
     @Override
     public @NotNull List<String> tabComplete(@NotNull CommandSender sender,
                                              @NotNull String alias,
-                                             String[] args) {
-        List<String> completions = null;
+                                             String @NotNull [] args) {
+        @Nullable List<String> completions = null;
 
         if (completer != null) {
             completions = completer.onTabComplete(sender, this, alias, args);

@@ -3,3 +3,4 @@ version: ${project.version}
 main: net.foulest.vulture.Vulture
 author: Foulest
 load: POSTWORLD
+depend: [ packetevents ]

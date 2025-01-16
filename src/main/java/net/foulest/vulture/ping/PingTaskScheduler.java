@@ -18,6 +18,7 @@
 package net.foulest.vulture.ping;
 
 import lombok.Data;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayDeque;
@@ -43,15 +44,15 @@ public class PingTaskScheduler {
      *
      * @param task - Runnable to schedule
      */
-    public void scheduleTask(PingTask task) {
+    public void scheduleTask(@NotNull PingTask task) {
         // The client can also respond to the start ping before
         // the end ping is sent, meaning tasks should already start
         if (runningTaskQueue != null && runningTaskQueue.equals(schedulingTaskQueue)) {
             task.onStart();
         }
 
+        // Create a new queue for the next tick
         if (schedulingTaskQueue == null) {
-            // Create a new queue for the next tick
             schedulingTaskQueue = new ArrayDeque<>();
         }
 

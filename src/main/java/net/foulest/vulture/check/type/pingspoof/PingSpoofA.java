@@ -17,54 +17,44 @@
  */
 package net.foulest.vulture.check.type.pingspoof;
 
-import net.foulest.packetevents.event.eventtypes.CancellableNMSPacketEvent;
-import net.foulest.packetevents.packettype.PacketType;
-import net.foulest.packetevents.packetwrappers.NMSPacket;
-import net.foulest.packetevents.utils.player.ClientVersion;
+import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
+import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientWindowConfirmation;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWindowConfirmation;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.util.KickUtil;
+import net.foulest.vulture.util.data.Pair;
+import org.jetbrains.annotations.NotNull;
 
-@CheckInfo(name = "PingSpoof (A)", type = CheckType.PINGSPOOF,
-        acceptsServerPackets = true, punishable = false,
+import java.util.AbstractQueue;
+import java.util.Comparator;
+import java.util.PriorityQueue;
+
+@CheckInfo(name = "PingSpoof (A)", type = CheckType.PINGSPOOF, punishable = false,
         description = "Detects clients modifying Transaction packets.")
 public class PingSpoofA extends Check {
 
-    //    private final EvictingList<Pair<Short, Long>> transactionsOut = new EvictingList<>(1000);
+    private final AbstractQueue<Pair<Short, Long>> transactionsOut = new PriorityQueue<>(100, Comparator.comparingLong(Pair::getLast));
+
     private int transactionsInCount;
     private int transactionsOutCount;
 
-    public PingSpoofA(PlayerData playerData) throws ClassNotFoundException {
+    public PingSpoofA(@NotNull PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(CancellableNMSPacketEvent event, byte packetId,
-                       NMSPacket nmsPacket, Object packet, long timestamp) {
-        if (packetId == PacketType.Play.Server.TRANSACTION) {
-//            WrappedPacketOutTransaction transaction = new WrappedPacketOutTransaction(nmsPacket);
-//            short actionNumber = transaction.getActionNumber();
+    public void handle(@NotNull PacketPlayReceiveEvent event) {
+        PacketTypeCommon packetType = event.getPacketType();
 
-            // Adds the Transaction packet sent by the server.
-//            transactionsOut.add(new Pair<>(actionNumber, timestamp));
-            transactionsOutCount++;
-
-            // If the client might be cancelling sending Transaction packets, kick them.
-            // The cancelling streak threshold is 385, which roughly equates to 10 seconds.
-            if (transactionsOutCount - transactionsInCount >= 385) {
-                if (!playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8_9)) {
-                    return;
-                }
-
-                transactionsOutCount = 0; // Resets the count to avoid kicking players twice.
-                KickUtil.kickPlayer(player, event, "Might be cancelling sending Transaction packets");
-            }
-
-        } else if (packetId == PacketType.Play.Client.TRANSACTION) {
-//            WrappedPacketInTransaction transaction = new WrappedPacketInTransaction(nmsPacket);
-//            short actionNumber = transaction.getActionNumber();
+        if (packetType == PacketType.Play.Client.WINDOW_CONFIRMATION) {
+            @NotNull WrapperPlayClientWindowConfirmation transaction = new WrapperPlayClientWindowConfirmation(event);
+            short actionId = transaction.getActionId();
 
             // Increments the count of Transaction packets received.
             transactionsInCount++;
@@ -72,25 +62,31 @@ public class PingSpoofA extends Check {
             // If the client has sent more Transaction packets than received, kick them.
             if (transactionsInCount - transactionsOutCount > 1) {
                 KickUtil.kickPlayer(player, event, "Sent more Transaction packets than received");
-//                return;
+                return;
             }
 
-//            // If the client has sent a Transaction packet that was not sent by the server, kick them.
-//            if (transactionsOut.stream().map(Pair::getFirst).noneMatch(first -> first == actionNumber)) {
-//                if (playerData.getTicksSince(ActionType.LOGIN) < 20
-//                        || playerData.getTicksSince(ActionType.RESPAWN) < 20
-//                        || playerData.getTicksSince(ActionType.TELEPORT) < 20) {
-//                    return;
-//                }
-//
-//                KickUtil.kickPlayer(player, event, "Sent a Transaction packet that was not sent by the server: " + actionNumber);
-//            } else {
-//                // Remove the Transaction packet sent by the server.
-//                transactionsOut.removeIf(pair -> {
-//                    Short first = pair.getFirst();
-//                    return first == actionNumber;
-//                });
-//            }
+            // Remove the Transaction packet sent by the server.
+            if (transactionsOut.stream().map(Pair::getFirst).anyMatch(first -> first == actionId)) {
+                transactionsOut.removeIf(pair -> {
+                    @NotNull Short first = pair.getFirst();
+                    return first == actionId;
+                });
+            }
+        }
+    }
+
+    @Override
+    public void handle(@NotNull PacketPlaySendEvent event) {
+        PacketTypeCommon packetType = event.getPacketType();
+        long timestamp = event.getTimestamp();
+
+        if (packetType == PacketType.Play.Server.WINDOW_CONFIRMATION) {
+            @NotNull WrapperPlayServerWindowConfirmation transaction = new WrapperPlayServerWindowConfirmation(event);
+            short actionId = transaction.getActionId();
+
+            // Adds the Transaction packet sent by the server.
+            transactionsOut.add(new Pair<>(actionId, timestamp));
+            transactionsOutCount++;
         }
     }
 }

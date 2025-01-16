@@ -17,11 +17,12 @@
  */
 package net.foulest.vulture.check.type.pingspoof;
 
-import net.foulest.packetevents.event.eventtypes.CancellableNMSPacketEvent;
-import net.foulest.packetevents.packettype.PacketType;
-import net.foulest.packetevents.packetwrappers.NMSPacket;
-import net.foulest.packetevents.packetwrappers.play.in.keepalive.WrappedPacketInKeepAlive;
-import net.foulest.packetevents.packetwrappers.play.out.keepalive.WrappedPacketOutKeepAlive;
+import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
+import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientKeepAlive;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerKeepAlive;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
@@ -30,9 +31,9 @@ import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.util.KickUtil;
 import net.foulest.vulture.util.data.EvictingList;
 import net.foulest.vulture.util.data.Pair;
+import org.jetbrains.annotations.NotNull;
 
-@CheckInfo(name = "PingSpoof (B)", type = CheckType.PINGSPOOF,
-        acceptsServerPackets = true, punishable = false,
+@CheckInfo(name = "PingSpoof (B)", type = CheckType.PINGSPOOF, punishable = false,
         description = "Detects clients modifying KeepAlive packets.")
 public class PingSpoofB extends Check {
 
@@ -47,35 +48,23 @@ public class PingSpoofB extends Check {
     public static long maxAveragePing;
     public static long maxPingDeviation;
 
-    public PingSpoofB(PlayerData playerData) throws ClassNotFoundException {
+    public PingSpoofB(@NotNull PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
     @SuppressWarnings("NestedMethodCall")
-    public void handle(CancellableNMSPacketEvent event, byte packetId,
-                       NMSPacket nmsPacket, Object packet, long timestamp) {
+    public void handle(@NotNull PacketPlayReceiveEvent event) {
+        PacketTypeCommon packetType = event.getPacketType();
+
         long timeSinceRespawn = playerData.getTicksSince(ActionType.RESPAWN);
         long timeSinceTeleport = playerData.getTicksSince(ActionType.TELEPORT);
         long timeSinceLogin = playerData.getTicksSince(ActionType.LOGIN);
 
-        if (packetId == PacketType.Play.Server.KEEP_ALIVE) {
-            WrappedPacketOutKeepAlive keepAlive = new WrappedPacketOutKeepAlive(nmsPacket);
-            long id = keepAlive.getId();
-
-            // Adds the KeepAlive packet sent by the server.
-            keepAliveOut.add(new Pair<>(id, timestamp));
-            keepAliveOutCount++;
-
-            // If the client might be cancelling sending KeepAlive packets, kick them.
-            if (keepAliveOutCount - keepAliveInCount >= 4 && !player.isDead()
-                    && timeSinceLogin > 20000L && timeSinceRespawn > 1000L && timeSinceTeleport > 1000L) {
-                KickUtil.kickPlayer(player, event, "Might be cancelling sending KeepAlive packets");
-            }
-
-        } else if (packetId == PacketType.Play.Client.KEEP_ALIVE) {
-            WrappedPacketInKeepAlive keepAlive = new WrappedPacketInKeepAlive(nmsPacket);
+        if (packetType == PacketType.Play.Client.KEEP_ALIVE) {
+            @NotNull WrapperPlayClientKeepAlive keepAlive = new WrapperPlayClientKeepAlive(event);
             long keepAliveId = keepAlive.getId();
+            long timestamp = System.currentTimeMillis();
 
             // Increments the count of KeepAlive packets received.
             keepAliveInCount++;
@@ -141,10 +130,35 @@ public class PingSpoofB extends Check {
                 } else {
                     // Remove the KeepAlive packet sent by the server.
                     keepAliveOut.removeIf(pair -> {
-                        Long first = pair.getFirst();
+                        @NotNull Long first = pair.getFirst();
                         return first == keepAliveId;
                     });
                 }
+            }
+        }
+    }
+
+    @Override
+    public void handle(@NotNull PacketPlaySendEvent event) {
+        PacketTypeCommon packetType = event.getPacketType();
+
+        long timeSinceRespawn = playerData.getTicksSince(ActionType.RESPAWN);
+        long timeSinceTeleport = playerData.getTicksSince(ActionType.TELEPORT);
+        long timeSinceLogin = playerData.getTicksSince(ActionType.LOGIN);
+
+        if (packetType == PacketType.Play.Server.KEEP_ALIVE) {
+            @NotNull WrapperPlayServerKeepAlive keepAlive = new WrapperPlayServerKeepAlive(event);
+            long keepAliveId = keepAlive.getId();
+            long timestamp = System.currentTimeMillis();
+
+            // Adds the KeepAlive packet sent by the server.
+            keepAliveOut.add(new Pair<>(keepAliveId, timestamp));
+            keepAliveOutCount++;
+
+            // If the client might be cancelling sending KeepAlive packets, kick them.
+            if (keepAliveOutCount - keepAliveInCount >= 4 && !player.isDead()
+                    && timeSinceLogin > 20000L && timeSinceRespawn > 1000L && timeSinceTeleport > 1000L) {
+                KickUtil.kickPlayer(player, event, "Might be cancelling sending KeepAlive packets");
             }
         }
     }

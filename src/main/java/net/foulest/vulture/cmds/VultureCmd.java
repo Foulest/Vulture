@@ -17,10 +17,9 @@
  */
 package net.foulest.vulture.cmds;
 
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import lombok.Data;
-import net.foulest.packetevents.PacketEvents;
-import net.foulest.packetevents.utils.player.ClientVersion;
-import net.foulest.packetevents.utils.player.PlayerUtils;
 import net.foulest.vulture.Vulture;
 import net.foulest.vulture.check.type.clientbrand.type.DataType;
 import net.foulest.vulture.check.type.clientbrand.type.ModType;
@@ -38,6 +37,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -80,7 +80,7 @@ public class VultureCmd {
                     return;
                 }
 
-                Player player = args.getPlayer();
+                @Nullable Player player = args.getPlayer();
 
                 if (player == null) {
                     MessageUtil.messagePlayer(sender, "&cOnly players can use this command.");
@@ -131,7 +131,7 @@ public class VultureCmd {
                     return;
                 }
 
-                Player player = args.getPlayer();
+                @Nullable Player player = args.getPlayer();
 
                 if (player == null) {
                     MessageUtil.messagePlayer(sender, "&cOnly players can use this command.");
@@ -166,14 +166,11 @@ public class VultureCmd {
                     return;
                 }
 
-                PacketEvents packetEvents = Vulture.instance.getPacketEvents();
-                PlayerUtils playerUtils = packetEvents.getPlayerUtils();
-
                 PlayerData targetData = PlayerDataManager.getPlayerData(target);
                 String targetName = target.getName();
-                ClientVersion targetVersion = targetData.getVersion();
-                String versionName = targetVersion.getDisplayName();
-                int targetPing = playerUtils.getPing(target);
+                @NotNull ClientVersion targetVersion = targetData.getVersion();
+                String versionName = targetVersion.getReleaseName();
+                int targetPing = PacketEvents.getAPI().getPlayerManager().getPing(target);
 
                 MessageUtil.messagePlayer(sender, "");
                 MessageUtil.messagePlayer(sender, "&e" + targetName + "'s Info");
@@ -184,20 +181,20 @@ public class VultureCmd {
                     MessageUtil.messagePlayer(sender, "");
                     MessageUtil.messagePlayer(sender, "&fPayloads (" + targetData.getPayloads().size() + "):");
 
-                    StringBuilder payloadBuilder = new StringBuilder();
+                    @NotNull StringBuilder payloadBuilder = new StringBuilder();
                     payloadBuilder.append("&7* ");
 
-                    for (PayloadType payloadType : targetData.getPayloads()) {
+                    for (@NotNull PayloadType payloadType : targetData.getPayloads()) {
                         String payloadName = payloadType.getName();
                         DataType dataType = payloadType.getDataType();
-                        String dataTypeName = dataType.getName();
+                        @NotNull String dataTypeName = dataType.getName();
 
                         payloadBuilder.append("&e").append(payloadName)
                                 .append(" &7(").append(dataTypeName).append(")&f, ");
                     }
 
                     // Trim the last comma and space.
-                    String payloads = payloadBuilder.toString().trim();
+                    @NotNull String payloads = payloadBuilder.toString().trim();
                     payloads = payloads.substring(0, payloads.length() - 1);
 
                     MessageUtil.messagePlayer(sender, payloads);
@@ -207,16 +204,16 @@ public class VultureCmd {
                     MessageUtil.messagePlayer(sender, "");
                     MessageUtil.messagePlayer(sender, "&fMods (" + targetData.getMods().size() + "):");
 
-                    StringBuilder modBuilder = new StringBuilder();
+                    @NotNull StringBuilder modBuilder = new StringBuilder();
                     modBuilder.append("&7* ");
 
-                    for (ModType modType : targetData.getMods()) {
+                    for (@NotNull ModType modType : targetData.getMods()) {
                         modBuilder.append("&e").append(modType.getName())
                                 .append(" &7(").append(modType.getVersion()).append(")&f, ");
                     }
 
                     // Trim the last comma and space.
-                    String mods = modBuilder.toString().trim();
+                    @NotNull String mods = modBuilder.toString().trim();
                     mods = mods.substring(0, mods.length() - 1);
 
                     MessageUtil.messagePlayer(sender, mods);
@@ -244,14 +241,14 @@ public class VultureCmd {
                     return;
                 }
 
-                StringBuilder reasonBuilder = new StringBuilder();
+                @NotNull StringBuilder reasonBuilder = new StringBuilder();
 
                 for (int i = 2; i < args.length(); i++) {
                     String s = args.getArgs(i);
                     reasonBuilder.append(s).append(" ");
                 }
 
-                String reason = reasonBuilder.toString().trim();
+                @NotNull String reason = reasonBuilder.toString().trim();
                 KickUtil.kickPlayer(target, reason);
                 break;
             }
@@ -274,7 +271,7 @@ public class VultureCmd {
 
                 String playerName = args.getArgs(2);
                 Player target = Bukkit.getPlayer(playerName);
-                UUID targetUUID = null;
+                @Nullable UUID targetUUID = null;
 
                 if (target != null && target.isOnline()) {
                     targetUUID = target.getUniqueId();
@@ -293,7 +290,7 @@ public class VultureCmd {
                     break;
                 }
 
-                String ipAddress = null;
+                @Nullable String ipAddress = null;
 
                 if (args.length() == 4) {
                     // Validate the IP address.
@@ -310,7 +307,7 @@ public class VultureCmd {
                 switch (args.getArgs(1)) {
                     case "add":
                         if (ipAddress == null) {
-                            MessageUtil.messagePlayer(sender, "&cIP address is required when adding a whitelist entry.");
+                            MessageUtil.messagePlayer(sender, "&cAn IP address is required when adding a whitelist entry.");
                             return;
                         }
 
@@ -327,8 +324,8 @@ public class VultureCmd {
 
                         // Saves the new whitelist.
                         ConfigurationSection whitelistSectionAdd = Settings.config.createSection("vulture.ip-whitelist.whitelist");
-                        for (Map.Entry<UUID, List<String>> entry : Settings.ipWhitelist.entrySet()) {
-                            String uuidString = entry.getKey().toString();
+                        for (Map.@NotNull Entry<UUID, List<String>> entry : Settings.ipWhitelist.entrySet()) {
+                            @NotNull String uuidString = entry.getKey().toString();
                             List<String> ipString = entry.getValue();
                             whitelistSectionAdd.set(uuidString + ".ips", ipString);
                         }
@@ -372,8 +369,8 @@ public class VultureCmd {
 
                         // Saves the new whitelist.
                         ConfigurationSection whitelistSectionRemove = Settings.config.createSection("vulture.ip-whitelist.whitelist");
-                        for (Map.Entry<UUID, List<String>> entry : Settings.ipWhitelist.entrySet()) {
-                            String uuidString = entry.getKey().toString();
+                        for (Map.@NotNull Entry<UUID, List<String>> entry : Settings.ipWhitelist.entrySet()) {
+                            @NotNull String uuidString = entry.getKey().toString();
                             List<String> ipString = entry.getValue();
                             whitelistSectionRemove.set(uuidString + ".ips", ipString);
                         }
@@ -420,14 +417,14 @@ public class VultureCmd {
      * @param args   The command arguments
      */
     @SuppressWarnings("MethodMayBeStatic")
-    private void handleHelp(@NotNull CommandSender sender, CommandArgs args) {
+    private void handleHelp(@NotNull CommandSender sender, @NotNull CommandArgs args) {
         if (!sender.hasPermission("vulture.main")) {
             MessageUtil.messagePlayer(sender, ConstantUtil.NO_PERMISSION);
             return;
         }
 
         // A list of available commands with their usages.
-        List<String> commands = Arrays.asList(
+        @NotNull List<String> commands = Arrays.asList(
                 "&f/vulture alerts &7- Toggles alerts.",
                 "&f/vulture reload &7- Reloads the config.",
                 "&f/vulture info <player> &7- View player info.",

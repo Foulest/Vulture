@@ -28,12 +28,13 @@ import io.netty.channel.ChannelPromise;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import net.foulest.pledge.packet.PacketFiltering;
+import org.jetbrains.annotations.NotNull;
 
 @ToString
 @RequiredArgsConstructor
 public class MessageQueuePrimer extends ChannelOutboundHandlerAdapter {
 
-    private final MessageQueueHandler queueHandler;
+    private final @NotNull MessageQueueHandler queueHandler;
 
     @Override
     @SuppressWarnings("ProhibitedExceptionDeclared")
@@ -45,7 +46,7 @@ public class MessageQueuePrimer extends ChannelOutboundHandlerAdapter {
 
         // Let whitelisted packets pass through the queue
         if (PacketFiltering.isWhitelistedFromQueue(msg)) {
-            QueueMode lastMode = queueHandler.getMode();
+            @NotNull QueueMode lastMode = queueHandler.getMode();
             queueHandler.setMode(QueueMode.PASS);
 
             try {

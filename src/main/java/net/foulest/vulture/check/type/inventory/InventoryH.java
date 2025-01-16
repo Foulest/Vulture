@@ -17,16 +17,17 @@
  */
 package net.foulest.vulture.check.type.inventory;
 
-import net.foulest.packetevents.event.eventtypes.CancellableNMSPacketEvent;
-import net.foulest.packetevents.packettype.PacketType;
-import net.foulest.packetevents.packetwrappers.NMSPacket;
-import net.foulest.packetevents.packetwrappers.play.in.windowclick.WrappedPacketInWindowClick;
-import net.foulest.packetevents.utils.player.ClientVersion;
+import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.util.KickUtil;
+import org.jetbrains.annotations.NotNull;
 
 @CheckInfo(name = "Inventory (H)", type = CheckType.INVENTORY, punishable = false)
 public class InventoryH extends Check {
@@ -35,28 +36,29 @@ public class InventoryH extends Check {
     private int lastSlot;
     private int lastButton;
 
-    public InventoryH(PlayerData playerData) throws ClassNotFoundException {
+    public InventoryH(@NotNull PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(CancellableNMSPacketEvent event, byte packetId,
-                       NMSPacket nmsPacket, Object packet, long timestamp) {
+    public void handle(@NotNull PacketPlayReceiveEvent event) {
         // Checks the player for exemptions.
-        if (playerData.getVersion().isNewerThan(ClientVersion.v_1_8_9)) {
+        if (playerData.getVersion().isNewerThan(ClientVersion.V_1_8)) {
             return;
         }
 
-        if (packetId == PacketType.Play.Client.WINDOW_CLICK) {
-            WrappedPacketInWindowClick windowClick = new WrappedPacketInWindowClick(nmsPacket);
-            int windowSlot = windowClick.getWindowSlot();
-            int windowButton = windowClick.getWindowButton();
-            int windowId = windowClick.getWindowId();
-            int windowMode = windowClick.getMode();
+        PacketTypeCommon packetType = event.getPacketType();
 
-            if (windowId != 0 && windowMode == 2) {
+        if (packetType == PacketType.Play.Client.CLICK_WINDOW) {
+            @NotNull WrapperPlayClientClickWindow windowClick = new WrapperPlayClientClickWindow(event);
+            WrapperPlayClientClickWindow.WindowClickType clickType = windowClick.getWindowClickType();
+            int windowSlot = windowClick.getSlot();
+            int windowButton = windowClick.getButton();
+            int windowId = windowClick.getWindowId();
+
+            if (windowId != 0 && clickType == WrapperPlayClientClickWindow.WindowClickType.SWAP) {
                 if (pressed && lastSlot != windowSlot && lastButton == windowButton) {
-                    KickUtil.kickPlayer(player, event, "Inventory (H) | Invalid window mode slot |"
+                    KickUtil.kickPlayer(player, event, "Inventory (H) |"
                             + " (windowSlot=" + windowSlot
                             + " lastSlot=" + lastSlot
                             + " windowButton=" + windowButton
@@ -69,7 +71,10 @@ public class InventoryH extends Check {
             lastSlot = windowSlot;
             lastButton = windowButton;
 
-        } else if (PacketType.Play.Client.Util.isInstanceOfFlying(packetId)) {
+        } else if (packetType == PacketType.Play.Client.PLAYER_FLYING
+                || packetType == PacketType.Play.Client.PLAYER_POSITION
+                || packetType == PacketType.Play.Client.PLAYER_ROTATION
+                || packetType == PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION) {
             pressed = false;
         }
     }

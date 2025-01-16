@@ -32,19 +32,19 @@ public interface PingTask {
     } // Executes on second pong received
 
     @Contract(value = "_ -> new", pure = true)
-    static @NotNull PingTask start(Runnable runnable) {
+    static @NotNull PingTask start(@NotNull Runnable runnable) {
         return of(runnable, () -> {
         });
     }
 
     @Contract(value = "_ -> new", pure = true)
-    static @NotNull PingTask end(Runnable runnable) {
+    static @NotNull PingTask end(@NotNull Runnable runnable) {
         return of(() -> {
         }, runnable);
     }
 
     @Contract(value = "_, _ -> new", pure = true)
-    static @NotNull PingTask of(Runnable r1, Runnable r2) {
+    static @NotNull PingTask of(@NotNull Runnable r1, @NotNull Runnable r2) {
         return new PingTask() {
             @Override
             public void onStart() {

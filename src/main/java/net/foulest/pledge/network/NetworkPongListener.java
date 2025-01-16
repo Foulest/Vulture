@@ -31,13 +31,14 @@ import net.foulest.pledge.event.PongReceiveEvent;
 import net.foulest.pledge.packet.PingPacketProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 @ToString
 @RequiredArgsConstructor
 public class NetworkPongListener extends ChannelInboundHandlerAdapter {
 
-    private final PledgeImpl clientPing;
-    private final Player player;
+    private final @NotNull PledgeImpl clientPing;
+    private final @NotNull Player player;
 
     @Override
     @SuppressWarnings("ProhibitedExceptionDeclared")

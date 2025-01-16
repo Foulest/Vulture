@@ -17,10 +17,9 @@
  */
 package net.foulest.vulture.util.data;
 
+import com.github.retrooper.packetevents.util.Vector3d;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import net.foulest.packetevents.utils.vector.Vector3d;
-import net.foulest.packetevents.utils.vector.Vector2f;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -38,22 +37,14 @@ public class CustomLocation {
     }
 
     private void setPos(double x, double y, double z) {
-        if (pos == null) {
-            pos = new Vector3d();
-        }
-
-        pos.set(x, y, z);
+        pos = new Vector3d(x, y, z);
     }
 
     private void setRot(float yaw, float pitch) {
-        if (rot == null) {
-            rot = new Vector2f();
-        }
-
-        rot.set(yaw, pitch);
+        rot = new Vector2f(yaw, pitch);
     }
 
-    public CustomLocation set(double x, double y, double z, float yaw, float pitch) {
+    public @NotNull CustomLocation set(double x, double y, double z, float yaw, float pitch) {
         setPos(x, y, z);
         setRot(yaw, pitch);
         return this;
@@ -72,7 +63,7 @@ public class CustomLocation {
         setRot(x, y);
     }
 
-    public CustomLocation set(@NotNull CustomLocation location) {
+    public @NotNull CustomLocation set(@NotNull CustomLocation location) {
         setPos(location.pos != null ? location.pos : new Vector3d());
         setRot(location.rot != null ? location.rot : new Vector2f());
         return this;

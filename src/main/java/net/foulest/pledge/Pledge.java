@@ -92,7 +92,7 @@ public interface Pledge {
      * @param plugin - Plugin to register listeners under
      * @return - API instance
      */
-    static Pledge getOrCreate(@NotNull Plugin plugin) {
+    static @NotNull Pledge getOrCreate(@NotNull Plugin plugin) {
         if (PledgeImpl.instance == null) {
             PledgeImpl.instance = new PledgeImpl(plugin);
         }

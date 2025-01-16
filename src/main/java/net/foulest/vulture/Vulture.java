@@ -17,23 +17,24 @@
  */
 package net.foulest.vulture;
 
+import com.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
-import net.foulest.packetevents.PacketEvents;
 import net.foulest.pledge.Pledge;
 import net.foulest.pledge.pinger.ClientPinger;
 import net.foulest.pledge.pinger.ClientPingerListener;
 import net.foulest.vulture.cmds.VultureCmd;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.data.PlayerDataManager;
-import net.foulest.vulture.listeners.CommandListener;
-import net.foulest.vulture.listeners.ExploitListener;
-import net.foulest.vulture.listeners.ModDataListener;
-import net.foulest.vulture.listeners.PlayerDataListener;
-import net.foulest.vulture.processor.type.PacketDecodeProcessor;
-import net.foulest.vulture.processor.type.PacketReceiveProcessor;
-import net.foulest.vulture.processor.type.PacketSendProcessor;
+import net.foulest.vulture.listeners.bukkit.CommandListener;
+import net.foulest.vulture.listeners.bukkit.ExploitListener;
+import net.foulest.vulture.listeners.bukkit.ModDataListener;
+import net.foulest.vulture.listeners.bukkit.PlayerDataListener;
+import net.foulest.vulture.listeners.packets.PacketPreReceiveProcessor;
+import net.foulest.vulture.listeners.packets.PacketReceiveProcessor;
+import net.foulest.vulture.listeners.packets.PacketSendProcessor;
 import net.foulest.vulture.util.MessageUtil;
 import net.foulest.vulture.util.Settings;
 import net.foulest.vulture.util.command.CommandFramework;
@@ -58,10 +59,6 @@ public class Vulture extends JavaPlugin implements ClientPingerListener {
     public static Vulture instance;
     public Pledge pledge;
     public CommandFramework framework;
-    public PacketEvents packetEvents;
-    public PacketDecodeProcessor decodeProcessor;
-    public PacketReceiveProcessor receiveProcessor;
-    public PacketSendProcessor sendProcessor;
     public boolean debugMode;
 
     @Override
@@ -69,18 +66,30 @@ public class Vulture extends JavaPlugin implements ClientPingerListener {
         // Sets the instance.
         instance = this;
 
+        // Sets the PacketEvents API.
+        PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
+
         // Loads PacketEvents.
-        packetEvents = PacketEvents.create(this);
-        packetEvents.load();
+        PacketEvents.getAPI().load();
+
+        // Registers packet processors.
+        MessageUtil.log(Level.INFO, "Loading Packet Processors...");
+        PacketEvents.getAPI().getEventManager().registerListener(new PacketPreReceiveProcessor());
+        PacketEvents.getAPI().getEventManager().registerListener(new PacketReceiveProcessor());
+        PacketEvents.getAPI().getEventManager().registerListener(new PacketSendProcessor());
     }
 
     @Override
     @SneakyThrows
     public void onEnable() {
         // Kicks all online players.
-        for (Player player : Bukkit.getOnlinePlayers()) {
+        for (@NotNull Player player : Bukkit.getOnlinePlayers()) {
             player.kickPlayer("Disconnected");
         }
+
+        // Initializes PacketEvents.
+        MessageUtil.log(Level.INFO, "Loading PacketEvents...");
+        PacketEvents.getAPI().init();
 
         // Initializes Pledge.
         MessageUtil.log(Level.INFO, "Loading Pledge...");
@@ -88,19 +97,9 @@ public class Vulture extends JavaPlugin implements ClientPingerListener {
         ClientPinger pinger = pledge.createPinger(-1, -400);
         pinger.attach(this);
 
-        // Initializes PacketEvents.
-        MessageUtil.log(Level.INFO, "Loading PacketEvents...");
-        packetEvents.init();
-
         // Loads the plugin's settings.
         MessageUtil.log(Level.INFO, "Loading Settings...");
         Settings.loadSettings();
-
-        // Loads the plugin's commands.
-        MessageUtil.log(Level.INFO, "Loading Packet Processors...");
-        decodeProcessor = new PacketDecodeProcessor();
-        receiveProcessor = new PacketReceiveProcessor();
-        sendProcessor = new PacketSendProcessor();
 
         // Loads the plugin's listeners.
         MessageUtil.log(Level.INFO, "Loading Listeners...");
@@ -121,11 +120,11 @@ public class Vulture extends JavaPlugin implements ClientPingerListener {
     public void onDisable() {
         // Terminates PacketEvents.
         MessageUtil.log(Level.INFO, "Terminating PacketEvents...");
-        packetEvents.terminate();
+        PacketEvents.getAPI().terminate();
 
         // Saves all online players' player data.
         MessageUtil.log(Level.INFO, "Saving Player Data...");
-        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+        for (@NotNull Player player : Bukkit.getServer().getOnlinePlayers()) {
             PlayerDataManager.removePlayerData(player);
         }
 
@@ -149,7 +148,7 @@ public class Vulture extends JavaPlugin implements ClientPingerListener {
      * @param commands Command to load.
      */
     private void loadCommands(Object @NotNull ... commands) {
-        for (Object command : commands) {
+        for (@NotNull Object command : commands) {
             framework.registerCommands(command);
         }
     }
@@ -161,7 +160,7 @@ public class Vulture extends JavaPlugin implements ClientPingerListener {
      * @param id     - ID of ping
      */
     @Override
-    public void onPingSendStart(Player player, int id) {
+    public void onPingSendStart(@NotNull Player player, int id) {
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
         if (playerData != null) {
@@ -176,7 +175,7 @@ public class Vulture extends JavaPlugin implements ClientPingerListener {
      * @param id     - ID of ping
      */
     @Override
-    public void onPingSendEnd(Player player, int id) {
+    public void onPingSendEnd(@NotNull Player player, int id) {
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
         if (playerData != null) {
@@ -191,7 +190,7 @@ public class Vulture extends JavaPlugin implements ClientPingerListener {
      * @param id     - ID of ping
      */
     @Override
-    public void onPongReceiveStart(Player player, int id) {
+    public void onPongReceiveStart(@NotNull Player player, int id) {
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
         if (playerData != null) {
@@ -206,7 +205,7 @@ public class Vulture extends JavaPlugin implements ClientPingerListener {
      * @param id     - ID of ping
      */
     @Override
-    public void onPongReceiveEnd(Player player, int id) {
+    public void onPongReceiveEnd(@NotNull Player player, int id) {
         PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
         if (playerData != null) {

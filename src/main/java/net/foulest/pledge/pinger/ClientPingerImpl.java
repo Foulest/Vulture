@@ -45,7 +45,7 @@ public class ClientPingerImpl implements ClientPinger {
     protected final Map<Player, PingData> pingDataMap = new LinkedHashMap<>();
     protected final List<ClientPingerListener> pingListeners = new ArrayList<>();
 
-    protected final PledgeImpl api;
+    protected final @NotNull PledgeImpl api;
     protected final int startId;
     protected final int endId;
 
@@ -90,19 +90,19 @@ public class ClientPingerImpl implements ClientPinger {
         pingListeners.add(listener);
     }
 
-    public void registerPlayer(Player player) {
+    public void registerPlayer(@NotNull Player player) {
         if (playerFilter.test(player)) {
             injectPlayer(player);
             pingDataMap.put(player, new PingData(player, this));
         }
     }
 
-    public void unregisterPlayer(Player player) {
+    public void unregisterPlayer(@NotNull Player player) {
         pingDataMap.remove(player);
         ejectPlayer(player);
     }
 
-    protected void injectPlayer(Player player) {
+    protected void injectPlayer(@NotNull Player player) {
         api.getChannel(player).ifPresent(channel ->
                 ChannelUtils.runInEventLoop(channel,
                         () -> channel.pipeline().addLast("vulture_pledge_tick_consolidator", new NetworkPacketConsolidator())
@@ -110,7 +110,7 @@ public class ClientPingerImpl implements ClientPinger {
         );
     }
 
-    protected void ejectPlayer(Player player) {
+    protected void ejectPlayer(@NotNull Player player) {
         api.getChannel(player).ifPresent(channel ->
                 ChannelUtils.runInEventLoop(channel,
                         () -> channel.pipeline().remove(NetworkPacketConsolidator.class)
@@ -119,7 +119,7 @@ public class ClientPingerImpl implements ClientPinger {
     }
 
     // Note: Should run in channel event loop
-    protected void ping(Player player, @NotNull Channel channel, Ping ping) {
+    protected void ping(@NotNull Player player, @NotNull Channel channel, @NotNull Ping ping) {
         if (!channel.eventLoop().inEventLoop()) {
             throw new IllegalStateException("Tried to run ping outside event loop!");
         }
@@ -134,7 +134,7 @@ public class ClientPingerImpl implements ClientPinger {
     }
 
     // Fixes an NPE in the original code
-    public Optional<PingData> getPingData(Player player) {
+    public @NotNull Optional<PingData> getPingData(Player player) {
         return Optional.ofNullable(pingDataMap.get(player));
     }
 

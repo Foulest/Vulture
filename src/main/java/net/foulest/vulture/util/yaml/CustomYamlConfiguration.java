@@ -51,7 +51,7 @@ public class CustomYamlConfiguration extends YamlConfiguration {
      * @throws InvalidConfigurationException If the configuration is invalid.
      */
     @Override
-    public void loadFromString(String contents) throws InvalidConfigurationException {
+    public void loadFromString(@NotNull String contents) throws InvalidConfigurationException {
         super.loadFromString(contents); // Call the original method to load the data
 
         // Reset comments map to ensure it's clean on each load
@@ -67,14 +67,14 @@ public class CustomYamlConfiguration extends YamlConfiguration {
      * @return The YAML data as a String.
      */
     @Override
-    public String saveToString() {
+    public @NotNull String saveToString() {
         // Strip all comments from the original data
-        String dataWithoutComments = super.saveToString().trim();
+        @NotNull String dataWithoutComments = super.saveToString().trim();
 
         // Use a pattern to match YAML comments and remove them
-        String dataStrippedOfComments = dataWithoutComments.replaceAll("(?m)^\\s*#.*$", "").trim();
+        @NotNull String dataStrippedOfComments = dataWithoutComments.replaceAll("(?m)^\\s*#.*$", "").trim();
 
-        StringBuilder dataWithComments = new StringBuilder();
+        @NotNull StringBuilder dataWithComments = new StringBuilder();
 
         // Insert header comments
         String headerComment = commentsMap.getOrDefault("__header__", "");
@@ -85,28 +85,28 @@ public class CustomYamlConfiguration extends YamlConfiguration {
         }
 
         // Iterate through each line of the stripped YAML data to reinsert comments
-        String[] lines = dataStrippedOfComments.split("\n");
+        String @NotNull [] lines = dataStrippedOfComments.split("\n");
 
-        for (String line : lines) {
+        for (@NotNull String line : lines) {
             // Attempt to extract a key from the current line
-            String key = getKeyFromLine(line);
+            @Nullable String key = getKeyFromLine(line);
 
             if (key != null && commentsMap.containsKey(key)) {
                 // Insert comment for the key before the line
                 String comment = commentsMap.get(key);
 
                 if (!comment.isEmpty()) {
-                    String[] commentLines = comment.split("\n");
+                    String @NotNull [] commentLines = comment.split("\n");
 
                     // Determine the indentation of the current line
                     int indent = line.indexOf(key);
-                    StringBuilder indentBuilder = new StringBuilder();
+                    @NotNull StringBuilder indentBuilder = new StringBuilder();
 
                     for (int i = 0; i < indent; i++) {
                         indentBuilder.append(" "); // Append space to match the indentation
                     }
 
-                    String indentSpace = indentBuilder.toString(); // Create an indentation string
+                    @NotNull String indentSpace = indentBuilder.toString(); // Create an indentation string
 
                     for (String commentLine : commentLines) {
                         dataWithComments.append(indentSpace).append("# ").append(commentLine).append(System.lineSeparator());
@@ -136,9 +136,9 @@ public class CustomYamlConfiguration extends YamlConfiguration {
      * @throws InvalidConfigurationException If the configuration is invalid.
      */
     @Override
-    public void load(File file) throws IOException, InvalidConfigurationException {
-        @Cleanup FileInputStream stream = new FileInputStream(file);
-        @Cleanup InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
+    public void load(@NotNull File file) throws IOException, InvalidConfigurationException {
+        @Cleanup @NotNull FileInputStream stream = new FileInputStream(file);
+        @Cleanup @NotNull InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
         load(reader);
     }
 
@@ -152,8 +152,8 @@ public class CustomYamlConfiguration extends YamlConfiguration {
     @Override
     @SuppressWarnings("RedundantThrows")
     public void load(Reader reader) throws IOException, InvalidConfigurationException {
-        @Cleanup BufferedReader input = reader instanceof BufferedReader ? (BufferedReader) reader : new BufferedReader(reader);
-        String builder = input.lines().map(line -> line + '\n').collect(Collectors.joining());
+        @Cleanup @NotNull BufferedReader input = reader instanceof BufferedReader ? (BufferedReader) reader : new BufferedReader(reader);
+        @NotNull String builder = input.lines().map(line -> line + '\n').collect(Collectors.joining());
         loadFromString(builder);
     }
 
@@ -163,8 +163,8 @@ public class CustomYamlConfiguration extends YamlConfiguration {
      * @param file The file to load the configuration from.
      * @return The loaded CustomYamlConfiguration.
      */
-    public static @NotNull CustomYamlConfiguration loadConfiguration(File file) {
-        CustomYamlConfiguration config = new CustomYamlConfiguration();
+    public static @NotNull CustomYamlConfiguration loadConfiguration(@NotNull File file) {
+        @NotNull CustomYamlConfiguration config = new CustomYamlConfiguration();
 
         try {
             config.load(file);
@@ -182,7 +182,7 @@ public class CustomYamlConfiguration extends YamlConfiguration {
      * @return The loaded CustomYamlConfiguration.
      */
     public static @NotNull CustomYamlConfiguration loadConfiguration(Reader reader) {
-        CustomYamlConfiguration config = new CustomYamlConfiguration();
+        @NotNull CustomYamlConfiguration config = new CustomYamlConfiguration();
 
         try {
             config.load(reader);
@@ -198,8 +198,8 @@ public class CustomYamlConfiguration extends YamlConfiguration {
      * @param line The line of YAML to extract the key from.
      * @return The key if the line contains a key-value pair, otherwise null.
      */
-    private static @Nullable String getKeyFromLine(CharSequence line) {
-        Matcher matcher = Pattern.compile("^\\s*([\\w\\-]+):").matcher(line);
+    private static @Nullable String getKeyFromLine(@NotNull CharSequence line) {
+        @NotNull Matcher matcher = Pattern.compile("^\\s*([\\w\\-]+):").matcher(line);
         return matcher.find() ? matcher.group(1) : null;
     }
 
@@ -210,13 +210,12 @@ public class CustomYamlConfiguration extends YamlConfiguration {
      * @param contents The YAML data to parse and store comments for.
      */
     private void parseAndStoreComments(@NotNull String contents) {
-        String[] lines = contents.split("\n");
-        StringBuilder commentBuilder = new StringBuilder();
-        String lastComment = commentBuilder.toString();
+        String @NotNull [] lines = contents.split("\n");
+        @NotNull StringBuilder commentBuilder = new StringBuilder();
         boolean isHeader = true; // Assume the first comments are header comments
 
         // Define the pattern within this method
-        Pattern keyPattern = Pattern.compile("^\\s*([\\w\\-]+):.*");
+        @NotNull Pattern keyPattern = Pattern.compile("^\\s*([\\w\\-]+):.*");
 
         for (String entry : lines) {
             String line = entry;
@@ -236,17 +235,19 @@ public class CustomYamlConfiguration extends YamlConfiguration {
             } else {
                 if (!line.trim().isEmpty() && isHeader) {
                     // Store header comments and mark that we've found a non-comment line
+                    @NotNull String lastComment = commentBuilder.toString();
                     commentsMap.put("__header__", lastComment);
                     commentBuilder.setLength(0);
                     isHeader = false; // No longer reading header comments
                 }
 
-                Matcher matcher = keyPattern.matcher(line);
+                @NotNull Matcher matcher = keyPattern.matcher(line);
 
                 if (matcher.find()) {
                     // Found a key, store the accumulated comments if any
                     String key = matcher.group(1);
                     if (commentBuilder.length() > 0) {
+                        @NotNull String lastComment = commentBuilder.toString();
                         commentsMap.put(key, lastComment);
                         commentBuilder.setLength(0); // Reset comment builder
                     }
@@ -256,6 +257,7 @@ public class CustomYamlConfiguration extends YamlConfiguration {
 
         // In case the file ends with comments not associated with a key
         if (commentBuilder.length() > 0 && !isHeader) {
+            @NotNull String lastComment = commentBuilder.toString();
             commentsMap.put("__footer__", lastComment);
         }
     }

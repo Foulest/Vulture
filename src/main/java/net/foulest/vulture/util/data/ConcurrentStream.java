@@ -35,8 +35,8 @@ import java.util.stream.Stream;
 @Data
 public class ConcurrentStream<T> {
 
-    private final Supplier<Stream<T>> supplier;
-    private final Collection<T> collection;
+    private final @NotNull Supplier<Stream<T>> supplier;
+    private final @NotNull Collection<T> collection;
     private final boolean parallel;
 
     @Contract(pure = true)

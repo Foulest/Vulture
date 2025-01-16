@@ -20,6 +20,7 @@ package net.foulest.vulture.check;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.bukkit.Location;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Data class for violations.
@@ -31,12 +32,12 @@ import org.bukkit.Location;
 public class Violation {
 
     // Check Data
-    private final CheckInfoData checkInfo;
-    private final String[] data;
+    private final @NotNull CheckInfoData checkInfo;
+    private final String @NotNull [] data;
     private final int violations;
 
     // Player Data
-    private final Location location;
+    private final @NotNull Location location;
     private final int ping;
 
     // Server Data

@@ -138,28 +138,44 @@ vulture:
       portals:
         block-affected-mobs: true
     packets:
-      max-packets-per-tick: 350
-      max-packets-per-second: 400
-      max-packets-smoothed: 400
+      max-packets-per-tick: 400
+      max-packets-per-second: 600
+      max-packets-smoothed: 500
+      max-time-over-server: 100
       abilities:
         duplicate-flying: true
         invalid-flight-allowed: true
         invalid-flying: true
-        invalid-instant-build: true
-        invalid-invulnerable: true
+        invalid-creative-mode: true
+        invalid-god-mode: true
       beacon:
         invalid-conditions: true
         invalid-data: true
         invalid-effect: true
         invalid-tier: true
-      block-dig:
+      block-placement:
+        invalid-block-position: true
         invalid-distance: true
-      block-place:
-        invalid-cursor-position: true
-        invalid-distance: true
-        invalid-other-block-position: true
+        invalid-up-cursor-bounds: true
+        invalid-up-cursor-position: true
+        invalid-up-pitch: true
+        invalid-down-cursor-bounds: true
+        invalid-down-cursor-position: true
+        invalid-down-pitch: true
+        invalid-east-cursor-bounds: true
+        invalid-east-cursor-position: true
+        invalid-east-yaw: true
+        invalid-west-cursor-bounds: true
+        invalid-west-cursor-position: true
+        invalid-west-yaw: true
+        invalid-north-cursor-bounds: true
+        invalid-north-cursor-position: true
+        invalid-north-yaw: true
+        invalid-south-cursor-bounds: true
+        invalid-south-cursor-position: true
+        invalid-south-yaw: true
         invalid-other-cursor-position: true
-        invalid-up-block-position: true
+        invalid-other-block-position: true
       book-edit:
         invalid-conditions: true
         invalid-data: true
@@ -168,30 +184,46 @@ vulture:
       book-sign:
         invalid-conditions: true
         invalid-data: true
-      chat:
+      chat-message:
         invalid-conditions: true
         invalid-message: true
       close-window:
         invalid-conditions: true
       command-block:
         invalid-conditions: true
-      custom-payload:
-        invalid-size: true
+      creative-inventory-action:
+        invalid-conditions: true
+        invalid-slot: true
+      digging:
+        invalid-block-type: true
+        invalid-block-position: true
+        invalid-distance: true
       entity-action:
-        invalid-jump-boost: true
+        invalid-entity-id: true
+        invalid-action: true
       flying:
         invalid-pitch: true
         invalid-position-data: true
         invalid-rotation-data: true
         invalid-y-data: true
-      held-item-slot:
+      held-item-change:
         invalid-conditions: true
         invalid-slot: true
         invalid-slot-change: true
-      item-drop:
+      drop-item:
         invalid-data: true
+      interact-entity:
+        invalid-conditions: true
+        invalid-distance: true
       item-name:
         invalid-data: true
+        invalid-size: true
+      open-horse-inventory:
+        invalid-conditions: true
+        invalid-vehicle: true
+        invalid-tamed: true
+      plugin-message:
+        invalid-channel-name: true
         invalid-size: true
       release-use-item:
         invalid-data: true
@@ -200,20 +232,19 @@ vulture:
       riding-jump:
         invalid-conditions: true
         invalid-jump-boost: true
-      set-creative-slot:
-        invalid-conditions: true
-        invalid-slot: true
       settings:
         invalid-locale: true
         invalid-view-distance: true
       spectate:
         invalid-conditions: true
+        invalid-target: true
       start-sneaking:
         invalid-conditions: true
       steer-vehicle:
         invalid-conditions: true
         invalid-dismount-value: true
         invalid-non-dismount-value: true
+        invalid-jump: true
         invalid-value: true
       stop-sleeping:
         invalid-conditions: true
@@ -221,20 +252,18 @@ vulture:
         invalid-message: true
       trade-select:
         invalid-data: true
-      transaction:
-        invalid-window-id: true
-        not-accepted: true
       update-sign:
         invalid-data: true
-      use-entity:
-        invalid-conditions: true
-        invalid-distance: true
       window-click:
         invalid-clone-button: true
         invalid-pickup-all-button: true
         invalid-pickup-button: true
         invalid-quick-craft-button: true
         invalid-quick-move-button: true
-        invalid-slot: true
         invalid-swap-button: true
         invalid-throw-button: true
+        invalid-slot: true
+        invalid-type: true
+      window-confirmation:
+        invalid-window-id: true
+        not-accepted: true

@@ -18,6 +18,7 @@
 package net.foulest.vulture.util;
 
 import lombok.Data;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -34,8 +35,8 @@ public class FileUtil {
      * @param data     The data to print.
      * @param fileName The file name to print to.
      */
-    public static void printDataToFile(String data, String fileName) {
-        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(fileName), StandardCharsets.UTF_8)) {
+    public static void printDataToFile(@NotNull String data, @NotNull String fileName) {
+        try (@NotNull BufferedWriter writer = Files.newBufferedWriter(Paths.get(fileName), StandardCharsets.UTF_8)) {
             writer.write(data);
         } catch (IOException ex) {
             ex.printStackTrace();

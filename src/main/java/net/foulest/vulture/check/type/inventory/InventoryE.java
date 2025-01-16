@@ -17,16 +17,17 @@
  */
 package net.foulest.vulture.check.type.inventory;
 
-import net.foulest.packetevents.event.eventtypes.CancellableNMSPacketEvent;
-import net.foulest.packetevents.packettype.PacketType;
-import net.foulest.packetevents.packetwrappers.NMSPacket;
-import net.foulest.packetevents.packetwrappers.play.in.blockplace.WrappedPacketInBlockPlace;
-import net.foulest.packetevents.packetwrappers.play.in.flying.WrappedPacketInFlying;
+import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerBlockPlacement;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.util.KickUtil;
+import org.jetbrains.annotations.NotNull;
 
 @CheckInfo(name = "Inventory (E)", type = CheckType.INVENTORY, punishable = false,
         description = "Detects this Inventory pattern: BlockPlace w/ Item, BlockPlace, HeldItemSlot")
@@ -34,22 +35,23 @@ public class InventoryE extends Check {
 
     private int stage;
 
-    public InventoryE(PlayerData playerData) throws ClassNotFoundException {
+    public InventoryE(@NotNull PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(CancellableNMSPacketEvent event, byte packetId,
-                       NMSPacket nmsPacket, Object packet, long timestamp) {
-        if (packetId == PacketType.Play.Client.HELD_ITEM_SLOT) {
+    public void handle(@NotNull PacketPlayReceiveEvent event) {
+        PacketTypeCommon packetType = event.getPacketType();
+
+        if (packetType == PacketType.Play.Client.SLOT_STATE_CHANGE) {
             if (stage == 2) {
                 KickUtil.kickPlayer(player, event, "Inventory (E) | Scaffold");
             }
 
             stage = 1;
 
-        } else if (packetId == PacketType.Play.Client.BLOCK_PLACE) {
-            WrappedPacketInBlockPlace blockPlace = new WrappedPacketInBlockPlace(nmsPacket);
+        } else if (packetType == PacketType.Play.Client.PLAYER_BLOCK_PLACEMENT) {
+            @NotNull WrapperPlayClientPlayerBlockPlacement blockPlace = new WrapperPlayClientPlayerBlockPlacement(event);
 
             if (stage == 1) {
                 stage = 2;
@@ -59,10 +61,13 @@ public class InventoryE extends Check {
                 stage = 0;
             }
 
-        } else if (PacketType.Play.Client.Util.isInstanceOfFlying(packetId)) {
-            WrappedPacketInFlying flying = new WrappedPacketInFlying(nmsPacket);
+        } else if (packetType == PacketType.Play.Client.PLAYER_FLYING
+                || packetType == PacketType.Play.Client.PLAYER_POSITION
+                || packetType == PacketType.Play.Client.PLAYER_ROTATION
+                || packetType == PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION) {
+            @NotNull WrapperPlayClientPlayerFlying flying = new WrapperPlayClientPlayerFlying(event);
 
-            if (flying.isMoving()) {
+            if (flying.hasPositionChanged()) {
                 stage = 0;
             }
         }

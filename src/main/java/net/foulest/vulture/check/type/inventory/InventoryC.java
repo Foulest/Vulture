@@ -17,16 +17,18 @@
  */
 package net.foulest.vulture.check.type.inventory;
 
-import net.foulest.packetevents.event.eventtypes.CancellableNMSPacketEvent;
-import net.foulest.packetevents.packettype.PacketType;
-import net.foulest.packetevents.packetwrappers.NMSPacket;
-import net.foulest.packetevents.packetwrappers.play.in.blockdig.WrappedPacketInBlockDig;
-import net.foulest.packetevents.packetwrappers.play.in.useentity.WrappedPacketInUseEntity;
+import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
+import com.github.retrooper.packetevents.protocol.player.DiggingAction;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerDigging;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.util.KickUtil;
+import org.jetbrains.annotations.NotNull;
 
 @CheckInfo(name = "Inventory (C)", type = CheckType.INVENTORY, punishable = false,
         description = "Detects basic AutoBlock.")
@@ -34,35 +36,39 @@ public class InventoryC extends Check {
 
     private int stage;
 
-    public InventoryC(PlayerData playerData) throws ClassNotFoundException {
+    public InventoryC(@NotNull PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(CancellableNMSPacketEvent event, byte packetId,
-                       NMSPacket nmsPacket, Object packet, long timestamp) {
-        if (packetId == PacketType.Play.Client.BLOCK_DIG) {
-            WrappedPacketInBlockDig blockDig = new WrappedPacketInBlockDig(nmsPacket);
-            WrappedPacketInBlockDig.PlayerDigType digType = blockDig.getDigType();
+    public void handle(@NotNull PacketPlayReceiveEvent event) {
+        PacketTypeCommon packetType = event.getPacketType();
 
-            if (digType == WrappedPacketInBlockDig.PlayerDigType.RELEASE_USE_ITEM && stage == 0) {
+        if (packetType == PacketType.Play.Client.PLAYER_DIGGING) {
+            @NotNull WrapperPlayClientPlayerDigging blockDig = new WrapperPlayClientPlayerDigging(event);
+            DiggingAction digType = blockDig.getAction();
+
+            if (digType == DiggingAction.RELEASE_USE_ITEM && stage == 0) {
                 ++stage;
             }
 
-        } else if (packetId == PacketType.Play.Client.ARM_ANIMATION) {
+        } else if (packetType == PacketType.Play.Client.ANIMATION) {
             if (stage == 1) {
                 ++stage;
             }
 
-        } else if (packetId == PacketType.Play.Client.USE_ENTITY) {
-            WrappedPacketInUseEntity useEntity = new WrappedPacketInUseEntity(nmsPacket);
-            WrappedPacketInUseEntity.EntityUseAction action = useEntity.getAction();
+        } else if (packetType == PacketType.Play.Client.INTERACT_ENTITY) {
+            @NotNull WrapperPlayClientInteractEntity interactEntity = new WrapperPlayClientInteractEntity(event);
+            WrapperPlayClientInteractEntity.InteractAction action = interactEntity.getAction();
 
-            if (action == WrappedPacketInUseEntity.EntityUseAction.ATTACK && stage == 2) {
+            if (action == WrapperPlayClientInteractEntity.InteractAction.ATTACK && stage == 2) {
                 ++stage;
             }
 
-        } else if (PacketType.Play.Client.Util.isInstanceOfFlying(packetId)) {
+        } else if (packetType == PacketType.Play.Client.PLAYER_FLYING
+                || packetType == PacketType.Play.Client.PLAYER_POSITION
+                || packetType == PacketType.Play.Client.PLAYER_ROTATION
+                || packetType == PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION) {
             stage = 0;
         }
 

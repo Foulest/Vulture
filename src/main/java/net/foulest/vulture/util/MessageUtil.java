@@ -41,6 +41,7 @@ import java.util.logging.Logger;
  *
  * @author Foulest
  */
+@SuppressWarnings("WeakerAccess")
 @Data
 public class MessageUtil {
 
@@ -64,8 +65,9 @@ public class MessageUtil {
      * @param sender  The player to send the message to.
      * @param message The message to send.
      */
-    public static void messagePlayer(CommandSender sender, String @NotNull ... message) {
-        for (String line : message) {
+    public static void messagePlayer(@NotNull CommandSender sender,
+                                     String @NotNull ... message) {
+        for (@NotNull String line : message) {
             sender.sendMessage(colorize(line));
         }
     }
@@ -76,7 +78,9 @@ public class MessageUtil {
      * @param sender  The player to send the message to.
      * @param message The message to send.
      */
-    public static void messagePlayerHoverable(CommandSender sender, Iterable<String> hoverableText, String message) {
+    public static void messagePlayerHoverable(CommandSender sender,
+                                              @NotNull Iterable<String> hoverableText,
+                                              @NotNull String message) {
         messagePlayerClickable(sender, hoverableText, "", message);
     }
 
@@ -89,16 +93,18 @@ public class MessageUtil {
      * @param command       The command to run when the message is clicked.
      * @param message       The message to send.
      */
-    private static void messagePlayerClickable(CommandSender sender, Iterable<String> hoverableText,
-                                               String command, String message) {
+    private static void messagePlayerClickable(CommandSender sender,
+                                               @NotNull Iterable<String> hoverableText,
+                                               String command,
+                                               @NotNull String message) {
         // Sends a normal message if the sender is not a player.
         if (!(sender instanceof Player)) {
             sender.sendMessage(colorize(message));
             return;
         }
 
-        Player player = (Player) sender;
-        TextComponent textComponent = new TextComponent(colorize(message));
+        @NotNull Player player = (Player) sender;
+        @NotNull TextComponent textComponent = new TextComponent(colorize(message));
 
         // Adds the hoverable text to the message.
         textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new BaseComponent[]{
@@ -119,7 +125,7 @@ public class MessageUtil {
      */
     public static void broadcast(String @NotNull ... message) {
         for (String line : message) {
-            for (Player player : Bukkit.getOnlinePlayers()) {
+            for (@NotNull Player player : Bukkit.getOnlinePlayers()) {
                 messagePlayer(player, line);
             }
 
@@ -134,7 +140,7 @@ public class MessageUtil {
      */
     static void broadcast(@NotNull Iterable<String> message) {
         for (String line : message) {
-            for (Player player : Bukkit.getOnlinePlayers()) {
+            for (@NotNull Player player : Bukkit.getOnlinePlayers()) {
                 messagePlayer(player, line);
             }
 
@@ -150,7 +156,7 @@ public class MessageUtil {
      */
     public static void broadcastWithPerm(String permission, String @NotNull ... message) {
         for (String line : message) {
-            for (Player online : Bukkit.getOnlinePlayers()) {
+            for (@NotNull Player online : Bukkit.getOnlinePlayers()) {
                 if (online.hasPermission(permission)) {
                     messagePlayer(online, line);
                 }
@@ -177,7 +183,7 @@ public class MessageUtil {
      * @param message The message to colorize.
      */
     @Contract("_ -> new")
-    public static @NotNull String colorize(String message) {
+    public static @NotNull String colorize(@NotNull String message) {
         return ChatColor.translateAlternateColorCodes('&', message);
     }
 
@@ -208,8 +214,8 @@ public class MessageUtil {
      *
      * @param message The message to send.
      */
-    public static void sendAlert(String message, String verbose) {
-        for (Player player : Bukkit.getOnlinePlayers()) {
+    public static void sendAlert(String message, @NotNull String verbose) {
+        for (@NotNull Player player : Bukkit.getOnlinePlayers()) {
             PlayerData playerData = PlayerDataManager.getPlayerData(player);
 
             if (playerData.isAlertsEnabled()) {

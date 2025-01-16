@@ -17,16 +17,17 @@
  */
 package net.foulest.vulture.check.type.inventory;
 
-import net.foulest.packetevents.event.eventtypes.CancellableNMSPacketEvent;
-import net.foulest.packetevents.packettype.PacketType;
-import net.foulest.packetevents.packetwrappers.NMSPacket;
-import net.foulest.packetevents.packetwrappers.play.in.clientcommand.WrappedPacketInClientCommand;
-import net.foulest.packetevents.utils.player.ClientVersion;
+import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClientStatus;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.util.KickUtil;
+import org.jetbrains.annotations.NotNull;
 
 @CheckInfo(name = "Inventory (G)", type = CheckType.INVENTORY, punishable = false)
 public class InventoryG extends Check {
@@ -34,39 +35,43 @@ public class InventoryG extends Check {
     private boolean wasOpen;
     private boolean open;
 
-    public InventoryG(PlayerData playerData) throws ClassNotFoundException {
+    public InventoryG(@NotNull PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(CancellableNMSPacketEvent event, byte packetId,
-                       NMSPacket nmsPacket, Object packet, long timestamp) {
+    public void handle(@NotNull PacketPlayReceiveEvent event) {
+        PacketTypeCommon packetType = event.getPacketType();
+
         // Checks the player for exemptions.
-        if (playerData.getVersion().isNewerThan(ClientVersion.v_1_8_9)) {
+        if (playerData.getVersion().isNewerThan(ClientVersion.V_1_8)) {
             return;
         }
 
-        if (packetId == PacketType.Play.Client.CLOSE_WINDOW) {
+        if (packetType == PacketType.Play.Client.CLOSE_WINDOW) {
             if (wasOpen) {
                 KickUtil.kickPlayer(player, event, "Inventory (G) | Opening inventory twice");
             }
 
-        } else if (packetId == PacketType.Play.Client.CLIENT_COMMAND) {
-            WrappedPacketInClientCommand clientCommand = new WrappedPacketInClientCommand(nmsPacket);
-            WrappedPacketInClientCommand.ClientCommand command = clientCommand.getClientCommand();
+        } else if (packetType == PacketType.Play.Client.CLIENT_STATUS) {
+            @NotNull WrapperPlayClientClientStatus clientStatus = new WrapperPlayClientClientStatus(event);
+            WrapperPlayClientClientStatus.Action action = clientStatus.getAction();
 
-            if (command == WrappedPacketInClientCommand.ClientCommand.OPEN_INVENTORY_ACHIEVEMENT) {
+            if (action == WrapperPlayClientClientStatus.Action.OPEN_INVENTORY_ACHIEVEMENT) {
                 open = true;
             }
 
-        } else if (packetId == PacketType.Play.Client.WINDOW_CLICK) {
+        } else if (packetType == PacketType.Play.Client.CLICK_WINDOW) {
             wasOpen = open;
 
             if (open) {
                 open = false;
             }
 
-        } else if (PacketType.Play.Client.Util.isInstanceOfFlying(packetId)) {
+        } else if (packetType == PacketType.Play.Client.PLAYER_FLYING
+                || packetType == PacketType.Play.Client.PLAYER_POSITION
+                || packetType == PacketType.Play.Client.PLAYER_ROTATION
+                || packetType == PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION) {
             open = false;
             wasOpen = false;
         }

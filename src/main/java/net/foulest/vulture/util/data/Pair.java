@@ -33,11 +33,11 @@ import org.jetbrains.annotations.NotNull;
 @AllArgsConstructor
 public class Pair<X, Y> {
 
-    private final X first;
-    private final Y last;
+    private final @NotNull X first;
+    private final @NotNull Y last;
 
     @Contract("_, _ -> new")
-    public static <X, Y> @NotNull Pair<X, Y> of(X x, Y y) {
+    public static <X, Y> @NotNull Pair<X, Y> of(@NotNull X x, @NotNull Y y) {
         return new Pair<>(x, y);
     }
 }

@@ -29,6 +29,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import net.foulest.pledge.network.NetworkMessage;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Deque;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -39,11 +40,11 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 public class MessageQueueHandler extends ChannelOutboundHandlerAdapter {
 
     private final Deque<NetworkMessage> messageQueue = new ConcurrentLinkedDeque<>();
-    private QueueMode mode = QueueMode.PASS;
+    private @NotNull QueueMode mode = QueueMode.PASS;
 
     @Override
     @SuppressWarnings("ProhibitedExceptionDeclared")
-    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+    public void write(ChannelHandlerContext ctx, @NotNull Object msg, @NotNull ChannelPromise promise) throws Exception {
         switch (mode) {
             case ADD_FIRST:
                 messageQueue.addFirst(NetworkMessage.of(msg, promise));
@@ -61,12 +62,12 @@ public class MessageQueueHandler extends ChannelOutboundHandlerAdapter {
 
     @Override
     @SuppressWarnings("ProhibitedExceptionDeclared")
-    public void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+    public void close(@NotNull ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
         drain(ctx);
         super.close(ctx, promise);
     }
 
-    public void drain(ChannelHandlerContext ctx) {
+    public void drain(@NotNull ChannelHandlerContext ctx) {
         while (!messageQueue.isEmpty()) {
             NetworkMessage message = messageQueue.poll();
             ctx.write(message.getMessage(), message.getPromise());

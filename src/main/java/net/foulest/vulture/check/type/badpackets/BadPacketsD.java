@@ -17,18 +17,19 @@
  */
 package net.foulest.vulture.check.type.badpackets;
 
-import net.foulest.packetevents.event.eventtypes.CancellableNMSPacketEvent;
-import net.foulest.packetevents.packettype.PacketType;
-import net.foulest.packetevents.packetwrappers.NMSPacket;
-import net.foulest.packetevents.packetwrappers.play.in.resourcepackstatus.WrappedPacketInResourcePackStatus;
+import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
+import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientResourcePackStatus;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.util.KickUtil;
+import org.jetbrains.annotations.NotNull;
 
-@CheckInfo(name = "BadPackets (D)", type = CheckType.BADPACKETS,
-        acceptsServerPackets = true, punishable = false,
+@CheckInfo(name = "BadPackets (D)", type = CheckType.BADPACKETS, punishable = false,
         description = "Detects sending invalid ResourcePackStatus packets.")
 public class BadPacketsD extends Check {
 
@@ -36,22 +37,20 @@ public class BadPacketsD extends Check {
     private int packetsSent;
     private int packetsReceived;
 
-    public BadPacketsD(PlayerData playerData) throws ClassNotFoundException {
+    public BadPacketsD(@NotNull PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(CancellableNMSPacketEvent event, byte packetId,
-                       NMSPacket nmsPacket, Object packet, long timestamp) {
-        if (packetId == PacketType.Play.Server.RESOURCE_PACK_SEND) {
-            ++packetsSent;
+    public void handle(@NotNull PacketPlayReceiveEvent event) {
+        PacketTypeCommon packetType = event.getPacketType();
 
-        } else if (packetId == PacketType.Play.Client.RESOURCE_PACK_STATUS) {
-            WrappedPacketInResourcePackStatus resourcePackStatus = new WrappedPacketInResourcePackStatus(nmsPacket);
-            WrappedPacketInResourcePackStatus.ResourcePackStatus status = resourcePackStatus.getStatus();
+        if (packetType == PacketType.Play.Client.RESOURCE_PACK_STATUS) {
+            @NotNull WrapperPlayClientResourcePackStatus packet = new WrapperPlayClientResourcePackStatus(event);
+            WrapperPlayClientResourcePackStatus.Result result = packet.getResult();
 
             // Keeps track of packets received.
-            if (status != WrappedPacketInResourcePackStatus.ResourcePackStatus.ACCEPTED) {
+            if (result != WrapperPlayClientResourcePackStatus.Result.ACCEPTED) {
                 ++packetsReceived;
             }
 
@@ -62,7 +61,7 @@ public class BadPacketsD extends Check {
             }
 
             // Detects sending two ACCEPTED packets in a row.
-            if (status == WrappedPacketInResourcePackStatus.ResourcePackStatus.ACCEPTED) {
+            if (result == WrapperPlayClientResourcePackStatus.Result.ACCEPTED) {
                 if (accepted) {
                     KickUtil.kickPlayer(player, event, "BadPackets (D) | Sent two ResourcePackStatus ACCEPTED packets in a row");
                     return;
@@ -72,6 +71,15 @@ public class BadPacketsD extends Check {
             } else {
                 accepted = false;
             }
+        }
+    }
+
+    @Override
+    public void handle(@NotNull PacketPlaySendEvent event) {
+        PacketTypeCommon packetType = event.getPacketType();
+
+        if (packetType == PacketType.Play.Server.RESOURCE_PACK_SEND) {
+            ++packetsSent;
         }
     }
 }

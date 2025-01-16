@@ -29,7 +29,7 @@ import org.jetbrains.annotations.NotNull;
 @UtilityClass
 public class ChannelUtils {
 
-    public void runInEventLoop(@NotNull Channel channel, Runnable runnable) {
+    public void runInEventLoop(@NotNull Channel channel, @NotNull Runnable runnable) {
         if (channel.eventLoop().inEventLoop()) {
             runnable.run();
         } else {

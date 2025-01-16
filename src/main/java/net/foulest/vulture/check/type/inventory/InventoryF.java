@@ -17,14 +17,17 @@
  */
 package net.foulest.vulture.check.type.inventory;
 
-import net.foulest.packetevents.event.eventtypes.CancellableNMSPacketEvent;
-import net.foulest.packetevents.packettype.PacketType;
-import net.foulest.packetevents.packetwrappers.NMSPacket;
+import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
 import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.util.KickUtil;
+import net.foulest.vulture.util.MessageUtil;
+import org.bukkit.GameMode;
+import org.jetbrains.annotations.NotNull;
 
 @CheckInfo(name = "Inventory (F)", type = CheckType.INVENTORY, punishable = false,
         description = "Detects swinging & clicking in your inventory at the same time.")
@@ -33,20 +36,29 @@ public class InventoryF extends Check {
     private boolean click;
     private boolean swing;
 
-    public InventoryF(PlayerData playerData) throws ClassNotFoundException {
+    public InventoryF(@NotNull PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(CancellableNMSPacketEvent event, byte packetId,
-                       NMSPacket nmsPacket, Object packet, long timestamp) {
-        if (packetId == PacketType.Play.Client.ARM_ANIMATION) {
+    public void handle(@NotNull PacketPlayReceiveEvent event) {
+        // Ignores this event if the player is in Spectator mode.
+        if (player.getGameMode() == GameMode.SPECTATOR) {
+            return;
+        }
+
+        PacketTypeCommon packetType = event.getPacketType();
+
+        if (packetType == PacketType.Play.Client.ANIMATION) {
             swing = true;
 
-        } else if (packetId == PacketType.Play.Client.WINDOW_CLICK) {
+        } else if (packetType == PacketType.Play.Client.CLICK_WINDOW) {
             click = true;
 
-        } else if (PacketType.Play.Client.Util.isInstanceOfFlying(packetId)) {
+        } else if (packetType == PacketType.Play.Client.PLAYER_FLYING
+                || packetType == PacketType.Play.Client.PLAYER_POSITION
+                || packetType == PacketType.Play.Client.PLAYER_ROTATION
+                || packetType == PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION) {
             if (swing && click) {
                 KickUtil.kickPlayer(player, event, "Inventory (F) | Attacking in inventory");
             }

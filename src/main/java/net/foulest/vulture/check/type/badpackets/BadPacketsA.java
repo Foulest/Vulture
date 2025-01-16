@@ -17,11 +17,10 @@
  */
 package net.foulest.vulture.check.type.badpackets;
 
-import net.foulest.packetevents.event.eventtypes.CancellableNMSPacketEvent;
-import net.foulest.packetevents.packettype.PacketType;
-import net.foulest.packetevents.packetwrappers.NMSPacket;
-import net.foulest.packetevents.packetwrappers.play.in.setcreativeslot.WrappedPacketInSetCreativeSlot;
-import net.foulest.packetevents.utils.player.ClientVersion;
+import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
@@ -29,8 +28,7 @@ import net.foulest.vulture.check.CheckType;
 import net.foulest.vulture.data.PlayerData;
 import net.foulest.vulture.util.KickUtil;
 import org.bukkit.GameMode;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
@@ -38,15 +36,15 @@ import java.util.Map;
         description = "Detects sending too many packets in the same tick.")
 public class BadPacketsA extends Check {
 
-    public BadPacketsA(PlayerData playerData) throws ClassNotFoundException {
+    public BadPacketsA(@NotNull PlayerData playerData) throws ClassNotFoundException {
         super(playerData);
     }
 
     @Override
-    public void handle(CancellableNMSPacketEvent event, byte packetId,
-                       NMSPacket nmsPacket, Object packet, long timestamp) {
+    public void handle(@NotNull PacketPlayReceiveEvent event) {
         synchronized (playerData.getPacketCounts()) {
-            Map<Byte, Integer> packetCounts = playerData.getPacketCounts();
+            Map<Integer, Integer> packetCounts = playerData.getPacketCounts();
+            int packetId = event.getPacketId();
             packetCounts.compute(packetId, (key, count) -> (count == null) ? 1 : count + 1);
             Integer count = packetCounts.get(packetId);
 
@@ -56,147 +54,128 @@ public class BadPacketsA extends Check {
                 return;
             }
 
-            String packetName = PacketType.getPacketFromId(packetId).getSimpleName();
-            boolean olderThan1_8 = playerData.getVersion().isOlderThanOrEquals(ClientVersion.v_1_8_9);
+            boolean olderThan1_8 = playerData.getVersion().isOlderThanOrEquals(ClientVersion.V_1_8);
             boolean inCreative = player.getGameMode() == GameMode.CREATIVE;
 
-            switch (packetId) {
-                case PacketType.Play.Client.BLOCK_PLACE:
-                case PacketType.Play.Client.HELD_ITEM_SLOT: {
-                    int threshold = olderThan1_8 && inCreative ? 3 : 5;
+            PacketTypeCommon packetType = event.getPacketType();
+            String packetName = packetType.getName();
 
-                    if (count >= threshold) {
-                        KickUtil.kickPlayer(player, event, "BadPackets (A) |"
-                                + " packet=" + packetName
-                                + " count=" + count);
-                    }
-                    break;
+            if (packetType.equals(PacketType.Play.Client.PLAYER_BLOCK_PLACEMENT)
+                    || packetType.equals(PacketType.Play.Client.HELD_ITEM_CHANGE)) {
+                int threshold = olderThan1_8 && inCreative ? 3 : 5;
+
+                if (count >= threshold) {
+                    KickUtil.kickPlayer(player, event, "BadPackets (A) |"
+                            + " packet=" + packetName
+                            + " count=" + count);
+                }
+                return;
+            }
+
+            if (packetType.equals(PacketType.Play.Client.CLIENT_STATUS)
+                    || packetType.equals(PacketType.Play.Client.TAB_COMPLETE)) {
+                if (count >= 3) {
+                    KickUtil.kickPlayer(player, event, "BadPackets (A) |"
+                            + " packet=" + packetName
+                            + " count=" + count);
+                }
+                return;
+            }
+
+            if (packetType.equals(PacketType.Play.Client.PLUGIN_MESSAGE)) {
+                if (count >= 15) {
+                    KickUtil.kickPlayer(player, event, "BadPackets (A) |"
+                            + " packet=" + packetName
+                            + " count=" + count);
+                }
+                return;
+            }
+
+            if (packetType.equals(PacketType.Play.Client.CLICK_WINDOW)) {
+                int threshold = olderThan1_8 ? 52 : 6;
+
+                if (count >= threshold) {
+                    KickUtil.kickPlayer(player, event, "BadPackets (A) |"
+                            + " packet=" + packetName
+                            + " count=" + count);
+                }
+                return;
+            }
+
+            if (packetType.equals(PacketType.Play.Client.ENTITY_ACTION)) {
+                if (count >= 5) {
+                    KickUtil.kickPlayer(player, event, "BadPackets (A) |"
+                            + " packet=" + packetName
+                            + " count=" + count);
+                }
+                return;
+            }
+
+            if (packetType.equals(PacketType.Play.Client.PLAYER_DIGGING)) {
+                if (count >= 6) {
+                    KickUtil.kickPlayer(player, event, "BadPackets (A) |"
+                            + " packet=" + packetName
+                            + " count=" + count);
+                }
+                return;
+            }
+
+            if (packetType.equals(PacketType.Play.Client.INTERACT_ENTITY)) {
+                if (count >= 10) {
+                    KickUtil.kickPlayer(player, event, "BadPackets (A) |"
+                            + " packet=" + packetName
+                            + " count=" + count);
+                }
+                return;
+            }
+
+            if (packetType.equals(PacketType.Play.Client.ANIMATION)) {
+                if (count >= 9) {
+                    KickUtil.kickPlayer(player, event, "BadPackets (A) |"
+                            + " packet=" + packetName
+                            + " count=" + count);
+                }
+                return;
+            }
+
+            if (packetType.equals(PacketType.Play.Client.CREATIVE_INVENTORY_ACTION)
+                    || packetType.equals(PacketType.Play.Client.CLIENT_SETTINGS)) {
+                if (count >= 50) {
+                    KickUtil.kickPlayer(player, event, "BadPackets (A) |"
+                            + " packet=" + packetName
+                            + " count=" + count);
+                }
+                return;
+            }
+
+            if (packetType.equals(PacketType.Play.Client.STEER_VEHICLE)) {
+                int threshold;
+
+                if (playerData.getTicksSince(ActionType.LOGIN) < 40) {
+                    threshold = 13;
+                } else {
+                    threshold = olderThan1_8 ? 3 : 5;
                 }
 
-                case PacketType.Play.Client.CLIENT_COMMAND:
-                case PacketType.Play.Client.TAB_COMPLETE:
-                    if (count >= 3) {
-                        KickUtil.kickPlayer(player, event, "BadPackets (A) |"
-                                + " packet=" + packetName
-                                + " count=" + count);
-                    }
-                    break;
-
-                case PacketType.Play.Client.CUSTOM_PAYLOAD:
-                    if (count >= 15) {
-                        KickUtil.kickPlayer(player, event, "BadPackets (A) |"
-                                + " packet=" + packetName
-                                + " count=" + count);
-                    }
-                    break;
-
-                case PacketType.Play.Client.WINDOW_CLICK: {
-                    int threshold = olderThan1_8 ? 52 : 6;
-
-                    if (count >= threshold) {
-                        KickUtil.kickPlayer(player, event, "BadPackets (A) |"
-                                + " packet=" + packetName
-                                + " count=" + count);
-                    }
-                    break;
+                if (count >= threshold) {
+                    KickUtil.kickPlayer(player, event, "BadPackets (A) |"
+                            + " packet=" + packetName
+                            + " count=" + count);
                 }
+                return;
+            }
 
-                case PacketType.Play.Client.ENTITY_ACTION:
-                    if (count >= 5) {
-                        KickUtil.kickPlayer(player, event, "BadPackets (A) |"
-                                + " packet=" + packetName
-                                + " count=" + count);
-                    }
-                    break;
-
-                case PacketType.Play.Client.BLOCK_DIG:
-                    if (count >= 6) {
-                        KickUtil.kickPlayer(player, event, "BadPackets (A) |"
-                                + " packet=" + packetName
-                                + " count=" + count);
-                    }
-                    break;
-
-                case PacketType.Play.Client.USE_ENTITY:
-                    if (count >= 10) {
-                        KickUtil.kickPlayer(player, event, "BadPackets (A) |"
-                                + " packet=" + packetName
-                                + " count=" + count);
-                    }
-                    break;
-
-                case PacketType.Play.Client.ARM_ANIMATION:
-                    if (count >= 9) {
-                        KickUtil.kickPlayer(player, event, "BadPackets (A) |"
-                                + " packet=" + packetName
-                                + " count=" + count);
-                    }
-                    break;
-
-                case PacketType.Play.Client.SET_CREATIVE_SLOT:
-                    WrappedPacketInSetCreativeSlot creativeSlot = new WrappedPacketInSetCreativeSlot(nmsPacket);
-                    ItemStack clickedItem = creativeSlot.getClickedItem();
-                    Material clickedItemType = clickedItem.getType();
-                    String clickedItemName = clickedItemType.name();
-
-                    if (clickedItemType == Material.AIR) {
-                        if (count >= 50) {
-                            KickUtil.kickPlayer(player, event, "BadPackets (A) |"
-                                    + " packet=" + packetName
-                                    + " count=" + count);
-                        }
-                    } else {
-                        if (count >= 30) {
-                            int slot = creativeSlot.getSlot();
-
-                            KickUtil.kickPlayer(player, event, "BadPackets (A) |"
-                                    + " packet=" + packetName
-                                    + " count=" + count
-                                    + " slot=" + slot
-                                    + " item=" + clickedItemName);
-                        }
-                    }
-                    break;
-
-                case PacketType.Play.Client.SETTINGS:
-                    if (count >= 41) {
-                        KickUtil.kickPlayer(player, event, "BadPackets (A) |"
-                                + " packet=" + packetName
-                                + " count=" + count);
-                    }
-                    break;
-
-                case PacketType.Play.Client.STEER_VEHICLE:
-                    int threshold;
-
-                    if (playerData.getTicksSince(ActionType.LOGIN) < 40) {
-                        threshold = 13;
-                    } else {
-                        threshold = olderThan1_8 ? 3 : 5;
-                    }
-
-                    if (count >= threshold) {
-                        KickUtil.kickPlayer(player, event, "BadPackets (A) |"
-                                + " packet=" + packetName
-                                + " count=" + count);
-                    }
-                    break;
-
-                case PacketType.Play.Client.FLYING:
-                case PacketType.Play.Client.LOOK:
-                case PacketType.Play.Client.POSITION:
-                case PacketType.Play.Client.POSITION_LOOK:
-                case PacketType.Play.Client.KEEP_ALIVE:
-                case PacketType.Play.Client.TRANSACTION:
-                    break;
-
-                default:
-                    if (count >= 2) {
-                        KickUtil.kickPlayer(player, event, "BadPackets (A) |"
-                                + " packet=" + packetName
-                                + " count=" + count);
-                    }
-                    break;
+            if (!packetType.equals(PacketType.Play.Client.PLAYER_FLYING)
+                    && !packetType.equals(PacketType.Play.Client.PLAYER_ROTATION)
+                    && !packetType.equals(PacketType.Play.Client.PLAYER_POSITION)
+                    && !packetType.equals(PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION)
+                    && !packetType.equals(PacketType.Play.Client.KEEP_ALIVE)
+                    && !packetType.equals(PacketType.Play.Client.WINDOW_CONFIRMATION)) {
+                if (count >= 2) {
+                    KickUtil.kickPlayer(player, event, "BadPackets (A) |"
+                            + " packet=" + packetName
+                            + " count=" + count);
+                }
             }
         }
     }
