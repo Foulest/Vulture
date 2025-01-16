@@ -154,7 +154,7 @@ public class BadPacketsA extends Check {
                 if (playerData.getTicksSince(ActionType.LOGIN) < 40) {
                     threshold = 13;
                 } else {
-                    threshold = olderThan1_8 ? 3 : 5;
+                    threshold = olderThan1_8 ? 4 : 5;
                 }
 
                 if (count >= threshold) {
