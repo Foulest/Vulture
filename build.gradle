@@ -63,7 +63,7 @@ dependencies {
 
     // Netty - for networking
     // https://mvnrepository.com/artifact/io.netty/netty-all
-    compileOnly group: 'io.netty', name: 'netty-all', version: '4.1.117.Final'
+    compileOnly group: 'io.netty', name: 'netty-all', version: '4.1.118.Final'
 
     // PacketEvents - for packet manipulation
     // https://packetevents.com
