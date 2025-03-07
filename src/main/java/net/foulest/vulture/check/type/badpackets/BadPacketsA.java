@@ -21,6 +21,7 @@ import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import net.foulest.vulture.action.ActionType;
 import net.foulest.vulture.check.Check;
 import net.foulest.vulture.check.CheckInfo;
@@ -42,6 +43,16 @@ public class BadPacketsA extends Check {
 
     @Override
     public void handle(@NotNull PacketPlayReceiveEvent event) {
+        // Ignores the check if the server is lagging.
+        if (SpigotReflectionUtil.getTPS() < 19.9) {
+            return;
+        }
+
+        // Ignores the check if the player recently logged in.
+        if (playerData.getTicksSince(ActionType.LOGIN) < 60) {
+            return;
+        }
+
         synchronized (playerData.getPacketCounts()) {
             Map<Integer, Integer> packetCounts = playerData.getPacketCounts();
             int packetId = event.getPacketId();
@@ -60,24 +71,36 @@ public class BadPacketsA extends Check {
             PacketTypeCommon packetType = event.getPacketType();
             String packetName = packetType.getName();
 
-            if (packetType.equals(PacketType.Play.Client.PLAYER_BLOCK_PLACEMENT)
-                    || packetType.equals(PacketType.Play.Client.HELD_ITEM_CHANGE)) {
+            if (packetType.equals(PacketType.Play.Client.PLAYER_BLOCK_PLACEMENT)) {
                 int threshold = olderThan1_8 && inCreative ? 3 : 5;
 
                 if (count >= threshold) {
                     KickUtil.kickPlayer(player, event, "BadPackets (A) |"
                             + " packet=" + packetName
-                            + " count=" + count);
+                            + " count=" + count
+                            + " tps=" + SpigotReflectionUtil.getTPS());
+                }
+                return;
+            }
+
+            if (packetType.equals(PacketType.Play.Client.HELD_ITEM_CHANGE)) {
+                if (count >= 6) {
+                    KickUtil.kickPlayer(player, event, "BadPackets (A) |"
+                            + " packet=" + packetName
+                            + " count=" + count
+                            + " tps=" + SpigotReflectionUtil.getTPS());
                 }
                 return;
             }
 
             if (packetType.equals(PacketType.Play.Client.CLIENT_STATUS)
+                    || packetType.equals(PacketType.Play.Client.CLOSE_WINDOW)
                     || packetType.equals(PacketType.Play.Client.TAB_COMPLETE)) {
                 if (count >= 3) {
                     KickUtil.kickPlayer(player, event, "BadPackets (A) |"
                             + " packet=" + packetName
-                            + " count=" + count);
+                            + " count=" + count
+                            + " tps=" + SpigotReflectionUtil.getTPS());
                 }
                 return;
             }
@@ -86,7 +109,8 @@ public class BadPacketsA extends Check {
                 if (count >= 15) {
                     KickUtil.kickPlayer(player, event, "BadPackets (A) |"
                             + " packet=" + packetName
-                            + " count=" + count);
+                            + " count=" + count
+                            + " tps=" + SpigotReflectionUtil.getTPS());
                 }
                 return;
             }
@@ -97,16 +121,18 @@ public class BadPacketsA extends Check {
                 if (count >= threshold) {
                     KickUtil.kickPlayer(player, event, "BadPackets (A) |"
                             + " packet=" + packetName
-                            + " count=" + count);
+                            + " count=" + count
+                            + " tps=" + SpigotReflectionUtil.getTPS());
                 }
                 return;
             }
 
             if (packetType.equals(PacketType.Play.Client.ENTITY_ACTION)) {
-                if (count >= 5) {
+                if (count >= 7) {
                     KickUtil.kickPlayer(player, event, "BadPackets (A) |"
                             + " packet=" + packetName
-                            + " count=" + count);
+                            + " count=" + count
+                            + " tps=" + SpigotReflectionUtil.getTPS());
                 }
                 return;
             }
@@ -115,7 +141,8 @@ public class BadPacketsA extends Check {
                 if (count >= 6) {
                     KickUtil.kickPlayer(player, event, "BadPackets (A) |"
                             + " packet=" + packetName
-                            + " count=" + count);
+                            + " count=" + count
+                            + " tps=" + SpigotReflectionUtil.getTPS());
                 }
                 return;
             }
@@ -124,16 +151,18 @@ public class BadPacketsA extends Check {
                 if (count >= 10) {
                     KickUtil.kickPlayer(player, event, "BadPackets (A) |"
                             + " packet=" + packetName
-                            + " count=" + count);
+                            + " count=" + count
+                            + " tps=" + SpigotReflectionUtil.getTPS());
                 }
                 return;
             }
 
             if (packetType.equals(PacketType.Play.Client.ANIMATION)) {
-                if (count >= 9) {
+                if (count >= 10) {
                     KickUtil.kickPlayer(player, event, "BadPackets (A) |"
                             + " packet=" + packetName
-                            + " count=" + count);
+                            + " count=" + count
+                            + " tps=" + SpigotReflectionUtil.getTPS());
                 }
                 return;
             }
@@ -143,7 +172,8 @@ public class BadPacketsA extends Check {
                 if (count >= 50) {
                     KickUtil.kickPlayer(player, event, "BadPackets (A) |"
                             + " packet=" + packetName
-                            + " count=" + count);
+                            + " count=" + count
+                            + " tps=" + SpigotReflectionUtil.getTPS());
                 }
                 return;
             }
@@ -160,7 +190,8 @@ public class BadPacketsA extends Check {
                 if (count >= threshold) {
                     KickUtil.kickPlayer(player, event, "BadPackets (A) |"
                             + " packet=" + packetName
-                            + " count=" + count);
+                            + " count=" + count
+                            + " tps=" + SpigotReflectionUtil.getTPS());
                 }
                 return;
             }
@@ -174,7 +205,8 @@ public class BadPacketsA extends Check {
                 if (count >= 2) {
                     KickUtil.kickPlayer(player, event, "BadPackets (A) |"
                             + " packet=" + packetName
-                            + " count=" + count);
+                            + " count=" + count
+                            + " tps=" + SpigotReflectionUtil.getTPS());
                 }
             }
         }

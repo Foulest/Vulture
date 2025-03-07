@@ -30,12 +30,14 @@ vulture:
   # -----------------------------------------------
   blocked:
     payloads:
-      - GalactiCraft
-      - Tinkers Construct
-      - InventoryTweaks
       - Aqua Acrobatics
+      - GalactiCraft
+      - InventoryTweaks
+      - Tinkers Construct
     mods:
       - aquaacrobatics
+      - antighost
+      - MouseTweaks
     commands:
       - /calc
       - /eval

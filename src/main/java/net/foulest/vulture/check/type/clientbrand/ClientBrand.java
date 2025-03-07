@@ -33,6 +33,7 @@ import net.foulest.vulture.util.FileUtil;
 import net.foulest.vulture.util.KickUtil;
 import net.foulest.vulture.util.MessageUtil;
 import net.foulest.vulture.util.Settings;
+import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -115,7 +116,16 @@ public class ClientBrand extends Check {
             new PayloadType("GEN", "Unknown (GEN)", DataType.REGISTER_DATA_OTHER, false),
             new PayloadType("autoconfig", "Unknown (autoconfig)", DataType.REGISTER_DATA_OTHER, false),
 
+            new PayloadType("AppleCore", "AppleCore", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("craftingtweaks", "CraftingTweaks", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("Emoticons", "Emoticons", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("emoticons", "Emoticons", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("hud", "Better HUD", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("essential|diffct", "Essential Mod", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("BSM", "Better Sprinting", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("essential:", "Essential Mod", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("AE2", "AE2", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("Ascribe", "Ascribe", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("AS_BT", "ASMC", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("AS_IF", "ASMC", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("AS_MM", "ASMC", DataType.REGISTER_DATA_MOD, false),
@@ -186,6 +196,8 @@ public class ClientBrand extends Check {
             new PayloadType("MoCreatures", "Mo' Creatures", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("MorePlayerModels", "MorePlayerModels", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("Morph", "Morph", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("chunkpregenerator", "Chunk Pregenerator", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("carbonconfig", "Carbon Config", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("Mystcraft", "Mystcraft", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("NVLFF1710155810", "NVL's Force Fields", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("OBFUSCATE|HS", "Obfuscate", DataType.REGISTER_DATA_MOD, false),
@@ -487,6 +499,7 @@ public class ClientBrand extends Check {
             new PayloadType("fishingmadebetter", "Fishing Made Better", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("fluidlogged_api", "Fluidlogged API", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("fluxnetworks:main_ne", "Flux Networks", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("fluxnetworks", "Flux Networks", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("flywheel:network", "FlyWheel", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("forgeendertech", "Forge Endertech", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("forgemultipartcbe", "Forge", DataType.REGISTER_DATA_MOD, false),
@@ -665,10 +678,110 @@ public class ClientBrand extends Check {
             new PayloadType("rftoolsbase:rftoolsb", "RFTools", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("rftoolsdim:rftoolsdi", "RFTools", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("rftoolspower:rftools", "RFTools", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("rftoolspower", "RFTools", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("rftools", "RFTools", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("rlmixins", "RLMixins", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("rltweaker", "RLTweaker", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("rustic", "Rustic", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("sampler", "Sampler", DataType.REGISTER_DATA_MOD, false),
+
+            new PayloadType("sevtweaks", "SevTweaks", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("modularmachinery", "Modular Machinery", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("ironbackpacks", "Iron Backpacks", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("betterwithaddons", "Better With Addons", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("RID_CHAN", "Realistic Item Drops", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("jtp", "Unknown (jtp)", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("BNBClientToServer", "BNBGamingLib", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("BNBServerToClient", "BNBGamingLib", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("emberroot", "EmberRoot Zoo", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("4017", "CD4017BE_lib", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("4017s", "CD4017BE_lib", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("4017g", "CD4017BE_lib", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("primal", "PrimalCore", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("magma_monsters", "Magma Monsters", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("immcraft", "Immersive Craft", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("refinedstorageaddons", "Refined Storage Addons", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("car", "Ultimate Car Mod", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("nutrition", "Nutrition", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("progressiontweaks", "Progression Tweaks", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("scannable", "Scannable", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("overloaded", "Overloaded", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("genplayerskins", "Player Skin Mobs", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("quantumstorage", "QuantumStorage", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("rftoolsctrl", "RFTools Control", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("death_compass", "death_compass", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("environmentaltech", "Environmental Tech", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("primal_tech", "primal_tech", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("abyssalcraft", "AbyssalCraft", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("igwmod", "In-Game wiki Mod", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("actuallyadditions", "Actually Additions", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("tothebatpoles", "To The Bat Poles!", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("waterstrainer", "Water Strainer", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("improvedbackpacks", "Improved Backpacks", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("sevtweaks", "SevTweaks", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("jaff", "Just a Few Fish", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("betterwithmods", "Better With Mods", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("bdew.generators", "Advanced Generators", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("totemic", "Totemic", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("thebetweenlands", "The Betweenlands", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("rc&me.modmuss5&21645", "Reborn Core", DataType.REGISTER_DATA_MOD, false),
+
+            new PayloadType("slabmachines", "Slab Machines", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cyclopscore", "Cyclops Core", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("extendedcrafting", "Extended Crafting", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("chineseworkshop", "ChineseWorkshop", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("genmpbasic", "ModPack Basic Tools", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("apotheosis", "Apotheosis", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("sqpatch", "Squeezer Patch", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("mob_grinding_utils", "Mob Grinding Utils", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("commoncapabilities", "CommonCapabilities", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("gamestages", "Game Stages", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("integratedtunnels", "Integrated Tunnels", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("tp", "TelePastries", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("SKY_CHAN", "Unknown (SKY_CHAN)", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("genmputils", "ModPack Basic Tools", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("pipemaster", "Pipe Master 2000", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("realfilingcabinet", "Real Filing Cabinet", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("Sync", "Sync", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("compactmachines3", "Compact Machines 3", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("clickmachine", "Click Machine", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("bonsaitrees", "Bonsai Trees", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("cyclicmagic", "Cyclic", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("integrateddynamics", "Integrated Dynamics", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("pickletweaks", "Pickle Tweaks", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("integrateddynamicsco", "Integrated Dynamics Compat", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("findme", "FindMe", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("ironjetpacks", "Iron Jetpacks", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("darkutils", "Dark Utilities", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("malisiscore", "MalisisCore", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("BDSM_CHAN", "Barrels, Drums, Storage & More", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("deepmoblearning", "Deep Mob Learning", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("PrimitiveCrafting", "Primitive Crafting", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("simplegenerators", "Simple Generators", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("horsepower", "Horse Power", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("walljump", "Wall-Jump!", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("network", "Unknown (Network)", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("worldutils", "World Utils", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("practicallogistics2", "Practical Logistics 2", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("Astral Sorcery", "Astral Sorcery", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("buildinggadgets", "Building Gadgets", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("limitlessstructureblocks", "Limitless Structure Blocks", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("malisisdoors", "MalisisDoors", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("valkyrielib", "Valkyrie Lib", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("parabox", "Parabox", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("ceramics", "Ceramics", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("enderutilities", "Ender Utilities", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("TGS2014", "Tree Growing Simulator 2016", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("integratedtunnelscom", "Integrated Tunnels Compat", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("yoyos", "Yoyos", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("nuclearcraft", "NuclearCraft", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("storagenetwork", "Simple Storage Network", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("topography", "Topography", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("prestige", "Prestige", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("vc", "ViesCraft", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("compactstorage", "CompactStorage", DataType.REGISTER_DATA_MOD, false),
+            new PayloadType("mo_channel", "Unknown (mo_channel)", DataType.REGISTER_DATA_MOD, false),
+
             new PayloadType("scalinghealth", "Scaling Health", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("schematica", "Schematica", DataType.REGISTER_DATA_MOD, false),
             new PayloadType("secretroomsmod", "Secret Rooms 5", DataType.REGISTER_DATA_MOD, false),
@@ -771,6 +884,10 @@ public class ClientBrand extends Check {
     );
 
     private static final List<PayloadType> CHANNELS = Arrays.asList(
+            new PayloadType("ironjetpacks", "Iron Jetpacks", DataType.CHANNEL, false),
+            new PayloadType("Astral Sorcery", "Astral Sorcery", DataType.CHANNEL, false),
+            new PayloadType("BSM", "Better Sprinting", DataType.CHANNEL, false),
+            new PayloadType("essential|diffct", "Essential Mod", DataType.CHANNEL, false),
             new PayloadType("AE2", "AE2", DataType.CHANNEL, false),
             new PayloadType("AS_IF", "ASMC", DataType.CHANNEL, false),
             new PayloadType("AS_MM", "ASMC", DataType.CHANNEL, false),
@@ -880,6 +997,7 @@ public class ClientBrand extends Check {
             new PayloadType("bigreactors", "BigReactors", DataType.CHANNEL, false),
             new PayloadType("biomecolorizer:a", "BiomeColorizer", DataType.CHANNEL, false),
             new PayloadType("biomesoplenty", "Biomes O' Plenty", DataType.CHANNEL, false),
+            new PayloadType("chunkpregenerator", "Chunk Pregenerator", DataType.CHANNEL, false),
             new PayloadType("bloodmagic", "Blood Magic", DataType.CHANNEL, false),
             new PayloadType("botania", "Botania", DataType.CHANNEL, false),
             new PayloadType("buildcraftbuilders", "BuildCraft", DataType.CHANNEL, false),
@@ -999,6 +1117,7 @@ public class ClientBrand extends Check {
             new PayloadType("teamlapenlib:main", "TeamLapenLib", DataType.CHANNEL, false),
             new PayloadType("teslacorelib", "TeslaCoreLib", DataType.CHANNEL, false),
             new PayloadType("thaumcraft", "ThaumCraft", DataType.CHANNEL, false),
+            new PayloadType("carbonconfig", "Carbon Config", DataType.CHANNEL, false),
             new PayloadType("thaumicaugmentation", "ThaumCraft", DataType.CHANNEL, false),
             new PayloadType("thaumicenergistics", "ThaumCraft", DataType.CHANNEL, false),
             new PayloadType("thaumictinkerer", "ThaumCraft", DataType.CHANNEL, false),
@@ -1348,19 +1467,25 @@ public class ClientBrand extends Check {
 
                 // Adds the payload type to the player's list of sent payloads.
                 if (playerData.getPayloads().stream().noneMatch(type -> {
-                    String name1 = type.getName();
-                    String name2 = payloadType.getName();
-                    return name1.equals(name2);
+                    // Check if the name and payload type are the same.
+                    boolean nameMatches = type.name.equals(payloadType.name);
+                    boolean dataMatches = type.dataType == payloadType.dataType;
+                    return nameMatches && dataMatches;
                 })) {
                     playerData.getPayloads().add(payloadType);
+
+//                    // If the payload is a channel, disable mod functionality.
+//                    if (dataType == DataType.CHANNEL) {
+//                        disableModFunctionality(playerData, data);
+//                    }
                 }
                 return;
             }
         }
 
         // Payload was not found in the list; handle as unknown data.
-        MessageUtil.sendAlert("&f" + playerName + " &7sent unknown data to the server.",
-                "&8(Type: " + dataTypeName + ") (Data: " + data + ")");
+        MessageUtil.messagePlayer(Bukkit.getConsoleSender(), Settings.prefix + " &f" + playerName
+                        + " &7sent unknown data to the server. &8(Type: " + dataTypeName + ") (Data: " + data + ")");
 
         // Prints the unknown data to a randomly generated text file.
         // TODO: Remove this in production.
@@ -1370,4 +1495,31 @@ public class ClientBrand extends Check {
         // This is needed to prevent the server from crashing / errors in console.
         event.setCancelled(true);
     }
+
+//    /**
+//     * Disables the functionality of certain mods through registered channels.a
+//     *
+//     * @param playerData The player data to disable mod functionality for.
+//     */
+//    @Contract(pure = true)
+//    public static void disableModFunctionality(@NotNull PlayerData playerData,
+//                                               @NotNull String channelName) {
+//        Player player = playerData.getPlayer();
+//
+//        switch (channelName) {
+//            // Disable the Better Sprinting mod.
+//            case "BSM": {
+//                byte[] data = new byte[1];
+//                data[0] = 1; // Message type
+//
+//                WrapperPlayServerPluginMessage packet = new WrapperPlayServerPluginMessage(channelName, data);
+//                PacketEvents.getAPI().getPlayerManager().sendPacket(player, packet);
+//                MessageUtil.messagePlayer(player, "&cBetter Sprinting functionality has been disabled.");
+//                break;
+//            }
+//
+//            default:
+//                break;
+//        }
+//    }
 }

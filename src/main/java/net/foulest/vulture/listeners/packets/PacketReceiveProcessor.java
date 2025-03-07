@@ -823,12 +823,18 @@ public class PacketReceiveProcessor extends SimplePacketListenerAbstract {
 
             // Checks for packets with invalid conditions.
             if (inventoryOpen || digging || placingBlock) {
-                KickUtil.kickPlayer(player, event, Settings.chatMessageInvalidConditions,
-                        "Sent " + packetName + " with invalid conditions"
-                                + " (inventoryOpen=" + inventoryOpen
-                                + " digging=" + digging
-                                + " placingBlock=" + placingBlock + ")");
-                return;
+
+                // Ignores WorldEdit CUI.
+                if (!message.equals("/we cui") && !message.equals("/worldedit cui")) {
+                    KickUtil.kickPlayer(player, event, Settings.chatMessageInvalidConditions,
+                            "Sent " + packetName + " with invalid conditions"
+                                    + " (inventoryOpen=" + inventoryOpen
+                                    + " digging=" + digging
+                                    + " placingBlock=" + placingBlock
+                                    + " message=" + message + ")"
+                    );
+                    return;
+                }
             }
 
             // Checks for packets with empty messages.
@@ -1562,7 +1568,7 @@ public class PacketReceiveProcessor extends SimplePacketListenerAbstract {
             );
 
             // Checks for packets with invalid locale lengths.
-            if (localeLength < 3 || localeLength > 8) {
+            if (localeLength < 2 || localeLength > 8) {
                 KickUtil.kickPlayer(player, event, Settings.settingsInvalidLocale,
                         "Sent " + packetName + " with invalid locale"
                                 + " (locale=" + locale + ")"
