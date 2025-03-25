@@ -59,7 +59,7 @@ repositories {
 dependencies {
     // Spigot 1.8.8 API - necessary for project
     // https://hub.spigotmc.org/nexus/content/repositories/snapshots
-    compileOnly group: 'org.spigotmc', name: 'spigot-api', version: '1.8.8-R0.1-SNAPSHOT'
+    compileOnly group: 'org.spigotmc', name: 'spigot-api', version: '1.21.5-R0.1-SNAPSHOT'
 
     // Netty - for networking
     // https://mvnrepository.com/artifact/io.netty/netty-all
