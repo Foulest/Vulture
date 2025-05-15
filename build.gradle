@@ -67,7 +67,7 @@ dependencies {
 
     // PacketEvents - for packet manipulation
     // https://packetevents.com
-    compileOnly group: 'com.github.retrooper', name: 'packetevents-spigot', version: '2.7.0'
+    compileOnly group: 'com.github.retrooper', name: 'packetevents-spigot', version: '2.8.0'
 
     // JetBrains Annotations - for code inspection and documentation
     // https://mvnrepository.com/artifact/org.jetbrains/annotations
