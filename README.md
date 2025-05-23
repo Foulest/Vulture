@@ -3,9 +3,9 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![CodeQL](https://github.com/Foulest/Vulture/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/Foulest/Vulture/actions/workflows/github-code-scanning/codeql)
 
-**Vulture** is a server protection plugin designed for Minecraft 1.8.9 servers.
+> **Note:** Support for this project has been officially dropped as of May 23, 2025.
 
-> **Note:** This project is still in development and is not yet ready for production use.
+**Vulture** is a server protection plugin designed for Minecraft 1.8.9 servers.
 
 ## Features
 
